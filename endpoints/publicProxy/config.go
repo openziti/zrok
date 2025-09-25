@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	zhttp "github.com/zitadel/oidc/v2/pkg/http"
 )
 
@@ -70,7 +70,7 @@ func (c *Config) Load(path string) error {
 
 func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 	if cfg.Oauth == nil {
-		logrus.Info("no oauth configuration; skipping oauth handler startup")
+		dl.Info("no oauth configuration; skipping oauth handler startup")
 		return nil
 	}
 

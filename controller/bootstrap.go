@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/michaelquigley/df/dl"
 	restModelEdge "github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/controller/automation"
@@ -13,7 +14,6 @@ import (
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 func Bootstrap(skipFrontend bool, inCfg *config.Config) error {
@@ -25,7 +25,7 @@ func Bootstrap(skipFrontend bool, inCfg *config.Config) error {
 		return errors.Wrap(err, "error opening store")
 	}
 
-	logrus.Info("connecting to the ziti edge management api")
+	dl.Info("connecting to the ziti edge management api")
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		return errors.Wrap(err, "error connecting to the ziti edge management api")
@@ -38,10 +38,10 @@ func Bootstrap(skipFrontend bool, inCfg *config.Config) error {
 
 	var frontendZId string
 	if !skipFrontend {
-		logrus.Info("creating identity for public frontend access")
+		dl.Info("creating identity for public frontend access")
 
 		if frontendZId, err = getIdentityId(env.PublicIdentityName()); err == nil {
-			logrus.Infof("frontend identity: %v", frontendZId)
+			dl.Infof("frontend identity: %v", frontendZId)
 		} else {
 			frontendZId, err = bootstrapIdentity(env.PublicIdentityName(), ziti)
 			if err != nil {
@@ -62,12 +62,12 @@ func Bootstrap(skipFrontend bool, inCfg *config.Config) error {
 		defer func() { _ = trx.Rollback() }()
 		publicFe, err := str.FindFrontendWithZId(frontendZId, trx)
 		if err != nil {
-			logrus.Warnf("missing public frontend for ziti id '%v'; please use 'zrok admin create frontend %v public https://{token}.your.dns.name' to create a frontend instance", frontendZId, frontendZId)
+			dl.Warnf("missing public frontend for ziti id '%v'; please use 'zrok admin create frontend %v public https://{token}.your.dns.name' to create a frontend instance", frontendZId, frontendZId)
 		} else {
 			if publicFe.PublicName != nil && publicFe.UrlTemplate != nil {
-				logrus.Infof("found public frontend entry '%v' (%v) for ziti identity '%v'", *publicFe.PublicName, publicFe.Token, frontendZId)
+				dl.Infof("found public frontend entry '%v' (%v) for ziti identity '%v'", *publicFe.PublicName, publicFe.Token, frontendZId)
 			} else {
-				logrus.Warnf("found frontend entry for ziti identity '%v'; missing either public name or url template", frontendZId)
+				dl.Warnf("found frontend entry for ziti identity '%v'; missing either public name or url template", frontendZId)
 			}
 		}
 	}
@@ -119,7 +119,7 @@ func assertIdentity(zId string, auto *automation.ZitiAutomation) error {
 	if err != nil {
 		return errors.Wrapf(err, "error asserting identity '%v'", zId)
 	}
-	logrus.Infof("asserted identity '%v'", zId)
+	dl.Infof("asserted identity '%v'", zId)
 	return nil
 }
 
@@ -170,7 +170,7 @@ func assertErpForIdentity(name, zId string, auto *automation.ZitiAutomation) err
 	}
 
 	if len(erps) != 1 {
-		logrus.Infof("creating erp for '%v' (%v)", name, zId)
+		dl.Infof("creating erp for '%v' (%v)", name, zId)
 
 		erpOpts := &automation.EdgeRouterPolicyOptions{
 			BaseOptions: automation.BaseOptions{
@@ -187,6 +187,6 @@ func assertErpForIdentity(name, zId string, auto *automation.ZitiAutomation) err
 			return errors.Wrapf(err, "error creating erp for '%v' (%v)", name, zId)
 		}
 	}
-	logrus.Infof("asserted erps for '%v' (%v)", name, zId)
+	dl.Infof("asserted erps for '%v' (%v)", name, zId)
 	return nil
 }

@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/agent"
-	"github.com/sirupsen/logrus"
 )
 
 type agentRemoteStatusHandler struct{}
@@ -20,33 +20,33 @@ func newAgentRemoteStatusHandler() *agentRemoteStatusHandler {
 func (h *agentRemoteStatusHandler) Handle(params agent.RemoteStatusParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction for '%v': %v", principal.Email, err)
+		dl.Errorf("error starting transaction for '%v': %v", principal.Email, err)
 		return agent.NewRemoteStatusInternalServerError()
 	}
 	defer trx.Rollback()
 
 	env, err := str.FindEnvironmentForAccount(params.Body.EnvZID, int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("error finding environment '%v' for '%v' (%v)", params.Body.EnvZID, principal.Email, err)
+		dl.Errorf("error finding environment '%v' for '%v' (%v)", params.Body.EnvZID, principal.Email, err)
 		return agent.NewRemoteStatusUnauthorized()
 	}
 
 	ae, err := str.FindAgentEnrollmentForEnvironment(env.Id, trx)
 	if err != nil {
-		logrus.Errorf("error finding agent enrollment for environment '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
+		dl.Errorf("error finding agent enrollment for environment '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewRemoteStatusBadGateway()
 	}
 
 	agentClient, agentConn, err := agentCtrl.NewClient(ae.Token)
 	if err != nil {
-		logrus.Errorf("error creating agent client for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
+		dl.Errorf("error creating agent client for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewRemoteStatusInternalServerError()
 	}
 	defer agentConn.Close()
 
 	resp, err := agentClient.Status(context.Background(), &agentGrpc.StatusRequest{})
 	if err != nil {
-		logrus.Errorf("error retrieving remote agent status for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
+		dl.Errorf("error retrieving remote agent status for '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewRemoteStatusBadGateway()
 	}
 

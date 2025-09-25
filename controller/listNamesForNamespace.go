@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
-	"github.com/sirupsen/logrus"
 )
 
 type listNamesForNamespaceHandler struct{}
@@ -16,7 +16,7 @@ func newListNamesForNamespaceHandler() *listNamesForNamespaceHandler {
 func (h *listNamesForNamespaceHandler) Handle(params share.ListNamesForNamespaceParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return share.NewListNamesForNamespaceInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
@@ -24,7 +24,7 @@ func (h *listNamesForNamespaceHandler) Handle(params share.ListNamesForNamespace
 	// find namespace
 	ns, err := str.FindNamespaceWithToken(params.NamespaceToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding namespace with token '%v': %v", params.NamespaceToken, err)
+		dl.Errorf("error finding namespace with token '%v': %v", params.NamespaceToken, err)
 		return share.NewListNamesForNamespaceNotFound()
 	}
 
@@ -32,11 +32,11 @@ func (h *listNamesForNamespaceHandler) Handle(params share.ListNamesForNamespace
 		// check namespace grant
 		granted, err := str.CheckNamespaceGrant(ns.Id, int(principal.ID), trx)
 		if err != nil {
-			logrus.Errorf("error checking namespace grant for account '%v' and namespace '%v': %v", principal.Email, ns.Token, err)
+			dl.Errorf("error checking namespace grant for account '%v' and namespace '%v': %v", principal.Email, ns.Token, err)
 			return share.NewListNamesForNamespaceInternalServerError()
 		}
 		if !granted {
-			logrus.Errorf("account '%v' is not granted access to namespace '%v'", principal.Email, ns.Token)
+			dl.Errorf("account '%v' is not granted access to namespace '%v'", principal.Email, ns.Token)
 			return share.NewListNamesForNamespaceUnauthorized()
 		}
 	}
@@ -44,7 +44,7 @@ func (h *listNamesForNamespaceHandler) Handle(params share.ListNamesForNamespace
 	// find allocated names for namespace
 	names, err := str.FindNamesWithShareTokensForAccountAndNamespace(int(principal.ID), ns.Id, trx)
 	if err != nil {
-		logrus.Errorf("error finding names for namespace '%v': %v", ns.Token, err)
+		dl.Errorf("error finding names for namespace '%v': %v", ns.Token, err)
 		return share.NewListNamesForNamespaceInternalServerError()
 	}
 
@@ -64,6 +64,6 @@ func (h *listNamesForNamespaceHandler) Handle(params share.ListNamesForNamespace
 		out = append(out, nameObj)
 	}
 
-	logrus.Debugf("listed %d names for namespace '%v' for account '%v'", len(out), ns.Token, principal.Email)
+	dl.Debugf("listed %d names for namespace '%v' for account '%v'", len(out), ns.Token, principal.Email)
 	return share.NewListNamesForNamespaceOK().WithPayload(out)
 }

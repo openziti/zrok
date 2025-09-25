@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -36,7 +36,7 @@ func (cmd *adminMigrate) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Info(dd.MustInspect(inCfg))
+	dl.Info(dd.MustInspect(inCfg))
 
 	// disable auto-migration, we'll control it manually
 	inCfg.Store.DisableAutoMigration = true
@@ -51,13 +51,13 @@ func (cmd *adminMigrate) run(_ *cobra.Command, args []string) {
 		if err := str.MigrateDown(inCfg.Store, cmd.steps); err != nil {
 			panic(err)
 		}
-		logrus.Infof("migrated down %d steps", cmd.steps)
+		dl.Infof("migrated down %d steps", cmd.steps)
 	} else {
 		// default behavior - migrate up
 		inCfg.Store.DisableAutoMigration = false
 		if _, err := store.Open(inCfg.Store); err != nil {
 			panic(err)
 		}
-		logrus.Info("migration complete")
+		dl.Info("migration complete")
 	}
 }

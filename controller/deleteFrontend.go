@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
-	"github.com/sirupsen/logrus"
 )
 
 type deleteFrontendHandler struct{}
@@ -17,30 +17,30 @@ func (h *deleteFrontendHandler) Handle(params admin.DeleteFrontendParams, princi
 	feToken := params.Body.FrontendToken
 
 	if !principal.Admin {
-		logrus.Errorf("invalid admin principal")
+		dl.Errorf("invalid admin principal")
 		return admin.NewDeleteFrontendUnauthorized()
 	}
 
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return admin.NewDeleteFrontendInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 
 	fe, err := str.FindFrontendWithToken(feToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding frontend with token '%v': %v", feToken, err)
+		dl.Errorf("error finding frontend with token '%v': %v", feToken, err)
 		return admin.NewDeleteFrontendNotFound()
 	}
 
 	if err := str.DeleteFrontend(fe.Id, trx); err != nil {
-		logrus.Errorf("error deleting frontend '%v': %v", feToken, err)
+		dl.Errorf("error deleting frontend '%v': %v", feToken, err)
 		return admin.NewDeleteFrontendInternalServerError()
 	}
 
 	if err := trx.Commit(); err != nil {
-		logrus.Errorf("error committing frontend '%v' deletion: %v", feToken, err)
+		dl.Errorf("error committing frontend '%v' deletion: %v", feToken, err)
 		return admin.NewDeleteFrontendInternalServerError()
 	}
 

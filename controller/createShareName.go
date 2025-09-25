@@ -11,7 +11,6 @@ import (
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type createShareNameHandler struct{}
@@ -23,7 +22,7 @@ func newCreateShareNameHandler() *createShareNameHandler {
 func (h *createShareNameHandler) Handle(params share.CreateShareNameParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return share.NewCreateShareNameInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
@@ -31,7 +30,7 @@ func (h *createShareNameHandler) Handle(params share.CreateShareNameParams, prin
 	// find namespace
 	ns, err := str.FindNamespaceWithToken(params.Body.NamespaceToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding namespace with token '%v': %v", params.Body.NamespaceToken, err)
+		dl.Errorf("error finding namespace with token '%v': %v", params.Body.NamespaceToken, err)
 		return share.NewCreateShareNameNotFound()
 	}
 
@@ -39,29 +38,29 @@ func (h *createShareNameHandler) Handle(params share.CreateShareNameParams, prin
 	if !ns.Open {
 		granted, err := str.CheckNamespaceGrant(ns.Id, int(principal.ID), trx)
 		if err != nil {
-			logrus.Errorf("error checking namespace grant for account '%v' and namespace '%v': %v", principal.Email, ns.Token, err)
+			dl.Errorf("error checking namespace grant for account '%v' and namespace '%v': %v", principal.Email, ns.Token, err)
 			return share.NewCreateShareNameInternalServerError()
 		}
 		if !granted {
-			logrus.Errorf("account '%v' is not granted access to namespace '%v'", principal.Email, ns.Token)
+			dl.Errorf("account '%v' is not granted access to namespace '%v'", principal.Email, ns.Token)
 			return share.NewCreateShareNameUnauthorized()
 		}
 	}
 
 	// check limits
 	if err := h.checkLimits(principal, trx); err != nil {
-		logrus.Errorf("limits error: %v", err)
+		dl.Errorf("limits error: %v", err)
 		return share.NewCreateShareNameConflict().WithPayload("names limit reached; cannot reserve additional names")
 	}
 
 	// check name availability
 	available, err := str.CheckNameAvailability(ns.Id, params.Body.Name, trx)
 	if err != nil {
-		logrus.Errorf("error checking name availability for '%v' in namespace '%v': %v", params.Body.Name, ns.Token, err)
+		dl.Errorf("error checking name availability for '%v' in namespace '%v': %v", params.Body.Name, ns.Token, err)
 		return share.NewCreateShareNameInternalServerError()
 	}
 	if !available {
-		logrus.Errorf("name '%v' already exists in namespace '%v'", params.Body.Name, ns.Token)
+		dl.Errorf("name '%v' already exists in namespace '%v'", params.Body.Name, ns.Token)
 		return share.NewCreateShareNameConflict()
 	}
 
@@ -80,16 +79,16 @@ func (h *createShareNameHandler) Handle(params share.CreateShareNameParams, prin
 	}
 	_, err = str.CreateName(an, trx)
 	if err != nil {
-		logrus.Errorf("error creating allocated name '%v' in namespace '%v' for account '%v': %v", params.Body.Name, ns.Token, principal.Email, err)
+		dl.Errorf("error creating allocated name '%v' in namespace '%v' for account '%v': %v", params.Body.Name, ns.Token, principal.Email, err)
 		return share.NewCreateShareNameInternalServerError()
 	}
 
 	if err := trx.Commit(); err != nil {
-		logrus.Errorf("error committing transaction: %v", err)
+		dl.Errorf("error committing transaction: %v", err)
 		return share.NewCreateShareNameInternalServerError()
 	}
 
-	logrus.Infof("created allocated name '%v' in namespace '%v' for account '%v'", params.Body.Name, ns.Token, principal.Email)
+	dl.Infof("created allocated name '%v' in namespace '%v' for account '%v'", params.Body.Name, ns.Token, principal.Email)
 	return share.NewCreateShareNameCreated()
 }
 

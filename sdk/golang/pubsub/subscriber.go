@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type subscriber struct {
@@ -78,7 +78,7 @@ func (s *subscriber) connect(ctx context.Context) error {
 		})
 		if err != nil {
 			if s.shouldReconnect() {
-				logrus.Warnf("failed to connect to pubsub service '%s', retrying in %v: %v",
+				dl.Warnf("failed to connect to pubsub service '%s', retrying in %v: %v",
 					s.cfg.ServiceName, s.cfg.ReconnectDelay, err)
 				s.reconnectCount++
 
@@ -100,7 +100,7 @@ func (s *subscriber) connect(ctx context.Context) error {
 		s.reconnectCount = 0
 		s.mutex.Unlock()
 
-		logrus.Infof("connected to pubsub service '%s'", s.cfg.ServiceName)
+		dl.Infof("connected to pubsub service '%s'", s.cfg.ServiceName)
 
 		// start message reading loop
 		go s.readMessages(ctx)
@@ -122,7 +122,7 @@ func (s *subscriber) connect(ctx context.Context) error {
 			return errors.New("max reconnection attempts reached")
 		}
 
-		logrus.Warnf("connection lost, attempting to reconnect in %v", s.cfg.ReconnectDelay)
+		dl.Warnf("connection lost, attempting to reconnect in %v", s.cfg.ReconnectDelay)
 		select {
 		case <-time.After(s.cfg.ReconnectDelay):
 			continue
@@ -159,7 +159,7 @@ func (s *subscriber) waitForDisconnection() {
 			// send keep-alive ping
 			conn.SetWriteDeadline(time.Now().Add(5 * time.Second))
 			if _, err := conn.Write([]byte("\n")); err != nil {
-				logrus.Debugf("connection lost during ping: %v", err)
+				dl.Debugf("connection lost during ping: %v", err)
 				return
 			}
 		}
@@ -192,7 +192,7 @@ func (s *subscriber) readMessages(ctx context.Context) {
 
 		msg, err := UnmarshalMessage([]byte(line))
 		if err != nil {
-			logrus.Errorf("failed to unmarshal message: %v", err)
+			dl.Errorf("failed to unmarshal message: %v", err)
 			continue
 		}
 
@@ -205,7 +205,7 @@ func (s *subscriber) readMessages(ctx context.Context) {
 			if handler != nil {
 				go func(m *Message) {
 					if err := handler(m); err != nil {
-						logrus.Errorf("message handler error: %v", err)
+						dl.Errorf("message handler error: %v", err)
 					}
 				}(msg)
 			}
@@ -213,7 +213,7 @@ func (s *subscriber) readMessages(ctx context.Context) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		logrus.Debugf("scanner error: %v", err)
+		dl.Debugf("scanner error: %v", err)
 	}
 }
 

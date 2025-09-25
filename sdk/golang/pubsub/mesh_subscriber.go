@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 // meshSubscriber extends the basic subscriber for mesh-aware operations
@@ -50,16 +50,16 @@ func (ms *meshSubscriber) wrapMessageHandler(originalHandler MessageHandler) Mes
 	return func(msg *Message) error {
 		// check for duplicate messages in mesh
 		if ms.messageCache.isDuplicate(msg.Id) {
-			logrus.Debugf("ignoring duplicate message: %s", msg.Id)
+			dl.Debugf("ignoring duplicate message: %s", msg.Id)
 			return nil
 		}
 
 		// add mesh-specific logging
 		if msg.OriginNode != "" && msg.OriginNode != ms.nodeID {
-			logrus.Debugf("processing message from mesh peer '%s': %s (topic: %s, hops: %d)", 
+			dl.Debugf("processing message from mesh peer '%s': %s (topic: %s, hops: %d)",
 				msg.OriginNode, msg.Id, msg.Topic, msg.HopCount)
 		} else {
-			logrus.Debugf("processing local message: %s (topic: %s)", msg.Id, msg.Topic)
+			dl.Debugf("processing local message: %s (topic: %s)", msg.Id, msg.Topic)
 		}
 
 		// call original handler

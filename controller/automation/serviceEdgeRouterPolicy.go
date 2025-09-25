@@ -1,10 +1,10 @@
 package automation
 
 import (
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_management_api_client/service_edge_router_policy"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type ServiceEdgeRouterPolicyManager struct {
@@ -44,7 +44,7 @@ func (serpm *ServiceEdgeRouterPolicyManager) Create(opts *ServiceEdgeRouterPolic
 		return "", errors.Wrapf(err, "error creating service edge router policy '%s'", opts.Name)
 	}
 
-	logrus.Infof("created service edge router policy '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
+	dl.Infof("created service edge router policy '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
 	return resp.Payload.Data.ID, nil
 }
 
@@ -60,7 +60,7 @@ func (serpm *ServiceEdgeRouterPolicyManager) Delete(id string) error {
 		return errors.Wrapf(err, "error deleting service edge router policy '%s'", id)
 	}
 
-	logrus.Infof("deleted service edge router policy '%s'", id)
+	dl.Infof("deleted service edge router policy '%s'", id)
 	return nil
 }
 

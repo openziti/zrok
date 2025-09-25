@@ -3,13 +3,13 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type unshareHandler struct{}
@@ -21,7 +21,7 @@ func newUnshareHandler() *unshareHandler {
 func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction for '%v': %v", principal.Email, err)
+		dl.Errorf("error starting transaction for '%v': %v", principal.Email, err)
 		return share.NewUnshareInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
@@ -32,52 +32,52 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 	// validate environment
 	env, err := h.validateEnvironment(envZId, principal, trx)
 	if err != nil {
-		logrus.Errorf("environment validation failed for '%v': %v", principal.Email, err)
+		dl.Errorf("environment validation failed for '%v': %v", principal.Email, err)
 		return share.NewUnshareNotFound()
 	}
 
 	// find and validate share
 	shr, err := h.findAndValidateShare(shrToken, env, trx)
 	if err != nil {
-		logrus.Errorf("share validation failed for '%v': %v", principal.Email, err)
+		dl.Errorf("share validation failed for '%v': %v", principal.Email, err)
 		return share.NewUnshareNotFound()
 	}
 
 	// deallocate ziti resources using automation framework
 	if err := h.deallocateResources(shrToken); err != nil {
-		logrus.Warnf("error deallocating ziti resources for share '%v': %v", shrToken, err)
+		dl.Warnf("error deallocating ziti resources for share '%v': %v", shrToken, err)
 	}
 
 	// send unbind mapping updates before cleaning up share name mappings
 	if err := h.processDynamicMappings(shr.Id, trx); err != nil {
-		logrus.Errorf("error sending unbind mapping updates for '%v': %v", shrToken, err)
+		dl.Errorf("error sending unbind mapping updates for '%v': %v", shrToken, err)
 	}
 
 	// clean up share name mappings
 	if err := h.cleanupShareNameMappings(shr.Id, trx); err != nil {
-		logrus.Errorf("error cleaning up share name mappings for '%v': %v", shrToken, err)
+		dl.Errorf("error cleaning up share name mappings for '%v': %v", shrToken, err)
 		return share.NewUnshareInternalServerError()
 	}
 
 	// clean up access grants
 	if err := str.DeleteAccessGrantsForShare(shr.Id, trx); err != nil {
-		logrus.Errorf("error deleting access grants for share '%v': %v", shrToken, err)
+		dl.Errorf("error deleting access grants for share '%v': %v", shrToken, err)
 		return share.NewUnshareInternalServerError()
 	}
 
 	// delete the share record
 	if err := str.DeleteShare(shr.Id, trx); err != nil {
-		logrus.Errorf("error deleting share '%v': %v", shrToken, err)
+		dl.Errorf("error deleting share '%v': %v", shrToken, err)
 		return share.NewUnshareInternalServerError()
 	}
 
 	// commit transaction
 	if err := trx.Commit(); err != nil {
-		logrus.Errorf("error committing transaction for '%v': %v", shrToken, err)
+		dl.Errorf("error committing transaction for '%v': %v", shrToken, err)
 		return share.NewUnshareInternalServerError()
 	}
 
-	logrus.Infof("successfully unshared '%v' for '%v'", shrToken, principal.Email)
+	dl.Infof("successfully unshared '%v' for '%v'", shrToken, principal.Email)
 	return share.NewUnshareOK()
 }
 
@@ -117,7 +117,7 @@ func (h *unshareHandler) deallocateResources(shrToken string) error {
 		return errors.Wrapf(err, "error cleaning up ziti resources for share '%v'", shrToken)
 	}
 
-	logrus.Infof("deallocated ziti resources for share '%v'", shrToken)
+	dl.Infof("deallocated ziti resources for share '%v'", shrToken)
 	return nil
 }
 
@@ -132,22 +132,22 @@ func (h *unshareHandler) cleanupShareNameMappings(shareId int, trx *sqlx.Tx) err
 	for _, mapping := range mappings {
 		name, err := str.GetName(mapping.NameId, trx)
 		if err != nil {
-			logrus.Warnf("error getting name '%v' for cleanup: %v", mapping.NameId, err)
+			dl.Warnf("error getting name '%v' for cleanup: %v", mapping.NameId, err)
 			continue
 		}
 
 		// only delete names that are not reserved (dynamically allocated by share12)
 		if !name.Reserved {
 			if err := str.DeleteName(name.Id, trx); err != nil {
-				logrus.Warnf("error deleting name '%v': %v", name.Name, err)
+				dl.Warnf("error deleting name '%v': %v", name.Name, err)
 			} else {
-				logrus.Debugf("deleted dynamically allocated name '%v'", name.Name)
+				dl.Debugf("deleted dynamically allocated name '%v'", name.Name)
 			}
 		}
 
 		// delete the share name mapping
 		if err := str.DeleteShareNameMapping(mapping.Id, trx); err != nil {
-			logrus.Warnf("error deleting share name mapping '%v': %v", mapping.Id, err)
+			dl.Warnf("error deleting share name mapping '%v': %v", mapping.Id, err)
 		}
 	}
 
@@ -170,21 +170,21 @@ func (h *unshareHandler) processDynamicMappings(shareId int, trx *sqlx.Tx) error
 		// find name record to get the name and namespace
 		name, err := str.GetName(mapping.NameId, trx)
 		if err != nil {
-			logrus.Warnf("error finding name with id '%v' for unbind update: %v", mapping.NameId, err)
+			dl.Warnf("error finding name with id '%v' for unbind update: %v", mapping.NameId, err)
 			continue
 		}
 
 		// find namespace
 		ns, err := str.GetNamespace(name.NamespaceId, trx)
 		if err != nil {
-			logrus.Warnf("error finding namespace with id '%v' for unbind update: %v", name.NamespaceId, err)
+			dl.Warnf("error finding namespace with id '%v' for unbind update: %v", name.NamespaceId, err)
 			continue
 		}
 
 		// find dynamic frontends for this namespace
 		frontends, err := str.FindDynamicFrontendsForNamespace(ns.Id, trx)
 		if err != nil {
-			logrus.Warnf("error finding dynamic frontends for namespace '%v': %v", ns.Token, err)
+			dl.Warnf("error finding dynamic frontends for namespace '%v': %v", ns.Token, err)
 			continue
 		}
 
@@ -193,10 +193,10 @@ func (h *unshareHandler) processDynamicMappings(shareId int, trx *sqlx.Tx) error
 			frontendName := util.ExpandUrlTemplate(name.Name, ns.Name)
 
 			if err := dPCtrl.UnbindFrontendMapping(frontend.Token, frontendName, trx); err != nil {
-				logrus.Errorf("error unbinding frontend mapping from frontend '%v': %v", frontend.Token, err)
+				dl.Errorf("error unbinding frontend mapping from frontend '%v': %v", frontend.Token, err)
 				// continue with other frontends rather than failing completely
 			} else {
-				logrus.Debugf("unbound frontend mapping '%v' from dynamic frontend '%v'", frontendName, frontend.Token)
+				dl.Debugf("unbound frontend mapping '%v' from dynamic frontend '%v'", frontendName, frontend.Token)
 			}
 		}
 	}

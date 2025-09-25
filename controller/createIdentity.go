@@ -6,11 +6,11 @@ import (
 	"fmt"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	rest_model_edge "github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
-	"github.com/sirupsen/logrus"
 )
 
 type createIdentityHandler struct{}
@@ -23,13 +23,13 @@ func (h *createIdentityHandler) Handle(params admin.CreateIdentityParams, princi
 	name := params.Body.Name
 
 	if !principal.Admin {
-		logrus.Errorf("invalid admin principal")
+		dl.Errorf("invalid admin principal")
 		return admin.NewCreateIdentityUnauthorized()
 	}
 
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
-		logrus.Errorf("error getting automation client: %v", err)
+		dl.Errorf("error getting automation client: %v", err)
 		return admin.NewCreateIdentityInternalServerError()
 	}
 
@@ -44,14 +44,14 @@ func (h *createIdentityHandler) Handle(params admin.CreateIdentityParams, princi
 	}
 	zId, err := ziti.Identities.Create(identityOpts)
 	if err != nil {
-		logrus.Errorf("error creating identity: %v", err)
+		dl.Errorf("error creating identity: %v", err)
 		return admin.NewCreateIdentityInternalServerError()
 	}
 
 	// enroll identity
 	idCfg, err := ziti.Identities.Enroll(zId)
 	if err != nil {
-		logrus.Errorf("error enrolling identity: %v", err)
+		dl.Errorf("error enrolling identity: %v", err)
 		return admin.NewCreateIdentityInternalServerError()
 	}
 
@@ -66,7 +66,7 @@ func (h *createIdentityHandler) Handle(params admin.CreateIdentityParams, princi
 		Semantic:        rest_model_edge.SemanticAllOf,
 	}
 	if _, err := ziti.EdgeRouterPolicies.Create(erpOpts); err != nil {
-		logrus.Errorf("error creating edge router policy for identity: %v", err)
+		dl.Errorf("error creating edge router policy for identity: %v", err)
 		return admin.NewCreateIdentityInternalServerError()
 	}
 
@@ -75,7 +75,7 @@ func (h *createIdentityHandler) Handle(params admin.CreateIdentityParams, princi
 	enc.SetEscapeHTML(false)
 	err = enc.Encode(&idCfg)
 	if err != nil {
-		logrus.Errorf("error encoding identity config: %v", err)
+		dl.Errorf("error encoding identity config: %v", err)
 		return admin.NewCreateIdentityInternalServerError()
 	}
 

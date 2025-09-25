@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -49,7 +49,7 @@ func (cmd *adminListNamespaceFrontendCommand) run(_ *cobra.Command, args []strin
 	frontendsReq := admin.NewListFrontendsParams()
 	frontendsResp, err := zrok.Admin.ListFrontends(frontendsReq, mustGetAdminAuth())
 	if err != nil {
-		logrus.Errorf("error listing frontends: %v", err)
+		dl.Errorf("error listing frontends: %v", err)
 		os.Exit(1)
 	}
 
@@ -65,7 +65,7 @@ func (cmd *adminListNamespaceFrontendCommand) run(_ *cobra.Command, args []strin
 
 	resp, err := zrok.Admin.ListNamespaceFrontendMappings(req, mustGetAdminAuth())
 	if err != nil {
-		logrus.Errorf("error listing namespace-frontend mappings: %v", err)
+		dl.Errorf("error listing namespace-frontend mappings: %v", err)
 		os.Exit(1)
 	}
 

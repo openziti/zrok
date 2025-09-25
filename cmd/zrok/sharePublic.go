@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -13,6 +14,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gobwas/glob"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/agentClient"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
@@ -89,6 +91,9 @@ func newSharePublicCommand() *sharePublicCommand {
 func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	if cmd.subordinate {
 		logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
+		dlOpts := dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo)
+		dlOpts.UseJSON = true
+		dl.Init(dlOpts)
 	}
 
 	root, err := environment.LoadRoot()
@@ -194,7 +199,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running http proxy backend: %v", err)
+				dl.Errorf("error running http proxy backend: %v", err)
 			}
 		}()
 
@@ -213,7 +218,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running http web backend: %v", err)
+				dl.Errorf("error running http web backend: %v", err)
 			}
 		}()
 
@@ -232,7 +237,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running caddy backend: %v", err)
+				dl.Errorf("error running caddy backend: %v", err)
 			}
 		}()
 
@@ -252,7 +257,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running drive backend: %v", err)
+				dl.Errorf("error running drive backend: %v", err)
 			}
 		}()
 
@@ -273,11 +278,11 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 	}
 
 	if cmd.headless && !cmd.subordinate {
-		logrus.Infof("access your zrok share at the following endpoints:\n %v", strings.Join(shr.FrontendEndpoints, "\n"))
+		dl.Infof("access your zrok share at the following endpoints:\n %v", strings.Join(shr.FrontendEndpoints, "\n"))
 		for {
 			select {
 			case req := <-requests:
-				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
+				dl.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
 			}
 		}
 
@@ -300,6 +305,10 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 
 	} else {
 		logrus.SetOutput(mdl)
+		dlOpts := dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo)
+		dlOpts.CustomHandler = dl.NewPrettyHandler(slog.LevelInfo, dl.DefaultOptions().SetOutput(mdl))
+		dl.Init(dlOpts)
+
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
 		mdl.prg = prg
 
@@ -332,11 +341,11 @@ func (cmd *sharePublicCommand) error(msg string, err error) {
 }
 
 func (cmd *sharePublicCommand) shutdown(root env_core.Root, shr *sdk.Share) {
-	logrus.Debugf("shutting down '%v'", shr.Token)
+	dl.Debugf("shutting down '%v'", shr.Token)
 	if err := sdk.DeleteShare(root, shr); err != nil {
-		logrus.Errorf("error shutting down '%v': %v", shr.Token, err)
+		dl.Errorf("error shutting down '%v': %v", shr.Token, err)
 	}
-	logrus.Debugf("shutdown complete")
+	dl.Debugf("shutdown complete")
 }
 
 func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {

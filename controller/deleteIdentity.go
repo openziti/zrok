@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
-	"github.com/sirupsen/logrus"
 )
 
 type deleteIdentityHandler struct{}
@@ -20,26 +20,26 @@ func (h *deleteIdentityHandler) Handle(params admin.DeleteIdentityParams, princi
 	identityZId := params.Body.ZID
 
 	if !principal.Admin {
-		logrus.Errorf("invalid admin principal")
+		dl.Errorf("invalid admin principal")
 		return admin.NewDeleteIdentityUnauthorized()
 	}
 
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
-		logrus.Errorf("error getting automation client: %v", err)
+		dl.Errorf("error getting automation client: %v", err)
 		return admin.NewDeleteIdentityInternalServerError()
 	}
 
 	// delete edge router policy for the identity
 	erpFilter := fmt.Sprintf("name=\"%v\"", identityZId)
 	if err := ziti.EdgeRouterPolicies.DeleteWithFilter(erpFilter); err != nil {
-		logrus.Errorf("error deleting edge router policy: %v", err)
+		dl.Errorf("error deleting edge router policy: %v", err)
 		return admin.NewDeleteIdentityInternalServerError()
 	}
 
 	// delete the identity
 	if err := ziti.Identities.Delete(identityZId); err != nil {
-		logrus.Errorf("error deleting identity '%v': %v", identityZId, err)
+		dl.Errorf("error deleting identity '%v': %v", identityZId, err)
 		return admin.NewDeleteIdentityInternalServerError()
 	}
 

@@ -18,9 +18,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	trimPrefix := "github.com/openziti/"
+const trimPrefix = "github.com/openziti/"
 
+func init() {
 	// dd/dl Logging
 	dl.Init(dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo))
 	dl.ConfigureChannel("mappings", dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo))
@@ -60,6 +60,7 @@ var rootCmd = &cobra.Command{
 	Short: "zrok",
 	PersistentPreRun: func(_ *cobra.Command, _ []string) {
 		if verbose {
+			dl.Init(dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo))
 			logrus.SetLevel(logrus.DebugLevel)
 		}
 	},

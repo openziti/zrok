@@ -8,12 +8,12 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
 	restEnvironment "github.com/openziti/zrok/rest_client_zrok/environment"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -84,7 +84,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 			}
 		}()
 	} else {
-		logrus.Infof("contacting the zrok service...")
+		dl.Infof("contacting the zrok service...")
 	}
 
 	resp, err := zrok.Environment.Enable(req, auth)
@@ -95,7 +95,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 			prg.Send(fmt.Sprintf("the zrok service returned an error: %v\n", err))
 			prg.Quit()
 		} else {
-			logrus.Errorf("the zrok service returned an error: %v", err)
+			dl.Errorf("the zrok service returned an error: %v", err)
 		}
 		select {
 		case <-done:
@@ -113,7 +113,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 			prg.Send(fmt.Sprintf("there was an error saving the new environment: %v", err))
 			prg.Quit()
 		} else {
-			logrus.Errorf("there was an error saving the new environment: %v", err)
+			dl.Errorf("there was an error saving the new environment: %v", err)
 		}
 		select {
 		case <-done:
@@ -126,7 +126,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 			prg.Send(fmt.Sprintf("there was an error writing the environment: %v", err))
 			prg.Quit()
 		} else {
-			logrus.Errorf("there was an error writing the environment: %v", err)
+			dl.Errorf("there was an error writing the environment: %v", err)
 		}
 		select {
 		case <-done:
@@ -139,7 +139,7 @@ func (cmd *enableCommand) run(_ *cobra.Command, args []string) {
 		prg.Send(fmt.Sprintf("the zrok environment was successfully enabled..."))
 		prg.Quit()
 	} else {
-		logrus.Infof("the zrok environment was successfully enabled...")
+		dl.Infof("the zrok environment was successfully enabled...")
 	}
 	select {
 	case <-done:

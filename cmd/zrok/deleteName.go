@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/share"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -51,5 +51,5 @@ func (cmd *deleteNameCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Infof("deleted name '%v' from namespace", args[0])
+	dl.Infof("deleted name '%v' from namespace", args[0])
 }

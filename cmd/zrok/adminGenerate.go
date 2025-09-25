@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/jaevor/go-nanoid"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -36,19 +37,19 @@ func (cmd *adminGenerateCommand) run(_ *cobra.Command, args []string) {
 	for i := 0; i < int(cmd.amount); i++ {
 		tokens[i], err = createToken()
 		if err != nil {
-			logrus.Error("error creating token", err)
+			dl.Errorf("error creating token: %v", err)
 		}
 	}
 
 	env, err := environment.LoadRoot()
 	if err != nil {
-		logrus.Error("error loading environment", err)
+		dl.Errorf("error loading environment: %v", err)
 	}
 
 	zrok, err := env.Client()
 	if err != nil {
 		if !panicInstead {
-			logrus.Error("error creating zrok api client", err)
+			dl.Errorf("error creating zrok api client: %v", err)
 		}
 		panic(err)
 	}
@@ -58,7 +59,7 @@ func (cmd *adminGenerateCommand) run(_ *cobra.Command, args []string) {
 	_, err = zrok.Admin.InviteTokenGenerate(req, mustGetAdminAuth())
 	if err != nil {
 		if !panicInstead {
-			logrus.Error("error creating invite tokens", err)
+			dl.Errorf("error creating invite tokens: %v", err)
 		}
 		panic(err)
 	}

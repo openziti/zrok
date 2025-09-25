@@ -7,13 +7,13 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
 	rest_model_edge "github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/environment"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type enableHandler struct{}
@@ -25,25 +25,25 @@ func newEnableHandler() *enableHandler {
 func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
+		dl.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 
 	if err := h.checkLimits(principal, trx); err != nil {
-		logrus.Errorf("limits error for user '%v': %v", principal.Email, err)
+		dl.Errorf("limits error for user '%v': %v", principal.Email, err)
 		return environment.NewEnableUnauthorized()
 	}
 
 	uniqueToken, err := createShareToken()
 	if err != nil {
-		logrus.Errorf("error creating unique identity token for user '%v': %v", principal.Email, err)
+		dl.Errorf("error creating unique identity token for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
-		logrus.Errorf("error getting automation client for user '%v': %v", principal.Email, err)
+		dl.Errorf("error getting automation client for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 
@@ -60,14 +60,14 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 	}
 	envZId, err := ziti.Identities.Create(identityOpts)
 	if err != nil {
-		logrus.Errorf("error creating environment identity for user '%v': %v", principal.Email, err)
+		dl.Errorf("error creating environment identity for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 
 	// enroll identity
 	zitiCfg, err := ziti.Identities.Enroll(envZId)
 	if err != nil {
-		logrus.Errorf("error enrolling environment identity for user '%v': %v", principal.Email, err)
+		dl.Errorf("error enrolling environment identity for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 
@@ -82,7 +82,7 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		Semantic:        rest_model_edge.SemanticAllOf,
 	}
 	if _, err := ziti.EdgeRouterPolicies.Create(erpOpts); err != nil {
-		logrus.Errorf("error creating edge router policy for user '%v': %v", principal.Email, err)
+		dl.Errorf("error creating edge router policy for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
 
@@ -93,16 +93,16 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		ZId:         envZId,
 	}, trx)
 	if err != nil {
-		logrus.Errorf("error storing created identity for user '%v': %v", principal.Email, err)
+		dl.Errorf("error storing created identity for user '%v': %v", principal.Email, err)
 		_ = trx.Rollback()
 		return environment.NewEnableInternalServerError()
 	}
 
 	if err := trx.Commit(); err != nil {
-		logrus.Errorf("error committing for user '%v': %v", principal.Email, err)
+		dl.Errorf("error committing for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
-	logrus.Infof("created environment for '%v', with ziti identity '%v', and database id '%v'", principal.Email, envZId, envId)
+	dl.Infof("created environment for '%v', with ziti identity '%v', and database id '%v'", principal.Email, envZId, envId)
 
 	resp := environment.NewEnableCreated().WithPayload(&environment.EnableCreatedBody{Identity: envZId})
 

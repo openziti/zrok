@@ -8,10 +8,10 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
-	"github.com/sirupsen/logrus"
 )
 
 type getAccountMetricsHandler struct {
@@ -35,7 +35,7 @@ func (h *getAccountMetricsHandler) Handle(params metadata.GetAccountMetricsParam
 	if params.Duration != nil {
 		v, err := time.ParseDuration(*params.Duration)
 		if err != nil {
-			logrus.Errorf("bad duration '%v' for '%v': %v", *params.Duration, principal.Email, err)
+			dl.Errorf("bad duration '%v' for '%v': %v", *params.Duration, principal.Email, err)
 			return metadata.NewGetAccountMetricsBadRequest()
 		}
 		duration = v
@@ -53,7 +53,7 @@ func (h *getAccountMetricsHandler) Handle(params metadata.GetAccountMetricsParam
 
 	rx, tx, timestamps, err := runFluxForRxTxArray(query, h.queryApi)
 	if err != nil {
-		logrus.Errorf("error running account metrics query for '%v': %v", principal.Email, err)
+		dl.Errorf("error running account metrics query for '%v': %v", principal.Email, err)
 		return metadata.NewGetAccountMetricsInternalServerError()
 	}
 
@@ -91,13 +91,13 @@ func newGetEnvironmentMetricsHandler(cfg *metrics.InfluxConfig) *getEnvironmentM
 func (h *getEnvironmentMetricsHandler) Handle(params metadata.GetEnvironmentMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return metadata.NewGetEnvironmentMetricsInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 	env, err := str.FindEnvironmentForAccount(params.EnvID, int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("error finding environment '%s' for '%s': %v", params.EnvID, principal.Email, err)
+		dl.Errorf("error finding environment '%s' for '%s': %v", params.EnvID, principal.Email, err)
 		return metadata.NewGetEnvironmentMetricsUnauthorized()
 	}
 
@@ -105,7 +105,7 @@ func (h *getEnvironmentMetricsHandler) Handle(params metadata.GetEnvironmentMetr
 	if params.Duration != nil {
 		v, err := time.ParseDuration(*params.Duration)
 		if err != nil {
-			logrus.Errorf("bad duration '%v' for '%v': %v", *params.Duration, principal.Email, err)
+			dl.Errorf("bad duration '%v' for '%v': %v", *params.Duration, principal.Email, err)
 			return metadata.NewGetAccountMetricsBadRequest()
 		}
 		duration = v
@@ -123,7 +123,7 @@ func (h *getEnvironmentMetricsHandler) Handle(params metadata.GetEnvironmentMetr
 
 	rx, tx, timestamps, err := runFluxForRxTxArray(query, h.queryApi)
 	if err != nil {
-		logrus.Errorf("error running account metrics query for '%v': %v", principal.Email, err)
+		dl.Errorf("error running account metrics query for '%v': %v", principal.Email, err)
 		return metadata.NewGetAccountMetricsInternalServerError()
 	}
 
@@ -162,22 +162,22 @@ func newGetShareMetricsHandler(cfg *metrics.InfluxConfig) *getShareMetricsHandle
 func (h *getShareMetricsHandler) Handle(params metadata.GetShareMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return metadata.NewGetEnvironmentMetricsInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 	shr, err := str.FindShareWithToken(params.ShareToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding share '%v' for '%v': %v", params.ShareToken, principal.Email, err)
+		dl.Errorf("error finding share '%v' for '%v': %v", params.ShareToken, principal.Email, err)
 		return metadata.NewGetShareMetricsUnauthorized()
 	}
 	env, err := str.GetEnvironment(shr.EnvironmentId, trx)
 	if err != nil {
-		logrus.Errorf("error finding environment '%d' for '%v': %v", shr.EnvironmentId, principal.Email, err)
+		dl.Errorf("error finding environment '%d' for '%v': %v", shr.EnvironmentId, principal.Email, err)
 		return metadata.NewGetShareMetricsUnauthorized()
 	}
 	if env.AccountId != nil && int64(*env.AccountId) != principal.ID {
-		logrus.Errorf("user '%v' does not own share '%v'", principal.Email, params.ShareToken)
+		dl.Errorf("user '%v' does not own share '%v'", principal.Email, params.ShareToken)
 		return metadata.NewGetShareMetricsUnauthorized()
 	}
 
@@ -185,7 +185,7 @@ func (h *getShareMetricsHandler) Handle(params metadata.GetShareMetricsParams, p
 	if params.Duration != nil {
 		v, err := time.ParseDuration(*params.Duration)
 		if err != nil {
-			logrus.Errorf("bad duration '%v' for '%v': %v", *params.Duration, principal.Email, err)
+			dl.Errorf("bad duration '%v' for '%v': %v", *params.Duration, principal.Email, err)
 			return metadata.NewGetAccountMetricsBadRequest()
 		}
 		duration = v
@@ -202,7 +202,7 @@ func (h *getShareMetricsHandler) Handle(params metadata.GetShareMetricsParams, p
 
 	rx, tx, timestamps, err := runFluxForRxTxArray(query, h.queryApi)
 	if err != nil {
-		logrus.Errorf("error running account metrics query for '%v': %v", principal.Email, err)
+		dl.Errorf("error running account metrics query for '%v': %v", principal.Email, err)
 		return metadata.NewGetAccountMetricsInternalServerError()
 	}
 

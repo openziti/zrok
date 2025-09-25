@@ -5,10 +5,10 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/endpoints/dynamicProxy"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/tui"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -49,7 +49,7 @@ func (cmd *accessDynamicProxyCommand) run(_ *cobra.Command, args []string) {
 		cmd.error(err)
 	}
 
-	logrus.Infof("starting dynamicProxy service with config '%v'", cmd.configPath)
+	dl.Infof("starting dynamicProxy service with config '%v'", cmd.configPath)
 
 	go func() {
 		if err := service.Start(); err != nil {
@@ -61,10 +61,10 @@ func (cmd *accessDynamicProxyCommand) run(_ *cobra.Command, args []string) {
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGQUIT)
 	<-c
 
-	logrus.Infof("shutting down dynamicProxy service")
+	dl.Infof("shutting down dynamicProxy service")
 
 	if err := service.Stop(); err != nil {
-		logrus.Errorf("error shutting down: %v", err)
+		dl.Errorf("error shutting down: %v", err)
 	}
 }
 

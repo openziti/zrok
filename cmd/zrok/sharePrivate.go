@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net"
 	"os"
 	"os/signal"
@@ -12,6 +13,7 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/agentClient"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
@@ -77,6 +79,9 @@ func newSharePrivateCommand() *sharePrivateCommand {
 func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	if cmd.subordinate {
 		logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
+		dlOpts := dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo)
+		dlOpts.UseJSON = true
+		dl.Init(dlOpts)
 	}
 
 	root, err := environment.LoadRoot()
@@ -124,6 +129,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 	if cmd.open {
 		req.PermissionMode = sdk.OpenPermissionMode
 	}
+
 	shr, err := sdk.CreateShare(root, req)
 	if err != nil {
 		cmd.error("unable to create share", err)
@@ -163,7 +169,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running http proxy backend: %v", err)
+				dl.Errorf("error running http proxy backend: %v", err)
 			}
 		}()
 
@@ -182,7 +188,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running http web backend: %v", err)
+				dl.Errorf("error running http web backend: %v", err)
 			}
 		}()
 
@@ -202,7 +208,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running tcpTunnel backend: %v", err)
+				dl.Errorf("error running tcpTunnel backend: %v", err)
 			}
 		}()
 
@@ -222,7 +228,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running udpTunnel backend: %v", err)
+				dl.Errorf("error running udpTunnel backend: %v", err)
 			}
 		}()
 
@@ -241,7 +247,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running caddy backend: %v", err)
+				dl.Errorf("error running caddy backend: %v", err)
 			}
 		}()
 
@@ -261,7 +267,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running drive backend: %v", err)
+				dl.Errorf("error running drive backend: %v", err)
 			}
 		}()
 
@@ -280,7 +286,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running socks backend: %v", err)
+				dl.Errorf("error running socks backend: %v", err)
 			}
 		}()
 
@@ -300,7 +306,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running VPN backend: %v", err)
+				dl.Errorf("error running VPN backend: %v", err)
 			}
 		}()
 
@@ -321,11 +327,11 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 	}
 
 	if cmd.headless && !cmd.subordinate {
-		logrus.Infof("allow other to access your share with the following command:\nzrok access private %v", shr.Token)
+		dl.Infof("allow other to access your share with the following command:\nzrok access private %v", shr.Token)
 		for {
 			select {
 			case req := <-requests:
-				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
+				dl.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
 			}
 		}
 
@@ -348,6 +354,10 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 
 	} else {
 		logrus.SetOutput(mdl)
+		dlOpts := dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo)
+		dlOpts.CustomHandler = dl.NewPrettyHandler(slog.LevelInfo, dl.DefaultOptions().SetOutput(mdl))
+		dl.Init(dlOpts)
+
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
 		mdl.prg = prg
 
@@ -380,11 +390,11 @@ func (cmd *sharePrivateCommand) error(msg string, err error) {
 }
 
 func (cmd *sharePrivateCommand) shutdown(root env_core.Root, shr *sdk.Share) {
-	logrus.Debugf("shutting down '%v'", shr.Token)
+	dl.Debugf("shutting down '%v'", shr.Token)
 	if err := sdk.DeleteShare(root, shr); err != nil {
-		logrus.Errorf("error shutting down '%v': %v", shr.Token, err)
+		dl.Errorf("error shutting down '%v': %v", shr.Token, err)
 	}
-	logrus.Debugf("shutdown complete")
+	dl.Debugf("shutdown complete")
 }
 
 func (cmd *sharePrivateCommand) shareAgent(args []string, root env_core.Root) {

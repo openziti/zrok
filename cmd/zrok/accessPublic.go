@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/endpoints/publicProxy"
 	"github.com/openziti/zrok/tui"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -42,7 +42,7 @@ func (cmd *accessPublicCommand) run(_ *cobra.Command, args []string) {
 			panic(err)
 		}
 	}
-	logrus.Info(dd.MustInspect(cfg))
+	dl.Info(dd.MustInspect(cfg))
 	frontend, err := publicProxy.NewHTTP(cfg)
 	if err != nil {
 		if !panicInstead {

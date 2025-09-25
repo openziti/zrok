@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
-	"github.com/sirupsen/logrus"
 )
 
 type accountDetailHandler struct{}
@@ -16,13 +16,13 @@ func newAccountDetailHandler() *accountDetailHandler {
 func (h *accountDetailHandler) Handle(params metadata.GetAccountDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction for '%v': %v", principal.Email, err)
+		dl.Errorf("error starting transaction for '%v': %v", principal.Email, err)
 		return metadata.NewGetAccountDetailInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("error retrieving environments for '%v': %v", principal.Email, err)
+		dl.Errorf("error retrieving environments for '%v': %v", principal.Email, err)
 		return metadata.NewGetAccountDetailInternalServerError()
 	}
 	sparkRx := make(map[int][]int64)
@@ -30,10 +30,10 @@ func (h *accountDetailHandler) Handle(params metadata.GetAccountDetailParams, pr
 	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
 		sparkRx, sparkTx, err = sparkDataForEnvironments(envs)
 		if err != nil {
-			logrus.Errorf("error querying spark data for environments for '%v': %v", principal.Email, err)
+			dl.Errorf("error querying spark data for environments for '%v': %v", principal.Email, err)
 		}
 	} else {
-		logrus.Debug("skipping spark data for environments; no influx configuration")
+		dl.Debug("skipping spark data for environments; no influx configuration")
 	}
 	var payload []*rest_model_zrok.Environment
 	for _, env := range envs {

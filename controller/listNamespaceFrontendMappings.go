@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
-	"github.com/sirupsen/logrus"
 )
 
 type listNamespaceFrontendMappingsHandler struct{}
@@ -15,13 +15,13 @@ func newListNamespaceFrontendMappingsHandler() *listNamespaceFrontendMappingsHan
 
 func (handler *listNamespaceFrontendMappingsHandler) Handle(params admin.ListNamespaceFrontendMappingsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	if !principal.Admin {
-		logrus.Errorf("invalid admin principal")
+		dl.Errorf("invalid admin principal")
 		return admin.NewListNamespaceFrontendMappingsUnauthorized()
 	}
 
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return admin.NewListNamespaceFrontendMappingsInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
@@ -30,13 +30,13 @@ func (handler *listNamespaceFrontendMappingsHandler) Handle(params admin.ListNam
 
 	ns, err := str.FindNamespaceWithToken(nsToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding namespace by token '%s': %v", nsToken, err)
+		dl.Errorf("error finding namespace by token '%s': %v", nsToken, err)
 		return admin.NewListNamespaceFrontendMappingsNotFound()
 	}
 
 	nfMappings, err := str.FindNamespaceFrontendMappingsForNamespace(ns.Id, trx)
 	if err != nil {
-		logrus.Errorf("error finding namespace frontend mappings for namespace '%s': %v", nsToken, err)
+		dl.Errorf("error finding namespace frontend mappings for namespace '%s': %v", nsToken, err)
 		return admin.NewListNamespaceFrontendMappingsInternalServerError()
 	}
 
@@ -44,7 +44,7 @@ func (handler *listNamespaceFrontendMappingsHandler) Handle(params admin.ListNam
 	for _, nfMapping := range nfMappings {
 		fe, err := str.GetFrontend(nfMapping.FrontendId, trx)
 		if err != nil {
-			logrus.Errorf("error finding frontend with id '%d': %v", nfMapping.FrontendId, err)
+			dl.Errorf("error finding frontend with id '%d': %v", nfMapping.FrontendId, err)
 			continue
 		}
 		mapping := &admin.ListNamespaceFrontendMappingsOKBodyItems0{
@@ -56,6 +56,6 @@ func (handler *listNamespaceFrontendMappingsHandler) Handle(params admin.ListNam
 		mappings = append(mappings, mapping)
 	}
 
-	logrus.Infof("listed '%d' frontend mappings for namespace '%s'", len(mappings), nsToken)
+	dl.Infof("listed '%d' frontend mappings for namespace '%s'", len(mappings), nsToken)
 	return admin.NewListNamespaceFrontendMappingsOK().WithPayload(mappings)
 }

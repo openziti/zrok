@@ -2,15 +2,16 @@ package main
 
 import (
 	"context"
-	"github.com/openziti/zrok/canary"
-	"github.com/openziti/zrok/environment"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	"math/rand"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/canary"
+	"github.com/openziti/zrok/environment"
+	"github.com/spf13/cobra"
 )
 
 func init() {
@@ -80,7 +81,7 @@ func newTestCanaryPublicProxy() *testCanaryPublicProxy {
 
 func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 	if err := canary.AcknowledgeDangerousCanary(); err != nil {
-		logrus.Fatal(err)
+		dl.Fatal(err)
 	}
 
 	root, err := environment.LoadRoot()
@@ -89,7 +90,7 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 	}
 
 	if !root.IsEnabled() {
-		logrus.Fatal("unable to load environment; did you 'zrok enable'?")
+		dl.Fatal("unable to load environment; did you 'zrok enable'?")
 	}
 
 	var sns *canary.SnapshotStreamer

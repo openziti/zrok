@@ -1,10 +1,10 @@
 package automation
 
 import (
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_management_api_client/service_policy"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type ServicePolicyManager struct {
@@ -47,7 +47,7 @@ func (spm *ServicePolicyManager) Create(opts *ServicePolicyOptions) (string, err
 		return "", errors.Wrapf(err, "error creating service policy '%s'", opts.Name)
 	}
 
-	logrus.Infof("created service policy '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
+	dl.Infof("created service policy '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
 	return resp.Payload.Data.ID, nil
 }
 
@@ -63,7 +63,7 @@ func (spm *ServicePolicyManager) Delete(id string) error {
 		return errors.Wrapf(err, "error deleting service policy '%s'", id)
 	}
 
-	logrus.Infof("deleted service policy '%s'", id)
+	dl.Infof("deleted service policy '%s'", id)
 	return nil
 }
 

@@ -3,17 +3,18 @@ package proxy
 import (
 	_ "embed"
 	"fmt"
+	"os"
+	"strings"
+	"text/template"
+
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
 	"github.com/caddyserver/caddy/v2/caddyconfig/httpcaddyfile"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp/fileserver"
 	_ "github.com/greenpau/caddy-security"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/sirupsen/logrus"
-	"os"
-	"strings"
-	"text/template"
 )
 
 //go:embed browse.html
@@ -45,7 +46,7 @@ func NewCaddyfileBackend(cfg *CaddyfileBackendConfig) (*CaddyfileBackend, error)
 		return nil, err
 	}
 	for _, warning := range warnings {
-		logrus.Warnf("%v [%d] (%v): %v", cfg.CaddyfilePath, warning.Line, warning.Directive, warning.Message)
+		dl.Warnf("%v [%d] (%v): %v", cfg.CaddyfilePath, warning.Line, warning.Directive, warning.Message)
 	}
 	return &CaddyfileBackend{cfg: caddyCfg}, nil
 }

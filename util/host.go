@@ -2,10 +2,11 @@ package util
 
 import (
 	"fmt"
-	"github.com/shirou/gopsutil/v3/host"
-	"github.com/sirupsen/logrus"
 	"os"
 	"os/user"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/shirou/gopsutil/v3/host"
 )
 
 // GetHostDetails returns the hostname, detailed host information, and username.
@@ -16,7 +17,7 @@ func GetHostDetails() (hostname string, hostDetail string, username string, err 
 		return "", "", "", err
 	}
 	hostname = info.Hostname
-	
+
 	userObj, err := user.Current()
 	if err == nil && userObj.Username != "" {
 		username = userObj.Username
@@ -25,14 +26,14 @@ func GetHostDetails() (hostname string, hostDetail string, username string, err 
 		if username == "" {
 			euid := os.Geteuid()
 			username = fmt.Sprintf("user-%d", euid)
-			logrus.Warnf("unable to determine the current user, using effective UID: %v", euid)
+			dl.Warnf("unable to determine the current user, using effective UID: %v", euid)
 		}
 	}
 
 	hostDetail = fmt.Sprintf("%v; %v; %v; %v; %v; %v; %v",
 		info.Hostname, info.OS, info.Platform, info.PlatformFamily,
 		info.PlatformVersion, info.KernelVersion, info.KernelArch)
-	
+
 	return hostname, hostDetail, username, nil
 }
 
@@ -40,12 +41,12 @@ func GetHostDetails() (hostname string, hostDetail string, username string, err 
 // It also returns a formatted description string if the input description is the default "<user>@<hostname>".
 func FormatHostDetailsWithUser(username, hostname, hostDetail, description string) (formattedHostDetail, formattedDescription string) {
 	formattedHostDetail = fmt.Sprintf("%v; %v", username, hostDetail)
-	
+
 	if description == "<user>@<hostname>" {
 		formattedDescription = fmt.Sprintf("%v@%v", username, hostname)
 	} else {
 		formattedDescription = description
 	}
-	
+
 	return formattedHostDetail, formattedDescription
-} 
+}

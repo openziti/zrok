@@ -12,9 +12,9 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	zhttp "github.com/zitadel/oidc/v3/pkg/http"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -79,7 +79,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 			targetHost, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
 			if err != nil {
 				err := fmt.Errorf("unable to unescape targetHost: %v", err)
-				logrus.Error(err)
+				dl.Error(err)
 				proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(err))
 				return
 			}
@@ -100,7 +100,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 				})
 				s, err := t.SignedString(signingKey)
 				if err != nil {
-					logrus.Errorf("unable to sign intermediate JWT: %v", err)
+					dl.Errorf("unable to sign intermediate JWT: %v", err)
 				}
 				return s
 			}, provider, rp.WithURLParam("access_type", "offline"), rp.URLParamOpt(rp.WithPrompt("login")))(w, r)
@@ -114,7 +114,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 		})
 		if err != nil {
 			errOut := errors.Wrap(err, "error parsing intermediate token")
-			logrus.Error(errOut)
+			dl.Error(errOut)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errOut))
 			return
 		}
@@ -124,7 +124,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 			refreshInterval = v
 		} else {
 			errOut := errors.Wrapf(err, "unable to parse authorization check interval '%v'", token.Claims.(*IntermediateJWT).RefreshInterval)
-			logrus.Error(errOut)
+			dl.Error(errOut)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errOut))
 			return
 		}
@@ -132,7 +132,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 		parsedUrl, err := url.Parse("https://api.github.com/user/emails")
 		if err != nil {
 			errOut := errors.Wrap(err, "error parsing github url")
-			logrus.Error(errOut)
+			dl.Error(errOut)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errOut))
 			return
 		}
@@ -145,7 +145,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			errOut := errors.Wrap(err, "error getting user info from github")
-			logrus.Error(errOut)
+			dl.Error(errOut)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errOut))
 			return
 		}
@@ -155,7 +155,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 		response, err := io.ReadAll(resp.Body)
 		if err != nil {
 			errOut := errors.Wrap(err, "error reading response body from github")
-			logrus.Error(errOut)
+			dl.Error(errOut)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errOut))
 			return
 		}
@@ -163,7 +163,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 		err = json.Unmarshal(response, &rDat)
 		if err != nil {
 			errOut := errors.Wrap(err, "error unmarshalling response from github")
-			logrus.Error(errOut)
+			dl.Error(errOut)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errOut))
 			return
 		}
@@ -207,7 +207,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 							fmt.Sprintf("https://api.github.com/applications/%s/token", c.ClientId),
 							strings.NewReader(fmt.Sprintf(`{"access_token":"%s"}`, accessToken)))
 						if err != nil {
-							logrus.Errorf("error creating access token delete request for '%v': %v", claims.Email, err)
+							dl.Errorf("error creating access token delete request for '%v': %v", claims.Email, err)
 							proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("error creating access token delete request")))
 							return
 						}
@@ -217,36 +217,36 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 
 						resp, err := http.DefaultClient.Do(req)
 						if err != nil {
-							logrus.Errorf("error invoking access token delete request for '%v': %v", claims.Email, err)
+							dl.Errorf("error invoking access token delete request for '%v': %v", claims.Email, err)
 							proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("error executing access token delete request")))
 							return
 						}
 						defer resp.Body.Close()
 
 						if resp.StatusCode == http.StatusNoContent {
-							logrus.Infof("revoked github access token for '%v'", claims.Email)
+							dl.Infof("revoked github access token for '%v'", claims.Email)
 						} else {
-							logrus.Errorf("access token revocation failed with status: %v", resp.StatusCode)
+							dl.Errorf("access token revocation failed with status: %v", resp.StatusCode)
 							proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("access token revocation failed")))
 							return
 						}
 					} else {
-						logrus.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
+						dl.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
 						proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to decrypt access token")))
 						return
 					}
 				} else {
-					logrus.Errorf("expected provider name '%v' got '%v'", c.Name, claims.Provider)
+					dl.Errorf("expected provider name '%v' got '%v'", c.Name, claims.Provider)
 					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("provider name mismatch")))
 					return
 				}
 			} else {
-				logrus.Errorf("invalid jwt; unable to parse: %v", err)
+				dl.Errorf("invalid jwt; unable to parse: %v", err)
 				proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid jwt; unable to parse")))
 				return
 			}
 		} else {
-			logrus.Errorf("error getting cookie '%v': %v", cfg.CookieName, err)
+			dl.Errorf("error getting cookie '%v': %v", cfg.CookieName, err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid cookie")))
 			return
 		}
@@ -268,7 +268,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 	}
 	http.HandleFunc(fmt.Sprintf("/%v/logout", c.Name), logout)
 
-	logrus.Infof("configured github provider at '/%v", c.Name)
+	dl.Infof("configured github provider at '/%v", c.Name)
 
 	return nil
 }

@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type limitAction struct {
@@ -45,9 +45,9 @@ func (a *limitAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 				if err := ziti.ServicePolicies.DeleteWithFilter(filter); err != nil {
 					return errors.Wrapf(err, "error deleting dial service policy for '%v'", shr.Token)
 				}
-				logrus.Infof("removed dial service policy for share '%v' of environment '%v'", shr.Token, env.ZId)
+				dl.Infof("removed dial service policy for share '%v' of environment '%v'", shr.Token, env.ZId)
 			} else {
-				logrus.Debugf("ignoring share '%v' for '%v' with backend mode '%v'", shr.Token, acct.Email, shr.BackendMode)
+				dl.Debugf("ignoring share '%v' for '%v' with backend mode '%v'", shr.Token, acct.Email, shr.BackendMode)
 			}
 		}
 	}

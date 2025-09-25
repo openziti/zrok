@@ -4,9 +4,9 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/sirupsen/logrus"
 )
 
 const AmqpSourceType = "amqpSource"
@@ -60,15 +60,15 @@ func (s *amqpSource) Stop() {
 }
 
 func (s *amqpSource) run() {
-	logrus.Info("started")
-	defer logrus.Info("stopped")
+	dl.Info("started")
+	defer dl.Info("stopped")
 	defer close(s.join)
 
 mainLoop:
 	for {
-		logrus.Infof("connecting to '%v'", s.cfg.Url)
+		dl.Infof("connecting to '%v'", s.cfg.Url)
 		if err := s.connect(); err != nil {
-			logrus.Errorf("error connecting to '%v': %v", s.cfg.Url, err)
+			dl.Errorf("error connecting to '%v': %v", s.cfg.Url, err)
 			select {
 			case <-time.After(10 * time.Second):
 				continue mainLoop
@@ -76,14 +76,14 @@ mainLoop:
 				break mainLoop
 			}
 		}
-		logrus.Infof("connected to '%v'", s.cfg.Url)
+		dl.Infof("connected to '%v'", s.cfg.Url)
 
 	msgLoop:
 		for {
 			select {
 			case err, ok := <-s.errs:
 				if err != nil || !ok {
-					logrus.Error(err)
+					dl.Error(err)
 					break msgLoop
 				}
 
@@ -92,7 +92,7 @@ mainLoop:
 
 			case event, ok := <-s.msgs:
 				if !ok {
-					logrus.Debug("selecting on msg !ok")
+					dl.Debug("selecting on msg !ok")
 					break msgLoop
 				}
 				if event.Body != nil {
@@ -101,7 +101,7 @@ mainLoop:
 						msg:  event,
 					}
 				} else {
-					logrus.Debug("event body was nil!")
+					dl.Debug("event body was nil!")
 					break msgLoop
 				}
 			}

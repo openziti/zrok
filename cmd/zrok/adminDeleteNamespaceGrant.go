@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -48,9 +48,9 @@ func (cmd *adminDeleteNamespaceGrantCommand) run(_ *cobra.Command, args []string
 	req.Body.Email = accountEmail
 
 	if _, err := zrok.Admin.RemoveNamespaceGrant(req, mustGetAdminAuth()); err != nil {
-		logrus.Errorf("error removing namespace grant: %v", err)
+		dl.Errorf("error removing namespace grant: %v", err)
 		os.Exit(1)
 	}
 
-	logrus.Infof("removed namespace ('%v') grant for '%v'", namespaceToken, accountEmail)
+	dl.Infof("removed namespace ('%v') grant for '%v'", namespaceToken, accountEmail)
 }

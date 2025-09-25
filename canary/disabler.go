@@ -1,11 +1,12 @@
 package canary
 
 import (
-	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/sirupsen/logrus"
 	"math/rand"
 	"time"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/environment/env_core"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 )
 
 type DisablerOptions struct {
@@ -34,7 +35,7 @@ func NewDisabler(id uint, opt *DisablerOptions, root env_core.Root) *Disabler {
 }
 
 func (d *Disabler) Run() {
-	defer logrus.Infof("#%d stopping", d.Id)
+	defer dl.Infof("#%d stopping", d.Id)
 	defer close(d.Done)
 	d.dwell()
 	d.iterate()
@@ -65,20 +66,20 @@ func (d *Disabler) iterate() {
 				snapshot.Completed = time.Now()
 				snapshot.Ok = true
 
-				logrus.Infof("#%d disabled environment '%v'", d.Id, env.ZitiIdentity)
+				dl.Infof("#%d disabled environment '%v'", d.Id, env.ZitiIdentity)
 
 			} else {
 				snapshot.Completed = time.Now()
 				snapshot.Ok = false
 				snapshot.Error = err
 
-				logrus.Errorf("error disabling canary (#%d) environment '%v': %v", d.Id, env.ZitiIdentity, err)
+				dl.Errorf("error disabling canary (#%d) environment '%v': %v", d.Id, env.ZitiIdentity, err)
 			}
 
 			if d.opt.SnapshotQueue != nil {
 				d.opt.SnapshotQueue <- snapshot
 			} else {
-				logrus.Info(snapshot)
+				dl.Info(snapshot)
 			}
 		}
 

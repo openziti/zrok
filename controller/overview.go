@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
-	"github.com/sirupsen/logrus"
 )
 
 type overviewHandler struct{}
@@ -16,27 +16,27 @@ func newOverviewHandler() *overviewHandler {
 func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return metadata.NewOverviewInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 
 	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("error finding environments for '%v': %v", principal.Email, err)
+		dl.Errorf("error finding environments for '%v': %v", principal.Email, err)
 		return metadata.NewOverviewInternalServerError()
 	}
 
 	accountLimited, err := isAccountLimited(int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("error checking account limited for '%v': %v", principal.Email, err)
+		dl.Errorf("error checking account limited for '%v': %v", principal.Email, err)
 	}
 
 	ovr := &rest_model_zrok.Overview{AccountLimited: accountLimited}
 	for _, env := range envs {
 		remoteAgent, err := str.IsAgentEnrolledForEnvironment(env.Id, trx)
 		if err != nil {
-			logrus.Errorf("error checking agent enrollment for environment '%v' (%v): %v", env.ZId, principal.Email, err)
+			dl.Errorf("error checking agent enrollment for environment '%v' (%v): %v", env.ZId, principal.Email, err)
 			return metadata.NewOverviewInternalServerError()
 		}
 
@@ -55,7 +55,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 
 		shrs, err := str.FindSharesForEnvironment(env.Id, trx)
 		if err != nil {
-			logrus.Errorf("error finding shares for environment '%v': %v", env.ZId, err)
+			dl.Errorf("error finding shares for environment '%v': %v", env.ZId, err)
 			return metadata.NewOverviewInternalServerError()
 		}
 		for _, shr := range shrs {
@@ -80,7 +80,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 		}
 		fes, err := str.FindFrontendsForEnvironment(env.Id, trx)
 		if err != nil {
-			logrus.Errorf("error finding frontends for environment '%v': %v", env.ZId, err)
+			dl.Errorf("error finding frontends for environment '%v': %v", env.ZId, err)
 			return metadata.NewOverviewInternalServerError()
 		}
 		for _, fe := range fes {
@@ -100,7 +100,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 			if fe.PrivateShareId != nil {
 				feShr, err := str.GetShare(*fe.PrivateShareId, trx)
 				if err != nil {
-					logrus.Errorf("error getting share for frontend '%v': %v", fe.ZId, err)
+					dl.Errorf("error getting share for frontend '%v': %v", fe.ZId, err)
 					return metadata.NewOverviewInternalServerError()
 				}
 				envFe.ShareToken = feShr.Token
@@ -115,7 +115,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 	// find all namespaces the user has access to
 	namespaces, err := str.FindNamespacesForAccount(int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("error finding namespaces for account '%v': %v", principal.Email, err)
+		dl.Errorf("error finding namespaces for account '%v': %v", principal.Email, err)
 		return metadata.NewOverviewInternalServerError()
 	}
 
@@ -132,7 +132,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 	for _, ns := range namespaces {
 		names, err := str.FindNamesWithShareTokensForAccountAndNamespace(int(principal.ID), ns.Id, trx)
 		if err != nil {
-			logrus.Errorf("error finding allocated names for namespace '%v': %v", ns.Token, err)
+			dl.Errorf("error finding allocated names for namespace '%v': %v", ns.Token, err)
 			return metadata.NewOverviewInternalServerError()
 		}
 

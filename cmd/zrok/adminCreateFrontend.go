@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -65,5 +65,5 @@ func (cmd *adminCreateFrontendCommand) run(_ *cobra.Command, args []string) {
 		}
 	}
 
-	logrus.Infof("created global public frontend '%v'", resp.Payload.FrontendToken)
+	dl.Infof("created global public frontend '%v'", resp.Payload.FrontendToken)
 }

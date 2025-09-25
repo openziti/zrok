@@ -3,10 +3,10 @@ package controller
 import (
 	"fmt"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 var zrokProxyConfigId string
@@ -19,7 +19,7 @@ func controllerStartup() error {
 }
 
 func inspectZiti() error {
-	logrus.Infof("inspecting ziti controller configuration")
+	dl.Infof("inspecting ziti controller configuration")
 
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
@@ -47,7 +47,7 @@ func findZrokProxyConfigType(ziti *automation.ZitiAutomation) error {
 	if len(configTypes) != 1 {
 		return errors.Errorf("expected 1 zrok proxy config type, found '%d'", len(configTypes))
 	}
-	logrus.Infof("found '%v' config type with id '%v'", sdk.ZrokProxyConfig, *configTypes[0].ID)
+	dl.Infof("found '%v' config type with id '%v'", sdk.ZrokProxyConfig, *configTypes[0].ID)
 	zrokProxyConfigId = *configTypes[0].ID
 
 	return nil

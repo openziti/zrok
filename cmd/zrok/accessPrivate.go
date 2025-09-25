@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/url"
 	"os"
 	"os/signal"
@@ -14,6 +15,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/agentClient"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
@@ -83,6 +85,9 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	if cmd.subordinate {
 		logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
+		dlOpts := dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo)
+		dlOpts.UseJSON = true
+		dl.Init(dlOpts)
 	}
 
 	root, err := environment.LoadRoot()
@@ -119,9 +124,9 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 
 	if cmd.templatePath != "" {
 		if err := proxyUi.ReplaceTemplate(cmd.templatePath); err != nil {
-			logrus.Fatalf("error loading template '%v': %v", cmd.templatePath, err)
+			dl.Fatalf("error loading template '%v': %v", cmd.templatePath, err)
 		}
-		logrus.Infof("loaded external proxy ui template '%v'", cmd.templatePath)
+		dl.Infof("loaded external proxy ui template '%v'", cmd.templatePath)
 	}
 
 	accessResp, err := zrok.Share.Access(req, auth)
@@ -288,11 +293,11 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 	}
 
 	if cmd.headless {
-		logrus.Infof("access the zrok share at the following endpoint: %v", endpointUrl.String())
+		dl.Infof("access the zrok share at the following endpoint: %v", endpointUrl.String())
 		for {
 			select {
 			case req := <-requests:
-				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
+				dl.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
 			}
 		}
 	} else if cmd.subordinate {
@@ -314,6 +319,10 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 	} else {
 		mdl := newAccessModel(shrToken, endpointUrl.String())
 		logrus.SetOutput(mdl)
+		dlOpts := dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo)
+		dlOpts.CustomHandler = dl.NewPrettyHandler(slog.LevelInfo, dl.DefaultOptions().SetOutput(mdl))
+		dl.Init(dlOpts)
+
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
 		mdl.prg = prg
 
@@ -348,15 +357,15 @@ func (cmd *accessPrivateCommand) error(err error) {
 }
 
 func (cmd *accessPrivateCommand) shutdown(frontendToken, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
-	logrus.Infof("shutting down '%v'", shrToken)
+	dl.Infof("shutting down '%v'", shrToken)
 	req := share.NewUnaccessParams()
 	req.Body.FrontendToken = frontendToken
 	req.Body.ShareToken = shrToken
 	req.Body.EnvZID = envZId
 	if _, err := zrok.Share.Unaccess(req, auth); err == nil {
-		logrus.Debugf("shutdown complete")
+		dl.Debugf("shutdown complete")
 	} else {
-		logrus.Errorf("error shutting down: %v", err)
+		dl.Errorf("error shutting down: %v", err)
 	}
 }
 

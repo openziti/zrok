@@ -5,6 +5,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/net-byte/vtun/common/config"
 	"github.com/net-byte/vtun/tun"
 	"github.com/openziti/sdk-golang/ziti"
@@ -13,7 +14,6 @@ import (
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type FrontendConfig struct {
@@ -76,7 +76,7 @@ func (f *Frontend) Run() error {
 		Method:     "CONNECTED",
 		Path:       cltCfg.Greeting,
 	}
-	logrus.Info("connected:", cltCfg.Greeting)
+	dl.Infof("connected: %v", cltCfg.Greeting)
 
 	defer func() {
 		f.cfg.RequestsChan <- &endpoints.Request{
@@ -96,7 +96,7 @@ func (f *Frontend) Run() error {
 	}
 	iface := tun.CreateTun(cfg)
 
-	logrus.Infof("created tun device: %s", iface.Name())
+	dl.Infof("created tun device: %s", iface.Name())
 
 	go func() {
 		defer func() {
@@ -108,14 +108,14 @@ func (f *Frontend) Run() error {
 		for {
 			n, err := f.conn.Read(b)
 			if err != nil {
-				logrus.WithError(err).Error("error reading from ziti")
+				dl.Errorf("error reading from ziti: %v", err)
 				return
 			}
 			p := packet(b[:n])
-			logrus.WithField("packet", p).Trace("received packet from peer")
+			dl.Log().With("packet", p).Debug("received packet from peer")
 			_, err = iface.Write(p)
 			if err != nil {
-				logrus.WithError(err).Error("error writing to device")
+				dl.Errorf("error writing to device: %v", err)
 				return
 			}
 		}
@@ -128,7 +128,7 @@ func (f *Frontend) Run() error {
 			return errors.Wrap(err, "error reading packet")
 		}
 		pkt := packet(buf[:n])
-		logrus.WithField("packet", pkt).Trace("read packet from tun device")
+		dl.Log().With("packet", pkt).Debug("read packet from tun device")
 		_, err = f.conn.Write(pkt)
 
 		if err != nil {

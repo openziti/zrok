@@ -3,12 +3,13 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/openziti/zrok/controller/config"
 	"strings"
 	"time"
 
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/controller/config"
+
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type maintenanceRegistrationAgent struct {
@@ -24,8 +25,8 @@ func newRegistrationMaintenanceAgent(ctx context.Context, cfg *config.Registrati
 }
 
 func (ma *maintenanceRegistrationAgent) run() {
-	logrus.Infof("started")
-	defer logrus.Info("exited")
+	dl.Infof("started")
+	defer dl.Info("exited")
 
 	ticker := time.NewTicker(ma.cfg.CheckFrequency)
 	for {
@@ -38,7 +39,7 @@ func (ma *maintenanceRegistrationAgent) run() {
 		case <-ticker.C:
 			{
 				if err := ma.deleteExpiredAccountRequests(); err != nil {
-					logrus.Error(err)
+					dl.Error(err)
 				}
 			}
 		}
@@ -58,7 +59,7 @@ func (ma *maintenanceRegistrationAgent) deleteExpiredAccountRequests() error {
 		return errors.Wrapf(err, "error finding expire account requests before %v", timeout)
 	}
 	if len(accountRequests) > 0 {
-		logrus.Infof("found %d expired account requests to remove", len(accountRequests))
+		dl.Infof("found %d expired account requests to remove", len(accountRequests))
 		acctStrings := make([]string, len(accountRequests))
 		ids := make([]int, len(accountRequests))
 		for i, acct := range accountRequests {
@@ -66,7 +67,7 @@ func (ma *maintenanceRegistrationAgent) deleteExpiredAccountRequests() error {
 			acctStrings[i] = fmt.Sprintf("{%d:%s}", acct.Id, acct.Email)
 		}
 
-		logrus.Infof("deleting expired account requests: %v", strings.Join(acctStrings, ","))
+		dl.Infof("deleting expired account requests: %v", strings.Join(acctStrings, ","))
 		if err := str.DeleteMultipleAccountRequests(ids, trx); err != nil {
 			return errors.Wrapf(err, "error deleting expired account requests before %v", timeout)
 		}
@@ -91,8 +92,8 @@ func newMaintenanceResetPasswordAgent(ctx context.Context, cfg *config.ResetPass
 }
 
 func (ma *maintenanceResetPasswordAgent) run() {
-	logrus.Infof("started")
-	defer logrus.Info("exited")
+	dl.Infof("started")
+	defer dl.Info("exited")
 
 	ticker := time.NewTicker(ma.cfg.CheckFrequency)
 	for {
@@ -105,7 +106,7 @@ func (ma *maintenanceResetPasswordAgent) run() {
 		case <-ticker.C:
 			{
 				if err := ma.deleteExpiredForgetPasswordRequests(); err != nil {
-					logrus.Error(err)
+					dl.Error(err)
 				}
 			}
 		}
@@ -124,7 +125,7 @@ func (ma *maintenanceResetPasswordAgent) deleteExpiredForgetPasswordRequests() e
 		return errors.Wrapf(err, "error finding expired password reset requests before %v", timeout)
 	}
 	if len(passwordResetRequests) > 0 {
-		logrus.Infof("found %d expired password reset requests to remove", len(passwordResetRequests))
+		dl.Infof("found %d expired password reset requests to remove", len(passwordResetRequests))
 		acctStrings := make([]string, len(passwordResetRequests))
 		ids := make([]int, len(passwordResetRequests))
 		for i, acct := range passwordResetRequests {
@@ -132,7 +133,7 @@ func (ma *maintenanceResetPasswordAgent) deleteExpiredForgetPasswordRequests() e
 			acctStrings[i] = fmt.Sprintf("{id:%d}", acct.Id)
 		}
 
-		logrus.Infof("deleting expired password reset requests: %v", strings.Join(acctStrings, ","))
+		dl.Infof("deleting expired password reset requests: %v", strings.Join(acctStrings, ","))
 		if err := str.DeleteMultiplePasswordResetRequests(ids, trx); err != nil {
 			return errors.Wrapf(err, "error deleting expired password reset requests before %v", timeout)
 		}

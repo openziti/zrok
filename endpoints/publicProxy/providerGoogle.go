@@ -12,8 +12,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/endpoints/proxyUi"
-	"github.com/sirupsen/logrus"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	zhttp "github.com/zitadel/oidc/v2/pkg/http"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -75,7 +75,7 @@ func (c *googleConfig) configure(cfg *OauthConfig, tls bool) error {
 		return func(w http.ResponseWriter, r *http.Request) {
 			targetHost, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
 			if err != nil {
-				logrus.Errorf("unable to unescape targetHost: %v", err)
+				dl.Errorf("unable to unescape targetHost: %v", err)
 				proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to escape targetHost")))
 				return
 			}
@@ -96,7 +96,7 @@ func (c *googleConfig) configure(cfg *OauthConfig, tls bool) error {
 				})
 				s, err := t.SignedString(signingKey)
 				if err != nil {
-					logrus.Errorf("unable to sign intermediate JWT: %v", err)
+					dl.Errorf("unable to sign intermediate JWT: %v", err)
 				}
 				return s
 			}, provider, rp.WithURLParam("access_type", "offline"), rp.URLParamOpt(rp.WithPrompt("login")))(w, r)
@@ -109,7 +109,7 @@ func (c *googleConfig) configure(cfg *OauthConfig, tls bool) error {
 			return signingKey, nil
 		})
 		if err != nil {
-			logrus.Errorf("error parsing intermediate token: %v", err.Error())
+			dl.Errorf("error parsing intermediate token: %v", err.Error())
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("error parsing intermediate token")))
 			return
 		}
@@ -118,14 +118,14 @@ func (c *googleConfig) configure(cfg *OauthConfig, tls bool) error {
 		if v, err := time.ParseDuration(token.Claims.(*IntermediateJWT).RefreshInterval); err == nil {
 			refreshInterval = v
 		} else {
-			logrus.Errorf("unable to parse authorization check interval: %v", err)
+			dl.Errorf("unable to parse authorization check interval: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to parse authorization check interval")))
 			return
 		}
 
 		resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + url.QueryEscape(tokens.AccessToken))
 		if err != nil {
-			logrus.Errorf("error getting user info from google: %v", err)
+			dl.Errorf("error getting user info from google: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("error getting user info from google")))
 			return
 		}
@@ -134,15 +134,15 @@ func (c *googleConfig) configure(cfg *OauthConfig, tls bool) error {
 		}()
 		response, err := io.ReadAll(resp.Body)
 		if err != nil {
-			logrus.Errorf("error reading response body: %v", err)
+			dl.Errorf("error reading response body: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("error reading google response body")))
 			return
 		}
-		logrus.Debugf("response from google userinfo endpoint: %s", string(response))
+		dl.Debugf("response from google userinfo endpoint: %s", string(response))
 		data := googleOauthEmailResp{}
 		err = json.Unmarshal(response, &data)
 		if err != nil {
-			logrus.Errorf("error unmarshalling google oauth response: %v", err)
+			dl.Errorf("error unmarshalling google oauth response: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("error unmarshalling google oauth response")))
 			return
 		}
@@ -181,34 +181,34 @@ func (c *googleConfig) configure(cfg *OauthConfig, tls bool) error {
 						if err == nil {
 							defer resp.Body.Close()
 							if resp.StatusCode == http.StatusOK {
-								logrus.Infof("revoked google token for '%v'", claims.Email)
+								dl.Infof("revoked google token for '%v'", claims.Email)
 							} else {
-								logrus.Errorf("access token revocation failed with status: %v", resp.StatusCode)
+								dl.Errorf("access token revocation failed with status: %v", resp.StatusCode)
 								proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("access token revocation failed")))
 								return
 							}
 						} else {
-							logrus.Errorf("unable to revoke access token for '%v': %v", claims.Email, err)
+							dl.Errorf("unable to revoke access token for '%v': %v", claims.Email, err)
 							proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to post access token revocation")))
 							return
 						}
 					} else {
-						logrus.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
+						dl.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
 						proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to decrypt access token")))
 						return
 					}
 				} else {
-					logrus.Errorf("expected provider name '%v' got '%v'", c.Name, claims.Provider)
+					dl.Errorf("expected provider name '%v' got '%v'", c.Name, claims.Provider)
 					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("provider name mismatch")))
 					return
 				}
 			} else {
-				logrus.Errorf("invalid jwt; unable to parse: %v", err)
+				dl.Errorf("invalid jwt; unable to parse: %v", err)
 				proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid jwt; unable to parse")))
 				return
 			}
 		} else {
-			logrus.Errorf("error getting cookie '%v': %v", cfg.CookieName, err)
+			dl.Errorf("error getting cookie '%v': %v", cfg.CookieName, err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("error getting cookie")))
 			return
 		}
@@ -230,7 +230,7 @@ func (c *googleConfig) configure(cfg *OauthConfig, tls bool) error {
 	}
 	http.HandleFunc(fmt.Sprintf("/%v/logout", c.Name), logout)
 
-	logrus.Infof("configured google provider at '/%v'", c.Name)
+	dl.Infof("configured google provider at '/%v'", c.Name)
 
 	return nil
 }

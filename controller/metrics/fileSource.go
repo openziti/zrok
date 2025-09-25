@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/nxadm/tail"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 const FileSourceType = "fileSource"
@@ -48,9 +48,9 @@ func (s *fileSource) Start(events chan ZitiEventMsg) (join chan struct{}, err er
 
 	ptr, err := s.readPtr()
 	if err != nil {
-		logrus.Errorf("error reading pointer: %v", err)
+		dl.Errorf("error reading pointer: %v", err)
 	}
-	logrus.Infof("retrieved stored position pointer at '%d'", ptr)
+	dl.Infof("retrieved stored position pointer at '%d'", ptr)
 
 	join = make(chan struct{})
 	go func() {
@@ -63,13 +63,13 @@ func (s *fileSource) Start(events chan ZitiEventMsg) (join chan struct{}, err er
 
 func (s *fileSource) Stop() {
 	if err := s.t.Stop(); err != nil {
-		logrus.Error(err)
+		dl.Error(err)
 	}
 }
 
 func (s *fileSource) tail(ptr int64, events chan ZitiEventMsg) {
-	logrus.Info("started")
-	defer logrus.Info("stopped")
+	dl.Info("started")
+	defer dl.Info("stopped")
 
 	var err error
 	s.t, err = tail.TailFile(s.cfg.Path, tail.Config{
@@ -78,7 +78,7 @@ func (s *fileSource) tail(ptr int64, events chan ZitiEventMsg) {
 		Location: &tail.SeekInfo{Offset: ptr},
 	})
 	if err != nil {
-		logrus.Errorf("error starting tail: %v", err)
+		dl.Errorf("error starting tail: %v", err)
 		return
 	}
 
@@ -88,7 +88,7 @@ func (s *fileSource) tail(ptr int64, events chan ZitiEventMsg) {
 		}
 
 		if err := s.writePtr(event.SeekInfo.Offset); err != nil {
-			logrus.Error(err)
+			dl.Error(err)
 		}
 	}
 }

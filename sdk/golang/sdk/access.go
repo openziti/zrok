@@ -2,10 +2,10 @@ package sdk
 
 import (
 	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/rest_client_zrok/share"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 func CreateAccess(root env_core.Root, request *AccessRequest) (*Access, error) {
@@ -18,7 +18,7 @@ func CreateAccess(root env_core.Root, request *AccessRequest) (*Access, error) {
 	out.Body.EnvZID = root.Environment().ZitiIdentity
 	if request.BindAddress != "" {
 		out.Body.BindAddress = request.BindAddress
-		logrus.Infof("requesting bind address '%v'", out.Body.BindAddress)
+		dl.Infof("requesting bind address '%v'", out.Body.BindAddress)
 	}
 
 	zrok, err := root.Client()

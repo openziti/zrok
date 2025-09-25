@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
-	"github.com/sirupsen/logrus"
 )
 
 type listAllNamesHandler struct{}
@@ -16,7 +16,7 @@ func newListAllNamesHandler() *listAllNamesHandler {
 func (h *listAllNamesHandler) Handle(params share.ListAllNamesParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return share.NewListAllNamesInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
@@ -24,7 +24,7 @@ func (h *listAllNamesHandler) Handle(params share.ListAllNamesParams, principal 
 	// find all namespaces the user has access to
 	namespaces, err := str.FindNamespacesForAccount(int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("error finding namespaces for account '%v': %v", principal.Email, err)
+		dl.Errorf("error finding namespaces for account '%v': %v", principal.Email, err)
 		return share.NewListAllNamesInternalServerError()
 	}
 
@@ -33,7 +33,7 @@ func (h *listAllNamesHandler) Handle(params share.ListAllNamesParams, principal 
 	for _, ns := range namespaces {
 		names, err := str.FindNamesWithShareTokensForAccountAndNamespace(int(principal.ID), ns.Id, trx)
 		if err != nil {
-			logrus.Errorf("error finding allocated names for namespace '%v': %v", ns.Token, err)
+			dl.Errorf("error finding allocated names for namespace '%v': %v", ns.Token, err)
 			return share.NewListAllNamesInternalServerError()
 		}
 
@@ -52,6 +52,6 @@ func (h *listAllNamesHandler) Handle(params share.ListAllNamesParams, principal 
 		}
 	}
 
-	logrus.Debugf("listed %d allocated names across all namespaces for account '%v'", len(out), principal.Email)
+	dl.Debugf("listed %d allocated names across all namespaces for account '%v'", len(out), principal.Email)
 	return share.NewListAllNamesOK().WithPayload(out)
 }

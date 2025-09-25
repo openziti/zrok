@@ -2,12 +2,12 @@ package limits
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type relaxAction struct {
@@ -20,7 +20,7 @@ func newRelaxAction(str *store.Store, zCfg *automation.Config) *relaxAction {
 }
 
 func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.BandwidthClass, _ *userLimits, trx *sqlx.Tx) error {
-	logrus.Debugf("relaxing '%v'", acct.Email)
+	dl.Debugf("relaxing '%v'", acct.Email)
 
 	envs, err := a.str.FindEnvironmentsForAccount(acct.Id, trx)
 	if err != nil {
@@ -61,11 +61,11 @@ func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 				switch shr.ShareMode {
 				case string(sdk.PublicShareMode):
 					if err := relaxPublicShare(a.str, ziti, shr, trx); err != nil {
-						logrus.Errorf("error relaxing public share '%v' for account '%v' (ignoring): %v", shr.Token, acct.Email, err)
+						dl.Errorf("error relaxing public share '%v' for account '%v' (ignoring): %v", shr.Token, acct.Email, err)
 					}
 				case string(sdk.PrivateShareMode):
 					if err := relaxPrivateShare(a.str, ziti, shr, trx); err != nil {
-						logrus.Errorf("error relaxing private share '%v' for account '%v' (ignoring): %v", shr.Token, acct.Email, err)
+						dl.Errorf("error relaxing private share '%v' for account '%v' (ignoring): %v", shr.Token, acct.Email, err)
 					}
 				}
 			}
@@ -100,7 +100,7 @@ func relaxPublicShare(str *store.Store, ziti *automation.ZitiAutomation, shr *st
 	if _, err := ziti.ServicePolicies.CreateDial(opts); err != nil {
 		return errors.Wrapf(err, "error creating dial service policy for '%v'", shr.Token)
 	}
-	logrus.Infof("added dial service policy for '%v'", shr.Token)
+	dl.Infof("added dial service policy for '%v'", shr.Token)
 	return nil
 }
 
@@ -135,7 +135,7 @@ func relaxPrivateShare(str *store.Store, ziti *automation.ZitiAutomation, shr *s
 				return errors.Wrapf(err, "unable to create dial policy for frontend '%v'", fe.Token)
 			}
 
-			logrus.Infof("added dial service policy for share '%v' to private frontend '%v'", shr.Token, fe.Token)
+			dl.Infof("added dial service policy for share '%v' to private frontend '%v'", shr.Token, fe.Token)
 		}
 	}
 	return nil

@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -58,5 +58,5 @@ func (cmd *adminCreateNamespaceCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Infof("created namespace '%v' with token '%v'", args[0], resp.Payload.NamespaceToken)
+	dl.Infof("created namespace '%v' with token '%v'", args[0], resp.Payload.NamespaceToken)
 }

@@ -2,10 +2,11 @@ package limits
 
 import (
 	"fmt"
+
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/build"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/wneessen/go-mail"
 )
 
@@ -87,6 +88,6 @@ func sendLimitWarningEmail(cfg *emailUi.Config, emailTo string, d *detailMessage
 		return errors.Wrap(err, "error sending limit warning email")
 	}
 
-	logrus.Infof("limit warning email sent to '%v'", emailTo)
+	dl.Infof("limit warning email sent to '%v'", emailTo)
 	return nil
 }

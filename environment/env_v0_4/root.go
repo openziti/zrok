@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 const V = "v0.4"
@@ -296,7 +296,7 @@ func loadEnvironment() (*env_core.Environment, error) {
 		if err := saveEnvironment(out); err != nil {
 			return nil, errors.Wrap(err, "error auto-rebasing apiEndpoint")
 		}
-		logrus.Info("auto-rebased 'apiEndpoint' for v2.0.x")
+		dl.Info("auto-rebased 'apiEndpoint' for v2.0.x")
 	}
 	return out, nil
 }

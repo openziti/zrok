@@ -5,12 +5,12 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/environment"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type disableHandler struct{}
@@ -22,30 +22,30 @@ func newDisableHandler() *disableHandler {
 func (h *disableHandler) Handle(params environment.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
+		dl.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 
 	env, err := str.FindEnvironmentForAccount(params.Body.Identity, int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("identity check failed for user '%v': %v", principal.Email, err)
+		dl.Errorf("identity check failed for user '%v': %v", principal.Email, err)
 		return environment.NewDisableUnauthorized()
 	}
 
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
-		logrus.Errorf("error getting automation client for user '%v': %v", principal.Email, err)
+		dl.Errorf("error getting automation client for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
 
 	if err := disableEnvironment(env, trx, ziti); err != nil {
-		logrus.Errorf("error disabling environment for user '%v': %v", principal.Email, err)
+		dl.Errorf("error disabling environment for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
 
 	if err := trx.Commit(); err != nil {
-		logrus.Errorf("error committing for user '%v': %v", principal.Email, err)
+		dl.Errorf("error committing for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
 
@@ -87,38 +87,38 @@ func removeSharesForEnvironment(env *store.Environment, trx *sqlx.Tx, ziti *auto
 	}
 	for _, shr := range shrs {
 		shrToken := shr.Token
-		logrus.Infof("garbage collecting share '%v' for environment '%v'", shrToken, env.ZId)
+		dl.Infof("garbage collecting share '%v' for environment '%v'", shrToken, env.ZId)
 
 		// delete service edge router policies for share
 		serpFilter := fmt.Sprintf("tags.zrokShareToken=\"%v\"", shrToken)
 		if err := ziti.ServiceEdgeRouterPolicies.DeleteWithFilter(serpFilter); err != nil {
-			logrus.Error(err)
+			dl.Error(err)
 		}
 
 		// delete dial service policies for share
 		dialFilter := fmt.Sprintf("tags.zrokShareToken=\"%v\" and type=1", shrToken)
 		if err := ziti.ServicePolicies.DeleteWithFilter(dialFilter); err != nil {
-			logrus.Error(err)
+			dl.Error(err)
 		}
 
 		// delete bind service policies for share
 		bindFilter := fmt.Sprintf("tags.zrokShareToken=\"%v\" and type=2", shrToken)
 		if err := ziti.ServicePolicies.DeleteWithFilter(bindFilter); err != nil {
-			logrus.Error(err)
+			dl.Error(err)
 		}
 
 		// delete configs for share
 		configFilter := fmt.Sprintf("tags.zrokShareToken=\"%v\"", shrToken)
 		if err := ziti.Configs.DeleteWithFilter(configFilter); err != nil {
-			logrus.Error(err)
+			dl.Error(err)
 		}
 
 		// delete service
 		if err := ziti.Services.Delete(shr.ZId); err != nil {
-			logrus.Error(err)
+			dl.Error(err)
 		}
 
-		logrus.Infof("removed share '%v' for environment '%v'", shr.Token, env.ZId)
+		dl.Infof("removed share '%v' for environment '%v'", shr.Token, env.ZId)
 	}
 	return nil
 }
@@ -131,7 +131,7 @@ func removeFrontendsForEnvironment(env *store.Environment, trx *sqlx.Tx, ziti *a
 	for _, fe := range fes {
 		filter := fmt.Sprintf("tags.zrokFrontendToken=\"%v\" and type=1", fe.Token)
 		if err := ziti.ServicePolicies.DeleteWithFilter(filter); err != nil {
-			logrus.Errorf("error removing frontend access for '%v': %v", fe.Token, err)
+			dl.Errorf("error removing frontend access for '%v': %v", fe.Token, err)
 		}
 	}
 	return nil

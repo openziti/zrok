@@ -11,6 +11,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/channel/v4"
 	"github.com/openziti/channel/v4/websockets"
 	"github.com/openziti/edge-api/rest_util"
@@ -18,7 +19,6 @@ import (
 	"github.com/openziti/ziti/common/pb/mgmt_pb"
 	"github.com/openziti/ziti/controller/event"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 const ZitiSession = "zt-session"
@@ -82,10 +82,10 @@ func (s *websocketSource) Start(events chan ZitiEventMsg) (join chan struct{}, e
 	if err != nil {
 		if resp != nil {
 			if body, rerr := io.ReadAll(resp.Body); rerr == nil {
-				logrus.Errorf("response body '%v': %v", string(body), err)
+				dl.Errorf("response body '%v': %v", string(body), err)
 			}
 		} else {
-			logrus.Errorf("no response from websocket dial: %v", err)
+			dl.Errorf("no response from websocket dial: %v", err)
 		}
 	}
 
@@ -132,7 +132,7 @@ func (s *websocketSource) Start(events chan ZitiEventMsg) (join chan struct{}, e
 	if responseMsg.ContentType == channel.ContentTypeResultType {
 		result := channel.UnmarshalResult(responseMsg)
 		if result.Success {
-			logrus.Infof("event stream started: %v", result.Message)
+			dl.Infof("event stream started: %v", result.Message)
 		} else {
 			return nil, errors.Wrap(err, "error starting event streaming")
 		}

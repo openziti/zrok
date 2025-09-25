@@ -2,11 +2,11 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
 	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/sirupsen/logrus"
 )
 
 type grantsHandler struct{}
@@ -17,44 +17,44 @@ func newGrantsHandler() *grantsHandler {
 
 func (h *grantsHandler) Handle(params admin.GrantsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	if !principal.Admin {
-		logrus.Errorf("invalid admin principal")
+		dl.Errorf("invalid admin principal")
 		return admin.NewGrantsUnauthorized()
 	}
 
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return admin.NewGrantsInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 
 	acct, err := str.FindAccountWithEmail(params.Body.Email, trx)
 	if err != nil {
-		logrus.Errorf("error finding account with email '%v': %v", params.Body.Email, err)
+		dl.Errorf("error finding account with email '%v': %v", params.Body.Email, err)
 		return admin.NewGrantsNotFound()
 	}
 
 	acctSkipInterstitial, err := str.IsAccountGrantedSkipInterstitial(acct.Id, trx)
 	if err != nil {
-		logrus.Errorf("error checking account '%v' granted skip interstitial: %v", acct.Email, err)
+		dl.Errorf("error checking account '%v' granted skip interstitial: %v", acct.Email, err)
 	}
 
 	envs, err := str.FindEnvironmentsForAccount(acct.Id, trx)
 	if err != nil {
-		logrus.Errorf("error finding environments for '%v': %v", acct.Email, err)
+		dl.Errorf("error finding environments for '%v': %v", acct.Email, err)
 		return admin.NewGrantsInternalServerError()
 	}
 
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
-		logrus.Errorf("error connecting to ziti: %v", err)
+		dl.Errorf("error connecting to ziti: %v", err)
 		return admin.NewGrantsInternalServerError()
 	}
 
 	for _, env := range envs {
 		shrs, err := str.FindSharesForEnvironment(env.Id, trx)
 		if err != nil {
-			logrus.Errorf("error finding shares for '%v': %v", acct.Email, err)
+			dl.Errorf("error finding shares for '%v': %v", acct.Email, err)
 			return admin.NewGrantsInternalServerError()
 		}
 
@@ -68,16 +68,16 @@ func (h *grantsHandler) Handle(params admin.GrantsParams, principal *rest_model_
 				}
 				configs, err := ziti.Configs.Find(filterOpts)
 				if err != nil {
-					logrus.Errorf("error finding config for share '%v': %v", shr.Token, err)
+					dl.Errorf("error finding config for share '%v': %v", shr.Token, err)
 					return admin.NewGrantsInternalServerError()
 				}
 				if len(configs) != 1 {
-					logrus.Errorf("expected 1 configuration for share '%v', found %v", shr.Token, len(configs))
+					dl.Errorf("expected 1 configuration for share '%v', found %v", shr.Token, len(configs))
 					return admin.NewGrantsInternalServerError()
 				}
 				config := configs[0]
 				if config.ConfigType.Name != sdk.ZrokProxyConfig {
-					logrus.Errorf("expected '%v' config type for share '%v', found '%v'", sdk.ZrokProxyConfig, shr.Token, config.ConfigType.Name)
+					dl.Errorf("expected '%v' config type for share '%v', found '%v'", sdk.ZrokProxyConfig, shr.Token, config.ConfigType.Name)
 					return admin.NewGrantsInternalServerError()
 				}
 
@@ -86,11 +86,11 @@ func (h *grantsHandler) Handle(params admin.GrantsParams, principal *rest_model_
 				if v, ok := config.Data.(map[string]interface{}); ok {
 					shrCfg, err = sdk.FrontendConfigFromMap(v)
 					if err != nil {
-						logrus.Errorf("error parsing config data for share '%v': %v", shr.Token, err)
+						dl.Errorf("error parsing config data for share '%v': %v", shr.Token, err)
 						return admin.NewGrantsInternalServerError()
 					}
 				} else {
-					logrus.Errorf("unexpected config data type for share '%v'", shr.Token)
+					dl.Errorf("unexpected config data type for share '%v'", shr.Token)
 					return admin.NewGrantsInternalServerError()
 				}
 
@@ -108,14 +108,14 @@ func (h *grantsHandler) Handle(params admin.GrantsParams, principal *rest_model_
 					}
 					err := ziti.Configs.Update(*config.ID, configOpts)
 					if err != nil {
-						logrus.Errorf("error updating config for '%v': %v", shr.Token, err)
+						dl.Errorf("error updating config for '%v': %v", shr.Token, err)
 						return admin.NewGrantsInternalServerError()
 					}
 				} else {
-					logrus.Infof("skipping config update for '%v'", shr.Token)
+					dl.Infof("skipping config update for '%v'", shr.Token)
 				}
 			} else {
-				logrus.Debugf("skipping share mode %v, backend mode %v", shr.ShareMode, shr.BackendMode)
+				dl.Debugf("skipping share mode %v, backend mode %v", shr.ShareMode, shr.BackendMode)
 			}
 		}
 	}

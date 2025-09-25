@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/metrics"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -37,7 +37,7 @@ func (cmd *bridgeCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	logrus.Info(dd.MustInspect(cfg))
+	dl.Info(dd.MustInspect(cfg))
 
 	bridge, err := metrics.NewBridge(cfg.Bridge)
 	if err != nil {

@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/sirupsen/logrus"
 )
 
 type AmqpPublisherConfig struct {
@@ -63,7 +63,7 @@ func (p *AmqpPublisher) connect() error {
 	p.ch = ch
 	p.connected = true
 
-	logrus.Infof("amqp publisher connected to '%s', exchange: '%s'", p.cfg.Url, p.cfg.ExchangeName)
+	dl.Infof("amqp publisher connected to '%s', exchange: '%s'", p.cfg.Url, p.cfg.ExchangeName)
 	return nil
 }
 
@@ -106,7 +106,7 @@ func (p *AmqpPublisher) Publish(ctx context.Context, frontendToken string, m Map
 		return errors.Wrapf(err, "failed to publish mapping update for frontend '%s'", frontendToken)
 	}
 
-	logrus.Debugf("published mapping update for frontend '%s': %+v", frontendToken, m)
+	dl.Debugf("published mapping update for frontend '%s': %+v", frontendToken, m)
 	return nil
 }
 

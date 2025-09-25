@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 // meshNode handles peer discovery and mesh coordination
@@ -106,7 +106,7 @@ func (mn *meshNode) joinMesh(ctx context.Context) error {
 
 	// initial peer discovery
 	if err := mn.discoverAndConnectPeers(ctx); err != nil {
-		logrus.Warnf("initial peer discovery failed: %v", err)
+		dl.Warnf("initial peer discovery failed: %v", err)
 	}
 
 	return nil
@@ -134,7 +134,7 @@ func (mn *meshNode) leaveMesh() error {
 
 // discoverPeers finds available peers using ziti service introspection
 func (mn *meshNode) discoverPeers() ([]string, error) {
-	logrus.Debugf("discovering peers for service '%s'", mn.cfg.ServiceName)
+	dl.Debugf("discovering peers for service '%s'", mn.cfg.ServiceName)
 
 	// approach 1: query ziti controller for service terminators
 	// note: this requires appropriate ziti API access
@@ -252,7 +252,7 @@ func (mn *meshNode) discoverAndConnectPeers(ctx context.Context) error {
 }
 
 func (mn *meshNode) connectToPeer(ctx context.Context, peerNodeID string) {
-	logrus.Debugf("connecting to peer: %s", peerNodeID)
+	dl.Debugf("connecting to peer: %s", peerNodeID)
 
 	// use addressable terminator to connect to specific peer
 	conn, err := mn.zCtx.DialWithOptions(mn.cfg.ServiceName, &ziti.DialOptions{
@@ -261,7 +261,7 @@ func (mn *meshNode) connectToPeer(ctx context.Context, peerNodeID string) {
 		// this is conceptual - would need ziti SDK specifics
 	})
 	if err != nil {
-		logrus.Warnf("failed to connect to peer '%s': %v", peerNodeID, err)
+		dl.Warnf("failed to connect to peer '%s': %v", peerNodeID, err)
 		return
 	}
 
@@ -276,7 +276,7 @@ func (mn *meshNode) connectToPeer(ctx context.Context, peerNodeID string) {
 	mn.peers[peerNodeID] = peer
 	mn.mutex.Unlock()
 
-	logrus.Infof("connected to peer: %s", peerNodeID)
+	dl.Infof("connected to peer: %s", peerNodeID)
 
 	// handle peer communication
 	go mn.handlePeerConnection(peer)
@@ -292,7 +292,7 @@ func (mn *meshNode) handlePeerConnection(peer *PeerConnection) {
 			peer.Conn.Close()
 		}
 
-		logrus.Debugf("disconnected from peer: %s", peer.NodeID)
+		dl.Debugf("disconnected from peer: %s", peer.NodeID)
 	}()
 
 	scanner := bufio.NewScanner(peer.Conn)
@@ -316,7 +316,7 @@ func (mn *meshNode) handlePeerConnection(peer *PeerConnection) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		logrus.Debugf("peer connection error for %s: %v", peer.NodeID, err)
+		dl.Debugf("peer connection error for %s: %v", peer.NodeID, err)
 	}
 }
 
@@ -335,7 +335,7 @@ func (mn *meshNode) handlePeerMessage(peer *PeerConnection, line string) {
 		return
 	}
 
-	logrus.Debugf("unknown message from peer %s: %s", peer.NodeID, line)
+	dl.Debugf("unknown message from peer %s: %s", peer.NodeID, line)
 }
 
 func (mn *meshNode) handleTopicAnnouncement(peer *PeerConnection, announcement *TopicAnnouncement) {
@@ -346,7 +346,7 @@ func (mn *meshNode) handleTopicAnnouncement(peer *PeerConnection, announcement *
 	}
 	mn.mutex.Unlock()
 
-	logrus.Debugf("received topic announcement from %s: %v", announcement.NodeID, announcement.Topics)
+	dl.Debugf("received topic announcement from %s: %v", announcement.NodeID, announcement.Topics)
 }
 
 func (mn *meshNode) handleRelayedMessage(msg *Message) {
@@ -356,12 +356,12 @@ func (mn *meshNode) handleRelayedMessage(msg *Message) {
 	}
 
 	if msg.HopCount >= mn.cfg.MaxHops {
-		logrus.Debugf("dropping message due to hop limit: %s", msg.Id)
+		dl.Debugf("dropping message due to hop limit: %s", msg.Id)
 		return
 	}
 
 	// this would be handled by the mesh publisher's relay logic
-	logrus.Debugf("received relayed message: %s (topic: %s, hops: %d)", msg.Id, msg.Topic, msg.HopCount)
+	dl.Debugf("received relayed message: %s (topic: %s, hops: %d)", msg.Id, msg.Topic, msg.HopCount)
 }
 
 func (mn *meshNode) managePeers(ctx context.Context) {
@@ -373,7 +373,7 @@ func (mn *meshNode) managePeers(ctx context.Context) {
 			return
 		case <-mn.peerRefresh.C:
 			if err := mn.discoverAndConnectPeers(ctx); err != nil {
-				logrus.Debugf("peer discovery error: %v", err)
+				dl.Debugf("peer discovery error: %v", err)
 			}
 			mn.cleanupStaleConnections()
 		}
@@ -387,7 +387,7 @@ func (mn *meshNode) cleanupStaleConnections() {
 	cutoff := time.Now().Add(-5 * time.Minute)
 	for peerID, peer := range mn.peers {
 		if peer.LastSeen.Before(cutoff) {
-			logrus.Debugf("removing stale peer connection: %s", peerID)
+			dl.Debugf("removing stale peer connection: %s", peerID)
 			if peer.Conn != nil {
 				peer.Conn.Close()
 			}
@@ -422,13 +422,13 @@ func (mn *meshNode) relayMessage(msg *Message) error {
 		if peer.Conn != nil {
 			go func(p *PeerConnection) {
 				if _, err := p.Conn.Write(append(data, '\n')); err != nil {
-					logrus.Debugf("failed to relay message to peer %s: %v", p.NodeID, err)
+					dl.Debugf("failed to relay message to peer %s: %v", p.NodeID, err)
 				}
 			}(peer)
 		}
 	}
 
-	logrus.Debugf("relayed message to %d peers: %s", len(peers), msg.Id)
+	dl.Debugf("relayed message to %d peers: %s", len(peers), msg.Id)
 	return nil
 }
 
@@ -456,7 +456,7 @@ func (mn *meshNode) announceTopics(topics []string) error {
 		if peer.Conn != nil {
 			go func(p *PeerConnection) {
 				if _, err := p.Conn.Write(append(data, '\n')); err != nil {
-					logrus.Debugf("failed to announce topics to peer %s: %v", p.NodeID, err)
+					dl.Debugf("failed to announce topics to peer %s: %v", p.NodeID, err)
 				}
 			}(peer)
 		}

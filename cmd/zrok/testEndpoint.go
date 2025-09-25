@@ -12,12 +12,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/cmd/zrok/endpointUi"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/time/rate"
 	"nhooyr.io/websocket"
@@ -120,16 +120,16 @@ func (cmd *testEndpointCommand) run(_ *cobra.Command, _ []string) {
 }
 
 func (cmd *testEndpointCommand) serveIndex(w http.ResponseWriter, r *http.Request) {
-	logrus.Infof("%v {%v} | %v -> /index.gohtml", r.RemoteAddr, r.Host, r.RequestURI)
+	dl.Infof("%v {%v} | %v -> /index.gohtml", r.RemoteAddr, r.Host, r.RequestURI)
 	if err := cmd.t.Execute(w, newEndpointData(r)); err != nil {
-		logrus.Error(err)
+		dl.Error(err)
 	}
 }
 
 func (cmd *testEndpointCommand) websocketEcho(w http.ResponseWriter, r *http.Request) {
 	c, err := websocket.Accept(w, r, nil)
 	if err != nil {
-		logrus.Error(err)
+		dl.Error(err)
 		return
 	}
 	defer func() { _ = c.Close(websocket.StatusInternalError, "connection terminated") }()
@@ -141,7 +141,7 @@ func (cmd *testEndpointCommand) websocketEcho(w http.ResponseWriter, r *http.Req
 			return
 		}
 		if err != nil {
-			logrus.Errorf("failed to echo for '%v': %v", r.RemoteAddr, err)
+			dl.Errorf("failed to echo for '%v': %v", r.RemoteAddr, err)
 			return
 		}
 	}
@@ -203,7 +203,7 @@ func newEndpointData(r *http.Request) *endpointData {
 func (ed *endpointData) getHostInfo() {
 	host, hostDetail, _, err := util.GetHostDetails()
 	if err != nil {
-		logrus.Errorf("error getting host detail: %v", err)
+		dl.Errorf("error getting host detail: %v", err)
 	}
 	ed.Host = host
 	ed.HostDetail = hostDetail

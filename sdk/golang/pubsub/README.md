@@ -37,7 +37,7 @@ func main() {
     // create publisher
     pub, err := pubsub.NewPublisher(cfg)
     if err != nil {
-        logrus.Fatalf("failed to create publisher: %v", err)
+        dl.Fatalf("failed to create publisher: %v", err)
     }
     defer pub.Close()
 
@@ -51,7 +51,7 @@ func main() {
 
     ctx := context.Background()
     if err := pub.Publish(ctx, msg); err != nil {
-        logrus.Errorf("failed to publish: %v", err)
+        dl.Errorf("failed to publish: %v", err)
     }
 
     fmt.Println("message published successfully")
@@ -84,7 +84,7 @@ func main() {
     // create subscriber
     sub, err := pubsub.NewSubscriber(cfg)
     if err != nil {
-        logrus.Fatalf("failed to create subscriber: %v", err)
+        dl.Fatalf("failed to create subscriber: %v", err)
     }
     defer sub.Close()
 
@@ -119,7 +119,7 @@ func main() {
     topics := []string{"frontend"}
 
     if err := sub.Subscribe(ctx, topics, handler); err != nil {
-        logrus.Errorf("subscription failed: %v", err)
+        dl.Errorf("subscription failed: %v", err)
     }
 
     fmt.Println("subscriber started with auto-reconnect")
@@ -178,14 +178,14 @@ func main() {
     // create mesh publisher
     pub, err := pubsub.NewMeshPublisher(cfg)
     if err != nil {
-        logrus.Fatalf("failed to create mesh publisher: %v", err)
+        dl.Fatalf("failed to create mesh publisher: %v", err)
     }
     defer pub.Close()
 
     // join mesh network
     ctx := context.Background()
     if err := pub.JoinMesh(ctx); err != nil {
-        logrus.Fatalf("failed to join mesh: %v", err)
+        dl.Fatalf("failed to join mesh: %v", err)
     }
 
     // announce available topics
@@ -199,10 +199,10 @@ func main() {
     })
 
     if err := pub.Publish(ctx, msg); err != nil {
-        logrus.Errorf("failed to publish: %v", err)
+        dl.Errorf("failed to publish: %v", err)
     }
 
-    logrus.Infof("connected to %d mesh peers", len(pub.GetConnectedPeers()))
+    dl.Infof("connected to %d mesh peers", len(pub.GetConnectedPeers()))
 }
 ```
 
@@ -230,20 +230,20 @@ func main() {
     // create mesh-aware subscriber
     sub, err := pubsub.NewMeshSubscriber(cfg, "frontend-1")
     if err != nil {
-        logrus.Fatalf("failed to create subscriber: %v", err)
+        dl.Fatalf("failed to create subscriber: %v", err)
     }
     defer sub.Close()
 
     // handler automatically deduplicates mesh messages
     handler := func(msg *pubsub.Message) error {
-        logrus.Infof("received %s from %s (hops: %d)", 
+        dl.Infof("received %s from %s (hops: %d)", 
             msg.Type, msg.OriginNode, msg.HopCount)
         return nil
     }
 
     ctx := context.Background()
     if err := sub.Subscribe(ctx, []string{"frontend"}, handler); err != nil {
-        logrus.Errorf("subscription failed: %v", err)
+        dl.Errorf("subscription failed: %v", err)
     }
 }
 ```

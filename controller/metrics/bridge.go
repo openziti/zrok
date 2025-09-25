@@ -2,8 +2,8 @@ package metrics
 
 import (
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type BridgeConfig struct {
@@ -45,24 +45,24 @@ func (b *Bridge) Start() (join chan struct{}, err error) {
 	}
 
 	go func() {
-		logrus.Info("started")
-		defer logrus.Info("stopped")
+		dl.Info("started")
+		defer dl.Info("stopped")
 		defer close(b.join)
 
 	eventLoop:
 		for {
 			select {
 			case eventJson := <-b.events:
-				logrus.Info(eventJson)
+				dl.Info(eventJson)
 				if err := b.snk.Handle(eventJson.Data()); err == nil {
-					logrus.Infof("-> %v", eventJson.Data())
+					dl.Infof("-> %v", eventJson.Data())
 				} else {
-					logrus.Error(err)
+					dl.Error(err)
 				}
 				eventJson.Ack()
 
 			case <-b.close:
-				logrus.Info("received close signal")
+				dl.Info("received close signal")
 				break eventLoop
 			}
 		}

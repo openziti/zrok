@@ -1,13 +1,14 @@
 package controller
 
 import (
+	"slices"
+
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
-	"github.com/sirupsen/logrus"
-	"slices"
 )
 
 type sparklinesHandler struct {
@@ -24,7 +25,7 @@ func (h *sparklinesHandler) Handle(params metadata.GetSparklinesParams, principa
 	if h.cfg.Metrics != nil && h.cfg.Metrics.Influx != nil {
 		trx, err := str.Begin()
 		if err != nil {
-			logrus.Errorf("error beginning transaction: %v", err)
+			dl.Errorf("error beginning transaction: %v", err)
 			return metadata.NewGetSparklinesInternalServerError()
 		}
 		defer func() { _ = trx.Rollback() }()
@@ -38,12 +39,12 @@ func (h *sparklinesHandler) Handle(params metadata.GetSparklinesParams, principa
 						selectedEnvs = append(selectedEnvs, envs[idx])
 						selectedEnvsIdIdx[envs[idx].Id] = envs[idx]
 					} else {
-						logrus.Warnf("requested sparkdata for environment '%v' not owned by '%v'", envZId, principal.Email)
+						dl.Warnf("requested sparkdata for environment '%v' not owned by '%v'", envZId, principal.Email)
 					}
 				}
 				envsRxSparkdata, envsTxSparkdata, err := sparkDataForEnvironments(selectedEnvs)
 				if err != nil {
-					logrus.Errorf("error getting sparkdata for selected environments for '%v': %v", principal.Email, err)
+					dl.Errorf("error getting sparkdata for selected environments for '%v': %v", principal.Email, err)
 					return metadata.NewGetSparklinesInternalServerError()
 				}
 				for envId, rx := range envsRxSparkdata {
@@ -64,7 +65,7 @@ func (h *sparklinesHandler) Handle(params metadata.GetSparklinesParams, principa
 					})
 				}
 			} else {
-				logrus.Errorf("error finding environments for '%v': %v", principal.Email, err)
+				dl.Errorf("error finding environments for '%v': %v", principal.Email, err)
 				return metadata.NewGetSparklinesInternalServerError()
 			}
 		}
@@ -76,12 +77,12 @@ func (h *sparklinesHandler) Handle(params metadata.GetSparklinesParams, principa
 					if idx := slices.IndexFunc(shrs, func(shr *store.Share) bool { return shr.Token == selectedShareToken }); idx > -1 {
 						selectedShares = append(selectedShares, shrs[idx])
 					} else {
-						logrus.Warnf("requested sparkdata for share '%v' not owned by '%v'", selectedShareToken, principal.Email)
+						dl.Warnf("requested sparkdata for share '%v' not owned by '%v'", selectedShareToken, principal.Email)
 					}
 				}
 				shrsRxSparkdata, shrsTxSparkdata, err := sparkDataForShares(selectedShares)
 				if err != nil {
-					logrus.Errorf("error getting sparkdata for selected shares for '%v': %v", principal.Email, err)
+					dl.Errorf("error getting sparkdata for selected shares for '%v': %v", principal.Email, err)
 					return metadata.NewGetSparklinesInternalServerError()
 				}
 				for shrToken, rx := range shrsRxSparkdata {
@@ -101,7 +102,7 @@ func (h *sparklinesHandler) Handle(params metadata.GetSparklinesParams, principa
 					})
 				}
 			} else {
-				logrus.Errorf("error finding shares for '%v': %v", principal.Email, err)
+				dl.Errorf("error finding shares for '%v': %v", principal.Email, err)
 				return metadata.NewGetSparklinesInternalServerError()
 			}
 		}

@@ -1,12 +1,12 @@
 package automation
 
 import (
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_management_api_client/identity"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/enroll"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type IdentityManager struct {
@@ -45,7 +45,7 @@ func (im *IdentityManager) Create(opts *IdentityOptions) (string, error) {
 		return "", errors.Wrapf(err, "error creating identity '%s'", opts.Name)
 	}
 
-	logrus.Infof("created identity '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
+	dl.Infof("created identity '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
 	return resp.Payload.Data.ID, nil
 }
 
@@ -61,7 +61,7 @@ func (im *IdentityManager) Delete(id string) error {
 		return errors.Wrapf(err, "error deleting identity '%s'", id)
 	}
 
-	logrus.Infof("deleted identity '%s'", id)
+	dl.Infof("deleted identity '%s'", id)
 	return nil
 }
 
@@ -121,7 +121,7 @@ func (im *IdentityManager) Enroll(id string) (*ziti.Config, error) {
 		return nil, errors.Wrap(err, "error enrolling identity")
 	}
 
-	logrus.Infof("enrolled identity '%s'", id)
+	dl.Infof("enrolled identity '%s'", id)
 	return conf, nil
 }
 

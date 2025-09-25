@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -48,9 +48,9 @@ func (cmd *adminDeleteNamespaceFrontendCommand) run(_ *cobra.Command, args []str
 	req.Body.NamespaceToken = namespaceToken
 
 	if _, err := zrok.Admin.RemoveNamespaceFrontendMapping(req, mustGetAdminAuth()); err != nil {
-		logrus.Errorf("error deleting namespace-frontend mapping: %v", err)
+		dl.Errorf("error deleting namespace-frontend mapping: %v", err)
 		os.Exit(1)
 	}
 
-	logrus.Infof("deleted namespace-frontend mapping: namespace '%v' -> frontend '%v'", namespaceToken, frontendToken)
+	dl.Infof("deleted namespace-frontend mapping: namespace '%v' -> frontend '%v'", namespaceToken, frontendToken)
 }

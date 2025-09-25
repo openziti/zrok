@@ -3,9 +3,10 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/openziti/zrok/controller/store"
-	"github.com/sirupsen/logrus"
 	"strconv"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/controller/store"
 )
 
 func sparkDataForEnvironments(envs []*store.Environment) (rx, tx map[int][]int64, err error) {
@@ -40,7 +41,7 @@ func sparkDataForEnvironments(envs []*store.Environment) (rx, tx map[int][]int64
 			envIdS := result.Record().ValueByKey("envId").(string)
 			envId, err := strconv.ParseInt(envIdS, 10, 32)
 			if err != nil {
-				logrus.Errorf("error parsing '%v': %v", envIdS, err)
+				dl.Errorf("error parsing '%v': %v", envIdS, err)
 				continue
 			}
 			switch result.Record().Field() {

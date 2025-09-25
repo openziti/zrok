@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/sirupsen/logrus"
 )
 
 const AmqpSinkType = "amqpSink"
@@ -41,12 +41,12 @@ func (s *amqpSink) Handle(event ZitiEventJson) error {
 		if err := s.connect(); err != nil {
 			return err
 		}
-		logrus.Infof("connected to '%v'", s.cfg.Url)
+		dl.Infof("connected to '%v'", s.cfg.Url)
 		s.connected = true
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	logrus.Infof("pushing '%v'", event)
+	dl.Infof("pushing '%v'", event)
 	err := s.ch.PublishWithContext(ctx, "", s.queue.Name, false, false, amqp.Publishing{
 		ContentType: "application/json",
 		Body:        []byte(event),

@@ -3,13 +3,13 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type accessHandler struct{}
@@ -21,7 +21,7 @@ func newAccessHandler() *accessHandler {
 func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
+		dl.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
 		return share.NewAccessInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
@@ -32,53 +32,53 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		found := false
 		for _, env := range envs {
 			if env.ZId == envZId {
-				logrus.Debugf("found identity '%v' for user '%v'", envZId, principal.Email)
+				dl.Debugf("found identity '%v' for user '%v'", envZId, principal.Email)
 				envId = env.Id
 				found = true
 				break
 			}
 		}
 		if !found {
-			logrus.Errorf("environment '%v' not found for user '%v'", envZId, principal.Email)
+			dl.Errorf("environment '%v' not found for user '%v'", envZId, principal.Email)
 			return share.NewAccessUnauthorized()
 		}
 	} else {
-		logrus.Errorf("error finding environments for account '%v'", principal.Email)
+		dl.Errorf("error finding environments for account '%v'", principal.Email)
 		return share.NewAccessNotFound()
 	}
 
 	shrToken := params.Body.ShareToken
 	shr, err := str.FindShareWithToken(shrToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding share with token '%v': %v", shrToken, err)
+		dl.Errorf("error finding share with token '%v': %v", shrToken, err)
 		return share.NewAccessNotFound()
 	}
 	if shr == nil {
-		logrus.Errorf("unable to find share '%v' for user '%v'", shrToken, principal.Email)
+		dl.Errorf("unable to find share '%v' for user '%v'", shrToken, principal.Email)
 		return share.NewAccessNotFound()
 	}
 
 	if shr.PermissionMode == store.ClosedPermissionMode {
 		shrEnv, err := str.GetEnvironment(shr.EnvironmentId, trx)
 		if err != nil {
-			logrus.Errorf("error getting environment for share '%v': %v", shrToken, err)
+			dl.Errorf("error getting environment for share '%v': %v", shrToken, err)
 			return share.NewAccessInternalServerError()
 		}
 
 		if err := h.checkAccessGrants(shr, *shrEnv.AccountId, principal, trx); err != nil {
-			logrus.Errorf("closed permission mode for '%v' fails for '%v': %v", shr.Token, principal.Email, err)
+			dl.Errorf("closed permission mode for '%v' fails for '%v': %v", shr.Token, principal.Email, err)
 			return share.NewAccessUnauthorized()
 		}
 	}
 
 	if err := h.checkLimits(shr, trx); err != nil {
-		logrus.Errorf("cannot access limited share for '%v': %v", principal.Email, err)
+		dl.Errorf("cannot access limited share for '%v': %v", principal.Email, err)
 		return share.NewAccessNotFound()
 	}
 
 	feToken, err := CreateToken()
 	if err != nil {
-		logrus.Error(err)
+		dl.Error(err)
 		return share.NewAccessInternalServerError()
 	}
 
@@ -87,13 +87,13 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		fe.BindAddress = &params.Body.BindAddress
 	}
 	if _, err := str.CreateFrontend(envId, fe, trx); err != nil {
-		logrus.Errorf("error creating frontend record for user '%v': %v", principal.Email, err)
+		dl.Errorf("error creating frontend record for user '%v': %v", principal.Email, err)
 		return share.NewAccessInternalServerError()
 	}
 
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
-		logrus.Error(err)
+		dl.Error(err)
 		return share.NewAccessInternalServerError()
 	}
 
@@ -114,12 +114,12 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 	}
 
 	if _, err := ziti.ServicePolicies.CreateDial(opts); err != nil {
-		logrus.Errorf("unable to create dial policy for user '%v': %v", principal.Email, err)
+		dl.Errorf("unable to create dial policy for user '%v': %v", principal.Email, err)
 		return share.NewAccessInternalServerError()
 	}
 
 	if err := trx.Commit(); err != nil {
-		logrus.Errorf("error committing frontend record: %v", err)
+		dl.Errorf("error committing frontend record: %v", err)
 		return share.NewAccessInternalServerError()
 	}
 
@@ -144,16 +144,16 @@ func (h *accessHandler) checkLimits(shr *store.Share, trx *sqlx.Tx) error {
 
 func (h *accessHandler) checkAccessGrants(shr *store.Share, ownerAccountId int, principal *rest_model_zrok.Principal, trx *sqlx.Tx) error {
 	if int(principal.ID) == ownerAccountId {
-		logrus.Infof("accessing own share '%v' for '%v'", shr.Token, principal.Email)
+		dl.Infof("accessing own share '%v' for '%v'", shr.Token, principal.Email)
 		return nil
 	}
 	count, err := str.IsAccessGrantedToAccountForShare(shr.Id, int(principal.ID), trx)
 	if err != nil {
-		logrus.Infof("error checking access grants for '%v': %v", shr.Token, err)
+		dl.Infof("error checking access grants for '%v': %v", shr.Token, err)
 		return err
 	}
 	if count > 0 {
-		logrus.Infof("found '%d' grants for '%v'", count, principal.Email)
+		dl.Infof("found '%d' grants for '%v'", count, principal.Email)
 		return nil
 	}
 	return errors.Errorf("access denied for '%v' accessing '%v'", principal.Email, shr.Token)

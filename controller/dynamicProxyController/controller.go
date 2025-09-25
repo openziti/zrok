@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/controller/store"
-	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
 
@@ -46,11 +46,11 @@ func NewController(cfg *Config, str *store.Store) (*Controller, error) {
 	}
 	go func() {
 		if err := srv.Serve(l); err != nil {
-			logrus.Errorf("error serving dynamic proxy controller: %v", err)
+			dl.Errorf("error serving dynamic proxy controller: %v", err)
 			return
 		}
 	}()
-	logrus.Infof("started dynamic proxy controller server")
+	dl.Infof("started dynamic proxy controller server")
 
 	return ctrl, nil
 }
@@ -124,6 +124,6 @@ func (c *Controller) sendMappingUpdate(frontendToken string, m Mapping) error {
 	if err := c.publisher.Publish(context.Background(), frontendToken, m); err != nil {
 		return err
 	}
-	logrus.Infof("sent mapping update '%+v' -> '%s'", m, frontendToken)
+	dl.Infof("sent mapping update '%+v' -> '%s'", m, frontendToken)
 	return nil
 }

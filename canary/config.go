@@ -2,9 +2,9 @@ package canary
 
 import (
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/metrics"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 const ConfigVersion = 1
@@ -22,6 +22,6 @@ func LoadConfig(path string) (*Config, error) {
 	if cfg.V != ConfigVersion {
 		return nil, errors.Errorf("expecting canary configuration version '%v', got '%v'", ConfigVersion, cfg.V)
 	}
-	logrus.Info(dd.MustInspect(cfg))
+	dl.Info(dd.MustInspect(cfg))
 	return cfg, nil
 }

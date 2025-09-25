@@ -26,19 +26,19 @@ conventions and idioms. The log formatting examples for Go are applicable to all
     Format log messages that report errors.
 
     ```go
-    logrus.Errorf("tried a thing and failed: %v", err)
+    dl.Errorf("tried a thing and failed: %v", err)
     ```
 
     Format in-line information in informational log messages.
 
     ```go
-    logrus.Infof("the expected value '%v' arrived as '%v'", expected, actual)
+    dl.Infof("the expected value '%v' arrived as '%v'", expected, actual)
     ```
 
     Format in-line information in error log messages.
 
     ```go
-    logrus.Errorf("the expected value '%v did not compute: %v", value, err)
+    dl.Errorf("the expected value '%v did not compute: %v", value, err)
     ```
 
 + Format log messages with format strings and arguments like 'tried a thing and failed: %s'.

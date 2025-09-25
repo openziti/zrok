@@ -2,12 +2,13 @@ package controller
 
 import (
 	"fmt"
+
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/agent"
-	"github.com/sirupsen/logrus"
 )
 
 type agentEnrollHandler struct{}
@@ -20,32 +21,32 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 	// start transaction early, if it fails, don't bother creating ziti resources
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction for '%v': %v", principal.Email, err)
+		dl.Errorf("error starting transaction for '%v': %v", principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
 	defer trx.Rollback()
 
 	env, err := str.FindEnvironmentForAccount(params.Body.EnvZID, int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("error finding environment '%v' for '%v': %v", params.Body.EnvZID, principal.Email, err)
+		dl.Errorf("error finding environment '%v' for '%v': %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewEnrollUnauthorized()
 	}
 
 	if _, err := str.FindAgentEnrollmentForEnvironment(env.Id, trx); err == nil {
-		logrus.Errorf("environment '%v' (%v) is already enrolled!", params.Body.EnvZID, principal.Email)
+		dl.Errorf("environment '%v' (%v) is already enrolled!", params.Body.EnvZID, principal.Email)
 		return agent.NewEnrollBadRequest()
 	}
 
 	token, err := CreateToken()
 	if err != nil {
-		logrus.Errorf("error creating agent enrollment token for '%v': %v", principal.Email, err)
+		dl.Errorf("error creating agent enrollment token for '%v': %v", principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
-	logrus.Infof("enrollment token: %v", token)
+	dl.Infof("enrollment token: %v", token)
 
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
-		logrus.Errorf("error getting automation client for '%v': %v", principal.Email, err)
+		dl.Errorf("error getting automation client for '%v': %v", principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
 
@@ -60,7 +61,7 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 	}
 	zId, err := ziti.Services.Create(serviceOpts)
 	if err != nil {
-		logrus.Errorf("error creating agent remoting service for '%v' (%v): %v", env.ZId, principal.Email, err)
+		dl.Errorf("error creating agent remoting service for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
 
@@ -77,7 +78,7 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 		Semantic:      rest_model.SemanticAllOf,
 	}
 	if _, err := ziti.ServicePolicies.CreateBind(bindOpts); err != nil {
-		logrus.Errorf("error creating agent remoting bind policy for '%v' (%v): %v", env.ZId, principal.Email, err)
+		dl.Errorf("error creating agent remoting bind policy for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
 
@@ -94,7 +95,7 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 		Semantic:      rest_model.SemanticAllOf,
 	}
 	if _, err := ziti.ServicePolicies.CreateDial(dialOpts); err != nil {
-		logrus.Errorf("error creating agent remoting dial policy for '%v' (%v): %v", env.ZId, principal.Email, err)
+		dl.Errorf("error creating agent remoting dial policy for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
 
@@ -109,17 +110,17 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 		Semantic:        rest_model.SemanticAllOf,
 	}
 	if _, err := ziti.ServiceEdgeRouterPolicies.Create(serpOpts); err != nil {
-		logrus.Errorf("error creating agent remoting serp for '%v' (%v): %v", env.ZId, principal.Email, err)
+		dl.Errorf("error creating agent remoting serp for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
 
 	if _, err := str.CreateAgentEnrollment(env.Id, token, trx); err != nil {
-		logrus.Errorf("error storing agent enrollment for '%v' (%v): %v", env.ZId, principal.Email, err)
+		dl.Errorf("error storing agent enrollment for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
 
 	if err := trx.Commit(); err != nil {
-		logrus.Errorf("error committing agent enrollment record for '%v' (%v): %v", env.ZId, principal.Email, err)
+		dl.Errorf("error committing agent enrollment record for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
 

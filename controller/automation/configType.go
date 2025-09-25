@@ -1,10 +1,10 @@
 package automation
 
 import (
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_management_api_client/config"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type ConfigTypeManager struct {
@@ -40,7 +40,7 @@ func (ctm *ConfigTypeManager) Create(opts *ConfigTypeOptions) (string, error) {
 		return "", errors.Wrapf(err, "error creating config type '%s'", opts.Name)
 	}
 
-	logrus.Infof("created config type '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
+	dl.Infof("created config type '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
 	return resp.Payload.Data.ID, nil
 }
 
@@ -56,7 +56,7 @@ func (ctm *ConfigTypeManager) Delete(id string) error {
 		return errors.Wrapf(err, "error deleting config type '%s'", id)
 	}
 
-	logrus.Infof("deleted config type '%s'", id)
+	dl.Infof("deleted config type '%s'", id)
 	return nil
 }
 
@@ -96,7 +96,7 @@ func (ctm *ConfigTypeManager) EnsureExists(name string) (string, error) {
 	}
 
 	if existing != nil {
-		logrus.Infof("found existing config type '%s' with id '%s'", name, *existing.ID)
+		dl.Infof("found existing config type '%s' with id '%s'", name, *existing.ID)
 		return *existing.ID, nil
 	}
 

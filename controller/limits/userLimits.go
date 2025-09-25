@@ -2,10 +2,10 @@ package limits
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type userLimits struct {
@@ -67,7 +67,7 @@ func (a *Agent) getUserLimits(acctId int, trx *sqlx.Tx) (*userLimits, error) {
 		} else if a.isScopedLimitClass(alc) {
 			scopes[*alc.BackendMode] = alc
 		} else {
-			logrus.Warnf("unknown type of limit class '%v' for account '#%d'", alc, acctId)
+			dl.Warnf("unknown type of limit class '%v' for account '#%d'", alc, acctId)
 		}
 	}
 

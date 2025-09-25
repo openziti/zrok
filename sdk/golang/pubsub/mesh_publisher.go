@@ -10,20 +10,20 @@ import (
 	"sync"
 	"time"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type meshPublisher struct {
-	cfg             *MeshConfig
-	node            *meshNode
-	listener        net.Listener
-	localClients    map[string]net.Conn
-	clientMutex     sync.RWMutex
-	topics          []string
-	topicMutex      sync.RWMutex
-	done            chan struct{}
+	cfg          *MeshConfig
+	node         *meshNode
+	listener     net.Listener
+	localClients map[string]net.Conn
+	clientMutex  sync.RWMutex
+	topics       []string
+	topicMutex   sync.RWMutex
+	done         chan struct{}
 }
 
 // NewMeshPublisher creates a new mesh-enabled publisher
@@ -72,7 +72,7 @@ func NewMeshPublisher(cfg *MeshConfig) (MeshPublisher, error) {
 	// start accepting local client connections
 	go mp.acceptLocalConnections()
 
-	logrus.Infof("mesh publisher listening on service '%s' with node ID '%s'", cfg.ServiceName, cfg.NodeID)
+	dl.Infof("mesh publisher listening on service '%s' with node ID '%s'", cfg.ServiceName, cfg.NodeID)
 	return mp, nil
 }
 
@@ -88,7 +88,7 @@ func (mp *meshPublisher) acceptLocalConnections() {
 				case <-mp.done:
 					return
 				default:
-					logrus.Errorf("failed to accept local connection: %v", err)
+					dl.Errorf("failed to accept local connection: %v", err)
 					continue
 				}
 			}
@@ -98,7 +98,7 @@ func (mp *meshPublisher) acceptLocalConnections() {
 			mp.localClients[clientID] = conn
 			mp.clientMutex.Unlock()
 
-			logrus.Debugf("local client connected: %s", clientID)
+			dl.Debugf("local client connected: %s", clientID)
 			go mp.handleLocalClient(clientID, conn)
 		}
 	}
@@ -110,13 +110,13 @@ func (mp *meshPublisher) handleLocalClient(clientID string, conn net.Conn) {
 		delete(mp.localClients, clientID)
 		mp.clientMutex.Unlock()
 		conn.Close()
-		logrus.Debugf("local client disconnected: %s", clientID)
+		dl.Debugf("local client disconnected: %s", clientID)
 	}()
 
 	// handle both subscriber connections and discovery requests
 	scanner := bufio.NewScanner(conn)
 	scanner.Scan() // read first message to determine connection type
-	
+
 	firstLine := strings.TrimSpace(scanner.Text())
 	if firstLine != "" && strings.Contains(firstLine, "peer_discovery") {
 		// handle discovery request
@@ -143,7 +143,7 @@ func (mp *meshPublisher) handleLocalClient(clientID string, conn net.Conn) {
 func (mp *meshPublisher) handleDiscoveryRequest(conn net.Conn, request string) {
 	var req map[string]interface{}
 	if err := json.Unmarshal([]byte(request), &req); err != nil {
-		logrus.Debugf("invalid discovery request: %v", err)
+		dl.Debugf("invalid discovery request: %v", err)
 		return
 	}
 
@@ -151,18 +151,18 @@ func (mp *meshPublisher) handleDiscoveryRequest(conn net.Conn, request string) {
 		// respond with list of known peers
 		peers := mp.node.getConnectedPeers()
 		peers = append(peers, mp.cfg.NodeID) // include self
-		
+
 		response := map[string]interface{}{
 			"type":  "peer_discovery_response",
 			"peers": peers,
 		}
-		
+
 		data, err := json.Marshal(response)
 		if err == nil {
 			conn.Write(append(data, '\n'))
 		}
-		
-		logrus.Debugf("responded to peer discovery request with %d peers", len(peers))
+
+		dl.Debugf("responded to peer discovery request with %d peers", len(peers))
 	}
 }
 
@@ -219,14 +219,14 @@ func (mp *meshPublisher) Publish(ctx context.Context, msg *Message) error {
 	// relay to mesh peers (if not a relayed message)
 	if msg.HopCount == 0 && msg.OriginNode == mp.cfg.NodeID {
 		if err := mp.node.relayMessage(msg); err != nil {
-			logrus.Errorf("failed to relay message to mesh: %v", err)
+			dl.Errorf("failed to relay message to mesh: %v", err)
 			if publishErr == nil {
 				publishErr = err
 			}
 		}
 	}
 
-	logrus.Debugf("published message: %s (topic: %s, origin: %s, hops: %d)", 
+	dl.Debugf("published message: %s (topic: %s, origin: %s, hops: %d)",
 		msg.Id, msg.Topic, msg.OriginNode, msg.HopCount)
 
 	return publishErr
@@ -243,12 +243,12 @@ func (mp *meshPublisher) publishToLocalClients(data []byte) error {
 	var publishErr error
 	for _, conn := range clients {
 		if _, err := conn.Write(append(data, '\n')); err != nil {
-			logrus.Errorf("failed to write to local client: %v", err)
+			dl.Errorf("failed to write to local client: %v", err)
 			publishErr = err
 		}
 	}
 
-	logrus.Debugf("published to %d local clients", len(clients))
+	dl.Debugf("published to %d local clients", len(clients))
 	return publishErr
 }
 
@@ -258,7 +258,7 @@ func (mp *meshPublisher) Close() error {
 
 	// leave mesh
 	if err := mp.node.leaveMesh(); err != nil {
-		logrus.Errorf("error leaving mesh: %v", err)
+		dl.Errorf("error leaving mesh: %v", err)
 	}
 
 	// close local client connections

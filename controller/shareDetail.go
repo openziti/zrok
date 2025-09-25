@@ -2,10 +2,10 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
-	"github.com/sirupsen/logrus"
 )
 
 type shareDetailHandler struct{}
@@ -17,18 +17,18 @@ func newShareDetailHandler() *shareDetailHandler {
 func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return metadata.NewGetShareDetailInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 	shr, err := str.FindShareWithToken(params.ShareToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding share '%v': %v", params.ShareToken, err)
+		dl.Errorf("error finding share '%v': %v", params.ShareToken, err)
 		return metadata.NewGetShareDetailNotFound()
 	}
 	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("error finding environments for account '%v': %v", principal.Email, err)
+		dl.Errorf("error finding environments for account '%v': %v", principal.Email, err)
 		return metadata.NewGetShareDetailInternalServerError()
 	}
 	found := false
@@ -41,7 +41,7 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 		}
 	}
 	if !found {
-		logrus.Errorf("environment not matched for share '%v' for account '%v'", params.ShareToken, principal.Email)
+		dl.Errorf("environment not matched for share '%v' for account '%v'", params.ShareToken, principal.Email)
 		return metadata.NewGetShareDetailNotFound()
 	}
 	sparkRx := make(map[string][]int64)
@@ -49,10 +49,10 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
 		sparkRx, sparkTx, err = sparkDataForShares([]*store.Share{shr})
 		if err != nil {
-			logrus.Errorf("error querying spark data for share: %v", err)
+			dl.Errorf("error querying spark data for share: %v", err)
 		}
 	} else {
-		logrus.Debug("skipping spark data; no influx configuration")
+		dl.Debug("skipping spark data; no influx configuration")
 	}
 
 	frontendEndpoints := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, trx)

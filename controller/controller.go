@@ -9,6 +9,7 @@ import (
 	"github.com/go-openapi/loads"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/jessevdk/go-flags"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/agentController"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/dynamicProxyController"
@@ -20,7 +21,6 @@ import (
 	"github.com/openziti/zrok/rest_server_zrok/operations/account"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -87,7 +87,7 @@ func Run(inCfg *config.Config) error {
 	if cfg.AgentController != nil {
 		if i, err := agentController.NewAgentController(cfg.AgentController); err == nil {
 			agentCtrl = i
-			logrus.Infof("created new agent controller")
+			dl.Infof("created new agent controller")
 		} else {
 			return errors.Wrap(err, "error creating agent controller")
 		}
@@ -149,13 +149,13 @@ func Run(inCfg *config.Config) error {
 		if err != nil {
 			return err
 		}
-		logrus.Infof("started dynamic proxy controller")
+		dl.Infof("started dynamic proxy controller")
 	}
 
 	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
 		idb = influxdb2.NewClient(cfg.Metrics.Influx.Url, cfg.Metrics.Influx.Token)
 	} else {
-		logrus.Warn("skipping influx client; no configuration")
+		dl.Warn("skipping influx client; no configuration")
 	}
 
 	if cfg.Metrics != nil && cfg.Metrics.Agent != nil && cfg.Metrics.Influx != nil {

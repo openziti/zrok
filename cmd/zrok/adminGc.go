@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller"
 	"github.com/openziti/zrok/controller/config"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -32,7 +32,7 @@ func (gc *adminGcCommand) run(_ *cobra.Command, args []string) {
 	if err != nil {
 		panic(err)
 	}
-	logrus.Info(dd.MustInspect(cfg))
+	dl.Info(dd.MustInspect(cfg))
 	if err := controller.GC(cfg); err != nil {
 		panic(err)
 	}

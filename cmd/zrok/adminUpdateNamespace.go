@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -51,7 +51,7 @@ func (cmd *adminUpdateNamespaceCommand) run(_ *cobra.Command, args []string) {
 		Name:           cmd.name,
 		Description:    cmd.description,
 	}
-	
+
 	if cmd.cmd.Flags().Changed("open") {
 		req.Body.Open = true
 		req.Body.OpenSet = true
@@ -65,5 +65,5 @@ func (cmd *adminUpdateNamespaceCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	logrus.Infof("updated namespace '%v'", args[0])
+	dl.Infof("updated namespace '%v'", args[0])
 }

@@ -8,7 +8,6 @@ package davServer
 import (
 	"errors"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"net/url"
@@ -18,6 +17,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/michaelquigley/df/dl"
 )
 
 type Handler struct {
@@ -279,13 +280,13 @@ func (h *Handler) handlePut(w http.ResponseWriter, r *http.Request) (status int,
 		if modTimeV, err := strconv.ParseInt(modTimes[0], 10, 64); err == nil {
 			if v, ok := f.(*webdavFile); ok {
 				if err := v.updateModtime(reqPath, time.Unix(modTimeV, 0)); err != nil {
-					logrus.Warn(err)
+					dl.Warn(err)
 				}
 			} else {
-				logrus.Error("!ok")
+				dl.Error("!ok")
 			}
 		} else {
-			logrus.Error(err)
+			dl.Error(err)
 		}
 	}
 

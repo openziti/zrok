@@ -1,10 +1,10 @@
 package automation
 
 import (
+	"github.com/michaelquigley/df/dl"
 	edgeservice "github.com/openziti/edge-api/rest_management_api_client/service"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type ServiceManager struct {
@@ -63,7 +63,7 @@ func (sm *ServiceManager) Create(opts *ServiceOptions) (string, error) {
 		return "", errors.Wrapf(err, "error creating service '%s'", opts.Name)
 	}
 
-	logrus.Infof("created service '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
+	dl.Infof("created service '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
 	return resp.Payload.Data.ID, nil
 }
 
@@ -79,7 +79,7 @@ func (sm *ServiceManager) Delete(id string) error {
 		return errors.Wrapf(err, "error deleting service '%s'", id)
 	}
 
-	logrus.Infof("deleted service '%s'", id)
+	dl.Infof("deleted service '%s'", id)
 	return nil
 }
 

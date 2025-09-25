@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
-	"github.com/sirupsen/logrus"
 )
 
 type environmentDetailHandler struct{}
@@ -16,13 +16,13 @@ func newEnvironmentDetailHandler() *environmentDetailHandler {
 func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
+		dl.Errorf("error starting transaction for user '%v': %v", principal.Email, err)
 		return metadata.NewGetEnvironmentDetailInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 	senv, err := str.FindEnvironmentForAccount(params.EnvZID, int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("environment '%v' not found for account '%v': %v", params.EnvZID, principal.Email, err)
+		dl.Errorf("environment '%v' not found for account '%v': %v", params.EnvZID, principal.Email, err)
 		return metadata.NewGetEnvironmentDetailNotFound()
 	}
 	es := &rest_model_zrok.EnvironmentAndResources{
@@ -37,7 +37,7 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 	}
 	shrs, err := str.FindSharesForEnvironment(senv.Id, trx)
 	if err != nil {
-		logrus.Errorf("error finding shares for environment '%v' for user '%v': %v", senv.ZId, principal.Email, err)
+		dl.Errorf("error finding shares for environment '%v' for user '%v': %v", senv.ZId, principal.Email, err)
 		return metadata.NewGetEnvironmentDetailInternalServerError()
 	}
 	sparkRx := make(map[string][]int64)
@@ -45,10 +45,10 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
 		sparkRx, sparkTx, err = sparkDataForShares(shrs)
 		if err != nil {
-			logrus.Errorf("error querying spark data for shares for user '%v': %v", principal.Email, err)
+			dl.Errorf("error querying spark data for shares for user '%v': %v", principal.Email, err)
 		}
 	} else {
-		logrus.Debug("skipping spark data for shares; no influx configuration")
+		dl.Debug("skipping spark data for shares; no influx configuration")
 	}
 	for _, shr := range shrs {
 		frontendEndpoints := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, trx)

@@ -9,11 +9,11 @@ import (
 	errors2 "github.com/go-openapi/errors"
 	"github.com/jaevor/go-nanoid"
 	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/config"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/util"
-	"github.com/sirupsen/logrus"
 )
 
 type zrokAuthenticator struct {
@@ -27,7 +27,7 @@ func newZrokAuthenticator(cfg *config.Config) *zrokAuthenticator {
 func (za *zrokAuthenticator) authenticate(token string) (*rest_model_zrok.Principal, error) {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction for '%v': %v", token, err)
+		dl.Errorf("error starting transaction for '%v': %v", token, err)
 		return nil, err
 	}
 	defer func() { _ = trx.Rollback() }()
@@ -55,7 +55,7 @@ func (za *zrokAuthenticator) authenticate(token string) (*rest_model_zrok.Princi
 		}
 
 		// no match
-		logrus.Warnf("invalid api key '%v'", token)
+		dl.Warnf("invalid api key '%v'", token)
 		return nil, errors2.New(401, "invalid api key")
 	}
 }
@@ -131,7 +131,7 @@ func buildFrontendEndpointsForShare(shareId int, shareToken string, deprecatedEn
 	// retrieve names for this share using the new mapping table
 	shareNames, err := str.FindNamesForShare(shareId, trx)
 	if err != nil {
-		logrus.Errorf("error finding names for share '%v': %v", shareToken, err)
+		dl.Errorf("error finding names for share '%v': %v", shareToken, err)
 		// continue without failing the entire request
 		shareNames = []*store.NameWithNamespace{}
 	}

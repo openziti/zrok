@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/sdk/golang/sdk"
 	"strings"
 	"time"
+
+	"github.com/openziti/zrok/sdk/golang/sdk"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -218,7 +219,7 @@ func (m *shareModel) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func (shareModel) Close() error {
+func (*shareModel) Close() error {
 	return nil
 }
 
@@ -230,24 +231,24 @@ func wrap(lines []string, width int) []string {
 			continue
 		}
 		for i := 0; i <= len(line); {
-			max := i + width
-			if max > len(line) {
-				max = len(line)
+			maxWidth := i + width
+			if maxWidth > len(line) {
+				maxWidth = len(line)
 			}
-			if line[i:max] == "" {
+			if line[i:maxWidth] == "" {
 				continue
 			}
 			nextI := i + width
-			if max < len(line)-1 {
-				if !wordwrapBreakpoints[rune(line[max])] || !wordwrapBreakpoints[rune(line[max+1])] {
-					lastSpace := strings.LastIndexAny(line[:max], wordwrapCharacters)
+			if maxWidth < len(line)-1 {
+				if !wordwrapBreakpoints[rune(line[maxWidth])] || !wordwrapBreakpoints[rune(line[maxWidth+1])] {
+					lastSpace := strings.LastIndexAny(line[:maxWidth], wordwrapCharacters)
 					if lastSpace > -1 {
-						max = lastSpace
+						maxWidth = lastSpace
 						nextI = lastSpace
 					}
 				}
 			}
-			ret = append(ret, strings.TrimSpace(line[i:max]))
+			ret = append(ret, strings.TrimSpace(line[i:maxWidth]))
 			i = nextI
 		}
 	}

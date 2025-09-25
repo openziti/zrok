@@ -6,11 +6,11 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/lib/pq"
 	"github.com/mattn/go-sqlite3"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/automation"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
-	"github.com/sirupsen/logrus"
 )
 
 type createFrontendHandler struct{}
@@ -21,37 +21,37 @@ func newCreateFrontendHandler() *createFrontendHandler {
 
 func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	if !principal.Admin {
-		logrus.Errorf("invalid admin principal")
+		dl.Errorf("invalid admin principal")
 		return admin.NewCreateFrontendUnauthorized()
 	}
 
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
-		logrus.Errorf("error getting automation client: %v", err)
+		dl.Errorf("error getting automation client: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
 	}
 
 	zId := params.Body.ZID
 	identity, err := ziti.Identities.GetByID(zId)
 	if err != nil {
-		logrus.Errorf("error getting identity details for '%v': %v", zId, err)
+		dl.Errorf("error getting identity details for '%v': %v", zId, err)
 		if ziti.IsNotFound(err) {
 			return admin.NewCreateFrontendNotFound()
 		}
 		return admin.NewCreateFrontendInternalServerError()
 	}
-	logrus.Infof("found frontend identity '%v'", *identity.Name)
+	dl.Infof("found frontend identity '%v'", *identity.Name)
 
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 
 	feToken, err := CreateToken()
 	if err != nil {
-		logrus.Errorf("error creating frontend token: %v", err)
+		dl.Errorf("error creating frontend token: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
 	}
 
@@ -77,16 +77,16 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 			}
 		}
 
-		logrus.Errorf("error creating frontend record: %v", err)
+		dl.Errorf("error creating frontend record: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
 	}
 
 	if err := trx.Commit(); err != nil {
-		logrus.Errorf("error committing frontend record: %v", err)
+		dl.Errorf("error committing frontend record: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
 	}
 
-	logrus.Infof("created global frontend '%v' with public name '%v'", fe.Token, *fe.PublicName)
+	dl.Infof("created global frontend '%v' with public name '%v'", fe.Token, *fe.PublicName)
 
 	return admin.NewCreateFrontendCreated().WithPayload(&admin.CreateFrontendCreatedBody{FrontendToken: feToken})
 }

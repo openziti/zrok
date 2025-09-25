@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type PasswordResetRequest struct {
@@ -19,7 +19,7 @@ type PasswordResetRequest struct {
 
 func (str *Store) CreatePasswordResetRequest(prr *PasswordResetRequest, trx *sqlx.Tx) (int, error) {
 	if err := str.DeletePasswordResetRequestsByAccountId(prr.AccountId, trx); err != nil {
-		logrus.Errorf("unable to delete old password reset requests for account '%v', but continuing: %v", prr.AccountId, err)
+		dl.Errorf("unable to delete old password reset requests for account '%v', but continuing: %v", prr.AccountId, err)
 	}
 
 	stmt, err := trx.Prepare("insert into password_reset_requests (account_id, token) values ($1, $2) returning id")

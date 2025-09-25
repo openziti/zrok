@@ -1,10 +1,10 @@
 package automation
 
 import (
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_management_api_client/config"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type ConfigManager struct {
@@ -42,7 +42,7 @@ func (cm *ConfigManager) Create(opts *ConfigOptions) (string, error) {
 		return "", errors.Wrapf(err, "error creating config '%s'", opts.Name)
 	}
 
-	logrus.Infof("created config '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
+	dl.Infof("created config '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
 	return resp.Payload.Data.ID, nil
 }
 
@@ -63,7 +63,7 @@ func (cm *ConfigManager) Update(id string, opts *ConfigOptions) error {
 		return errors.Wrapf(err, "error updating config '%s'", id)
 	}
 
-	logrus.Infof("updated config '%s'", id)
+	dl.Infof("updated config '%s'", id)
 	return nil
 }
 
@@ -79,7 +79,7 @@ func (cm *ConfigManager) Delete(id string) error {
 		return errors.Wrapf(err, "error deleting config '%s'", id)
 	}
 
-	logrus.Infof("deleted config '%s'", id)
+	dl.Infof("deleted config '%s'", id)
 	return nil
 }
 

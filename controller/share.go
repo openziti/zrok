@@ -14,7 +14,6 @@ import (
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type shareHandler struct{}
@@ -26,7 +25,7 @@ func newShareHandler() *shareHandler {
 func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return share.NewShareInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
@@ -35,13 +34,13 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	envZId := params.Body.EnvZID
 	envId, err := h.validateEnvironment(envZId, principal, trx)
 	if err != nil {
-		logrus.Errorf("environment validation failed: %v", err)
+		dl.Errorf("environment validation failed: %v", err)
 		return share.NewShareUnauthorized()
 	}
 
 	// check limits
 	if err := h.checkLimits(envId, principal, params, trx); err != nil {
-		logrus.Errorf("limits error: %v", err)
+		dl.Errorf("limits error: %v", err)
 		return share.NewShareUnauthorized()
 	}
 
@@ -52,13 +51,13 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		if util.IsValidUniqueName(params.Body.PrivateShareToken) {
 			shrToken = params.Body.PrivateShareToken
 		} else {
-			logrus.Errorf("requested private share token '%v' has invalid unique name", params.Body.PrivateShareToken)
+			dl.Errorf("requested private share token '%v' has invalid unique name", params.Body.PrivateShareToken)
 			return share.NewShareConflict().WithPayload(rest_model_zrok.ErrorMessage(fmt.Sprintf("requested private share token '%v' has invalid unique name", params.Body.PrivateShareToken)))
 		}
 	} else {
 		shrToken, err = createShareToken()
 		if err != nil {
-			logrus.Error(err)
+			dl.Error(err)
 			return share.NewShareInternalServerError()
 		}
 	}
@@ -69,7 +68,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	if sdk.ShareMode(params.Body.ShareMode) == sdk.PublicShareMode {
 		frontendEndpoints, nameIds, err = h.processNameSelections(params.Body.NameSelections, shrToken, principal, trx)
 		if err != nil {
-			logrus.Errorf("namespace selection processing failed: %v", err)
+			dl.Errorf("namespace selection processing failed: %v", err)
 			return share.NewShareConflict().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 		}
 	}
@@ -80,7 +79,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	case sdk.PublicShareMode:
 		interstitial, err := h.shouldUseInterstitial(params.Body.BackendMode, principal, trx)
 		if err != nil {
-			logrus.Errorf("error determining interstitial setting for account '%v': %v", principal.Email, err)
+			dl.Errorf("error determining interstitial setting for account '%v': %v", principal.Email, err)
 			return share.NewShareInternalServerError()
 		}
 		shrZId, frontendEndpoints, err = h.allocatePublicResources(envZId, shrToken, frontendEndpoints, params, interstitial, trx)
@@ -89,25 +88,25 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		// check private share token availability if provided
 		if params.Body.PrivateShareToken != "" {
 			if err := h.checkPrivateShareTokenAvailability(shrToken); err != nil {
-				logrus.Errorf("private share token conflict: %v", err)
+				dl.Errorf("private share token conflict: %v", err)
 				return share.NewShareConflict().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 			}
 		}
 		shrZId, frontendEndpoints, err = h.allocatePrivateResources(envZId, shrToken, frontendEndpoints, params, trx)
 
 	default:
-		logrus.Errorf("unknown share mode '%v'", params.Body.ShareMode)
+		dl.Errorf("unknown share mode '%v'", params.Body.ShareMode)
 		return share.NewShareInternalServerError()
 	}
 	if err != nil {
-		logrus.Errorf("error allocating share resources: %v", err)
+		dl.Errorf("error allocating share resources: %v", err)
 		return share.NewShareInternalServerError()
 	}
 
 	// create share record
 	shareId, err := h.createShareRecord(envId, shrZId, shrToken, params, frontendEndpoints, trx)
 	if err != nil {
-		logrus.Errorf("error creating share record: %v", err)
+		dl.Errorf("error creating share record: %v", err)
 		return share.NewShareInternalServerError()
 	}
 
@@ -120,29 +119,29 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 			}
 			_, err := str.CreateShareNameMapping(snm, trx)
 			if err != nil {
-				logrus.Errorf("error creating share name mapping for share '%v' and name '%v': %v", shareId, nameId, err)
+				dl.Errorf("error creating share name mapping for share '%v' and name '%v': %v", shareId, nameId, err)
 				return share.NewShareInternalServerError()
 			}
 		}
 
 		// send mapping updates to dynamic frontends after successful commit
 		if err := h.processDynamicMappings(shrToken, nameIds, trx); err != nil {
-			logrus.Errorf("error sending mapping updates: %v", err)
+			dl.Errorf("error sending mapping updates: %v", err)
 		}
 	}
 
 	// handle access grants if closed permission mode
 	if err := h.processAccessGrants(shareId, params.Body.AccessGrants, params.Body.PermissionMode, principal, trx); err != nil {
-		logrus.Errorf("error processing access grants: %v", err)
+		dl.Errorf("error processing access grants: %v", err)
 		return share.NewShareInternalServerError()
 	}
 
 	if err := trx.Commit(); err != nil {
-		logrus.Errorf("error committing share record: %v", err)
+		dl.Errorf("error committing share record: %v", err)
 		return share.NewShareInternalServerError()
 	}
 
-	logrus.Infof("recorded share '%v' with id '%v' for '%v'", shrToken, shareId, principal.Email)
+	dl.Infof("recorded share '%v' with id '%v' for '%v'", shrToken, shareId, principal.Email)
 
 	return share.NewShareCreated().WithPayload(&rest_model_zrok.ShareResponse{
 		FrontendProxyEndpoints: frontendEndpoints,
@@ -412,7 +411,7 @@ func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontend
 		return "", nil, errors.Wrap(err, "error creating service edge router policy")
 	}
 
-	logrus.Infof("allocated public resources for share '%v' with service id '%v'", shrToken, shrZId)
+	dl.Infof("allocated public resources for share '%v' with service id '%v'", shrToken, shrZId)
 	return shrZId, frontendEndpoints, nil
 }
 
@@ -536,7 +535,7 @@ func (h *shareHandler) allocatePrivateResources(envZId, shrToken string, fronten
 	// note: private shares don't create dial policies here
 	// dial access is granted separately via the access endpoint
 
-	logrus.Infof("allocated private resources for share '%v' with service id '%v'", shrToken, shrZId)
+	dl.Infof("allocated private resources for share '%v' with service id '%v'", shrToken, shrZId)
 	return shrZId, frontendEndpoints, nil
 }
 
@@ -573,7 +572,7 @@ func (h *shareHandler) createShareRecord(envId int, shrZId, shrToken string, par
 		return 0, errors.Wrap(err, "error creating share record")
 	}
 
-	logrus.Infof("created share record with id '%v' for share '%v'", shareId, shrToken)
+	dl.Infof("created share record with id '%v' for share '%v'", shareId, shrToken)
 	return shareId, nil
 }
 
@@ -590,7 +589,7 @@ func (h *shareHandler) processAccessGrants(shareId int, accessGrants []string, p
 		if err != nil {
 			return errors.Wrapf(err, "unable to find account '%v' for share request from '%v'", email, principal.Email)
 		}
-		logrus.Debugf("found id '%d' for '%v'", acct.Id, acct.Email)
+		dl.Debugf("found id '%d' for '%v'", acct.Id, acct.Email)
 		accessGrantAcctIds = append(accessGrantAcctIds, acct.Id)
 	}
 
@@ -600,11 +599,11 @@ func (h *shareHandler) processAccessGrants(shareId int, accessGrants []string, p
 		if err != nil {
 			return errors.Wrapf(err, "error creating access grant for share '%v' and account '%v'", shareId, acctId)
 		}
-		logrus.Debugf("created access grant for share '%v' and account '%v'", shareId, acctId)
+		dl.Debugf("created access grant for share '%v' and account '%v'", shareId, acctId)
 	}
 
 	if len(accessGrantAcctIds) > 0 {
-		logrus.Infof("created %d access grants for closed share '%v'", len(accessGrantAcctIds), shareId)
+		dl.Infof("created %d access grants for closed share '%v'", len(accessGrantAcctIds), shareId)
 	}
 
 	return nil
@@ -613,7 +612,7 @@ func (h *shareHandler) processAccessGrants(shareId int, accessGrants []string, p
 func (h *shareHandler) processDynamicMappings(shrToken string, nameIds []int, trx *sqlx.Tx) error {
 	// only send updates if dynamic proxy controller is enabled
 	if dPCtrl == nil {
-		logrus.Warnf("dynamic proxy controller is nil")
+		dl.Warnf("dynamic proxy controller is nil")
 		return nil
 	}
 
@@ -639,13 +638,13 @@ func (h *shareHandler) processDynamicMappings(shrToken string, nameIds []int, tr
 		// send mapping updates to each dynamic frontend
 		for _, frontend := range frontends {
 			frontendName := util.ExpandUrlTemplate(name.Name, ns.Name)
-			logrus.Infof("binding name '%v'", frontendName)
+			dl.Infof("binding name '%v'", frontendName)
 
 			if err := dPCtrl.BindFrontendMapping(frontend.Token, frontendName, shrToken, trx); err != nil {
-				logrus.Errorf("error binding frontend mapping to frontend '%v': %v", frontend.Token, err)
+				dl.Errorf("error binding frontend mapping to frontend '%v': %v", frontend.Token, err)
 				// continue with other frontends rather than failing completely
 			} else {
-				logrus.Infof("bound frontend mapping '%v' to dynamic frontend '%v'", frontendName, frontend.Token)
+				dl.Infof("bound frontend mapping '%v' to dynamic frontend '%v'", frontendName, frontend.Token)
 			}
 		}
 	}

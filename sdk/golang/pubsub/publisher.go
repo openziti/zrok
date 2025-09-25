@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type publisher struct {
@@ -47,7 +47,7 @@ func NewPublisher(cfg *PublisherConfig) (Publisher, error) {
 	}
 
 	go p.acceptConnections()
-	logrus.Infof("publisher listening on service '%s'", cfg.ServiceName)
+	dl.Infof("publisher listening on service '%s'", cfg.ServiceName)
 	return p, nil
 }
 
@@ -63,7 +63,7 @@ func (p *publisher) acceptConnections() {
 				case <-p.done:
 					return
 				default:
-					logrus.Errorf("failed to accept connection: %v", err)
+					dl.Errorf("failed to accept connection: %v", err)
 					continue
 				}
 			}
@@ -73,7 +73,7 @@ func (p *publisher) acceptConnections() {
 			p.clients[clientID] = conn
 			p.mutex.Unlock()
 
-			logrus.Debugf("client connected: %s", clientID)
+			dl.Debugf("client connected: %s", clientID)
 			go p.handleClient(clientID, conn)
 		}
 	}
@@ -85,7 +85,7 @@ func (p *publisher) handleClient(clientID string, conn net.Conn) {
 		delete(p.clients, clientID)
 		p.mutex.Unlock()
 		conn.Close()
-		logrus.Debugf("client disconnected: %s", clientID)
+		dl.Debugf("client disconnected: %s", clientID)
 	}()
 
 	// keep connection alive, handle client disconnection
@@ -120,12 +120,12 @@ func (p *publisher) Publish(ctx context.Context, msg *Message) error {
 	var publishErr error
 	for _, conn := range clients {
 		if _, err := conn.Write(append(data, '\n')); err != nil {
-			logrus.Errorf("failed to write to client: %v", err)
+			dl.Errorf("failed to write to client: %v", err)
 			publishErr = err
 		}
 	}
 
-	logrus.Debugf("published message to %d clients: %s", len(clients), msg.Type)
+	dl.Debugf("published message to %d clients: %s", len(clients), msg.Type)
 	return publishErr
 }
 

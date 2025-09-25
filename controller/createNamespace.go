@@ -2,10 +2,10 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
-	"github.com/sirupsen/logrus"
 )
 
 type createNamespaceHandler struct{}
@@ -16,13 +16,13 @@ func newCreateNamespaceHandler() *createNamespaceHandler {
 
 func (h *createNamespaceHandler) Handle(params admin.CreateNamespaceParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	if !principal.Admin {
-		logrus.Errorf("invalid admin principal")
+		dl.Errorf("invalid admin principal")
 		return admin.NewCreateNamespaceUnauthorized()
 	}
 
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return admin.NewCreateNamespaceInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
@@ -30,7 +30,7 @@ func (h *createNamespaceHandler) Handle(params admin.CreateNamespaceParams, prin
 	// check if namespace already exists
 	if params.Body.Name != "" {
 		if _, err := str.FindNamespaceWithName(params.Body.Name, trx); err == nil {
-			logrus.Errorf("namespace '%v' already exists", params.Body.Name)
+			dl.Errorf("namespace '%v' already exists", params.Body.Name)
 			return admin.NewCreateNamespaceConflict()
 		}
 	}
@@ -41,7 +41,7 @@ func (h *createNamespaceHandler) Handle(params admin.CreateNamespaceParams, prin
 	} else {
 		namespaceToken, err = CreateToken()
 		if err != nil {
-			logrus.Errorf("error creating namespace token: %v", err)
+			dl.Errorf("error creating namespace token: %v", err)
 			return admin.NewCreateNamespaceInternalServerError()
 		}
 	}
@@ -53,16 +53,16 @@ func (h *createNamespaceHandler) Handle(params admin.CreateNamespaceParams, prin
 		Open:        params.Body.Open,
 	}
 	if _, err := str.CreateNamespace(ns, trx); err != nil {
-		logrus.Errorf("error creating namespace: %v", err)
+		dl.Errorf("error creating namespace: %v", err)
 		return admin.NewCreateNamespaceInternalServerError()
 	}
 
 	if err := trx.Commit(); err != nil {
-		logrus.Errorf("error committing namespace: %v", err)
+		dl.Errorf("error committing namespace: %v", err)
 		return admin.NewCreateNamespaceInternalServerError()
 	}
 
-	logrus.Infof("added namespace '%v' with name '%v'", ns.Token, ns.Name)
+	dl.Infof("added namespace '%v' with name '%v'", ns.Token, ns.Name)
 
 	return admin.NewCreateNamespaceCreated().WithPayload(&admin.CreateNamespaceCreatedBody{NamespaceToken: ns.Token})
 }

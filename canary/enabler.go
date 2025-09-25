@@ -2,11 +2,12 @@ package canary
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/sirupsen/logrus"
 	"math/rand"
 	"time"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/environment/env_core"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 )
 
 type EnablerOptions struct {
@@ -39,7 +40,7 @@ func NewEnabler(id uint, opt *EnablerOptions, root env_core.Root) *Enabler {
 func (e *Enabler) Run() {
 	defer close(e.Environments)
 	defer close(e.Done)
-	defer logrus.Infof("#%d stopping", e.Id)
+	defer dl.Infof("#%d stopping", e.Id)
 	e.dwell()
 	e.iterate()
 }
@@ -54,7 +55,7 @@ func (e *Enabler) dwell() {
 }
 
 func (e *Enabler) iterate() {
-	defer logrus.Info("done")
+	defer dl.Info("done")
 	for i := uint(0); i < e.opt.Iterations; i++ {
 		snapshot := NewSnapshot("enable", e.Id, uint64(i))
 
@@ -65,12 +66,12 @@ func (e *Enabler) iterate() {
 		if err == nil {
 			snapshot.Complete().Success()
 			e.Environments <- env
-			logrus.Infof("#%d enabled environment '%v'", e.Id, env.ZitiIdentity)
+			dl.Infof("#%d enabled environment '%v'", e.Id, env.ZitiIdentity)
 
 		} else {
 			snapshot.Complete().Failure(err)
 
-			logrus.Errorf("error creating canary (#%d) environment: %v", e.Id, err)
+			dl.Errorf("error creating canary (#%d) environment: %v", e.Id, err)
 		}
 
 		snapshot.Send(e.opt.SnapshotQueue)

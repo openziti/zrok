@@ -8,11 +8,11 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/michaelquigley/df/dl"
 	postgresql_schema "github.com/openziti/zrok/controller/store/sql/postgresql"
 	sqlite3_schema "github.com/openziti/zrok/controller/store/sql/sqlite3"
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
-	"github.com/sirupsen/logrus"
 )
 
 type Model struct {
@@ -55,7 +55,7 @@ func Open(cfg *Config) (*Store, error) {
 	default:
 		return nil, errors.Errorf("unknown database type '%v' (supported: sqlite3, postgres)", cfg.Type)
 	}
-	logrus.Info("database connected")
+	dl.Info("database connected")
 	dbx.MapperFunc(strcase.ToSnake)
 
 	store := &Store{cfg: cfg, db: dbx}
@@ -95,7 +95,7 @@ func (str *Store) migrateWithDirection(cfg *Config, direction migrate.MigrationD
 		if err != nil {
 			return errors.Wrap(err, "error running migrations")
 		}
-		logrus.Infof("applied %d migrations", n)
+		dl.Infof("applied %d migrations", n)
 
 	case "postgres":
 		migrations := &migrate.EmbedFileSystemMigrationSource{
@@ -107,7 +107,7 @@ func (str *Store) migrateWithDirection(cfg *Config, direction migrate.MigrationD
 		if err != nil {
 			return errors.Wrap(err, "error running migrations")
 		}
-		logrus.Infof("applied %d migrations", n)
+		dl.Infof("applied %d migrations", n)
 	}
 	return nil
 }
