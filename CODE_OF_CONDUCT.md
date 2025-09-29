@@ -1,7 +1,7 @@
 # Code of Conduct
 
 All open source projects managed by NetFoundry share a common [code of
-conduct](https://netfoundry.github.io/policies/CODE_OF_CONDUCT.html) which all contributors are expected to follow.
+conduct](https://netfoundry.io/docs/openziti/policies/CODE_OF_CONDUCT/) which all contributors are expected to follow.
 Please be sure you read, understand and adhere to the thoughts expressed therein.
 
 Individuals acting in any way that is considered in violation of the Code of Conduct will receive corrective actions
