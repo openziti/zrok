@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { Failure } from './Failure';
+import {
+    FailureFromJSON,
+    FailureFromJSONTyped,
+    FailureToJSON,
+    FailureToJSONTyped,
+} from './Failure';
+
 /**
  * 
  * @export
@@ -43,6 +51,18 @@ export interface AccessDetail {
      * @memberof AccessDetail
      */
     responseHeaders?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof AccessDetail
+     */
+    status?: string;
+    /**
+     * 
+     * @type {Failure}
+     * @memberof AccessDetail
+     */
+    failure?: Failure;
 }
 
 /**
@@ -66,6 +86,8 @@ export function AccessDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'token': json['token'] == null ? undefined : json['token'],
         'bindAddress': json['bindAddress'] == null ? undefined : json['bindAddress'],
         'responseHeaders': json['responseHeaders'] == null ? undefined : json['responseHeaders'],
+        'status': json['status'] == null ? undefined : json['status'],
+        'failure': json['failure'] == null ? undefined : FailureFromJSON(json['failure']),
     };
 }
 
@@ -84,6 +106,8 @@ export function AccessDetailToJSONTyped(value?: AccessDetail | null, ignoreDiscr
         'token': value['token'],
         'bindAddress': value['bindAddress'],
         'responseHeaders': value['responseHeaders'],
+        'status': value['status'],
+        'failure': FailureToJSON(value['failure']),
     };
 }
 

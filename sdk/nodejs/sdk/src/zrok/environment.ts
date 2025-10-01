@@ -18,14 +18,14 @@ export class Root {
     public apiConfiguration = (): Configuration => {
         let apiEndpoint = this.apiEndpoint();
         if(this.isEnabled()) {
-            return new Configuration({basePath: apiEndpoint.endpoint + "/api/v1", apiKey: this.environment?.accountToken})
+            return new Configuration({basePath: apiEndpoint.endpoint + "/api/v2", apiKey: this.environment?.accountToken})
         } else {
-            return new Configuration({basePath: apiEndpoint.endpoint + "/api/v1"});
+            return new Configuration({basePath: apiEndpoint.endpoint + "/api/v2"});
         }
     }
 
     public apiEndpoint = (): ApiEndpoint => {
-        let endpoint = "https://api-v1.zrok.io";
+        let endpoint = "https://api-v2.zrok.io";
         let from = "binary";
 
         if(this.config?.apiEndpoint !== "") {

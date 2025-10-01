@@ -3,17 +3,18 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"net/http"
+
+	"github.com/michaelquigley/df/dl"
 )
 
 func HealthCheckHTTP(w http.ResponseWriter, _ *http.Request) {
 	if err := healthCheckStore(w); err != nil {
-		logrus.Error(err)
+		dl.Error(err)
 		return
 	}
 	if err := healthCheckMetrics(w); err != nil {
-		logrus.Error(err)
+		dl.Error(err)
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -34,7 +35,7 @@ func healthCheckStore(w http.ResponseWriter) error {
 		http.Error(w, "error selecting migration count", http.StatusInternalServerError)
 		return err
 	}
-	logrus.Debugf("%d migrations", count)
+	dl.Debugf("%d migrations", count)
 	return nil
 }
 
@@ -56,7 +57,7 @@ func healthCheckMetrics(w http.ResponseWriter) error {
 		for result.Next() {
 			results++
 		}
-		logrus.Debugf("%d results", results)
+		dl.Debugf("%d results", results)
 	}
 	return nil
 }

@@ -9,6 +9,8 @@ Name | Type | Description | Notes
 **token** | **str** |  | [optional] 
 **bind_address** | **str** |  | [optional] 
 **response_headers** | **List[str]** |  | [optional] 
+**status** | **str** |  | [optional] 
+**failure** | [**RemoteStatus200ResponseSharesInnerFailure**](RemoteStatus200ResponseSharesInnerFailure.md) |  | [optional] 
 
 ## Example
 

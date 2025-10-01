@@ -3,12 +3,13 @@ package controller
 import (
 	"bytes"
 	"fmt"
-	"github.com/openziti/zrok/build"
 	"html/template"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/build"
 
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/wneessen/go-mail"
 )
 
@@ -65,7 +66,7 @@ func sendResetPasswordEmail(emailAddress, token string) error {
 		return errors.Wrap(err, "error sending reset password email")
 	}
 
-	logrus.Infof("reset password email sent to '%v'", emailAddress)
+	dl.Infof("reset password email sent to '%v'", emailAddress)
 	return nil
 }
 

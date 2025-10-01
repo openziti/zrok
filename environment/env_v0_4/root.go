@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/environment/env_v0_3"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 const V = "v0.4"
@@ -226,20 +226,20 @@ func loadConfig() (*env_core.Config, error) {
 		return nil, errors.Wrapf(err, "error unmarshaling config file '%v'", cf)
 	}
 	out := &env_core.Config{
-		ApiEndpoint:     cfg.ApiEndpoint,
-		DefaultFrontend: cfg.DefaultFrontend,
-		Headless:        cfg.Headless,
-		SuperNetwork:    cfg.SuperNetwork,
+		ApiEndpoint:      cfg.ApiEndpoint,
+		DefaultNamespace: cfg.DefaultNamespace,
+		Headless:         cfg.Headless,
+		SuperNetwork:     cfg.SuperNetwork,
 	}
 	return out, nil
 }
 
 func saveConfig(cfg *env_core.Config) error {
 	in := &config{
-		ApiEndpoint:     cfg.ApiEndpoint,
-		DefaultFrontend: cfg.DefaultFrontend,
-		Headless:        cfg.Headless,
-		SuperNetwork:    cfg.SuperNetwork,
+		ApiEndpoint:      cfg.ApiEndpoint,
+		DefaultNamespace: cfg.DefaultNamespace,
+		Headless:         cfg.Headless,
+		SuperNetwork:     cfg.SuperNetwork,
 	}
 	data, err := json.MarshalIndent(in, "", "  ")
 	if err != nil {
@@ -292,11 +292,11 @@ func loadEnvironment() (*env_core.Environment, error) {
 		ApiEndpoint:  env.ApiEndpoint,
 	}
 	if strings.HasPrefix(env.ApiEndpoint, "https://api.zrok.io") {
-		out.ApiEndpoint = "https://api-v1.zrok.io"
+		out.ApiEndpoint = "https://api-v2.zrok.io"
 		if err := saveEnvironment(out); err != nil {
 			return nil, errors.Wrap(err, "error auto-rebasing apiEndpoint")
 		}
-		logrus.Info("auto-rebased 'apiEndpoint' for v1.0.x")
+		dl.Info("auto-rebased 'apiEndpoint' for v2.0.x")
 	}
 	return out, nil
 }
@@ -341,10 +341,10 @@ type metadata struct {
 }
 
 type config struct {
-	ApiEndpoint     string `json:"api_endpoint"`
-	DefaultFrontend string `json:"default_frontend"`
-	Headless        bool   `json:"headless"`
-	SuperNetwork    bool   `json:"super_network"`
+	ApiEndpoint      string `json:"api_endpoint"`
+	DefaultNamespace string `json:"default_namespace"`
+	Headless         bool   `json:"headless"`
+	SuperNetwork     bool   `json:"super_network"`
 }
 
 type environment struct {

@@ -66,7 +66,7 @@ func (c *orgAdminListCommand) run(_ *cobra.Command, args []string) {
 	fmt.Println()
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleColoredDark)
+	t.SetStyle(table.StyleRounded)
 	t.AppendHeader(table.Row{"Email", "Admin?"})
 	for _, member := range resp.Payload.Members {
 		t.AppendRow(table.Row{member.Email, member.Admin})

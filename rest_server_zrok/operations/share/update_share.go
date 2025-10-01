@@ -81,9 +81,6 @@ type UpdateShareBody struct {
 	// add access grants
 	AddAccessGrants []string `json:"addAccessGrants"`
 
-	// backend proxy endpoint
-	BackendProxyEndpoint string `json:"backendProxyEndpoint,omitempty"`
-
 	// remove access grants
 	RemoveAccessGrants []string `json:"removeAccessGrants"`
 

@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type sessionCookieRequest struct {
@@ -27,7 +27,7 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 	targetHost := strings.TrimSpace(req.targetHost)
 	if targetHost == "" {
 		err := errors.New("targetHost claim must not be empty")
-		logrus.Error(err)
+		dl.Error(err)
 		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(err))
 		return
 	}
@@ -35,7 +35,7 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 
 	encryptedAccessToken, err := encryptToken(req.accessToken, req.encryptionKey)
 	if err != nil {
-		logrus.Errorf("failed to encrypt access token: %v", err)
+		dl.Errorf("failed to encrypt access token: %v", err)
 		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("failed to encrypt access token")))
 		return
 	}
@@ -54,7 +54,7 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 	})
 	sTkn, err := tkn.SignedString(req.signingKey)
 	if err != nil {
-		logrus.Errorf("error signing jwt: %v", err)
+		dl.Errorf("error signing jwt: %v", err)
 		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(req.email).WithError(errors.New("error signing jwt")))
 		return
 	}

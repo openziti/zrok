@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/michaelquigley/df/dl"
 	"github.com/net-byte/vtun/common/config"
 	"github.com/net-byte/vtun/tun"
 	_ "github.com/net-byte/vtun/tun"
@@ -19,7 +20,6 @@ import (
 	"github.com/openziti/zrok/util"
 	cmap "github.com/orcaman/concurrent-map/v2"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/songgao/water/waterutil"
 )
 
@@ -104,7 +104,7 @@ func (b *Backend) readTun() {
 	for {
 		n, err := b.tun.Read(buf)
 		if err != nil {
-			logrus.WithError(err).Error("failed to read tun device")
+			dl.Errorf("failed to read tun device: %v", err)
 			// handle? error
 			panic(err)
 			return
@@ -114,7 +114,7 @@ func (b *Backend) readTun() {
 			continue
 		}
 
-		logrus.WithField("packet", pkt).Trace("read from tun device")
+		dl.Log().With("packet", pkt).Debug("read from tun device")
 		dest := pkt.destination()
 		if clt, ok := b.clients.Get(dest); ok {
 			_, err := clt.conn.Write(pkt)
@@ -125,21 +125,21 @@ func (b *Backend) readTun() {
 					Method:     "DISCONNECTED",
 				}
 
-				logrus.WithError(err).Errorf("failed to write packet to clt[%v]", dest)
+				dl.Errorf("failed to write packet to clt[%v]: %v", dest, err)
 				_ = clt.conn.Close()
 				b.clients.Remove(dest)
 			}
 		} else {
 			if b.subnet.Contains(net.IP(dest.addr[:])) {
-				logrus.Errorf("no client with address[%v]", dest)
+				dl.Errorf("no client with address[%v]", dest)
 			}
 		}
 	}
 }
 
 func (b *Backend) Run() error {
-	logrus.Info("started")
-	defer logrus.Info("exited")
+	dl.Info("started")
+	defer dl.Info("exited")
 
 	bits, _ := b.subnet.Mask.Size()
 	bits6, _ := b.subnet6.Mask.Size()
@@ -152,7 +152,7 @@ func (b *Backend) Run() error {
 		MTU:        ZROK_VPN_MTU,
 		Verbose:    true,
 	}
-	logrus.Infof("%+v", tunCfg)
+	dl.Infof("%+v", tunCfg)
 	b.tun = tun.CreateTun(tunCfg)
 	defer func() {
 		_ = b.tun.Close()
@@ -198,12 +198,12 @@ func (b *Backend) handle(conn net.Conn) {
 
 	j, err := json.Marshal(&cfg)
 	if err != nil {
-		logrus.WithError(err).Error("failed to write client VPN config")
+		dl.Errorf("failed to write client VPN config: %v", err)
 		return
 	}
 	_, err = conn.Write(j)
 	if err != nil {
-		logrus.WithError(err).Error("failed to write client VPN config")
+		dl.Errorf("failed to write client VPN config: %v", err)
 		return
 	}
 
@@ -215,7 +215,7 @@ func (b *Backend) handle(conn net.Conn) {
 		read, err := conn.Read(buf)
 		if err != nil {
 			if err != io.EOF {
-				logrus.WithError(err).Error("read error")
+				dl.Errorf("read error: %v", err)
 			}
 			b.cfg.RequestsChan <- &endpoints.Request{
 				Stamp:      time.Now(),
@@ -225,10 +225,10 @@ func (b *Backend) handle(conn net.Conn) {
 			return
 		}
 		pkt := packet(buf[:read])
-		logrus.WithField("packet", pkt).Trace("read from ziti")
+		dl.Log().With("packet", pkt).Debug("read from ziti")
 		_, err = b.tun.Write(pkt)
 		if err != nil {
-			logrus.WithError(err).Error("failed to write packet to tun")
+			dl.Errorf("failed to write packet to tun: %v", err)
 			return
 		}
 	}

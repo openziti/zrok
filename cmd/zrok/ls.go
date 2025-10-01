@@ -2,17 +2,18 @@ package main
 
 import (
 	"fmt"
+	"net/url"
+	"os"
+	"sort"
+
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/drives/sync"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
 	"github.com/openziti/zrok/util"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"net/url"
-	"os"
-	"sort"
 )
 
 func init() {
@@ -62,7 +63,7 @@ func (cmd *lsCommand) run(_ *cobra.Command, args []string) {
 		}
 		defer func() {
 			if err := sdk.DeleteAccess(root, access); err != nil {
-				logrus.Warningf("error freeing access: %v", err)
+				dl.Warnf("error freeing access: %v", err)
 			}
 		}()
 	}
@@ -82,7 +83,7 @@ func (cmd *lsCommand) run(_ *cobra.Command, args []string) {
 
 	tw := table.NewWriter()
 	tw.SetOutputMirror(os.Stdout)
-	tw.SetStyle(table.StyleLight)
+	tw.SetStyle(table.StyleRounded)
 	tw.AppendHeader(table.Row{"type", "Name", "Size", "Modified"})
 	for _, object := range objects {
 		if object.IsDir {
