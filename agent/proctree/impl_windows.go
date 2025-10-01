@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/kolesnikovae/go-winjob"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/windows"
 )
 
