@@ -4,6 +4,8 @@
 
 FEATURE: The `agent.Agent` now can optionally enforce that agent remoting starts successfully when creating a new instance. The `agent.Config` struct has a new `RequireRemoting` boolean to control this behavior. (https://github.com/openziti/zrok/issues/1085)
 
+CHANGE: Additional diagnostic logging in the zrok Agent; details around sub-process executions, etc. (https://github.com/openziti/zrok/issues/1084)
+
 ## v1.1.5
 
 CHANGE: Upgraded go toolchain to `v1.24.6`. (https://github.com/openziti/zrok/issues/1072)
