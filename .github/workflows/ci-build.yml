@@ -75,6 +75,56 @@ jobs:
           path: ${{ steps.solve_go_bin.outputs.go_bin }}/zrok
           if-no-files-found: error
 
+  windows-build:
+    name: Build Windows AMD64 CLI
+    runs-on: ubuntu-24.04
+    steps:
+      - run: sudo apt update
+      - run: sudo apt-get install gcc-mingw-w64-x86-64
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - run: git fetch --force --tags
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: ./go.mod
+          cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - run: npm install
+        working-directory: ui
+
+      - run: npm run build
+        working-directory: ui
+        env:
+          CI: "true"
+
+      - run: npm install
+        working-directory: agent/agentUi
+
+      - run: npm run build
+        working-directory: agent/agentUi
+        env:
+          CI: "true"
+
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: build --snapshot --clean --config .goreleaser-windows.yml
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-amd64
+          path: ./dist/**/zrok.exe
+          if-no-files-found: error
+
   pytest:
     name: Test the Python SDK
     runs-on: ubuntu-24.04

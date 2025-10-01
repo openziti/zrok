@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.1.8
+
+CI: pull requests now trigger a native-architecture Windows build
+
 ## v1.1.7
 
 FIX: Missing import for windows-specific build.
