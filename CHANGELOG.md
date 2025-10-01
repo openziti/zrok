@@ -26,6 +26,20 @@ CHANGE: Updated `github.com/openziti/sdk-golang` to `v1.2.4`.
 
 CHANGE: All logging migrated from `githhub.com/michaelquigley/pfxlog` and `github.com/sirupsen/logrus` to `github.com/michaelquigley/df/dl` and `log/slog`. Use environment variable `DL_USE_JSON=true` to force JSON output. Use `DL_USE_COLOR` to force colorized output. (https://github.com/openziti/zrok/issues/1078)
 
+## v1.1.8
+
+CI: pull requests now trigger a native-architecture Windows build
+
+## v1.1.7
+
+FIX: Missing import for windows-specific build.
+
+## v1.1.6
+
+FEATURE: The `agent.Agent` now can optionally enforce that agent remoting starts successfully when creating a new instance. The `agent.Config` struct has a new `RequireRemoting` boolean to control this behavior. (https://github.com/openziti/zrok/issues/1085)
+
+CHANGE: Additional diagnostic logging in the zrok Agent; details around sub-process executions, etc. (https://github.com/openziti/zrok/issues/1084)
+
 ## v1.1.5
 
 CHANGE: Upgraded go toolchain to `v1.24.6`. (https://github.com/openziti/zrok/issues/1072)

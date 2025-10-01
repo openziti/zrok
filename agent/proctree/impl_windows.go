@@ -3,10 +3,13 @@
 package proctree
 
 import (
-	"github.com/kolesnikovae/go-winjob"
-	"golang.org/x/sys/windows"
 	"os/exec"
+	"strings"
 	"sync"
+
+	"github.com/kolesnikovae/go-winjob"
+	"github.com/sirupsen/logrus"
+	"golang.org/x/sys/windows"
 )
 
 var job *winjob.JobObject
@@ -23,6 +26,8 @@ func Init(name string) error {
 }
 
 func StartChild(tail TailFunction, args ...string) (*Child, error) {
+	logrus.Infof("executing '%v'", strings.Join(args, " "))
+
 	cmd := exec.Command(args[0], args[1:]...)
 	cmd.SysProcAttr = &windows.SysProcAttr{CreationFlags: windows.CREATE_SUSPENDED}
 

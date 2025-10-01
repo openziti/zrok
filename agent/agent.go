@@ -78,7 +78,14 @@ func (a *Agent) Run() error {
 	if a.cfg.ConsoleEnabled {
 		go a.gateway()
 	}
-	go a.remoteAgent()
+	failure := make(chan error, 1)
+	go a.remoteAgent(failure)
+	go func() {
+		err := <-failure
+		if a.cfg.RequireRemoting {
+			panic(errors.Errorf("remote agent requires remoting: %v", err))
+		}
+	}()
 
 	a.persistRegistry = false
 	if err := a.ReloadRegistry(); err != nil {
@@ -286,16 +293,22 @@ func (a *Agent) SaveRegistry() error {
 	return nil
 }
 
-func (a *Agent) remoteAgent() {
+func (a *Agent) remoteAgent(failure chan error) {
 	enrollmentPath, err := a.root.AgentEnrollment()
 	if err != nil {
 		dl.Errorf("unable to get agent enrollment path: %v", err)
+		if failure != nil {
+			failure <- err
+		}
 		return
 	}
 
 	enrollment, err := LoadEnrollment(enrollmentPath)
 	if err != nil {
 		dl.Warnf("unable to load agent enrollment: %v", err)
+		if failure != nil {
+			failure <- err
+		}
 		return
 	}
 
@@ -304,6 +317,9 @@ func (a *Agent) remoteAgent() {
 	l, err := sdk.NewListener(enrollment.Token, a.root)
 	if err != nil {
 		dl.Errorf("error listening for remote agent: %v", err)
+		if failure != nil {
+			failure <- err
+		}
 		return
 	}
 
@@ -311,6 +327,9 @@ func (a *Agent) remoteAgent() {
 	agentGrpc.RegisterAgentServer(srv, &agentGrpcImpl{agent: a})
 	if err := srv.Serve(l); err != nil {
 		dl.Errorf("error serving: %v", err)
+		if failure != nil {
+			failure <- err
+		}
 		return
 	}
 }
