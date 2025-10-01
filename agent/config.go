@@ -5,6 +5,7 @@ type AgentConfig struct {
 	ConsoleStartPort uint16
 	ConsoleEndPort   uint16
 	ConsoleEnabled   bool
+	RequireRemoting  bool
 }
 
 func DefaultConfig() *AgentConfig {
@@ -13,5 +14,6 @@ func DefaultConfig() *AgentConfig {
 		ConsoleStartPort: 8080,
 		ConsoleEndPort:   8181,
 		ConsoleEnabled:   true,
+		RequireRemoting:  false,
 	}
 }
