@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.1.6
+
+CHANGE: Additional diagnostic logging in the zrok Agent; details around sub-process executions, etc. (https://github.com/openziti/zrok/issues/1084)
+
 ## v1.1.5
 
 CHANGE: Upgraded go toolchain to `v1.24.6`. (https://github.com/openziti/zrok/issues/1072)

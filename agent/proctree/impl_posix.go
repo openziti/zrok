@@ -4,7 +4,10 @@ package proctree
 
 import (
 	"os/exec"
+	"strings"
 	"sync"
+
+	"github.com/sirupsen/logrus"
 )
 
 func Init(_ string) error {
@@ -12,6 +15,8 @@ func Init(_ string) error {
 }
 
 func StartChild(tail TailFunction, args ...string) (*Child, error) {
+	logrus.Infof("executing '%v'", strings.Join(args, " "))
+
 	cmd := exec.Command(args[0], args[1:]...)
 
 	cld := &Child{

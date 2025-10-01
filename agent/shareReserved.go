@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/agent/proctree"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
 	"github.com/openziti/zrok/environment"
 	"github.com/sirupsen/logrus"
-	"os"
 )
 
 func (a *Agent) ShareReserved(req *ShareReservedRequest) (*ShareReservedResponse, error) {
