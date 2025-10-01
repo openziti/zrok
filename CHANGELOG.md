@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.1.7
+
+FIX: Missing import for windows-specific build.
+
 ## v1.1.6
 
 FEATURE: The `agent.Agent` now can optionally enforce that agent remoting starts successfully when creating a new instance. The `agent.Config` struct has a new `RequireRemoting` boolean to control this behavior. (https://github.com/openziti/zrok/issues/1085)
