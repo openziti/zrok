@@ -2,7 +2,9 @@
 
 ## v1.1.8
 
-CI: pull requests now trigger a native-architecture Windows build
+CHANGE: `github.com/openziti/sdk-golang` updated to `v1.2.8`.
+
+CHANGE: CI pull requests now trigger a native-architecture Windows build.
 
 ## v1.1.7
 
