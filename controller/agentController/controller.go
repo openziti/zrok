@@ -34,7 +34,14 @@ func (ctrl *Controller) NewClient(serviceName string) (client agentGrpc.AgentCli
 		grpc.WithContextDialer(func(_ context.Context, addr string) (net.Conn, error) {
 			conn, err := ctrl.zCtx.DialWithOptions(addr, &ziti.DialOptions{ConnectTimeout: 30 * time.Second})
 			if err != nil {
-				return nil, err
+				if _, err := ctrl.zCtx.RefreshService(addr); err != nil {
+					return nil, err
+				}
+				conn, err := ctrl.zCtx.DialWithOptions(addr, &ziti.DialOptions{ConnectTimeout: 30 * time.Second})
+				if err != nil {
+					return nil, err
+				}
+				return conn, nil
 			}
 			return conn, nil
 		}),
