@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.1.9
+
+FIX: Fix for icon/favicon in HTML for the api console. (https://github.com/openziti/zrok/pull/1094)
+
 ## v1.1.8
 
 CHANGE: The `ContextDialer` in `agent.Controller.NewClient` now utilizes the "two-phase" approach to invoking `Dial` on the remote agent service. First, it attempts to dial the service with the current service list state. If that fails, it will call `RefreshService` to update the service list and does a second `Dial`. If the second `Dial` fails, then the connection fails. This works around service list staleness issues. (https://github.com/openziti/zrok/issues/1090)
