@@ -14,7 +14,7 @@ FEATURE: The zrok Agent now includes significantly improved handling for subordi
 
 FEATURE: The zrok Agent has been updated for v2 name selections. Now that "reserved shares" have been replaced with reserved names, the zrok Agent will automatically restart any share which contains a name selection with a reserved name. The Agent continues to automatically manage `zrok access private` processes as always.
 
-FEATURE: `zrok overview` now includes a human-readble default output, that formats all of the details of your zrok account in an easy-to-understand format. The classic JSON output is still available using the `--json` flag. (https://github.com/openziti/zrok/issues/1064)
+FEATURE: `zrok overview` now includes a human-readable default output, that formats the details of your zrok account in an easy-to-understand format. The classic JSON output is still available using the `--json` flag. (https://github.com/openziti/zrok/issues/1064)
 
 FEATURE: `zrok admin migrate` now supports a `--down <n>` flag, which allows for reverse-migration by a specified number of migrations
 
@@ -25,6 +25,10 @@ CHANGE: Completely overhauled the core ziti automation logic. The legacy `contro
 CHANGE: Updated `github.com/openziti/sdk-golang` to `v1.2.4`.
 
 CHANGE: All logging migrated from `githhub.com/michaelquigley/pfxlog` and `github.com/sirupsen/logrus` to `github.com/michaelquigley/df/dl` and `log/slog`. Use environment variable `DL_USE_JSON=true` to force JSON output. Use `DL_USE_COLOR` to force colorized output. (https://github.com/openziti/zrok/issues/1078)
+
+## v1.1.9
+
+FIX: Fix for icon/favicon in HTML for the api console. (https://github.com/openziti/zrok/pull/1094)
 
 ## v1.1.8
 
@@ -725,7 +729,7 @@ CHANGE: Incorporate initial docker image build (https://github.com/openziti/zrok
 CHANGE: Improve target URL parsing for `zrok share` when using `--backend-mode` proxy (https://github.com/openziti/zrok/issues/211)
 
 	New and improved URL handling for proxy backends:
-	
+
 	9090 -> http://127.0.0.1:9090
 	localhost:9090 -> http://127.0.0.1:9090
 	https://localhost:9090 -> https://localhost:9090
