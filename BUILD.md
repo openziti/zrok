@@ -11,6 +11,10 @@ To build, follow these steps:
 * run `npm install`
 * run `npm run build` (this process takes a while the first time and only needs to be run if the ui changes)
 * change back to the checkout root
+* change to the existing `agent/agentUi/` folder
+* run `npm install`
+* run `npm run build` (this process takes a while the first time and only needs to be run if the ui changes)
+* change back to the checkout root
 * make sure the dist directory exists: `mkdir -p dist`
 * build the go project normally: `go build -o dist ./...`
 
