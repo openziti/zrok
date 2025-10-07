@@ -123,7 +123,7 @@ func (h *agentRemoteShareHandler) reservedShare(params agent.RemoteShareParams, 
 	}
 	resp, err := client.ShareReserved(context.Background(), req)
 	if err != nil {
-		logrus.Error("reserved share failed for '%v': %v", params.Body.Token, err)
+		logrus.Errorf("reserved share failed for '%v': %v", params.Body.Token, err)
 		return "", err
 	}
 	logrus.Infof("got token '%v'", resp.Token)
