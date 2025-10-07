@@ -29,13 +29,14 @@ func (h *agentRemoteShareHandler) Handle(params agent.RemoteShareParams, princip
 		logrus.Errorf("error finding environment '%v' for '%v': %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewRemoteShareUnauthorized()
 	}
+	logrus.Infof("found environment '%v' for '%v'", params.Body.EnvZID, principal.Email)
 
 	ae, err := str.FindAgentEnrollmentForEnvironment(env.Id, trx)
 	if err != nil {
 		logrus.Errorf("error finding agent enrollment for environment '%v' (%v): %v", params.Body.EnvZID, principal.Email, err)
 		return agent.NewRemoteShareBadGateway()
 	}
-	_ = trx.Rollback() // ...or will block share trx on sqlite
+	logrus.Infof("found agent enrollment '%v' for environment '%v' for '%v'", ae.Token, params.Body.EnvZID, principal.Email)
 
 	agentClient, agentConn, err := agentCtrl.NewClient(ae.Token)
 	if err != nil {
@@ -43,6 +44,7 @@ func (h *agentRemoteShareHandler) Handle(params agent.RemoteShareParams, princip
 		return agent.NewRemoteShareInternalServerError()
 	}
 	defer agentConn.Close()
+	logrus.Infof("created agentCtrl client for environment '%v' for '%v'", params.Body.EnvZID, principal.Email)
 
 	out := &agent.RemoteShareOKBody{}
 	switch params.Body.ShareMode {
@@ -108,10 +110,12 @@ func (h *agentRemoteShareHandler) privateShare(params agent.RemoteShareParams, c
 	if err != nil {
 		return "", err
 	}
+	logrus.Infof("got token '%v'", resp.Token)
 	return resp.Token, nil
 }
 
 func (h *agentRemoteShareHandler) reservedShare(params agent.RemoteShareParams, client agentGrpc.AgentClient) (token string, err error) {
+	logrus.Infof("requesting reserved share '%v'", params.Body.Token)
 	req := &agentGrpc.ShareReservedRequest{
 		Token:            params.Body.Token,
 		OverrideEndpoint: params.Body.Target,
@@ -119,7 +123,9 @@ func (h *agentRemoteShareHandler) reservedShare(params agent.RemoteShareParams, 
 	}
 	resp, err := client.ShareReserved(context.Background(), req)
 	if err != nil {
+		logrus.Error("reserved share failed for '%v': %v", params.Body.Token, err)
 		return "", err
 	}
+	logrus.Infof("got token '%v'", resp.Token)
 	return resp.Token, nil
 }
