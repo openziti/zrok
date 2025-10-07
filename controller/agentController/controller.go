@@ -33,7 +33,7 @@ func NewAgentController(cfg *Config) (*Controller, error) {
 func (ctrl *Controller) NewClient(serviceName string) (client agentGrpc.AgentClient, conn *grpc.ClientConn, err error) {
 	opts := []grpc.DialOption{
 		grpc.WithContextDialer(func(_ context.Context, addr string) (net.Conn, error) {
-			logrus.Debugf("dialing '%v'", addr)
+			logrus.Infof("dialing '%v'", addr)
 			conn, err := ctrl.zCtx.DialWithOptions(addr, &ziti.DialOptions{ConnectTimeout: 30 * time.Second})
 			if err != nil {
 				logrus.Warnf("initial dial failed; refreshing service '%v'", addr)
@@ -44,9 +44,10 @@ func (ctrl *Controller) NewClient(serviceName string) (client agentGrpc.AgentCli
 				if err != nil {
 					return nil, err
 				}
+				logrus.Infof("succeeded on second dial for '%v'", addr)
 				return conn, nil
 			}
-			logrus.Debugf("returning success from initial dial for '%v'", addr)
+			logrus.Infof("returning success from initial dial for '%v'", addr)
 			return conn, nil
 		}),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
