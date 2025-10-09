@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/openziti/zrok/canary"
-	"github.com/openziti/zrok/environment"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	"math/rand"
 	"time"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/canary"
+	"github.com/openziti/zrok/environment"
+	"github.com/spf13/cobra"
 )
 
 func init() {
@@ -54,7 +55,7 @@ func newTestCanaryEnabler() *testCanaryEnabler {
 
 func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 	if err := canary.AcknowledgeDangerousCanary(); err != nil {
-		logrus.Fatal(err)
+		dl.Fatal(err)
 	}
 
 	root, err := environment.LoadRoot()
@@ -124,7 +125,7 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 			go disabler.Run()
 		}
 		for _, disabler := range disablers {
-			logrus.Infof("waiting for disabler #%d", disabler.Id)
+			dl.Infof("waiting for disabler #%d", disabler.Id)
 			<-disabler.Done
 		}
 
@@ -137,7 +138,7 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 					if !ok {
 						break enablerLoop
 					}
-					logrus.Infof("enabler #%d: %v", enabler.Id, env.ZitiIdentity)
+					dl.Infof("enabler #%d: %v", enabler.Id, env.ZitiIdentity)
 				}
 			}
 		}
@@ -152,5 +153,5 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 		<-sns.Closed
 	}
 
-	logrus.Info("complete")
+	dl.Info("complete")
 }

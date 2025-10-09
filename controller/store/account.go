@@ -15,8 +15,8 @@ type Account struct {
 	Deleted   bool
 }
 
-func (str *Store) CreateAccount(a *Account, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("insert into accounts (email, salt, password, token, limitless) values (lower($1), $2, $3, $4, $5) returning id")
+func (str *Store) CreateAccount(a *Account, trx *sqlx.Tx) (int, error) {
+	stmt, err := trx.Prepare("insert into accounts (email, salt, password, token, limitless) values (lower($1), $2, $3, $4, $5) returning id")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing accounts insert statement")
 	}
@@ -27,40 +27,40 @@ func (str *Store) CreateAccount(a *Account, tx *sqlx.Tx) (int, error) {
 	return id, nil
 }
 
-func (str *Store) GetAccount(id int, tx *sqlx.Tx) (*Account, error) {
+func (str *Store) GetAccount(id int, trx *sqlx.Tx) (*Account, error) {
 	a := &Account{}
-	if err := tx.QueryRowx("select * from accounts where id = $1", id).StructScan(a); err != nil {
+	if err := trx.QueryRowx("select * from accounts where id = $1", id).StructScan(a); err != nil {
 		return nil, errors.Wrap(err, "error selecting account by id")
 	}
 	return a, nil
 }
 
-func (str *Store) FindAccountWithEmail(email string, tx *sqlx.Tx) (*Account, error) {
+func (str *Store) FindAccountWithEmail(email string, trx *sqlx.Tx) (*Account, error) {
 	a := &Account{}
-	if err := tx.QueryRowx("select * from accounts where email = lower($1) and not deleted", email).StructScan(a); err != nil {
+	if err := trx.QueryRowx("select * from accounts where email = lower($1) and not deleted", email).StructScan(a); err != nil {
 		return nil, errors.Wrap(err, "error selecting account by email")
 	}
 	return a, nil
 }
 
-func (str *Store) FindAccountWithEmailAndDeleted(email string, tx *sqlx.Tx) (*Account, error) {
+func (str *Store) FindAccountWithEmailAndDeleted(email string, trx *sqlx.Tx) (*Account, error) {
 	a := &Account{}
-	if err := tx.QueryRowx("select * from accounts where email = lower($1)", email).StructScan(a); err != nil {
+	if err := trx.QueryRowx("select * from accounts where email = lower($1)", email).StructScan(a); err != nil {
 		return nil, errors.Wrap(err, "error selecting acount by email")
 	}
 	return a, nil
 }
 
-func (str *Store) FindAccountWithToken(token string, tx *sqlx.Tx) (*Account, error) {
+func (str *Store) FindAccountWithToken(token string, trx *sqlx.Tx) (*Account, error) {
 	a := &Account{}
-	if err := tx.QueryRowx("select * from accounts where token = $1 and not deleted", token).StructScan(a); err != nil {
+	if err := trx.QueryRowx("select * from accounts where token = $1 and not deleted", token).StructScan(a); err != nil {
 		return nil, errors.Wrap(err, "error selecting account by token")
 	}
 	return a, nil
 }
 
-func (str *Store) UpdateAccount(a *Account, tx *sqlx.Tx) (int, error) {
-	stmt, err := tx.Prepare("update accounts set email=lower($1), salt=$2, password=$3, token=$4, limitless=$5 where id = $6")
+func (str *Store) UpdateAccount(a *Account, trx *sqlx.Tx) (int, error) {
+	stmt, err := trx.Prepare("update accounts set email=lower($1), salt=$2, password=$3, token=$4, limitless=$5 where id = $6")
 	if err != nil {
 		return 0, errors.Wrap(err, "error preparing accounts update statement")
 	}

@@ -66,14 +66,14 @@ func (cmd *configSetCommand) run(_ *cobra.Command, args []string) {
 			fmt.Printf("\n[%v]: because you have a %v-d environment, you won't see your config change until you run %v first!\n\n", tui.WarningLabel, tui.Code.Render("zrok enable"), tui.Code.Render("zrok disable"))
 		}
 
-	case "defaultFrontend":
+	case "defaultNamespace":
 		if env.Config() == nil {
-			if err := env.SetConfig(&env_core.Config{DefaultFrontend: value}); err != nil {
+			if err := env.SetConfig(&env_core.Config{DefaultNamespace: value}); err != nil {
 				tui.Error("unable to save config", err)
 			}
 		} else {
 			cfg := env.Config()
-			cfg.DefaultFrontend = value
+			cfg.DefaultNamespace = value
 			if err := env.SetConfig(cfg); err != nil {
 				tui.Error("unable to save config", err)
 			}

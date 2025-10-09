@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+
 	httpTransport "github.com/go-openapi/runtime/client"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment"
 	restEnvironment "github.com/openziti/zrok/rest_client_zrok/environment"
 	"github.com/openziti/zrok/tui"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -55,7 +56,7 @@ func (cmd *disableCommand) run(_ *cobra.Command, _ []string) {
 
 	_, err = zrok.Environment.Disable(req, auth)
 	if err != nil {
-		logrus.Warnf("share cleanup failed (%v); will clean up local environment", err)
+		dl.Warnf("share cleanup failed (%v); will clean up local environment", err)
 	}
 	if err := env.DeleteEnvironment(); err != nil {
 		if !panicInstead {

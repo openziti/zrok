@@ -1,9 +1,10 @@
 package sync
 
 import (
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"os"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/pkg/errors"
 )
 
 func OneWay(src, dst Target, sync bool) error {
@@ -29,11 +30,11 @@ func OneWay(src, dst Target, sync bool) error {
 	for _, srcF := range srcTree {
 		if dstF, found := dstIndex[srcF.Path]; found {
 			if !srcF.IsDir && (dstF.Size != srcF.Size || dstF.Modified.Unix() != srcF.Modified.Unix()) {
-				logrus.Debugf("%v <- dstF.Size = '%d', srcF.Size = '%d', dstF.Modified.UTC = '%d', srcF.Modified.UTC = '%d'", srcF.Path, dstF.Size, srcF.Size, dstF.Modified.Unix(), srcF.Modified.Unix())
+				dl.Debugf("%v <- dstF.Size = '%d', srcF.Size = '%d', dstF.Modified.UTC = '%d', srcF.Modified.UTC = '%d'", srcF.Path, dstF.Size, srcF.Size, dstF.Modified.Unix(), srcF.Modified.Unix())
 				copyList = append(copyList, srcF)
 			}
 		} else {
-			logrus.Debugf("%v <- !found", srcF.Path)
+			dl.Debugf("%v <- !found", srcF.Path)
 			copyList = append(copyList, srcF)
 		}
 	}
@@ -52,7 +53,7 @@ func OneWay(src, dst Target, sync bool) error {
 				return err
 			}
 		}
-		logrus.Infof("=> %v", copyPath.Path)
+		dl.Infof("=> %v", copyPath.Path)
 	}
 
 	return nil

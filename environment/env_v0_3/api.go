@@ -1,7 +1,6 @@
 package env_v0_3
 
 import (
-	"fmt"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -46,14 +45,14 @@ func (r *Root) Client() (*rest_client_zrok.Zrok, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "error parsing api endpoint '%v'", r)
 	}
-	transport := httptransport.New(apiUrl.Host, "/api/v1", []string{apiUrl.Scheme})
+	transport := httptransport.New(apiUrl.Host, "/api/v2", []string{apiUrl.Scheme})
 	transport.Producers["application/zrok.v1+json"] = runtime.JSONProducer()
 	transport.Consumers["application/zrok.v1+json"] = runtime.JSONConsumer()
 
 	zrok := rest_client_zrok.New(transport, strfmt.Default)
 	_, err = zrok.Metadata.ClientVersionCheck(&metadata2.ClientVersionCheckParams{
 		Body: metadata2.ClientVersionCheckBody{
-			ClientVersion: fmt.Sprintf("v1.0-%s", build.String()), // TODO: go back to build.String()
+			ClientVersion: build.String(),
 		},
 	})
 	if err != nil {
@@ -64,7 +63,7 @@ func (r *Root) Client() (*rest_client_zrok.Zrok, error) {
 }
 
 func (r *Root) ApiEndpoint() (string, string) {
-	apiEndpoint := "https://api-v1.zrok.io"
+	apiEndpoint := "https://api-v2.zrok.io"
 	from := "binary"
 
 	if r.Config() != nil && r.Config().ApiEndpoint != "" {
@@ -86,22 +85,22 @@ func (r *Root) ApiEndpoint() (string, string) {
 	return apiEndpoint, from
 }
 
-func (r *Root) DefaultFrontend() (string, string) {
-	defaultFrontend := "public"
+func (r *Root) DefaultNamespace() (string, string) {
+	defaultNamespace := "public"
 	from := "binary"
 
-	if r.Config() != nil && r.Config().DefaultFrontend != "" {
-		defaultFrontend = r.Config().DefaultFrontend
+	if r.Config() != nil && r.Config().DefaultNamespace != "" {
+		defaultNamespace = r.Config().DefaultNamespace
 		from = "config"
 	}
 
-	env := os.Getenv("ZROK_DEFAULT_FRONTEND")
+	env := os.Getenv("ZROK_DEFAULT_NAMESPACE")
 	if env != "" {
-		defaultFrontend = env
-		from = "ZROK_DEFAULT_FRONTEND"
+		defaultNamespace = env
+		from = "ZROK_DEFAULT_NAMESPACE"
 	}
 
-	return defaultFrontend, from
+	return defaultNamespace, from
 }
 
 func (r *Root) Headless() (bool, string) {

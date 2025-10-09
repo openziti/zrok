@@ -3,8 +3,9 @@ package subordinate
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/sirupsen/logrus"
 	"strings"
+
+	"github.com/michaelquigley/df/dl"
 )
 
 const (
@@ -34,14 +35,14 @@ func NewMessageHandler() *MessageHandler {
 func (h *MessageHandler) Tail(data []byte) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Errorf("recovered: %v", r)
+			dl.Errorf("recovered: %v", r)
 		}
 	}()
 
 	h.readBuffer.Write(data)
 	if line, err := h.readBuffer.ReadString('\n'); err == nil {
 		line = strings.Trim(line, "\n \t")
-		logrus.Debugf("line: '%v'", line)
+		dl.Debugf("line: '%v'", line)
 		msg := make(map[string]interface{})
 		if !h.booted {
 			if line[0] == '{' {
@@ -74,7 +75,7 @@ func (h *MessageHandler) Tail(data []byte) {
 		} else {
 			if line[0] == '{' {
 				if err := json.Unmarshal([]byte(line), &msg); err != nil {
-					logrus.Error(line)
+					dl.Error(line)
 				}
 			} else {
 				msg[MessageKey] = RawMessage

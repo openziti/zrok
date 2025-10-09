@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"os"
+
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func init() {
@@ -41,7 +42,7 @@ func (cmd *adminCreateIdentity) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 	if _, err := os.Stat(zif); err == nil {
-		logrus.Errorf("identity '%v' already exists at '%v'", name, zif)
+		dl.Errorf("identity '%v' already exists at '%v'", name, zif)
 		os.Exit(1)
 	}
 

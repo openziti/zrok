@@ -1,12 +1,13 @@
 package agentUi
 
 import (
-	"github.com/sirupsen/logrus"
 	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/michaelquigley/df/dl"
 )
 
 const staticPath = "dist"
@@ -19,7 +20,7 @@ func Middleware(handler http.Handler) http.Handler {
 		}
 
 		path := filepath.ToSlash(filepath.Join(staticPath, r.URL.Path))
-		logrus.Debugf("path = %v", path)
+		dl.Debugf("path = %v", path)
 
 		f, err := FS.Open(path)
 		if os.IsNotExist(err) {

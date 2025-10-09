@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -13,6 +14,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gobwas/glob"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/agent/agentClient"
 	"github.com/openziti/zrok/agent/agentGrpc"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
@@ -33,20 +35,20 @@ func init() {
 }
 
 type sharePublicCommand struct {
-	basicAuth                 []string
-	frontendSelection         []string
-	backendMode               string
-	headless                  bool
-	subordinate               bool
-	forceLocal                bool
-	forceAgent                bool
-	insecure                  bool
-	oauthProvider             string
-	oauthEmailAddressPatterns []string
-	oauthCheckInterval        time.Duration
-	open                      bool
-	accessGrants              []string
-	cmd                       *cobra.Command
+	basicAuth            []string
+	nameSelections       []string
+	backendMode          string
+	headless             bool
+	subordinate          bool
+	forceLocal           bool
+	forceAgent           bool
+	insecure             bool
+	oauthProvider        string
+	oauthEmailDomains    []string
+	oauthRefreshInterval time.Duration
+	open                 bool
+	accessGrants         []string
+	cmd                  *cobra.Command
 }
 
 func newSharePublicCommand() *sharePublicCommand {
@@ -56,16 +58,16 @@ func newSharePublicCommand() *sharePublicCommand {
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &sharePublicCommand{cmd: cmd}
-	defaultFrontends := []string{"public"}
+	defaultNameSelections := []string{"public"}
 	if root, err := environment.LoadRoot(); err == nil {
-		defaultFrontend, _ := root.DefaultFrontend()
-		defaultFrontends = []string{defaultFrontend}
+		rootNamespace, _ := root.DefaultNamespace()
+		defaultNameSelections = []string{rootNamespace}
 	}
 	headless := false
 	if root, err := environment.LoadRoot(); err == nil {
 		headless, _ = root.Headless()
 	}
-	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontend", defaultFrontends, "Selected frontends to use for the share")
+	cmd.Flags().StringArrayVarP(&command.nameSelections, "name-selection", "n", defaultNameSelections, "Selected frontends to use for the share")
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy, drive}")
 	cmd.Flags().BoolVar(&command.headless, "headless", headless, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
@@ -78,8 +80,8 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().StringArrayVar(&command.accessGrants, "access-grant", []string{}, "zrok accounts that are allowed to access this share (see --closed)")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Select named OAuth provider (configured in selected frontend)")
-	cmd.Flags().StringArrayVar(&command.oauthEmailAddressPatterns, "oauth-email-address-pattern", []string{}, "Allow only email addresses matching this glob to access")
-	cmd.Flags().DurationVar(&command.oauthCheckInterval, "oauth-check-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; refresh after expiry")
+	cmd.Flags().StringArrayVar(&command.oauthEmailDomains, "oauth-email-domain", []string{}, "Allow only email addresses matching this glob to access")
+	cmd.Flags().DurationVar(&command.oauthRefreshInterval, "oauth-refresh-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; refresh after expiry")
 	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
 
 	cmd.Run = command.run
@@ -89,6 +91,9 @@ func newSharePublicCommand() *sharePublicCommand {
 func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	if cmd.subordinate {
 		logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
+		dlOpts := dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo)
+		dlOpts.UseJSON = true
+		dl.Init(dlOpts)
 	}
 
 	root, err := environment.LoadRoot()
@@ -100,50 +105,26 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		cmd.error("unable to create share", errors.New("unable to load environment; did you 'zrok enable'?"))
 	}
 
-	if cmd.subordinate || cmd.forceLocal {
-		cmd.shareLocal(args, root)
-	} else {
-		agent := cmd.forceAgent
-		if !cmd.forceAgent {
-			agent, err = agentClient.IsAgentRunning(root)
-			if err != nil {
-				tui.Error("error checking if agent is running", err)
-			}
-		}
-		if agent {
-			cmd.shareAgent(args, root)
-		} else {
-			cmd.shareLocal(args, root)
-		}
-	}
+	detectAndRouteToAgent(
+		cmd.subordinate, cmd.forceLocal, cmd.forceAgent,
+		root,
+		func() { cmd.shareLocal(args, root) },
+		func() { cmd.shareAgent(args, root) },
+	)
 }
 
 func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
-	var target string
+	// validate and process backend mode (public shares only support specific modes)
+	allowedModes := []string{"proxy", "web", "caddy", "drive"}
+	target, forceHeadless, err := validateBackendMode(cmd.backendMode, args, allowedModes)
+	if err != nil {
+		cmd.error("unable to create share", err)
+	}
+	if forceHeadless {
+		cmd.headless = true
+	}
 
 	superNetwork, _ := root.SuperNetwork()
-
-	switch cmd.backendMode {
-	case "proxy":
-		v, err := parseUrl(args[0])
-		if err != nil {
-			cmd.error("invalid target endpoint URL", err)
-		}
-		target = v
-
-	case "web":
-		target = args[0]
-
-	case "caddy":
-		target = args[0]
-		cmd.headless = true
-
-	case "drive":
-		target = args[0]
-
-	default:
-		cmd.error("unable to create share", fmt.Errorf("invalid backend mode '%v'; expected {proxy, web, caddy, drive}", cmd.backendMode))
-	}
 
 	zif, err := root.ZitiIdentityNamed(root.EnvironmentIdentityName())
 	if err != nil {
@@ -153,21 +134,27 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 	req := &sdk.ShareRequest{
 		BackendMode:    sdk.BackendMode(cmd.backendMode),
 		ShareMode:      sdk.PublicShareMode,
-		Frontends:      cmd.frontendSelection,
 		BasicAuth:      cmd.basicAuth,
 		Target:         target,
 		PermissionMode: sdk.ClosedPermissionMode,
 		AccessGrants:   cmd.accessGrants,
+	}
+	for _, nssStr := range cmd.nameSelections {
+		if nss, err := sdk.ParseNameSelection(nssStr); err == nil {
+			req.NameSelections = append(req.NameSelections, nss)
+		} else {
+			cmd.error("unable to parse namespace selection", err)
+		}
 	}
 	if cmd.open {
 		req.PermissionMode = sdk.OpenPermissionMode
 	}
 	if cmd.oauthProvider != "" {
 		req.OauthProvider = cmd.oauthProvider
-		req.OauthEmailAddressPatterns = cmd.oauthEmailAddressPatterns
-		req.OauthAuthorizationCheckInterval = cmd.oauthCheckInterval
+		req.OauthEmailAddressPatterns = cmd.oauthEmailDomains
+		req.OauthRefreshInterval = cmd.oauthRefreshInterval
 
-		for _, g := range cmd.oauthEmailAddressPatterns {
+		for _, g := range cmd.oauthEmailDomains {
 			_, err := glob.Compile(g)
 			if err != nil {
 				cmd.error(fmt.Sprintf("unable to create share, invalid oauth email glob (%v)", g), err)
@@ -212,7 +199,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running http proxy backend: %v", err)
+				dl.Errorf("error running http proxy backend: %v", err)
 			}
 		}()
 
@@ -231,7 +218,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running http web backend: %v", err)
+				dl.Errorf("error running http web backend: %v", err)
 			}
 		}()
 
@@ -250,7 +237,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running caddy backend: %v", err)
+				dl.Errorf("error running caddy backend: %v", err)
 			}
 		}()
 
@@ -270,7 +257,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 
 		go func() {
 			if err := be.Run(); err != nil {
-				logrus.Errorf("error running drive backend: %v", err)
+				dl.Errorf("error running drive backend: %v", err)
 			}
 		}()
 
@@ -291,11 +278,11 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 	}
 
 	if cmd.headless && !cmd.subordinate {
-		logrus.Infof("access your zrok share at the following endpoints:\n %v", strings.Join(shr.FrontendEndpoints, "\n"))
+		dl.Infof("access your zrok share at the following endpoints:\n %v", strings.Join(shr.FrontendEndpoints, "\n"))
 		for {
 			select {
 			case req := <-requests:
-				logrus.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
+				dl.Infof("%v -> %v %v", req.RemoteAddr, req.Method, req.Path)
 			}
 		}
 
@@ -318,6 +305,10 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 
 	} else {
 		logrus.SetOutput(mdl)
+		dlOpts := dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo)
+		dlOpts.CustomHandler = dl.NewPrettyHandler(slog.LevelInfo, dl.DefaultOptions().SetOutput(mdl))
+		dl.Init(dlOpts)
+
 		prg := tea.NewProgram(mdl, tea.WithAltScreen())
 		mdl.prg = prg
 
@@ -350,11 +341,11 @@ func (cmd *sharePublicCommand) error(msg string, err error) {
 }
 
 func (cmd *sharePublicCommand) shutdown(root env_core.Root, shr *sdk.Share) {
-	logrus.Debugf("shutting down '%v'", shr.Token)
+	dl.Debugf("shutting down '%v'", shr.Token)
 	if err := sdk.DeleteShare(root, shr); err != nil {
-		logrus.Errorf("error shutting down '%v': %v", shr.Token, err)
+		dl.Errorf("error shutting down '%v': %v", shr.Token, err)
 	}
-	logrus.Debugf("shutdown complete")
+	dl.Debugf("shutdown complete")
 }
 
 func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
@@ -411,18 +402,28 @@ func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
 	}
 	defer func() { _ = conn.Close() }()
 
-	shr, err := client.SharePublic(context.Background(), &agentGrpc.SharePublicRequest{
-		Target:                    target,
-		BasicAuth:                 cmd.basicAuth,
-		FrontendSelection:         cmd.frontendSelection,
-		BackendMode:               cmd.backendMode,
-		Insecure:                  cmd.insecure,
-		OauthProvider:             cmd.oauthProvider,
-		OauthEmailAddressPatterns: cmd.oauthEmailAddressPatterns,
-		OauthCheckInterval:        cmd.oauthCheckInterval.String(),
-		Closed:                    !cmd.open,
-		AccessGrants:              cmd.accessGrants,
-	})
+	grpcReq := &agentGrpc.SharePublicRequest{
+		Target:               target,
+		BasicAuth:            cmd.basicAuth,
+		BackendMode:          cmd.backendMode,
+		Insecure:             cmd.insecure,
+		OauthProvider:        cmd.oauthProvider,
+		OauthEmailDomains:    cmd.oauthEmailDomains,
+		OauthRefreshInterval: cmd.oauthRefreshInterval.String(),
+		Closed:               !cmd.open,
+		AccessGrants:         cmd.accessGrants,
+	}
+	for _, nssStr := range cmd.nameSelections {
+		nss, err := sdk.ParseNameSelection(nssStr)
+		if err != nil {
+			tui.Error(fmt.Sprintf("invalid namespace selection '%v'", nssStr), err)
+		}
+		grpcReq.NameSelections = append(grpcReq.NameSelections, &agentGrpc.NameSelection{
+			NamespaceToken: nss.NamespaceToken,
+			Name:           nss.Name,
+		})
+	}
+	shr, err := client.SharePublic(context.Background(), grpcReq)
 	if err != nil {
 		tui.Error("error creating share", err)
 	}

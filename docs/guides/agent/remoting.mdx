@@ -39,7 +39,7 @@ warning! proceeding will allow remote control of your zrok agent!
 
 your agent will accept remote commands from:
 
-https://api-v1.zrok.io
+https://api-v2.zrok.io
 
 you should only proceed if you understand the implications of this action!
 
@@ -72,7 +72,7 @@ The `apiEndpoint` `http://localhost:18080` is a zrok controller in a local devel
 You can call the `/agent/share` endpoint to create a share on a remote Agent through the API:
 
 ```
-$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4", "shareMode": "public", "backendMode": "web", "target": "/home/michael/Repos/nf/zrok"}' http://localhost:18080/api/v1/agent/share | jq
+$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4", "shareMode": "public", "backendMode": "web", "target": "/home/michael/Repos/nf/zrok"}' http://localhost:18080/api/v2/agent/share | jq
 {
   "frontendEndpoints": [
     "http://51bnatug7ua3.zrok.quigley.com:8080"
@@ -84,7 +84,7 @@ $ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+j
 ### Query the Status of the Remote Agent
 
 ```
-$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4"}' http://localhost:18080/api/v1/agent/status | jq
+$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4"}' http://localhost:18080/api/v2/agent/status | jq
 {
   "accesses": null,
   "shares": [
@@ -104,9 +104,9 @@ $ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+j
 ### Remove the Remote Share
 
 ```
-$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4", "token": "51bnatug7ua3"}' http://localhost:18080/api/v1/agent/unshare
+$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4", "token": "51bnatug7ua3"}' http://localhost:18080/api/v2/agent/unshare
 
-$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4"}' http://localhost:18080/api/v1/agent/status | jq
+$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4"}' http://localhost:18080/api/v2/agent/status | jq
 {
   "accesses": null,
   "shares": null
@@ -123,7 +123,7 @@ The `zrok agent unenroll` command will remove all remote control access from an 
 
 ```
 $ zrok agent unenroll
-SUCCESS: unenrolled agent from 'https://api-v1.zrok.io'
+SUCCESS: unenrolled agent from 'https://api-v2.zrok.io'
 SUCCESS: removed agent-enrollment.json
 ```
 
