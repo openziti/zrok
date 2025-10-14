@@ -92,7 +92,7 @@ func (ctm *ConfigTypeManager) DeleteWithFilter(filter string) error {
 func (ctm *ConfigTypeManager) EnsureExists(name string) (string, error) {
 	existing, err := ctm.GetByName(name)
 	if err != nil {
-		return "", err
+		dl.Warnf("error getting config type: %v", err)
 	}
 
 	if existing != nil {
