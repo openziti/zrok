@@ -342,7 +342,7 @@ if you run into issues during migration:
 2. use `zrok list namespaces` to see what namespaces are available to you
 3. use `zrok list names` to see your current names
 4. review the error messages - v2.0 has improved error reporting
-5. consult the [self-hosting guides](/category/self-hosting/) if you manage your own instance
+5. consult the [self-hosting guides](/docs/category/self-hosting/) if you manage your own instance
 6. check the [concepts documentation](/concepts/index.md) for deeper understanding
 
 ---
