@@ -4,53 +4,53 @@ sidebar_label: v2 Migration Guide
 sidebar_position: 5
 ---
 
-# migrating from zrok v1 to v2
+# Migrating from zrok v1 to v2
 
-this guide helps you transition from zrok v1.x to v2.0, focusing on the major paradigm shift from reserved shares to the new namespaces and names system.
+This guide helps you transition from zrok v1.x to v2.0, focusing on the major paradigm shift from reserved shares to the new namespaces and names system.
 
 :::warning breaking changes
-zrok v2.0 introduces breaking changes. the reserved sharing commands (`zrok reserve`, `zrok release`, `zrok share reserved`) have been removed and replaced with a more flexible namespace and name system.
+zrok v2.0 introduces breaking changes. The reserved sharing commands (`zrok reserve`, `zrok release`, `zrok share reserved`) have been removed and replaced with a more flexible namespace and name system.
 :::
 
-## what's changing
+## What's Changing
 
-### the big picture
+### The Big Picture
 
-in v1.x, you created reserved shares with persistent tokens using `zrok reserve`. in v2.0, this concept has evolved into a more powerful system:
+In v1.x, you created reserved shares with persistent tokens using `zrok reserve`. In v2.0, this concept has evolved into a more powerful system:
 
 - **namespaces** - logical groupings that contain names (like folders)
 - **names** - unique identifiers within namespaces that can be reserved or ephemeral
 - **name selections** - the combination of namespace and name you use when sharing
 
-this new model provides:
-- better organization of your shares
-- more flexible routing through namespace-to-frontend mappings
-- cleaner separation between identity (names) and sharing (shares)
-- support for multiple names per share
+This new model provides:
+- Better organization of your shares
+- More flexible routing through namespace-to-frontend mappings
+- Cleaner separation between identity (names) and sharing (shares)
+- Support for multiple names per share
 
-### configuration changes
+### Configuration Changes
 
-the `defaultFrontend` configuration option has been replaced with `defaultNamespace`. you'll need to update your configuration files accordingly (see `zrok status` and `zrok config --help`).
+The `defaultFrontend` configuration option has been replaced with `defaultNamespace`. You'll need to update your configuration files accordingly (see `zrok status` and `zrok config --help`).
 
 ---
 
-## concept mapping: v1 → v2
+## Concept Mapping: v1 → v2
 
 | v1.x concept | v2.0 equivalent | description |
 |--------------|----------------|-------------|
-| reserved share | reserved name in a namespace | a persistent identifier for your share |
-| share token | name within a namespace | the unique identifier users see in URLs |
-| `zrok reserve` | `zrok create name` with `-r` flag | create a reserved name |
-| `zrok share reserved <token>` | `zrok share public/private -n <namespace>/<name>` | share using a name |
-| `zrok release <token>` | `zrok delete name <name>` | remove a reserved name |
+| reserved share | reserved name in a namespace | A persistent identifier for your share |
+| share token | name within a namespace | The unique identifier users see in URLs |
+| `zrok reserve` | `zrok create name` with `-r` flag | Create a reserved name |
+| `zrok share reserved <token>` | `zrok share public/private -n <namespace>/<name>` | Share using a name |
+| `zrok release <token>` | `zrok delete name <name>` | Remove a reserved name |
 
 ---
 
-## command reference
+## Command Reference
 
-### removed commands
+### Removed Commands
 
-these commands no longer exist in v2.0:
+These commands no longer exist in v2.0:
 
 ```bash
 # ❌ no longer available
@@ -61,9 +61,9 @@ zrok release <token>
 zrok overview public-frontends
 ```
 
-### new commands
+### New Commands
 
-#### namespace management (end users)
+#### Namespace Management (End Users)
 
 ```bash
 # list available namespaces
@@ -88,7 +88,7 @@ zrok delete name <name>
 zrok unshare <share-token>
 ```
 
-#### sharing with names
+#### Sharing with Names
 
 ```bash
 # public share with a name selection
@@ -103,9 +103,9 @@ zrok share private <target> --share-token my-custom-token
 
 ---
 
-## migration walkthrough
+## Migration Walkthrough
 
-### scenario 1: simple reserved public share
+### Scenario 1: Simple Reserved Public Share
 
 **v1.x workflow:**
 
@@ -145,7 +145,7 @@ $ zrok share public --backend-mode web /var/www/mysite -n public/mysite
 $ zrok delete name mysite
 ```
 
-### scenario 2: private reserved share
+### Scenario 2: Private Reserved Share
 
 **v1.x workflow:**
 
@@ -180,9 +180,9 @@ access your share with: zrok access private myapi-prod
 $ zrok access private myapi-prod
 ```
 
-### scenario 3: ephemeral shares (unchanged)
+### Scenario 3: Ephemeral Shares (Unchanged)
 
-ephemeral shares work mostly the same, but now support optional name selections:
+Ephemeral shares work mostly the same, but now support optional name selections:
 
 ```bash
 # v1.x - still works in v2.0
@@ -196,17 +196,17 @@ $ zrok share public 8080 -n public/temp-demo
 
 ---
 
-## using the zrok agent with v2
+## Using the zrok Agent with v2
 
-if you're using the zrok agent, there are significant improvements in v2.0:
+If you're using the zrok agent, there are significant improvements in v2.0:
 
-### automatic retry and error handling
+### Automatic Retry and Error Handling
 
-the agent now automatically retries failed shares with exponential backoff. errored processes receive transient `err_XXXX` tokens for management.
+The agent now automatically retries failed shares with exponential backoff. Errored processes receive transient `err_XXXX` tokens for management.
 
-### persistent shares
+### Persistent Shares
 
-shares with reserved name selections automatically restart after abnormal exit:
+Shares with reserved name selections automatically restart after abnormal exit:
 
 ```bash
 # create a reserved name
@@ -216,18 +216,18 @@ $ zrok create name public myapp -r
 $ zrok agent share public http://localhost:3000 -n public/myapp
 ```
 
-### improved status command
+### Improved Status Command
 
-the `zrok agent status` command now shows:
-- detailed error states for failed processes
-- frontend endpoints for public shares
-- failure information with error messages
+The `zrok agent status` command now shows:
+- Detailed error states for failed processes
+- Frontend endpoints for public shares
+- Failure information with error messages
 
 ---
 
-## working with multiple names
+## Working with Multiple Names
 
-one powerful v2.0 feature: a single share can use multiple name selections:
+One powerful v2.0 feature: a single share can use multiple name selections:
 
 ```bash
 # create multiple names
@@ -246,16 +246,16 @@ $ zrok share public http://localhost:3000 \
 
 ---
 
-## understanding namespaces
+## Understanding Namespaces
 
-### what is a namespace?
+### What is a Namespace?
 
-a namespace is a logical grouping for names, similar to how folders organize files. your zrok instance may have one or more namespaces available:
+A namespace is a logical grouping for names, similar to how folders organize files. Your zrok instance may have one or more namespaces available:
 
 - **public** - typically the default namespace for all users
 - **custom namespaces** - may be created by administrators for specific purposes
 
-### listing available namespaces
+### Listing Available Namespaces
 
 ```bash
 $ zrok list namespaces
@@ -263,15 +263,15 @@ NAMESPACE    DESCRIPTION
 public       default public namespace
 ```
 
-### namespace grants
+### Namespace Grants
 
-administrators can control which accounts can create names in specific namespaces using namespace grants. if a namespace is "open", any user can create names in it without a grant.
+Administrators can control which accounts can create names in specific namespaces using namespace grants. If a namespace is "open", any user can create names in it without a grant.
 
 ---
 
-## checking your current shares and names
+## Checking Your Current Shares and Names
 
-### view all your names
+### View All Your Names
 
 ```bash
 $ zrok list names
@@ -280,7 +280,7 @@ public       mysite       true        2025-10-14 10:30:00
 public       temp-demo    false       2025-10-14 11:45:00
 ```
 
-### view overview (now includes names)
+### View Overview (Now Includes Names)
 
 ```bash
 $ zrok overview
@@ -292,64 +292,64 @@ $ zrok overview --json
 
 ---
 
-## migration checklist
+## Migration Checklist
 
-when upgrading from v1.x to v2.0:
+When upgrading from v1.x to v2.0:
 
-- [ ] identify all reserved shares you're currently using
-- [ ] note the share tokens and frontend URLs
-- [ ] check your configuration for `defaultFrontend` and change to `defaultNamespace`
-- [ ] for each reserved share:
-  - [ ] create a reserved name with `zrok create name <namespace> <name> -r`
-  - [ ] stop the old `zrok share reserved <token>` process
-  - [ ] start new share with `zrok share <mode> <target> -n <namespace>/<name>`
-  - [ ] verify the share works at the new URL
-  - [ ] update any bookmarks or external references to the new URL
-- [ ] update any scripts or automation to use new commands
-- [ ] if using the agent, review new error handling and status features
-
----
-
-## common questions
-
-### do i need to keep the same URL?
-
-no, with the namespace/name system, your URLs will change based on the name you choose. if you need to maintain the same identifier, you can choose a name that matches your old token, though the full URL structure may differ based on how your zrok instance's frontends are configured.
-
-### can i use the old share tokens as names?
-
-yes, names can use the same format as old share tokens. however, this is your opportunity to choose more meaningful, memorable names for your shares.
-
-### what happens to permission modes?
-
-permission modes (open/closed) still work the same way with `--open` and `--closed` flags, plus the `--access-grant` flag for granting access to specific accounts.
-
-### do ephemeral shares still work?
-
-yes! ephemeral shares work just as before. the main difference is they now support optional name selections, and by default names created without the `-r` flag are ephemeral.
-
-### what if i have scripts using the old commands?
-
-you'll need to update your scripts to use the new command structure. the good news is the new system is more flexible and often requires fewer steps for common workflows.
+- [ ] Identify all reserved shares you're currently using
+- [ ] Note the share tokens and frontend URLs
+- [ ] Check your configuration for `defaultFrontend` and change to `defaultNamespace`
+- [ ] For each reserved share:
+  - [ ] Create a reserved name with `zrok create name <namespace> <name> -r`
+  - [ ] Stop the old `zrok share reserved <token>` process
+  - [ ] Start new share with `zrok share <mode> <target> -n <namespace>/<name>`
+  - [ ] Verify the share works at the new URL
+  - [ ] Update any bookmarks or external references to the new URL
+- [ ] Update any scripts or automation to use new commands
+- [ ] If using the agent, review new error handling and status features
 
 ---
 
-## getting help
+## Common Questions
 
-if you run into issues during migration:
+### Do I Need to Keep the Same URL?
 
-1. check `zrok status` to verify your environment is properly enabled
-2. use `zrok list namespaces` to see what namespaces are available to you
-3. use `zrok list names` to see your current names
-4. review the error messages - v2.0 has improved error reporting
-5. consult the [self-hosting guides](/docs/category/self-hosting/) if you manage your own instance
-6. check the [concepts documentation](/concepts/index.md) for deeper understanding
+No, with the namespace/name system, your URLs will change based on the name you choose. If you need to maintain the same identifier, you can choose a name that matches your old token, though the full URL structure may differ based on how your zrok instance's frontends are configured.
+
+### Can I Use the Old Share Tokens as Names?
+
+Yes, names can use the same format as old share tokens. However, this is your opportunity to choose more meaningful, memorable names for your shares.
+
+### What Happens to Permission Modes?
+
+Permission modes (open/closed) still work the same way with `--open` and `--closed` flags, plus the `--access-grant` flag for granting access to specific accounts.
+
+### Do Ephemeral Shares Still Work?
+
+Yes! Ephemeral shares work just as before. The main difference is they now support optional name selections, and by default names created without the `-r` flag are ephemeral.
+
+### What if I Have Scripts Using the Old Commands?
+
+You'll need to update your scripts to use the new command structure. The good news is the new system is more flexible and often requires fewer steps for common workflows.
 
 ---
 
-## next steps
+## Getting Help
 
-- explore [namespace concepts](/concepts/sharing-public.mdx) (update needed for v2)
-- learn about [the zrok agent](/guides/agent/index.mdx) and its improved error handling
-- review [permission modes](/guides/permission-modes.md) which work the same in v2
-- if you're an administrator, see the admin commands for namespace management
+If you run into issues during migration:
+
+1. Check `zrok status` to verify your environment is properly enabled
+2. Use `zrok list namespaces` to see what namespaces are available to you
+3. Use `zrok list names` to see your current names
+4. Review the error messages - v2.0 has improved error reporting
+5. Consult the [self-hosting guides](/docs/category/self-hosting/) if you manage your own instance
+6. Check the [concepts documentation](/concepts/index.md) for deeper understanding
+
+---
+
+## Next Steps
+
+- Explore [namespace concepts](/concepts/sharing-public.mdx) (update needed for v2)
+- Learn about [the zrok agent](/guides/agent/index.mdx) and its improved error handling
+- Review [permission modes](/guides/permission-modes.md) which work the same in v2
+- If you're an administrator, see the admin commands for namespace management
