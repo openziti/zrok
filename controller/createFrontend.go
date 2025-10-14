@@ -69,10 +69,12 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 		switch {
 		case errors.As(err, &perr):
 			if perr.Code == pq.ErrorCode("23505") {
+				dl.Errorf("error creating frontend record: %v", err)
 				return admin.NewCreateFrontendBadRequest()
 			}
 		case errors.As(err, sqliteErr):
 			if errors.Is(sqliteErr.Code, sqlite3.ErrConstraint) {
+				dl.Errorf("error creating frontend record: %v", err)
 				return admin.NewCreateFrontendBadRequest()
 			}
 		}
