@@ -10,12 +10,14 @@ create table namespace_frontend_mappings (
   is_default            boolean             not null default(false),
   created_at            timestamp           not null default(current_timestamp),
   updated_at            timestamp           not null default(current_timestamp),
-  deleted               boolean             not null default(false),
-
-  constraint uk_namespace_frontend_mappings unique (namespace_id, frontend_id) where not deleted,
-  constraint uk_default_namespace_frontend unique (frontend_id) where is_default and not deleted
+  deleted               boolean             not null default(false)
 );
+
+create unique index uk_namespace_frontend_mappings on namespace_frontend_mappings(namespace_id, frontend_id) where not deleted;
+create unique index uk_default_namespace_frontend on namespace_frontend_mappings(frontend_id) where is_default and not deleted;
 
 -- +migrate Down
 
+drop index if exists uk_default_namespace_frontend;
+drop index if exists uk_namespace_frontend_mappings;
 drop table if exists namespace_frontend_mappings;
