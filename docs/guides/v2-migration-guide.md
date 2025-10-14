@@ -30,7 +30,7 @@ this new model provides:
 
 ### configuration changes
 
-the `defaultFrontend` configuration option has been replaced with `defaultNamespace`. you'll need to update your configuration files accordingly.
+the `defaultFrontend` configuration option has been replaced with `defaultNamespace`. you'll need to update your configuration files accordingly (see `zrok status` and `zrok config --help`).
 
 ---
 
@@ -351,5 +351,5 @@ if you run into issues during migration:
 
 - explore [namespace concepts](/concepts/sharing-public.mdx) (update needed for v2)
 - learn about [the zrok agent](/guides/agent/) and its improved error handling
-- review [permission modes](/guides/permission-modes) which work the same in v2
+- review [permission modes](/guides/permission-modes.md) which work the same in v2
 - if you're an administrator, see the admin commands for namespace management
