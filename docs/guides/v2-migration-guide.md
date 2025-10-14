@@ -12,7 +12,7 @@ This guide helps you transition from zrok v1.x to v2.0, focusing on the major pa
 zrok v2.0 introduces breaking changes. The reserved sharing commands (`zrok reserve`, `zrok release`, `zrok share reserved`) have been removed and replaced with a more flexible namespace and name system.
 :::
 
-## What's Changing
+## What's Changing?
 
 ### The Big Picture
 
