@@ -1,6 +1,7 @@
 .$*
 .idea
 .vscode
+.contexts
 CLAUDE.md
 *.db
 /automated-release-build/
