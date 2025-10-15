@@ -14,8 +14,9 @@ func init() {
 }
 
 type adminCreateFrontendCommand struct {
-	cmd    *cobra.Command
-	closed bool
+	cmd     *cobra.Command
+	closed  bool
+	dynamic bool
 }
 
 func newAdminCreateFrontendCommand() *adminCreateFrontendCommand {
@@ -26,6 +27,7 @@ func newAdminCreateFrontendCommand() *adminCreateFrontendCommand {
 	}
 	command := &adminCreateFrontendCommand{cmd: cmd}
 	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enabled closed permission mode")
+	cmd.Flags().BoolVar(&command.dynamic, "dynamic", false, "Enable dynamic mode for the frontend")
 	cmd.Run = command.run
 	return command
 }
@@ -54,6 +56,7 @@ func (cmd *adminCreateFrontendCommand) run(_ *cobra.Command, args []string) {
 	req.Body.PublicName = publicName
 	req.Body.URLTemplate = urlTemplate
 	req.Body.PermissionMode = string(permissionMode)
+	req.Body.Dynamic = cmd.dynamic
 
 	resp, err := zrok.Admin.CreateFrontend(req, mustGetAdminAuth())
 	if err != nil {

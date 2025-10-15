@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
 	"github.com/spf13/cobra"
-	"os"
-	"time"
 )
 
 func init() {
@@ -15,7 +16,8 @@ func init() {
 }
 
 type adminListFrontendsCommand struct {
-	cmd *cobra.Command
+	cmd   *cobra.Command
+	extra bool
 }
 
 func newAdminListFrontendsCommand() *adminListFrontendsCommand {
@@ -26,6 +28,7 @@ func newAdminListFrontendsCommand() *adminListFrontendsCommand {
 		Args:    cobra.ExactArgs(0),
 	}
 	command := &adminListFrontendsCommand{cmd: cmd}
+	cmd.Flags().BoolVar(&command.extra, "extra", false, "show extra (v1) fields")
 	cmd.Run = command.run
 	return command
 }
@@ -51,16 +54,31 @@ func (cmd *adminListFrontendsCommand) run(_ *cobra.Command, _ []string) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleRounded)
-	t.AppendHeader(table.Row{"Token", "zId", "Public Name", "Url Template", "Created At", "Updated At"})
+	if cmd.extra {
+		t.AppendHeader(table.Row{"Frontend Token", "zId", "Public Name", "Url Template", "Dynamic", "Created At", "Updated At"})
+	} else {
+		t.AppendHeader(table.Row{"Frontend Token", "zId", "Public Name", "Dynamic", "Updated At"})
+	}
 	for _, pfe := range resp.Payload {
-		t.AppendRow(table.Row{
-			pfe.FrontendToken,
-			pfe.ZID,
-			pfe.PublicName,
-			pfe.URLTemplate,
-			time.UnixMilli(pfe.CreatedAt),
-			time.UnixMilli(pfe.UpdatedAt),
-		})
+		if cmd.extra {
+			t.AppendRow(table.Row{
+				pfe.FrontendToken,
+				pfe.ZID,
+				pfe.PublicName,
+				pfe.URLTemplate,
+				pfe.Dynamic,
+				time.UnixMilli(pfe.CreatedAt),
+				time.UnixMilli(pfe.UpdatedAt),
+			})
+		} else {
+			t.AppendRow(table.Row{
+				pfe.FrontendToken,
+				pfe.ZID,
+				pfe.PublicName,
+				pfe.Dynamic,
+				time.UnixMilli(pfe.UpdatedAt),
+			})
+		}
 	}
 	t.Render()
 	fmt.Println()
