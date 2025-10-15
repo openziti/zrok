@@ -62,6 +62,7 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 		UrlTemplate:    &params.Body.URLTemplate,
 		Reserved:       true,
 		PermissionMode: store.PermissionMode(params.Body.PermissionMode),
+		Dynamic:        params.Body.Dynamic,
 	}
 	if _, err := str.CreateGlobalFrontend(fe, trx); err != nil {
 		perr := &pq.Error{}

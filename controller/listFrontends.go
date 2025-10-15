@@ -39,6 +39,7 @@ func (h *listFrontendsHandler) Handle(params admin.ListFrontendsParams, principa
 			ZID:           sfe.ZId,
 			CreatedAt:     sfe.CreatedAt.UnixMilli(),
 			UpdatedAt:     sfe.UpdatedAt.UnixMilli(),
+			Dynamic:       sfe.Dynamic,
 		}
 		if sfe.UrlTemplate != nil {
 			frontend.URLTemplate = *sfe.UrlTemplate

@@ -17,6 +17,8 @@ func (h *updateFrontendHandler) Handle(params admin.UpdateFrontendParams, princi
 	feToken := params.Body.FrontendToken
 	publicName := params.Body.PublicName
 	urlTemplate := params.Body.URLTemplate
+	dynamic := params.Body.Dynamic
+	dynamicSet := params.Body.DynamicSet
 
 	if !principal.Admin {
 		dl.Errorf("invalid admin principal")
@@ -46,6 +48,12 @@ func (h *updateFrontendHandler) Handle(params admin.UpdateFrontendParams, princi
 	if urlTemplate != "" {
 		if fe.UrlTemplate == nil || (fe.UrlTemplate != nil && *fe.UrlTemplate != urlTemplate) {
 			fe.UrlTemplate = &urlTemplate
+			doUpdate = true
+		}
+	}
+	if dynamicSet {
+		if fe.Dynamic != dynamic {
+			fe.Dynamic = dynamic
 			doUpdate = true
 		}
 	}

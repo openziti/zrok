@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr, field_validator
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
@@ -30,7 +30,8 @@ class CreateFrontendRequest(BaseModel):
     url_template: Optional[StrictStr] = None
     public_name: Optional[StrictStr] = None
     permission_mode: Optional[StrictStr] = Field(default=None, alias="permissionMode")
-    __properties: ClassVar[List[str]] = ["zId", "url_template", "public_name", "permissionMode"]
+    dynamic: Optional[StrictBool] = None
+    __properties: ClassVar[List[str]] = ["zId", "url_template", "public_name", "permissionMode", "dynamic"]
 
     @field_validator('permission_mode')
     def permission_mode_validate_enum(cls, value):
@@ -96,7 +97,8 @@ class CreateFrontendRequest(BaseModel):
             "zId": obj.get("zId"),
             "url_template": obj.get("url_template"),
             "public_name": obj.get("public_name"),
-            "permissionMode": obj.get("permissionMode")
+            "permissionMode": obj.get("permissionMode"),
+            "dynamic": obj.get("dynamic")
         })
         return _obj
 

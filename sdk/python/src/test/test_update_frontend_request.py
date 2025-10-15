@@ -37,7 +37,9 @@ class TestUpdateFrontendRequest(unittest.TestCase):
             return UpdateFrontendRequest(
                 frontend_token = '',
                 public_name = '',
-                url_template = ''
+                url_template = '',
+                dynamic = True,
+                dynamic_set = True
             )
         else:
             return UpdateFrontendRequest(

@@ -17,7 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
@@ -29,7 +29,9 @@ class UpdateFrontendRequest(BaseModel):
     frontend_token: Optional[StrictStr] = Field(default=None, alias="frontendToken")
     public_name: Optional[StrictStr] = Field(default=None, alias="publicName")
     url_template: Optional[StrictStr] = Field(default=None, alias="urlTemplate")
-    __properties: ClassVar[List[str]] = ["frontendToken", "publicName", "urlTemplate"]
+    dynamic: Optional[StrictBool] = None
+    dynamic_set: Optional[StrictBool] = Field(default=None, alias="dynamicSet")
+    __properties: ClassVar[List[str]] = ["frontendToken", "publicName", "urlTemplate", "dynamic", "dynamicSet"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -84,7 +86,9 @@ class UpdateFrontendRequest(BaseModel):
         _obj = cls.model_validate({
             "frontendToken": obj.get("frontendToken"),
             "publicName": obj.get("publicName"),
-            "urlTemplate": obj.get("urlTemplate")
+            "urlTemplate": obj.get("urlTemplate"),
+            "dynamic": obj.get("dynamic"),
+            "dynamicSet": obj.get("dynamicSet")
         })
         return _obj
 

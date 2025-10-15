@@ -37,6 +37,18 @@ export interface UpdateFrontendRequest {
      * @memberof UpdateFrontendRequest
      */
     urlTemplate?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UpdateFrontendRequest
+     */
+    dynamic?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UpdateFrontendRequest
+     */
+    dynamicSet?: boolean;
 }
 
 /**
@@ -59,6 +71,8 @@ export function UpdateFrontendRequestFromJSONTyped(json: any, ignoreDiscriminato
         'frontendToken': json['frontendToken'] == null ? undefined : json['frontendToken'],
         'publicName': json['publicName'] == null ? undefined : json['publicName'],
         'urlTemplate': json['urlTemplate'] == null ? undefined : json['urlTemplate'],
+        'dynamic': json['dynamic'] == null ? undefined : json['dynamic'],
+        'dynamicSet': json['dynamicSet'] == null ? undefined : json['dynamicSet'],
     };
 }
 
@@ -76,6 +90,8 @@ export function UpdateFrontendRequestToJSONTyped(value?: UpdateFrontendRequest |
         'frontendToken': value['frontendToken'],
         'publicName': value['publicName'],
         'urlTemplate': value['urlTemplate'],
+        'dynamic': value['dynamic'],
+        'dynamicSet': value['dynamicSet'],
     };
 }
 

@@ -43,6 +43,12 @@ export interface CreateFrontendRequest {
      * @memberof CreateFrontendRequest
      */
     permissionMode?: CreateFrontendRequestPermissionModeEnum;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CreateFrontendRequest
+     */
+    dynamic?: boolean;
 }
 
 
@@ -77,6 +83,7 @@ export function CreateFrontendRequestFromJSONTyped(json: any, ignoreDiscriminato
         'urlTemplate': json['url_template'] == null ? undefined : json['url_template'],
         'publicName': json['public_name'] == null ? undefined : json['public_name'],
         'permissionMode': json['permissionMode'] == null ? undefined : json['permissionMode'],
+        'dynamic': json['dynamic'] == null ? undefined : json['dynamic'],
     };
 }
 
@@ -95,6 +102,7 @@ export function CreateFrontendRequestToJSONTyped(value?: CreateFrontendRequest |
         'url_template': value['urlTemplate'],
         'public_name': value['publicName'],
         'permissionMode': value['permissionMode'],
+        'dynamic': value['dynamic'],
     };
 }
 

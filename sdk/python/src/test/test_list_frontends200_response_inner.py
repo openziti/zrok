@@ -39,6 +39,7 @@ class TestListFrontends200ResponseInner(unittest.TestCase):
                 z_id = '',
                 url_template = '',
                 public_name = '',
+                dynamic = True,
                 created_at = 56,
                 updated_at = 56
             )

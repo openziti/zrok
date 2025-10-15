@@ -1183,6 +1183,9 @@ func init() {
             "schema": {
               "type": "object",
               "properties": {
+                "dynamic": {
+                  "type": "boolean"
+                },
                 "permissionMode": {
                   "type": "string",
                   "enum": [
@@ -1285,6 +1288,12 @@ func init() {
             "schema": {
               "type": "object",
               "properties": {
+                "dynamic": {
+                  "type": "boolean"
+                },
+                "dynamicSet": {
+                  "type": "boolean"
+                },
                 "frontendToken": {
                   "type": "string"
                 },
@@ -1482,6 +1491,9 @@ func init() {
                 "properties": {
                   "createdAt": {
                     "type": "integer"
+                  },
+                  "dynamic": {
+                    "type": "boolean"
                   },
                   "frontendToken": {
                     "type": "string"
@@ -4998,6 +5010,9 @@ func init() {
             "schema": {
               "type": "object",
               "properties": {
+                "dynamic": {
+                  "type": "boolean"
+                },
                 "permissionMode": {
                   "type": "string",
                   "enum": [
@@ -5100,6 +5115,12 @@ func init() {
             "schema": {
               "type": "object",
               "properties": {
+                "dynamic": {
+                  "type": "boolean"
+                },
+                "dynamicSet": {
+                  "type": "boolean"
+                },
                 "frontendToken": {
                   "type": "string"
                 },
@@ -7260,6 +7281,9 @@ func init() {
       "properties": {
         "createdAt": {
           "type": "integer"
+        },
+        "dynamic": {
+          "type": "boolean"
         },
         "frontendToken": {
           "type": "string"

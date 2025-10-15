@@ -81,6 +81,9 @@ func (o *CreateFrontend) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 // swagger:model CreateFrontendBody
 type CreateFrontendBody struct {
 
+	// dynamic
+	Dynamic bool `json:"dynamic,omitempty"`
+
 	// permission mode
 	// Enum: [open closed]
 	PermissionMode string `json:"permissionMode,omitempty"`

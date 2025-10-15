@@ -294,6 +294,8 @@ paths:
               permissionMode:
                 type: string
                 enum: [ "open", "closed" ]
+              dynamic:
+                type: boolean
       responses:
         201:
           description: frontend created
@@ -328,6 +330,10 @@ paths:
                 type: string
               urlTemplate:
                 type: string
+              dynamic:
+                type: boolean
+              dynamicSet:
+                type: boolean
       responses:
         200:
           description: frontend updated
@@ -475,6 +481,8 @@ paths:
                   type: string
                 publicName:
                   type: string
+                dynamic:
+                  type: boolean
                 createdAt:
                   type: integer
                 updatedAt:

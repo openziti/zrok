@@ -38,7 +38,8 @@ class TestCreateFrontendRequest(unittest.TestCase):
                 z_id = '',
                 url_template = '',
                 public_name = '',
-                permission_mode = 'open'
+                permission_mode = 'open',
+                dynamic = True
             )
         else:
             return CreateFrontendRequest(

@@ -78,6 +78,12 @@ func (o *UpdateFrontend) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 // swagger:model UpdateFrontendBody
 type UpdateFrontendBody struct {
 
+	// dynamic
+	Dynamic bool `json:"dynamic,omitempty"`
+
+	// dynamic set
+	DynamicSet bool `json:"dynamicSet,omitempty"`
+
 	// frontend token
 	FrontendToken string `json:"frontendToken,omitempty"`
 
