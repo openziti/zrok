@@ -6,6 +6,7 @@ CLAUDE.md
 *.db
 /automated-release-build/
 etc/dev*
+etc/*.pem
 
 # Dependencies
 node_modules/
