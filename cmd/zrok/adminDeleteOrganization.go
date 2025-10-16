@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -46,5 +46,5 @@ func (cmd *adminDeleteOrganizationCommand) run(_ *cobra.Command, args []string) 
 		panic(err)
 	}
 
-	logrus.Infof("deleted organization with token '%v'", args[0])
+	dl.Infof("deleted organization with token '%v'", args[0])
 }

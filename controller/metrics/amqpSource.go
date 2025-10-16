@@ -1,32 +1,27 @@
 package metrics
 
 import (
-	"github.com/michaelquigley/cf"
-	"github.com/openziti/zrok/controller/env"
+	"time"
+
+	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/sirupsen/logrus"
-	"time"
 )
 
-func init() {
-	env.GetCfOptions().AddFlexibleSetter("amqpSource", loadAmqpSourceConfig)
-}
+const AmqpSourceType = "amqpSource"
 
 type AmqpSourceConfig struct {
-	Url       string `cf:"+secret"`
+	Url       string `dd:"+secret"`
 	QueueName string
 }
 
-func loadAmqpSourceConfig(v interface{}, _ *cf.Options) (interface{}, error) {
-	if submap, ok := v.(map[string]interface{}); ok {
-		cfg := &AmqpSourceConfig{}
-		if err := cf.Bind(cfg, submap, cf.DefaultOptions()); err != nil {
-			return nil, err
-		}
-		return newAmqpSource(cfg)
+func LoadAmqpSource(v map[string]any) (dd.Dynamic, error) {
+	cfg, err := dd.New[AmqpSourceConfig](v)
+	if err != nil {
+		return nil, err
 	}
-	return nil, errors.New("invalid config structure for 'amqpSource'")
+	return newAmqpSource(cfg)
 }
 
 type amqpSource struct {
@@ -50,6 +45,9 @@ func newAmqpSource(cfg *AmqpSourceConfig) (*amqpSource, error) {
 	return as, nil
 }
 
+func (s *amqpSource) Type() string                   { return AmqpSourceType }
+func (s *amqpSource) ToMap() (map[string]any, error) { return nil, nil }
+
 func (s *amqpSource) Start(events chan ZitiEventMsg) (join chan struct{}, err error) {
 	s.events = events
 	go s.run()
@@ -62,15 +60,15 @@ func (s *amqpSource) Stop() {
 }
 
 func (s *amqpSource) run() {
-	logrus.Info("started")
-	defer logrus.Info("stopped")
+	dl.Info("started")
+	defer dl.Info("stopped")
 	defer close(s.join)
 
 mainLoop:
 	for {
-		logrus.Infof("connecting to '%v'", s.cfg.Url)
+		dl.Infof("connecting to '%v'", s.cfg.Url)
 		if err := s.connect(); err != nil {
-			logrus.Errorf("error connecting to '%v': %v", s.cfg.Url, err)
+			dl.Errorf("error connecting to '%v': %v", s.cfg.Url, err)
 			select {
 			case <-time.After(10 * time.Second):
 				continue mainLoop
@@ -78,14 +76,14 @@ mainLoop:
 				break mainLoop
 			}
 		}
-		logrus.Infof("connected to '%v'", s.cfg.Url)
+		dl.Infof("connected to '%v'", s.cfg.Url)
 
 	msgLoop:
 		for {
 			select {
 			case err, ok := <-s.errs:
 				if err != nil || !ok {
-					logrus.Error(err)
+					dl.Error(err)
 					break msgLoop
 				}
 
@@ -94,7 +92,7 @@ mainLoop:
 
 			case event, ok := <-s.msgs:
 				if !ok {
-					logrus.Debug("selecting on msg !ok")
+					dl.Debug("selecting on msg !ok")
 					break msgLoop
 				}
 				if event.Body != nil {
@@ -103,7 +101,7 @@ mainLoop:
 						msg:  event,
 					}
 				} else {
-					logrus.Debug("event body was nil!")
+					dl.Debug("event body was nil!")
 					break msgLoop
 				}
 			}

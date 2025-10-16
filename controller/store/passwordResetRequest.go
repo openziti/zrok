@@ -1,0 +1,117 @@
+package store
+
+import (
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
+	"github.com/pkg/errors"
+)
+
+type PasswordResetRequest struct {
+	Model
+	Token     string
+	AccountId int
+	Deleted   bool
+}
+
+func (str *Store) CreatePasswordResetRequest(prr *PasswordResetRequest, trx *sqlx.Tx) (int, error) {
+	if err := str.DeletePasswordResetRequestsByAccountId(prr.AccountId, trx); err != nil {
+		dl.Errorf("unable to delete old password reset requests for account '%v', but continuing: %v", prr.AccountId, err)
+	}
+
+	stmt, err := trx.Prepare("insert into password_reset_requests (account_id, token) values ($1, $2) returning id")
+	if err != nil {
+		return 0, errors.Wrap(err, "error preparing password_reset_requests insert statement")
+	}
+	var id int
+	if err := stmt.QueryRow(prr.AccountId, prr.Token).Scan(&id); err != nil {
+		return 0, errors.Wrap(err, "error executing password_reset_requests insert statement")
+	}
+	return id, nil
+}
+
+func (str *Store) FindPasswordResetRequestWithToken(token string, trx *sqlx.Tx) (*PasswordResetRequest, error) {
+	prr := &PasswordResetRequest{}
+	if err := trx.QueryRowx("select * from password_reset_requests where token = $1 and not deleted", token).StructScan(prr); err != nil {
+		return nil, errors.Wrap(err, "error selecting password_reset_requests by token")
+	}
+	return prr, nil
+}
+
+func (str *Store) FindExpiredPasswordResetRequests(before time.Time, limit int, trx *sqlx.Tx) ([]*PasswordResetRequest, error) {
+	var sql string
+	switch str.cfg.Type {
+	case "postgres":
+		sql = "select * from password_reset_requests where created_at < $1 and not deleted limit %d for update"
+
+	case "sqlite3":
+		sql = "select * from password_reset_requests where created_at < $1 and not deleted limit %d"
+	default:
+		return nil, errors.Errorf("unknown database type '%v'", str.cfg.Type)
+	}
+
+	rows, err := trx.Queryx(fmt.Sprintf(sql, limit), before)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting expired password_reset_requests")
+	}
+	var prrs []*PasswordResetRequest
+	for rows.Next() {
+		prr := &PasswordResetRequest{}
+		if err := rows.StructScan(prr); err != nil {
+			return nil, errors.Wrap(err, "error scanning password_reset_request")
+		}
+		prrs = append(prrs, prr)
+	}
+	return prrs, nil
+}
+
+func (str *Store) DeletePasswordResetRequest(id int, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("update password_reset_requests set updated_at = current_timestamp, deleted = true where id = $1")
+	if err != nil {
+		return errors.Wrap(err, "error preparing password_reset_requests delete statement")
+	}
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return errors.Wrap(err, "error executing password_reset_requests delete statement")
+	}
+	return nil
+}
+
+func (str *Store) DeleteMultiplePasswordResetRequests(ids []int, trx *sqlx.Tx) error {
+	if len(ids) == 0 {
+		return nil
+	}
+
+	anyIds := make([]any, len(ids))
+	indexes := make([]string, len(ids))
+
+	for i, id := range ids {
+		anyIds[i] = id
+		indexes[i] = fmt.Sprintf("$%d", i+1)
+	}
+
+	stmt, err := trx.Prepare(fmt.Sprintf("update password_reset_requests set updated_at = current_timestamp, deleted = true where id in (%s)", strings.Join(indexes, ",")))
+	if err != nil {
+		return errors.Wrap(err, "error preparing password_reset_requests delete multiple statement")
+	}
+	_, err = stmt.Exec(anyIds...)
+	if err != nil {
+		return errors.Wrap(err, "error executing password_reset_requests delete multiple statement")
+	}
+	return nil
+}
+
+func (str *Store) DeletePasswordResetRequestsByAccountId(accountId int, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("update password_reset_requests set updated_at = current_timestamp, deleted = true where account_id = $1")
+	if err != nil {
+		return errors.Wrap(err, "error preparing password_reset_requests delete by account_id statement")
+	}
+	_, err = stmt.Exec(accountId)
+	if err != nil {
+		return errors.Wrap(err, "error executing password_reset_requests delete by account_id statement")
+	}
+	return nil
+}

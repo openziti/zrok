@@ -5,13 +5,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type FrontendConfig struct {
@@ -123,7 +123,7 @@ func NewFrontend(cfg *FrontendConfig) (*Frontend, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error loading ziti context")
 	}
-	logrus.Errorf("creating new frontend")
+	dl.Errorf("creating new frontend")
 	return &Frontend{
 		cfg:     cfg,
 		zCtx:    zCtx,
@@ -150,20 +150,20 @@ func (f *Frontend) Run() error {
 			clt.active <- true
 			_, err := clt.zitiConn.Write(buf[:count])
 			if err != nil {
-				logrus.Errorf("error writing '%v': %v", f.cfg.ShrToken, err)
+				dl.Errorf("error writing '%v': %v", f.cfg.ShrToken, err)
 				f.clients.Delete(srcAddr)
 				_ = clt.zitiConn.Close()
 			}
 		} else {
 			zitiConn, err := f.zCtx.DialWithOptions(f.cfg.ShrToken, &ziti.DialOptions{ConnectTimeout: 30 * time.Second})
 			if err != nil {
-				logrus.Errorf("error dialing '%v': %v", f.cfg.ShrToken, err)
+				dl.Errorf("error dialing '%v': %v", f.cfg.ShrToken, err)
 				continue
 			}
 
 			_, err = zitiConn.Write(buf[:count])
 			if err != nil {
-				logrus.Errorf("error writing '%v': %v", f.cfg.ShrToken, err)
+				dl.Errorf("error writing '%v': %v", f.cfg.ShrToken, err)
 				_ = zitiConn.Close()
 				continue
 			}

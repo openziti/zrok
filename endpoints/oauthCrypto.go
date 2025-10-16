@@ -42,7 +42,7 @@ func EncryptToken(token string, key []byte) (string, error) {
 	return obj.CompactSerialize()
 }
 
-// DecryptToken decrypts an encrypted token using AES-GCM (256)
+// DecryptToken decrypts a token that was encrypted with EncryptToken
 func DecryptToken(encrypted string, key []byte) (string, error) {
 	obj, err := jose.ParseEncrypted(encrypted, []jose.KeyAlgorithm{jose.DIRECT}, []jose.ContentEncryption{jose.A256GCM})
 	if err != nil {

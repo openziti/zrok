@@ -3,19 +3,22 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/michaelquigley/pfxlog"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/sirupsen/logrus"
 	"io"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/michaelquigley/pfxlog"
+	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/sirupsen/logrus"
 )
 
 func init() {
 	pfxlog.GlobalInit(logrus.WarnLevel, pfxlog.DefaultOptions())
+	dl.Init(dl.DefaultOptions())
 }
 
 func main() {

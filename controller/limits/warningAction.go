@@ -1,13 +1,14 @@
 package limits
 
 import (
+	"time"
+
 	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/controller/emailUi"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type warningAction struct {
@@ -20,7 +21,7 @@ func newWarningAction(cfg *emailUi.Config, str *store.Store) *warningAction {
 }
 
 func (a *warningAction) HandleAccount(acct *store.Account, rxBytes, txBytes int64, bwc store.BandwidthClass, _ *userLimits, _ *sqlx.Tx) error {
-	logrus.Infof("warning '%v'", acct.Email)
+	dl.Infof("warning '%v'", acct.Email)
 
 	if a.cfg != nil {
 		rxLimit := "(store.Unlimited bytes)"
@@ -45,7 +46,7 @@ func (a *warningAction) HandleAccount(acct *store.Account, rxBytes, txBytes int6
 			return errors.Wrapf(err, "error sending limit warning email to '%v'", acct.Email)
 		}
 	} else {
-		logrus.Warnf("skipping warning email for account limit; no email configuration specified")
+		dl.Warnf("skipping warning email for account limit; no email configuration specified")
 	}
 
 	return nil

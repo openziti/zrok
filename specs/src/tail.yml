@@ -1,0 +1,8 @@
+
+produces:
+- application/zrok.v1+json
+consumes:
+- application/zrok.v1+json
+schemes:
+- http
+swagger: "2.0"

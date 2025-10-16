@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
-	"github.com/sirupsen/logrus"
 )
 
 type listFrontendsHandler struct{}
@@ -15,20 +15,20 @@ func newListFrontendsHandler() *listFrontendsHandler {
 
 func (h *listFrontendsHandler) Handle(params admin.ListFrontendsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	if !principal.Admin {
-		logrus.Error("invalid admin principal")
+		dl.Error("invalid admin principal")
 		return admin.NewListFrontendsUnauthorized()
 	}
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return admin.NewListFrontendsInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
-	sfes, err := str.FindPublicFrontends(tx)
+	sfes, err := str.FindPublicFrontends(trx)
 	if err != nil {
-		logrus.Errorf("error finding public frontends: %v", err)
+		dl.Errorf("error finding public frontends: %v", err)
 		return admin.NewListFrontendsInternalServerError()
 	}
 
@@ -39,6 +39,7 @@ func (h *listFrontendsHandler) Handle(params admin.ListFrontendsParams, principa
 			ZID:           sfe.ZId,
 			CreatedAt:     sfe.CreatedAt.UnixMilli(),
 			UpdatedAt:     sfe.UpdatedAt.UnixMilli(),
+			Dynamic:       sfe.Dynamic,
 		}
 		if sfe.UrlTemplate != nil {
 			frontend.URLTemplate = *sfe.UrlTemplate

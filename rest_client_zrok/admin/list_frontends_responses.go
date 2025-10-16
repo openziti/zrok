@@ -233,6 +233,9 @@ type ListFrontendsOKBodyItems0 struct {
 	// created at
 	CreatedAt int64 `json:"createdAt,omitempty"`
 
+	// dynamic
+	Dynamic bool `json:"dynamic,omitempty"`
+
 	// frontend token
 	FrontendToken string `json:"frontendToken,omitempty"`
 

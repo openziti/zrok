@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
-	"github.com/sirupsen/logrus"
 )
 
 type listOrgMembersHandler struct{}
@@ -16,30 +16,30 @@ func newListOrgMembersHandler() *listOrgMembersHandler {
 func (h *listOrgMembersHandler) Handle(params metadata.ListOrgMembersParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return metadata.NewListOrgMembersInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 
 	org, err := str.FindOrganizationByToken(params.OrganizationToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding organization by token: %v", err)
+		dl.Errorf("error finding organization by token: %v", err)
 		return metadata.NewListOrgMembersNotFound()
 	}
 
 	admin, err := str.IsAccountAdminOfOrganization(int(principal.ID), org.Id, trx)
 	if err != nil {
-		logrus.Errorf("error checking account '%v' admin: %v", principal.Email, err)
+		dl.Errorf("error checking account '%v' admin: %v", principal.Email, err)
 		return metadata.NewListOrgMembersNotFound()
 	}
 	if !admin {
-		logrus.Errorf("requesting account '%v' is not admin of organization '%v'", principal.Email, org.Token)
+		dl.Errorf("requesting account '%v' is not admin of organization '%v'", principal.Email, org.Token)
 		return metadata.NewOrgAccountOverviewNotFound()
 	}
 
 	members, err := str.FindAccountsForOrganization(org.Id, trx)
 	if err != nil {
-		logrus.Errorf("error finding accounts for organization '%v': %v", org.Token, err)
+		dl.Errorf("error finding accounts for organization '%v': %v", org.Token, err)
 		return metadata.NewListOrgMembersInternalServerError()
 	}
 

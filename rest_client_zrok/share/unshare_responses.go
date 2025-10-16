@@ -297,9 +297,6 @@ type UnshareBody struct {
 	// env z Id
 	EnvZID string `json:"envZId,omitempty"`
 
-	// reserved
-	Reserved bool `json:"reserved,omitempty"`
-
 	// share token
 	ShareToken string `json:"shareToken,omitempty"`
 }

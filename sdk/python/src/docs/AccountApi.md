@@ -1,6 +1,6 @@
 # zrok_api.AccountApi
 
-All URIs are relative to */api/v1*
+All URIs are relative to */api/v2*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -27,10 +27,10 @@ from zrok_api.models.change_password_request import ChangePasswordRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -102,10 +102,10 @@ from zrok_api.models.invite_request import InviteRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 
@@ -166,10 +166,10 @@ from zrok_api.models.login_request import LoginRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 
@@ -232,10 +232,10 @@ from zrok_api.models.regenerate_account_token_request import RegenerateAccountTo
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -308,10 +308,10 @@ from zrok_api.models.register_request import RegisterRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 
@@ -374,10 +374,10 @@ from zrok_api.models.reset_password_request import ResetPasswordRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 
@@ -438,10 +438,10 @@ from zrok_api.models.regenerate_account_token_request import RegenerateAccountTo
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 
@@ -502,10 +502,10 @@ from zrok_api.models.verify_request import VerifyRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 

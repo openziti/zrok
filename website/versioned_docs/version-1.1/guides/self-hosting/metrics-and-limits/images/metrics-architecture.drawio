@@ -1,0 +1,67 @@
+<mxfile host="Electron" modified="2023-04-04T15:26:45.884Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.1.2 Chrome/106.0.5249.199 Electron/21.4.3 Safari/537.36" etag="WmZNtDHtF91euXotUkS-" version="21.1.2" type="device">
+  <diagram name="Page-1" id="IMoEC3u-7S6gkD3jGaqt">
+    <mxGraphModel dx="1030" dy="801" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="600" pageHeight="600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-1" value="Ziti&lt;br&gt;Controller" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="110" y="55" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-2" value="events.json" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="70" width="80" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-3" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.875;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="z8BNBxY42kQ6VSPeSeC1-1" target="z8BNBxY42kQ6VSPeSeC1-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="350" y="285" as="sourcePoint" />
+            <mxPoint x="400" y="235" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-4" value="zrok&lt;br&gt;Metrics Bridge" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="370" y="65" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-5" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="z8BNBxY42kQ6VSPeSeC1-2" target="z8BNBxY42kQ6VSPeSeC1-4">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="300" y="255" as="sourcePoint" />
+            <mxPoint x="350" y="205" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-6" value="Event Queue&lt;br&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;(AMQP/RabbitMQ)&lt;/font&gt;" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="175" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-12" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="230.5" y="295" width="139" height="81" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-9" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="z8BNBxY42kQ6VSPeSeC1-12">
+          <mxGeometry width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-10" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="z8BNBxY42kQ6VSPeSeC1-12">
+          <mxGeometry x="10" y="10" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-11" value="zrok&lt;br&gt;Controller(s)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="z8BNBxY42kQ6VSPeSeC1-12">
+          <mxGeometry x="19" y="21" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-13" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.88;entryY=0.25;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="z8BNBxY42kQ6VSPeSeC1-4" target="z8BNBxY42kQ6VSPeSeC1-6">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="430" y="165" as="sourcePoint" />
+            <mxPoint x="470" y="205" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-14" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.55;exitY=0.95;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="z8BNBxY42kQ6VSPeSeC1-6" target="z8BNBxY42kQ6VSPeSeC1-9">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="470" y="355" as="sourcePoint" />
+            <mxPoint x="520" y="305" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-15" value="zrok&lt;br&gt;Metrics Store&lt;br&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;(InfluxDB)&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="250" y="425" width="100" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="z8BNBxY42kQ6VSPeSeC1-17" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="z8BNBxY42kQ6VSPeSeC1-15" target="z8BNBxY42kQ6VSPeSeC1-11">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="450" y="435" as="sourcePoint" />
+            <mxPoint x="500" y="385" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

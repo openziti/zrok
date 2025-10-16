@@ -7,18 +7,17 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **env_zid** | **str** |  | [optional] 
 **share_mode** | **str** |  | [optional] 
-**frontend_selection** | **List[str]** |  | [optional] 
+**name_selections** | [**List[NameSelection]**](NameSelection.md) |  | [optional] 
+**private_share_token** | **str** |  | [optional] 
 **backend_mode** | **str** |  | [optional] 
-**backend_proxy_endpoint** | **str** |  | [optional] 
+**target** | **str** |  | [optional] 
 **auth_scheme** | **str** |  | [optional] 
-**auth_users** | [**List[AuthUser]**](AuthUser.md) |  | [optional] 
+**basic_auth_users** | [**List[AuthUser]**](AuthUser.md) |  | [optional] 
 **oauth_provider** | **str** |  | [optional] 
 **oauth_email_domains** | **List[str]** |  | [optional] 
-**oauth_authorization_check_interval** | **str** |  | [optional] 
-**reserved** | **bool** |  | [optional] 
+**oauth_refresh_interval** | **str** |  | [optional] 
 **permission_mode** | **str** |  | [optional] 
 **access_grants** | **List[str]** |  | [optional] 
-**unique_name** | **str** |  | [optional] 
 
 ## Example
 

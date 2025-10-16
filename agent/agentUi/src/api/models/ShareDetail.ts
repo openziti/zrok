@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { Failure } from './Failure';
+import {
+    FailureFromJSON,
+    FailureFromJSONTyped,
+    FailureToJSON,
+    FailureToJSONTyped,
+} from './Failure';
+
 /**
  * 
  * @export
@@ -39,12 +47,6 @@ export interface ShareDetail {
     backendMode?: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof ShareDetail
-     */
-    reserved?: boolean;
-    /**
-     * 
      * @type {Array<string>}
      * @memberof ShareDetail
      */
@@ -67,6 +69,12 @@ export interface ShareDetail {
      * @memberof ShareDetail
      */
     status?: string;
+    /**
+     * 
+     * @type {Failure}
+     * @memberof ShareDetail
+     */
+    failure?: Failure;
 }
 
 /**
@@ -89,11 +97,11 @@ export function ShareDetailFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'token': json['token'] == null ? undefined : json['token'],
         'shareMode': json['shareMode'] == null ? undefined : json['shareMode'],
         'backendMode': json['backendMode'] == null ? undefined : json['backendMode'],
-        'reserved': json['reserved'] == null ? undefined : json['reserved'],
         'frontendEndpoint': json['frontendEndpoint'] == null ? undefined : json['frontendEndpoint'],
         'backendEndpoint': json['backendEndpoint'] == null ? undefined : json['backendEndpoint'],
         'closed': json['closed'] == null ? undefined : json['closed'],
         'status': json['status'] == null ? undefined : json['status'],
+        'failure': json['failure'] == null ? undefined : FailureFromJSON(json['failure']),
     };
 }
 
@@ -111,11 +119,11 @@ export function ShareDetailToJSONTyped(value?: ShareDetail | null, ignoreDiscrim
         'token': value['token'],
         'shareMode': value['shareMode'],
         'backendMode': value['backendMode'],
-        'reserved': value['reserved'],
         'frontendEndpoint': value['frontendEndpoint'],
         'backendEndpoint': value['backendEndpoint'],
         'closed': value['closed'],
         'status': value['status'],
+        'failure': FailureToJSON(value['failure']),
     };
 }
 

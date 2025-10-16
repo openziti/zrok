@@ -24,32 +24,26 @@ type Share struct {
 	// backend mode
 	BackendMode string `json:"backendMode,omitempty"`
 
-	// backend proxy endpoint
-	BackendProxyEndpoint string `json:"backendProxyEndpoint,omitempty"`
-
 	// created at
 	CreatedAt int64 `json:"createdAt,omitempty"`
 
 	// env z Id
 	EnvZID string `json:"envZId,omitempty"`
 
-	// frontend endpoint
-	FrontendEndpoint string `json:"frontendEndpoint,omitempty"`
-
-	// frontend selection
-	FrontendSelection string `json:"frontendSelection,omitempty"`
+	// frontend endpoints
+	FrontendEndpoints []string `json:"frontendEndpoints"`
 
 	// limited
 	Limited bool `json:"limited,omitempty"`
-
-	// reserved
-	Reserved bool `json:"reserved,omitempty"`
 
 	// share mode
 	ShareMode string `json:"shareMode,omitempty"`
 
 	// share token
 	ShareToken string `json:"shareToken,omitempty"`
+
+	// target
+	Target string `json:"target,omitempty"`
 
 	// updated at
 	UpdatedAt int64 `json:"updatedAt,omitempty"`
