@@ -40,6 +40,7 @@ type OauthConfig struct {
 	CookieDomain         string
 	SessionLifetime      time.Duration
 	IntermediateLifetime time.Duration
+	MaxCookieSize        int
 	SigningKey           string        `cf:"+secret"`
 	EncryptionKey        string        `cf:"+secret"`
 	Providers            []interface{} `cf:"+secret"`
@@ -147,3 +148,8 @@ func configureOauth(ctx context.Context, cfg *Config, tls bool) error {
 
 	return nil
 }
+
+func (c *OauthConfig) GetCookieName() string             { return c.CookieName }
+func (c *OauthConfig) GetCookieDomain() string           { return c.CookieDomain }
+func (c *OauthConfig) GetMaxCookieSize() int             { return c.MaxCookieSize }
+func (c *OauthConfig) GetSessionLifetime() time.Duration { return c.SessionLifetime }

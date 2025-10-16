@@ -47,7 +47,7 @@ func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg ma
 	refreshInterval := getRefreshInterval(oauthMap)
 	target := fmt.Sprintf("%s%s", r.Host, r.URL.Path)
 
-	cookie, err := r.Cookie(h.cfg.Oauth.CookieName)
+	cookie, err := getSessionCookie(r, h.cfg.Oauth.CookieName)
 	if err != nil {
 		logrus.Errorf("unable to get '%v' cookie: %v", h.cfg.Oauth.CookieName, err)
 		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
