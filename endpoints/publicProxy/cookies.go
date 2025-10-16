@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -23,6 +24,11 @@ type sessionCookieRequest struct {
 	targetHost      string
 }
 
+// getSessionCookie retrieves and reassembles a session cookie using the shared endpoints package
+func getSessionCookie(r *http.Request, cookieName string) (*http.Cookie, error) {
+	return endpoints.GetSessionCookie(r, cookieName)
+}
+
 func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 	targetHost := strings.TrimSpace(req.targetHost)
 	if targetHost == "" {
@@ -33,7 +39,7 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 	}
 	targetHost = strings.Split(targetHost, "/")[0]
 
-	encryptedAccessToken, err := encryptToken(req.accessToken, req.encryptionKey)
+	encryptedAccessToken, err := endpoints.EncryptToken(req.accessToken, req.encryptionKey)
 	if err != nil {
 		logrus.Errorf("failed to encrypt access token: %v", err)
 		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("failed to encrypt access token")))
@@ -59,30 +65,41 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:    req.oauthCfg.CookieName,
-		Value:   sTkn,
-		MaxAge:  int(req.oauthCfg.SessionLifetime.Seconds()),
-		Domain:  req.oauthCfg.CookieDomain,
-		Path:    "/",
-		Expires: time.Now().Add(req.oauthCfg.SessionLifetime),
-		// Secure:  true, // pending server tls feature https://github.com/openziti/zrok/issues/24
-		HttpOnly: true,                 // enabled because zrok frontend is the only intended consumer of this cookie, not client-side scripts
-		SameSite: http.SameSiteLaxMode, // explicitly set to the default Lax mode which allows the zrok share to be navigated to from another site and receive the cookie
-	})
+	// use the shared endpoints package to set the cookie with compression and striping
+	if err := endpoints.SetSessionCookie(w, req.oauthCfg.CookieName, sTkn, req.oauthCfg); err != nil {
+		logrus.Errorf("failed to set session cookie: %v", err)
+		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(req.email).WithError(errors.New("failed to set session cookie")))
+		return
+	}
+}
+
+// clearSessionCookies clears all session cookies using the shared endpoints package
+func clearSessionCookies(w http.ResponseWriter, r *http.Request, cookieName string, cfg *OauthConfig) {
+	endpoints.ClearSessionCookies(w, r, cookieName, cfg)
 }
 
 // filterSessionCookies strips out the configured session cookie and also any `pkce` cookie
 func filterSessionCookies(w http.ResponseWriter, r *http.Request, cfg *Config) {
 	cookies := r.Cookies()
 	r.Header.Del("Cookie")
-	for _, cookie := range cookies {
-		if cfg.Oauth != nil && cfg.Oauth.CookieName == cookie.Name {
-			continue
+
+	if cfg.Oauth != nil {
+		// use the shared endpoints package to filter session cookies
+		filtered := endpoints.FilterSessionCookies(cookies, cfg.Oauth.CookieName)
+		for _, cookie := range filtered {
+			// also filter out pkce cookie
+			if cookie.Name == "pkce" {
+				continue
+			}
+			r.AddCookie(cookie)
 		}
-		if cookie.Name == "pkce" {
-			continue
+	} else {
+		// no oauth config, just filter pkce
+		for _, cookie := range cookies {
+			if cookie.Name == "pkce" {
+				continue
+			}
+			r.AddCookie(cookie)
 		}
-		r.AddCookie(cookie)
 	}
 }

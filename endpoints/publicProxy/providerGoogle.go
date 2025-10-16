@@ -12,6 +12,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/mitchellh/mapstructure"
+	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/sirupsen/logrus"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
@@ -58,11 +59,11 @@ func (c *googleConfigurer) configure() error {
 		scheme = "https"
 	}
 
-	signingKey, err := deriveKey(c.cfg.SigningKey, 32)
+	signingKey, err := endpoints.DeriveKey(c.cfg.SigningKey, 32)
 	if err != nil {
 		return err
 	}
-	encryptionKey, err := deriveKey(c.cfg.EncryptionKey, 32)
+	encryptionKey, err := endpoints.DeriveKey(c.cfg.EncryptionKey, 32)
 	if err != nil {
 		return err
 	}
@@ -182,7 +183,7 @@ func (c *googleConfigurer) configure() error {
 	http.Handle(fmt.Sprintf("/%v/auth/callback", c.googleCfg.Name), rp.CodeExchangeHandler(login, provider))
 
 	logout := func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie(c.cfg.CookieName)
+		cookie, err := getSessionCookie(r, c.cfg.CookieName)
 		if err == nil {
 			tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 				return signingKey, nil
@@ -190,7 +191,7 @@ func (c *googleConfigurer) configure() error {
 			if err == nil {
 				claims := tkn.Claims.(*zrokClaims)
 				if claims.Provider == c.googleCfg.Name {
-					accessToken, err := decryptToken(claims.AccessToken, encryptionKey)
+					accessToken, err := endpoints.DecryptToken(claims.AccessToken, encryptionKey)
 					if err == nil {
 						revokeURL := "https://oauth2.googleapis.com/revoke"
 						resp, err := http.PostForm(revokeURL, url.Values{
@@ -231,14 +232,7 @@ func (c *googleConfigurer) configure() error {
 			return
 		}
 
-		http.SetCookie(w, &http.Cookie{
-			Name:     c.cfg.CookieName,
-			Value:    "",
-			MaxAge:   -1,
-			Domain:   c.cfg.CookieDomain,
-			Path:     "/",
-			HttpOnly: true,
-		})
+		clearSessionCookies(w, r, c.cfg.CookieName, c.cfg)
 
 		redirectURL := r.URL.Query().Get("redirect_url")
 		if redirectURL == "" {

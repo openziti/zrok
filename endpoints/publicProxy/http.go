@@ -30,7 +30,7 @@ func NewHTTP(cfg *Config) (*HttpFrontend, error) {
 	var signingKey []byte
 	var err error
 	if cfg.Oauth != nil {
-		signingKey, err = deriveKey(cfg.Oauth.SigningKey, 32)
+		signingKey, err = endpoints.DeriveKey(cfg.Oauth.SigningKey, 32)
 		if err != nil {
 			return nil, err
 		}
