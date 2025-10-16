@@ -1,11 +1,13 @@
 .$*
 .idea
 .vscode
+.contexts
 CLAUDE.md
 *.db
 /automated-release-build/
 etc/dev.yml
 etc/dev-*
+etc/*.pem
 
 # Dependencies
 node_modules/
