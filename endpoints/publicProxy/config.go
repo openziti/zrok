@@ -37,6 +37,7 @@ type OauthConfig struct {
 	EndpointUrl          string
 	CookieName           string
 	CookieDomain         string
+	MaxCookieSize        int
 	SessionLifetime      time.Duration
 	IntermediateLifetime time.Duration
 	SigningKey           string       `dd:"+secret"`
@@ -44,10 +45,29 @@ type OauthConfig struct {
 	Providers            []dd.Dynamic `dd:"+secret"`
 }
 
+func (c *OauthConfig) GetCookieName() string {
+	return c.CookieName
+}
+
+func (c *OauthConfig) GetCookieDomain() string {
+	return c.CookieDomain
+}
+
+func (c *OauthConfig) GetMaxCookieSize() int {
+	return c.MaxCookieSize
+}
+
+func (c *OauthConfig) GetSessionLifetime() time.Duration {
+	return c.SessionLifetime
+}
+
 func DefaultConfig() *Config {
 	return &Config{
 		Identity: "public",
 		Address:  "0.0.0.0:8080",
+		Oauth: &OauthConfig{
+			MaxCookieSize: 3072,
+		},
 	}
 }
 

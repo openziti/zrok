@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/openziti/zrok/endpoints"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -141,7 +143,7 @@ func (p *oidcProvider) refreshHandler() http.HandlerFunc {
 			return
 		}
 
-		cookie, err := r.Cookie(p.oauthCfg.CookieName)
+		cookie, err := getSessionCookie(r, p.oauthCfg.CookieName)
 		if err != nil {
 			dl.Errorf("unable to get auth session cookie: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to get auth session cookie")))
@@ -164,7 +166,7 @@ func (p *oidcProvider) refreshHandler() http.HandlerFunc {
 			return
 		}
 
-		accessToken, err := decryptToken(claims.AccessToken, p.encryptionKey)
+		accessToken, err := endpoints.DecryptToken(claims.AccessToken, p.encryptionKey)
 		if err != nil {
 			dl.Errorf("unable to decrypt access token: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to decrypt access token")))
@@ -238,7 +240,7 @@ func (p *oidcProvider) loginHandler() func(w http.ResponseWriter, r *http.Reques
 // logoutHandler creates the logout handler for revoking OIDC tokens and clearing cookies
 func (p *oidcProvider) logoutHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie(p.oauthCfg.CookieName)
+		cookie, err := getSessionCookie(r, p.oauthCfg.CookieName)
 		if err == nil {
 			tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 				return p.signingKey, nil
@@ -246,7 +248,7 @@ func (p *oidcProvider) logoutHandler() http.HandlerFunc {
 			if err == nil {
 				claims := tkn.Claims.(*zrokClaims)
 				if claims.Provider == p.config.Name {
-					accessToken, err := decryptToken(claims.AccessToken, p.encryptionKey)
+					accessToken, err := endpoints.DecryptToken(claims.AccessToken, p.encryptionKey)
 					if err == nil {
 						if err := rp.RevokeToken(context.Background(), p.provider, accessToken, "access_token"); err == nil {
 							dl.Infof("revoked access token for '%v'", claims.Email)
@@ -276,15 +278,7 @@ func (p *oidcProvider) logoutHandler() http.HandlerFunc {
 			return
 		}
 
-		// clear cookie
-		http.SetCookie(w, &http.Cookie{
-			Name:     p.oauthCfg.CookieName,
-			Value:    "",
-			MaxAge:   -1,
-			Domain:   p.oauthCfg.CookieDomain,
-			Path:     "/",
-			HttpOnly: true,
-		})
+		clearSessionCookies(w, r, p.oauthCfg.CookieName, p.oauthCfg)
 
 		redirectURL := r.URL.Query().Get("redirect_url")
 		if redirectURL == "" {
@@ -296,11 +290,11 @@ func (p *oidcProvider) logoutHandler() http.HandlerFunc {
 
 // createOidcProvider creates a new OIDC OAuth provider
 func createOidcProvider(config *oidcConfig, oauthCfg *oauthConfig, tls bool) (*oidcProvider, error) {
-	signingKey, err := deriveKey(oauthCfg.SigningKey, 32)
+	signingKey, err := endpoints.DeriveKey(oauthCfg.SigningKey, 32)
 	if err != nil {
 		return nil, err
 	}
-	encryptionKey, err := deriveKey(oauthCfg.EncryptionKey, 32)
+	encryptionKey, err := endpoints.DeriveKey(oauthCfg.EncryptionKey, 32)
 	if err != nil {
 		return nil, err
 	}

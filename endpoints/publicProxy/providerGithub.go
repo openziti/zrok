@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/openziti/zrok/endpoints"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/michaelquigley/df/dd"
@@ -41,11 +43,11 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 		scheme = "https"
 	}
 
-	signingKey, err := deriveKey(cfg.SigningKey, 32)
+	signingKey, err := endpoints.DeriveKey(cfg.SigningKey, 32)
 	if err != nil {
 		return err
 	}
-	encryptionKey, err := deriveKey(cfg.EncryptionKey, 32)
+	encryptionKey, err := endpoints.DeriveKey(cfg.EncryptionKey, 32)
 	if err != nil {
 		return err
 	}
@@ -193,7 +195,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 	http.Handle(fmt.Sprintf("/%v/auth/callback", c.Name), rp.CodeExchangeHandler(login, provider))
 
 	logout := func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie(cfg.CookieName)
+		cookie, err := getSessionCookie(r, cfg.CookieName)
 		if err == nil {
 			tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 				return signingKey, nil
@@ -201,7 +203,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 			if err == nil {
 				claims := tkn.Claims.(*zrokClaims)
 				if claims.Provider == c.Name {
-					accessToken, err := decryptToken(claims.AccessToken, encryptionKey)
+					accessToken, err := endpoints.DecryptToken(claims.AccessToken, encryptionKey)
 					if err == nil {
 						req, err := http.NewRequest("DELETE",
 							fmt.Sprintf("https://api.github.com/applications/%s/token", c.ClientId),
@@ -251,14 +253,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 			return
 		}
 
-		http.SetCookie(w, &http.Cookie{
-			Name:     cfg.CookieName,
-			Value:    "",
-			MaxAge:   -1,
-			Domain:   cfg.CookieDomain,
-			Path:     "/",
-			HttpOnly: true,
-		})
+		clearSessionCookies(w, r, cfg.CookieName, cfg)
 
 		redirectURL := r.URL.Query().Get("redirect_url")
 		if redirectURL == "" {

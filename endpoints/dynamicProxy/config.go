@@ -28,21 +28,38 @@ type interstitialConfig struct {
 }
 
 type oauthConfig struct {
-	BindAddress          string
-	EndpointUrl          string
-	CookieName           string
-	CookieDomain         string
-	SessionLifetime      time.Duration
-	IntermediateLifetime time.Duration
-	SigningKey           string `dd:"+secret"`
-	EncryptionKey        string `dd:"+secret"`
+	BindAddress          string `dd:"+required"`
+	EndpointUrl          string `dd:"+required"`
+	CookieName           string `dd:"+required"`
+	CookieDomain         string `dd:"+required"`
+	MaxCookieSize        int
+	SessionLifetime      time.Duration `dd:"+required"`
+	IntermediateLifetime time.Duration `dd:"+required"`
+	SigningKey           string        `dd:"+secret"`
+	EncryptionKey        string        `dd:"+secret"`
 	Providers            []dd.Dynamic
 }
 
+func (c *oauthConfig) GetCookieName() string {
+	return c.CookieName
+}
+
+func (c *oauthConfig) GetCookieDomain() string {
+	return c.CookieDomain
+}
+
+func (c *oauthConfig) GetMaxCookieSize() int {
+	return c.MaxCookieSize
+}
+
+func (c *oauthConfig) GetSessionLifetime() time.Duration {
+	return c.SessionLifetime
+}
+
 type oauthProviderConfig struct {
-	Name         string
-	ClientId     string
-	ClientSecret string `dd:"+secret"`
+	Name         string `dd:"+required"`
+	ClientId     string `dd:"+required"`
+	ClientSecret string `dd:"+secret,+required"`
 }
 
 func defaults() *config {
@@ -55,6 +72,9 @@ func defaults() *config {
 		},
 		Controller: &controllerClientConfig{
 			Timeout: 30 * time.Second,
+		},
+		Oauth: &oauthConfig{
+			MaxCookieSize: 3072,
 		},
 	}
 }
