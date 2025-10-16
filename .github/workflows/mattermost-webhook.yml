@@ -1,4 +1,4 @@
-name: mattermost-ziti-webhook
+name: Send Event to Mattermost with Py SDK
 on:
   create:
   delete:
@@ -23,14 +23,14 @@ jobs:
     runs-on: ubuntu-latest
     name: POST Webhook
     steps:
-    - uses: openziti/ziti-mattermost-action-py@main
+    - uses: openziti/ziti-mattermost-action-py@v1
       if: |
-        github.repository_owner == 'openziti' 
-        && ((github.event_name != 'pull_request_review') 
+        github.repository_owner == 'openziti'
+        && ((github.event_name != 'pull_request_review')
         || (github.event_name == 'pull_request_review' && github.event.review.state == 'approved'))
       with:
         zitiId: ${{ secrets.ZITI_MATTERMOST_IDENTITY }}
-        webhookUrl: ${{ secrets.ZHOOK_URL }}
+        webhookUrl: ${{ secrets.ZHOOK_URL_DEV_NOTIFICATIONS }}
         eventJson: ${{ toJson(github.event) }}
         senderUsername: "GitHubZ"
         destChannel: "dev-notifications"
