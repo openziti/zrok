@@ -24,7 +24,7 @@ type OAuthCookieConfig interface {
 	GetSessionLifetime() time.Duration
 }
 
-// compressToken compresses a JWT token string using gzip and returns a base64-encoded string
+// CompressToken compresses a JWT token string using gzip and returns a base64-encoded string
 func CompressToken(token string) (string, error) {
 	var buf bytes.Buffer
 	gzWriter := gzip.NewWriter(&buf)
@@ -40,7 +40,7 @@ func CompressToken(token string) (string, error) {
 	return base64.URLEncoding.EncodeToString(buf.Bytes()), nil
 }
 
-// decompressToken decompresses a base64-encoded gzip string back to the original JWT token
+// DecompressToken decompresses a base64-encoded gzip string back to the original JWT token
 func DecompressToken(compressed string) (string, error) {
 	data, err := base64.URLEncoding.DecodeString(compressed)
 	if err != nil {
@@ -189,39 +189,20 @@ func SetSessionCookie(w http.ResponseWriter, cookieName string, tokenValue strin
 
 // ClearSessionCookies clears all session cookies including striped cookie chunks
 func ClearSessionCookies(w http.ResponseWriter, r *http.Request, cookieName string, cfg OAuthCookieConfig) {
-	// try to determine if we have striped cookies by checking the first cookie
-	cookie, err := r.Cookie(cookieName)
-	if err == nil && strings.Contains(cookie.Value, "|") {
-		parts := strings.SplitN(cookie.Value, "|", 2)
-		if len(parts) == 2 {
-			count, err := strconv.Atoi(parts[0])
-			if err == nil && count > 0 {
-				// clear all striped cookie chunks
-				for i := 1; i < count; i++ {
-					http.SetCookie(w, &http.Cookie{
-						Name:     fmt.Sprintf("%s_%d", cookieName, i),
-						Value:    "",
-						MaxAge:   -1,
-						Domain:   cfg.GetCookieDomain(),
-						Path:     "/",
-						HttpOnly: true,
-						SameSite: http.SameSiteLaxMode,
-					})
-				}
-			}
+	// iterate through all cookies and clear any that match the session cookie pattern
+	for _, cookie := range r.Cookies() {
+		// clear base cookie or any numbered chunks (cookieName_1, cookieName_2, etc.)
+		if cookie.Name == cookieName || strings.HasPrefix(cookie.Name, cookieName+"_") {
+			http.SetCookie(w, &http.Cookie{
+				Name:     cookie.Name,
+				Value:    "",
+				MaxAge:   -1,
+				Domain:   cfg.GetCookieDomain(),
+				Path:     "/",
+				HttpOnly: true,
+			})
 		}
 	}
-
-	// always clear the base cookie
-	http.SetCookie(w, &http.Cookie{
-		Name:     cookieName,
-		Value:    "",
-		MaxAge:   -1,
-		Domain:   cfg.GetCookieDomain(),
-		Path:     "/",
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-	})
 }
 
 // FilterSessionCookies filters out session cookies and their striped chunks from a cookie list

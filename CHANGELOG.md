@@ -30,6 +30,8 @@ CHANGE: All logging migrated from `githhub.com/michaelquigley/pfxlog` and `githu
 
 ## v1.1.9
 
+CHANGE: The `publicProxy` now supports "striped session cookies" to support larger authentication payloads when working with OIDC providers that use larger tokens/payloads. (https://github.com/openziti/zrok/issues/1101)
+
 FIX: Fix for icon/favicon in HTML for the api console. (https://github.com/openziti/zrok/pull/1094)
 
 ## v1.1.8
