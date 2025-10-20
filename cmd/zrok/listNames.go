@@ -58,7 +58,7 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 
 		for _, name := range resp.Payload {
 			t.AppendRow(table.Row{
-				util.ExpandUrlTemplate(name.Name, name.NamespaceName),
+				util.NameInNamespace(name.Name, name.NamespaceName),
 				name.NamespaceToken,
 				name.ShareToken,
 				name.Reserved,
@@ -76,7 +76,7 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 
 		for _, name := range resp.Payload {
 			t.AppendRow(table.Row{
-				util.ExpandUrlTemplate(name.Name, name.NamespaceName),
+				util.NameInNamespace(name.Name, name.NamespaceName),
 				name.NamespaceToken,
 				name.ShareToken,
 				name.Reserved,

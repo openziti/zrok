@@ -230,7 +230,7 @@ func (h *shareHandler) processNameSelections(selections []*rest_model_zrok.NameS
 			}
 
 			nameId = name.Id
-			endpoint = util.ExpandUrlTemplate(name.Name, ns.Name)
+			endpoint = util.NameInNamespace(name.Name, ns.Name)
 
 		} else { // no name specified - generate one and create name record
 			// check namespace permissions
@@ -257,7 +257,7 @@ func (h *shareHandler) processNameSelections(selections []*rest_model_zrok.NameS
 				return nil, nil, errors.Wrapf(err, "error creating allocated name '%v' in namespace '%v' for account '%v'", shrToken, ns.Token, principal.Email)
 			}
 
-			endpoint = util.ExpandUrlTemplate(shrToken, ns.Name)
+			endpoint = util.NameInNamespace(shrToken, ns.Name)
 		}
 
 		frontendEndpoints = append(frontendEndpoints, endpoint)
@@ -637,7 +637,7 @@ func (h *shareHandler) processDynamicMappings(shrToken string, nameIds []int, tr
 
 		// send mapping updates to each dynamic frontend
 		for _, frontend := range frontends {
-			frontendName := util.ExpandUrlTemplate(name.Name, ns.Name)
+			frontendName := util.NameInNamespace(name.Name, ns.Name)
 			dl.Infof("binding name '%v'", frontendName)
 
 			if err := dPCtrl.BindFrontendMapping(frontend.Token, frontendName, shrToken, trx); err != nil {

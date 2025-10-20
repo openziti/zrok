@@ -190,7 +190,7 @@ func (h *unshareHandler) processDynamicMappings(shareId int, trx *sqlx.Tx) error
 
 		// send unbind mapping updates to each dynamic frontend
 		for _, frontend := range frontends {
-			frontendName := util.ExpandUrlTemplate(name.Name, ns.Name)
+			frontendName := util.NameInNamespace(name.Name, ns.Name)
 
 			if err := dPCtrl.UnbindFrontendMapping(frontend.Token, frontendName, trx); err != nil {
 				dl.Errorf("error unbinding frontend mapping from frontend '%v': %v", frontend.Token, err)

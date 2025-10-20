@@ -110,7 +110,7 @@ func (cmd *overviewCommand) run(_ *cobra.Command, _ []string) {
 		namesTable.AppendHeader(table.Row{"URL", "Namespace Token", "Share Token", "Reserved", "Created"})
 
 		for _, name := range overview.Names {
-			url := util.ExpandUrlTemplate(name.Name, name.NamespaceName)
+			url := util.NameInNamespace(name.Name, name.NamespaceName)
 			shareToken := name.ShareToken
 			if shareToken == "" {
 				shareToken = "-"
