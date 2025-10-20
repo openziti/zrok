@@ -139,8 +139,6 @@ func buildFrontendEndpointsForShare(shareId int, shareToken string, deprecatedEn
 	// build frontend endpoints from the names
 	var frontendEndpoints []string
 	for _, sn := range shareNames {
-		// use NameInNamespace where namespace.name is the template and name.name is the token
-		// this replaces {token} in namespace.name with the actual name.name value
 		endpoint := util.NameInNamespace(sn.Name.Name, sn.NamespaceName)
 		frontendEndpoints = append(frontendEndpoints, endpoint)
 	}
