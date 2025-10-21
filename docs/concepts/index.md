@@ -14,5 +14,5 @@ Naturally, regular web-based resources can be shared but `zrok` also includes su
 Learn about `zrok` [hosting here](./hosting.md), including instructions on how to [install your own `zrok` instance](/guides/self-hosting/linux/index.mdx).
 
 :::tip migrating from v1.x
-If you're upgrading from zrok v1.x, see the [v2 migration guide](/docs/guides/v2-migration-guide.md) to learn about the new namespace and name system that replaces reserved shares.
+If you're upgrading from zrok v1.x, see the [v2 migration guide](/guides/v2-migration-guide.md) to learn about the new namespace and name system that replaces reserved shares.
 :::
