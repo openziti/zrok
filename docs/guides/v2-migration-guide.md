@@ -69,27 +69,21 @@ zrok list namespaces
 # list all your names
 zrok list names
 
-# create a new name (ephemeral by default)
-zrok create name <namespace> <name>
-
 # create a reserved name (persistent)
-zrok create name <namespace> <name> -r
+zrok create name -n <namespaceToken> <name>
 
 # modify a name (e.g., toggle reserved status)
-zrok modify name <name> -r
+zrok modify name -n <namespaceToken> <name> -r|-r=false
 
 # delete a name
-zrok delete name <name>
+zrok delete name -n <namespaceToken> <name>
 ```
 
 #### Sharing with Names
 
 ```bash
 # public share with a name selection
-zrok share public <target> -n <namespace>:<name>
-
-# private share with a name selection
-zrok share private <target> -n <namespace>:<name>
+zrok share public <target> -n <namespaceToken>:<name>
 
 # private share with vanity token
 zrok share private <target> --share-token my-custom-token
@@ -187,7 +181,7 @@ The agent now automatically retries failed shares with exponential backoff. Erro
 
 ### Persistent Shares
 
-Shares with reserved name selections automatically restart after abnormal exit:
+Shares with reserved name selections automatically restart after abnormal exit or agent restart:
 
 ```bash
 # create a reserved name (-n defaults to 'public')
@@ -316,12 +310,5 @@ If you run into issues during migration:
 4. Review the error messages - v2.0 has improved error reporting
 5. Consult the [self-hosting guides](/docs/category/self-hosting/) if you manage your own instance
 6. Check the [concepts documentation](/concepts/index.md) for deeper understanding
+7. Reach out on the [OpenZiti Discourse](https://openziti.discourse.group) for help
 
----
-
-## Next Steps
-
-- Explore [namespace concepts](/concepts/sharing-public.mdx) (update needed for v2)
-- Learn about [the zrok agent](/guides/agent/index.mdx) and its improved error handling
-- Review [permission modes](/guides/permission-modes.md) which work the same in v2
-- If you're an administrator, see the admin commands for namespace management
