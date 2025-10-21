@@ -19,7 +19,7 @@ zrok defaults to continuing to create shares with the _open permission mode_. Th
 
 ## Creating a Share with Closed Permission Mode
 
-Adding the `--closed` flag to the `zrok share` or `zrok reserve` commands will create shares using the _closed permission mode_:
+Adding the `--closed` flag to the `zrok share` command will create shares using the _closed permission mode_:
 
 ```
 $ zrok share private --headless --closed -b web .
@@ -34,7 +34,7 @@ $ zrok access private 0vzwzodf0c7g
 [ERROR]: unable to access ([POST /access][401] accessUnauthorized)
 ```
 
-The `zrok share` and `zrok reserve` commands now include an `--access-grant` flag, which allows you to specify additional zrok accounts that are allowed to access your shares:
+The `zrok share` command includes an `--access-grant` flag, which allows you to specify additional zrok accounts that are allowed to access your shares:
 
 ```
 $ zrok share private --headless --closed --access-grant anotheruser@test.com -b web .
@@ -74,6 +74,35 @@ And to remove the grant:
 ```
 $ zrok modify share s4czjylwk7wa --remove-access-grant anotheruser@test.com
 updated
+```
+
+## Using Permission Modes with Reserved Names (v2.0)
+
+In zrok v2.0, you can use permission modes with reserved names for persistent public shares:
+
+```bash
+# create a reserved name
+$ zrok create name -n public myapp
+
+# share with closed permission mode using the name
+$ zrok share public localhost:8080 -n public:myapp --closed --access-grant friend@example.com
+```
+
+For persistent private shares in v2.0, use the `--share-token` flag:
+
+```bash
+# create a persistent private share with custom token and closed permissions
+$ zrok share private localhost:8080 --share-token myapi --closed --access-grant colleague@example.com
+```
+
+You can modify access grants for shares using reserved names or custom share tokens:
+
+```bash
+# modify a share using a reserved name's current share token
+$ zrok modify share <currentShareToken> --add-access-grant user@example.com
+
+# or modify using the custom share token
+$ zrok modify share myapi --add-access-grant user@example.com
 ```
 
 ## Limitations
