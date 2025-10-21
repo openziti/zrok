@@ -52,5 +52,5 @@ func (cmd *createNameCommand) run(_ *cobra.Command, args []string) {
 		tui.Error("unable to create name", err)
 	}
 
-	dl.Infof("created name '%v' in namespace", args[0])
+	dl.Infof("created name '%v' in namespace '%v'", args[0], cmd.namespaceToken)
 }

@@ -51,5 +51,5 @@ func (cmd *deleteNameCommand) run(_ *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	dl.Infof("deleted name '%v' from namespace", args[0])
+	dl.Infof("deleted name '%v' from namespace '%v'", args[0], cmd.namespaceToken)
 }

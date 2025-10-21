@@ -16,16 +16,14 @@ zrok v2.0 introduces breaking changes. The reserved sharing commands (`zrok rese
 
 ### The Big Picture
 
-In v1.x, you created reserved shares with persistent tokens using `zrok reserve`. In v2.0, this concept has evolved into a more powerful system:
+In v1.x, you created reserved shares with persistent share tokens using `zrok reserve`. In v2.0, this concept has evolved into a more powerful system:
 
-- **namespaces** - logical groupings that contain names (like folders)
-- **names** - unique identifiers within namespaces that can be reserved or ephemeral
+- **namespaces** - logical groupings that contain names (typically corresponds with a DNS zone)
+- **names** - unique identifiers within namespaces that can be reserved or ephemeral (typically corresponds with an `A` record in a DNS zone)
 - **name selections** - the combination of namespace and name you use when sharing
 
 This new model provides:
-- Better organization of your shares
-- More flexible routing through namespace-to-frontend mappings
-- Cleaner separation between identity (names) and sharing (shares)
+- Less coupling between environments and external names
 - Support for multiple names per share
 
 ### Configuration Changes
@@ -38,10 +36,9 @@ The `defaultFrontend` configuration option has been replaced with `defaultNamesp
 
 | v1.x concept | v2.0 equivalent | description |
 |--------------|----------------|-------------|
-| reserved share | reserved name in a namespace | A persistent identifier for your share |
-| share token | name within a namespace | The unique identifier users see in URLs |
+| reserved share | reserved name in a namespace | A persistent external name for your share |
 | `zrok reserve` | `zrok create name` with `-r` flag | Create a reserved name |
-| `zrok share reserved <token>` | `zrok share public/private -n <namespace>/<name>` | Share using a name |
+| `zrok share reserved <token>` | `zrok share public/private -n <namespace>:<name>` | Share using a name |
 | `zrok release <token>` | `zrok delete name <name>` | Remove a reserved name |
 
 ---
@@ -53,7 +50,7 @@ The `defaultFrontend` configuration option has been replaced with `defaultNamesp
 These commands no longer exist in v2.0:
 
 ```bash
-# ❌ no longer available
+# no longer available
 zrok reserve public --backend-mode web /path/to/files
 zrok reserve private http://localhost:3000
 zrok share reserved <token>
@@ -83,19 +80,16 @@ zrok modify name <name> -r
 
 # delete a name
 zrok delete name <name>
-
-# explicitly unshare (previously implicit)
-zrok unshare <share-token>
 ```
 
 #### Sharing with Names
 
 ```bash
 # public share with a name selection
-zrok share public <target> -n <namespace>/<name>
+zrok share public <target> -n <namespace>:<name>
 
 # private share with a name selection
-zrok share private <target> -n <namespace>/<name>
+zrok share private <target> -n <namespace>:<name>
 
 # private share with vanity token
 zrok share private <target> --share-token my-custom-token
@@ -127,22 +121,23 @@ $ zrok release abc123xyz
 ```bash
 # first, check available namespaces
 $ zrok list namespaces
-available namespaces:
-- public (default)
+╭───────────────────────┬─────────────────┬─────────────╮
+│ NAME                  │ NAMESPACE TOKEN │ DESCRIPTION │
+├───────────────────────┼─────────────────┼─────────────┤
+│ example.com           │ public          │             │
+╰───────────────────────┴─────────────────┴─────────────╯
 
 # create a reserved name in the 'public' namespace
-$ zrok create name public mysite -r
-created reserved name 'mysite' in namespace 'public'
+$ zrok create name -n public api
 
 # start sharing using the name selection
-$ zrok share public --backend-mode web /var/www/mysite -n public/mysite
-share is running at: https://mysite.share.zrok.io
+$ zrok share public localhost:8080 -n public:api
 
-# the share persists across restarts - just run the same command again
-$ zrok share public --backend-mode web /var/www/mysite -n public/mysite
+# the name persists across share restarts
+$ zrok share public localhost:8080 -n public:api
 
 # when done, delete the name
-$ zrok delete name mysite
+$ zrok delete name -n public api
 ```
 
 ### Scenario 2: Private Reserved Share
@@ -164,17 +159,8 @@ $ zrok access private xyz789abc
 **v2.0 workflow:**
 
 ```bash
-# create a reserved name
-$ zrok create name public myapi -r
-created reserved name 'myapi' in namespace 'public'
-
-# share privately using the name
-$ zrok share private http://localhost:8080 -n public/myapi
-access your share with: zrok access private <share-token>
-
-# alternatively, use a custom share token (vanity token)
-$ zrok share private http://localhost:8080 -n public/myapi --share-token myapi-prod
-access your share with: zrok access private myapi-prod
+# share privately using the name (-s specifies a share token name)
+$ zrok share private http://localhost:8080 -s myapi-prod
 
 # access from another environment
 $ zrok access private myapi-prod
@@ -186,12 +172,7 @@ Ephemeral shares work mostly the same, but now support optional name selections:
 
 ```bash
 # v1.x - still works in v2.0
-$ zrok share public 8080
-
-# v2.0 - optionally use a name
-$ zrok create name public temp-demo
-$ zrok share public 8080 -n public/temp-demo
-# name is automatically removed when share ends (not reserved)
+$ zrok share public :8080
 ```
 
 ---
@@ -209,11 +190,12 @@ The agent now automatically retries failed shares with exponential backoff. Erro
 Shares with reserved name selections automatically restart after abnormal exit:
 
 ```bash
-# create a reserved name
-$ zrok create name public myapp -r
+# create a reserved name (-n defaults to 'public')
+$ zrok create name myapp
 
-# share via agent (persists across agent restarts)
-$ zrok agent share public http://localhost:3000 -n public/myapp
+# when agent running, share will persist across agent restarts due to reserved name
+# selection
+$ zrok share public http://localhost:3000 -n public:myapp
 ```
 
 ### Improved Status Command
@@ -231,13 +213,13 @@ One powerful v2.0 feature: a single share can use multiple name selections:
 
 ```bash
 # create multiple names
-$ zrok create name public myapp -r
-$ zrok create name public myapp-staging -r
+$ zrok create name myapp
+$ zrok create name myapp-staging
 
 # share using both names
 $ zrok share public http://localhost:3000 \
-  -n public/myapp \
-  -n public/myapp-staging
+  -n public:myapp \
+  -n public:myapp-staging
 
 # both URLs now point to the same share:
 # - https://myapp.share.zrok.io
@@ -250,7 +232,7 @@ $ zrok share public http://localhost:3000 \
 
 ### What is a Namespace?
 
-A namespace is a logical grouping for names, similar to how folders organize files. Your zrok instance may have one or more namespaces available:
+A namespace is a logical grouping for names, similar to how a DNS zone works. Your zrok instance may have one or more namespaces available:
 
 - **public** - typically the default namespace for all users
 - **custom namespaces** - may be created by administrators for specific purposes
@@ -259,8 +241,13 @@ A namespace is a logical grouping for names, similar to how folders organize fil
 
 ```bash
 $ zrok list namespaces
-NAMESPACE    DESCRIPTION
-public       default public namespace
+
+╭───────────────────────┬─────────────────┬─────────────╮
+│ NAME                  │ NAMESPACE TOKEN │ DESCRIPTION │
+├───────────────────────┼─────────────────┼─────────────┤
+│ share.zrok.io         │ public          │             │
+╰───────────────────────┴─────────────────┴─────────────╯
+
 ```
 
 ### Namespace Grants
@@ -275,9 +262,12 @@ Administrators can control which accounts can create names in specific namespace
 
 ```bash
 $ zrok list names
-NAMESPACE    NAME         RESERVED    CREATED
-public       mysite       true        2025-10-14 10:30:00
-public       temp-demo    false       2025-10-14 11:45:00
+
+╭───────────────────────────────┬─────────┬───────────┬─────────────┬──────────┬─────────────────────╮
+│ URL                           │ NAME    │ NAMESPACE │ SHARE TOKEN │ RESERVED │ CREATED             │
+├───────────────────────────────┼─────────┼───────────┼─────────────┼──────────┼─────────────────────┤
+│ testing.share.zrok.io         │ testing │ public    │             │ true     │ 2025-10-17 13:17:11 │
+╰───────────────────────────────┴─────────┴───────────┴─────────────┴──────────┴─────────────────────╯
 ```
 
 ### View Overview (Now Includes Names)
@@ -289,24 +279,6 @@ $ zrok overview
 # for json output
 $ zrok overview --json
 ```
-
----
-
-## Migration Checklist
-
-When upgrading from v1.x to v2.0:
-
-- [ ] Identify all reserved shares you're currently using
-- [ ] Note the share tokens and frontend URLs
-- [ ] Check your configuration for `defaultFrontend` and change to `defaultNamespace`
-- [ ] For each reserved share:
-  - [ ] Create a reserved name with `zrok create name <namespace> <name> -r`
-  - [ ] Stop the old `zrok share reserved <token>` process
-  - [ ] Start new share with `zrok share <mode> <target> -n <namespace>/<name>`
-  - [ ] Verify the share works at the new URL
-  - [ ] Update any bookmarks or external references to the new URL
-- [ ] Update any scripts or automation to use new commands
-- [ ] If using the agent, review new error handling and status features
 
 ---
 
@@ -326,7 +298,7 @@ Permission modes (open/closed) still work the same way with `--open` and `--clos
 
 ### Do Ephemeral Shares Still Work?
 
-Yes! Ephemeral shares work just as before. The main difference is they now support optional name selections, and by default names created without the `-r` flag are ephemeral.
+Yes! Ephemeral shares work just as before. The main difference is they now support optional name selections, and by default names created without a reserved name selection are ephemeral.
 
 ### What if I Have Scripts Using the Old Commands?
 
