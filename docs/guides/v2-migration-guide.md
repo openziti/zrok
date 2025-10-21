@@ -6,10 +6,10 @@ sidebar_position: 5
 
 # Migrating from zrok v1 to v2
 
-This guide helps you transition from zrok v1.x to v2.0, focusing on the major paradigm shift from reserved shares to the new namespaces and names system.
+This guide helps you transition from zrok v1.x to v2.0, focusing on the paradigm shift from reserved shares to the new namespaces model.
 
 :::warning breaking changes
-zrok v2.0 introduces breaking changes. The reserved sharing commands (`zrok reserve`, `zrok release`, `zrok share reserved`) have been removed and replaced with a more flexible namespace and name system.
+zrok v2.0 introduces breaking changes. The reserved sharing commands (`zrok reserve`, `zrok release`, `zrok share reserved`) have been removed and replaced with a more flexible namespace system.
 :::
 
 ## What's Changing?
@@ -18,12 +18,11 @@ zrok v2.0 introduces breaking changes. The reserved sharing commands (`zrok rese
 
 In v1.x, you created reserved shares with persistent share tokens using `zrok reserve`. In v2.0, this concept has evolved into a more powerful system:
 
-- **namespaces** - logical groupings that contain names (typically corresponds with a DNS zone)
+- **namespaces** - "zones" contain names (typically corresponds with a DNS zone)
 - **names** - unique identifiers within namespaces that can be reserved or ephemeral (typically corresponds with an `A` record in a DNS zone)
-- **name selections** - the combination of namespace and name you use when sharing
 
 This new model provides:
-- Less coupling between environments and external names
+- Less coupling between environments and external names; this means you can more easily move your share backends around between hosts and reconfigure how you're sharing, without changing the names you're sharing with
 - Support for multiple names per share
 
 ### Configuration Changes
@@ -37,8 +36,8 @@ The `defaultFrontend` configuration option has been replaced with `defaultNamesp
 | v1.x concept | v2.0 equivalent | description |
 |--------------|----------------|-------------|
 | reserved share | reserved name in a namespace | A persistent external name for your share |
-| `zrok reserve` | `zrok create name` with `-r` flag | Create a reserved name |
-| `zrok share reserved <token>` | `zrok share public/private -n <namespace>:<name>` | Share using a name |
+| `zrok reserve` | `zrok create name` | Create a reserved name |
+| `zrok share reserved <token>` | `zrok share public/private -n <namespaceToken>:<name>` | Share using a name (`-n` selects a name in a namespace) |
 | `zrok release <token>` | `zrok delete name <name>` | Remove a reserved name |
 
 ---
@@ -190,6 +189,9 @@ $ zrok create name myapp
 # when agent running, share will persist across agent restarts due to reserved name
 # selection
 $ zrok share public http://localhost:3000 -n public:myapp
+
+# when agent running, private share with --share-token will persist across agent restarts
+$ zrok share private http://localhost:3000 --share-token myapp
 ```
 
 ### Improved Status Command
@@ -216,8 +218,8 @@ $ zrok share public http://localhost:3000 \
   -n public:myapp-staging
 
 # both URLs now point to the same share:
-# - https://myapp.share.zrok.io
-# - https://myapp-staging.share.zrok.io
+ - https://myapp.share.zrok.io
+ - https://myapp-staging.share.zrok.io
 ```
 
 ---
@@ -229,7 +231,7 @@ $ zrok share public http://localhost:3000 \
 A namespace is a logical grouping for names, similar to how a DNS zone works. Your zrok instance may have one or more namespaces available:
 
 - **public** - typically the default namespace for all users
-- **custom namespaces** - may be created by administrators for specific purposes
+- **custom namespaces** - may be created by administrators for specific purposes (custom domains, for example)
 
 ### Listing Available Namespaces
 
@@ -243,10 +245,6 @@ $ zrok list namespaces
 ╰───────────────────────┴─────────────────┴─────────────╯
 
 ```
-
-### Namespace Grants
-
-Administrators can control which accounts can create names in specific namespaces using namespace grants. If a namespace is "open", any user can create names in it without a grant.
 
 ---
 
