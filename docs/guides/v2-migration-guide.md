@@ -18,8 +18,8 @@ zrok v2.0 introduces breaking changes. The reserved sharing commands (`zrok rese
 
 In v1.x, you created reserved shares with persistent share tokens using `zrok reserve`. In v2.0, this concept has evolved into a more powerful system:
 
-- **namespaces** - "zones" contain names (typically corresponds with a DNS zone)
-- **names** - unique identifiers within namespaces that can be reserved or ephemeral (typically corresponds with an `A` record in a DNS zone)
+- **namespaces** - "zones" that contain names (typically corresponding with a DNS zone)
+- **names** - unique identifiers within namespaces that can be reserved or ephemeral (typically corresponding with an `A` record in a DNS zone)
 
 This new model provides:
 - Less coupling between environments and external names; this means you can more easily move your share backends around between hosts and reconfigure how you're sharing, without changing the names you're sharing with
