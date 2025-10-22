@@ -48,7 +48,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	var shrToken string
 	if sdk.ShareMode(params.Body.ShareMode) == sdk.PrivateShareMode && params.Body.PrivateShareToken != "" {
 		dl.Infof("private share requested share token '%v'", params.Body.PrivateShareToken)
-		if util.IsValidUniqueName(params.Body.PrivateShareToken) {
+		if util.IsValidShareToken(params.Body.PrivateShareToken) {
 			shrToken = params.Body.PrivateShareToken
 		} else {
 			dl.Errorf("requested private share token '%v' has invalid unique name", params.Body.PrivateShareToken)
