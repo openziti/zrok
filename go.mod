@@ -3,7 +3,7 @@ module github.com/openziti/zrok
 go 1.24.7
 
 require (
-	github.com/TwiN/go-away v1.6.12
+	github.com/TwiN/go-away v1.8.0
 	github.com/caddyserver/caddy/v2 v2.9.1
 	github.com/charmbracelet/bubbles v0.14.0
 	github.com/charmbracelet/bubbletea v0.23.1
