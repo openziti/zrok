@@ -5,7 +5,7 @@ sidebar_position: 0
 
 # Detailed Changelog
 
-Welcome to the zrok detailed changelog. This section provides comprehensive release notes for each zrok version, including:
+This is the detailed changelog for zrok. This section provides comprehensive release notes for each zrok version, including:
 
 - Feature descriptions and usage examples
 - Breaking changes and migration guidance
@@ -19,7 +19,7 @@ Welcome to the zrok detailed changelog. This section provides comprehensive rele
 - **Detailed Release Notes**: The pages in this section provide in-depth information about major changes, with examples and context for both end users and self-hosters.
 
 :::note
-Detailed changelogs began with v2.0.0. For earlier versions, please refer to the [CHANGELOG.md](https://github.com/openziti/zrok/blob/main/CHANGELOG.md).
+Detailed changelogs began with `v2.0.0`. For earlier versions, please refer to the [CHANGELOG.md](https://github.com/openziti/zrok/blob/main/CHANGELOG.md).
 :::
 
 ## Available Detailed Changelogs
@@ -34,9 +34,9 @@ Detailed changelogs began with v2.0.0. For earlier versions, please refer to the
 
 zrok follows [Semantic Versioning](https://semver.org/):
 
-- **Major versions** (e.g., 2.0.0) introduce breaking changes that may require migration steps
-- **Minor versions** (e.g., 2.1.0) add new features while maintaining backward compatibility
-- **Patch versions** (e.g., 2.0.1) contain bug fixes and small improvements
+- **Major versions** (e.g., `v2.0.0`) introduce breaking changes that may require migration steps
+- **Minor versions** (e.g., `v2.1.0`) add new features while maintaining backward compatibility
+- **Patch versions** (e.g., `v2.0.1`) contain bug fixes and small improvements
 
 ### Upgrading Guidance
 
@@ -51,14 +51,10 @@ When upgrading zrok:
 For self-hosters, pay special attention to:
 - Database migrations (handled automatically by default, but can be managed with `zrok admin migrate`)
 - Configuration changes (some versions require config updates)
-- Infrastructure requirements (new components like RabbitMQ in v2.0.0)
+- Infrastructure requirements (new components like RabbitMQ in `v2.0.0`)
 
 ---
 
-## Contributing
+## Support?
 
-Found an error or want to improve the documentation? Contributions are welcome!
-
-- Report issues: [GitHub Issues](https://github.com/openziti/zrok/issues)
-- Suggest improvements: [OpenZiti Discourse](https://openziti.discourse.group/)
-- Submit changes: [GitHub Pull Requests](https://github.com/openziti/zrok/pulls)
+Found an error or want to improve the documentation? Reach out on the [OpenZiti Discourse](https://openziti.discourse.group). This is the best avenue for zrok support.
