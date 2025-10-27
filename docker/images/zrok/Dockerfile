@@ -1,5 +1,5 @@
 # this builds docker.io/openziti/zrok
-FROM docker.io/openziti/ziti-cli:1.6.8
+FROM docker.io/openziti/ziti-cli:1.6.9
 
 ARG ARTIFACTS_DIR=./dist
 ARG DOCKER_BUILD_DIR=.
