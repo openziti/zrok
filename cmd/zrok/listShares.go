@@ -29,6 +29,7 @@ type listSharesCommand struct {
 
 	// boolean filters
 	hasActivity *bool
+	idle        *bool
 
 	// date range filters
 	createdAfter  string
@@ -61,6 +62,7 @@ func newListSharesCommand() *listSharesCommand {
 
 	// boolean filters
 	cmd.Flags().BoolP("has-activity", "A", false, "filter shares with recent activity")
+	cmd.Flags().BoolP("idle", "I", false, "filter shares without recent activity")
 
 	// date range filters
 	cmd.Flags().StringVar(&command.createdAfter, "created-after", "", "filter by created date (RFC3339 format)")
@@ -114,6 +116,17 @@ func (cmd *listSharesCommand) run(_ *cobra.Command, _ []string) {
 		val, _ := cmd.cmd.Flags().GetBool("has-activity")
 		req.HasActivity = &val
 		cmd.hasActivity = &val
+	}
+	if cmd.cmd.Flags().Changed("idle") {
+		val, _ := cmd.cmd.Flags().GetBool("idle")
+		req.Idle = &val
+		cmd.idle = &val
+	}
+
+	// validate that hasActivity and idle are not both set
+	if cmd.hasActivity != nil && *cmd.hasActivity && cmd.idle != nil && *cmd.idle {
+		fmt.Println("error: cannot use both --has-activity and --idle flags")
+		os.Exit(1)
 	}
 
 	// date range filters

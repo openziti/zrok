@@ -106,9 +106,15 @@ func (h *listEnvironmentsHandler) Handle(params metadata.ListEnvironmentsParams,
 		return metadata.NewListEnvironmentsInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
-	// check for hasActivity filter
+	// validate that hasActivity and idle are not both set
+	if params.HasActivity != nil && *params.HasActivity && params.Idle != nil && *params.Idle {
+		dl.Errorf("hasActivity and idle cannot both be set for user '%v'", principal.Email)
+		return metadata.NewListEnvironmentsBadRequest().WithPayload("cannot use both hasActivity and idle filters")
+	}
+
+	// check for hasActivity or idle filter
 	var activeEnvIds map[int]bool
-	if params.HasActivity != nil && *params.HasActivity {
+	if (params.HasActivity != nil && *params.HasActivity) || (params.Idle != nil && *params.Idle) {
 		// parse and validate activity duration
 		duration := 24 * time.Hour // default
 		if params.ActivityDuration != nil {
@@ -175,11 +181,18 @@ func (h *listEnvironmentsHandler) Handle(params metadata.ListEnvironmentsParams,
 			}
 		}
 
-		// apply hasActivity filter
+		// apply hasActivity/idle filter
 		hasActivity := false
 		if activeEnvIds != nil {
 			hasActivity = activeEnvIds[env.Id]
+
+			// filter by hasActivity (wants active environments)
 			if params.HasActivity != nil && *params.HasActivity && !hasActivity {
+				continue
+			}
+
+			// filter by idle (wants inactive environments)
+			if params.Idle != nil && *params.Idle && hasActivity {
 				continue
 			}
 		}

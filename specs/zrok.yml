@@ -1553,6 +1553,10 @@ paths:
           in: query
           type: boolean
           description: filter by whether environment has metrics within activityDuration timeframe
+        - name: idle
+          in: query
+          type: boolean
+          description: filter environments WITHOUT recent activity (inverse of hasActivity)
         - name: shareCount
           in: query
           type: string
@@ -1633,6 +1637,10 @@ paths:
           in: query
           type: boolean
           description: filter shares with recent activity
+        - name: idle
+          in: query
+          type: boolean
+          description: filter shares WITHOUT recent activity (inverse of hasActivity)
         - name: activityDuration
           in: query
           type: string

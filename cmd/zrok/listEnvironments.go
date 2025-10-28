@@ -28,6 +28,7 @@ type listEnvironmentsCommand struct {
 	hasShares   *bool
 	hasAccesses *bool
 	hasActivity *bool
+	idle        *bool
 
 	// numeric filters
 	shareCount  string
@@ -64,6 +65,7 @@ func newListEnvironmentsCommand() *listEnvironmentsCommand {
 	cmd.Flags().BoolP("has-shares", "s", false, "filter environments with shares")
 	cmd.Flags().BoolP("has-accesses", "a", false, "filter environments with accesses")
 	cmd.Flags().BoolP("has-activity", "A", false, "filter environments with recent activity")
+	cmd.Flags().BoolP("idle", "I", false, "filter environments without recent activity")
 
 	// numeric filters
 	cmd.Flags().StringVar(&command.shareCount, "share-count", "", "filter by share count with operator (e.g., '>0', '>=5', '=3')")
@@ -127,6 +129,17 @@ func (cmd *listEnvironmentsCommand) run(_ *cobra.Command, _ []string) {
 		val, _ := cmd.cmd.Flags().GetBool("has-activity")
 		req.HasActivity = &val
 		cmd.hasActivity = &val
+	}
+	if cmd.cmd.Flags().Changed("idle") {
+		val, _ := cmd.cmd.Flags().GetBool("idle")
+		req.Idle = &val
+		cmd.idle = &val
+	}
+
+	// validate that hasActivity and idle are not both set
+	if cmd.hasActivity != nil && *cmd.hasActivity && cmd.idle != nil && *cmd.idle {
+		fmt.Println("error: cannot use both --has-activity and --idle flags")
+		os.Exit(1)
 	}
 
 	// numeric filters

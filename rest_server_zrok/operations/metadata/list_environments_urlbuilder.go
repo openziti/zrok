@@ -25,6 +25,7 @@ type ListEnvironmentsURL struct {
 	HasActivity      *bool
 	HasShares        *bool
 	Host             *string
+	Idle             *bool
 	RemoteAgent      *bool
 	ShareCount       *string
 	UpdatedAfter     *string
@@ -142,6 +143,14 @@ func (o *ListEnvironmentsURL) Build() (*url.URL, error) {
 	}
 	if hostQ != "" {
 		qs.Set("host", hostQ)
+	}
+
+	var idleQ string
+	if o.Idle != nil {
+		idleQ = swag.FormatBool(*o.Idle)
+	}
+	if idleQ != "" {
+		qs.Set("idle", idleQ)
 	}
 
 	var remoteAgentQ string

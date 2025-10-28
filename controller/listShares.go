@@ -101,9 +101,15 @@ func (h *listSharesHandler) Handle(params metadata.ListSharesParams, principal *
 		return metadata.NewListSharesInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 	}
 
-	// check for hasActivity filter
+	// validate that hasActivity and idle are not both set
+	if params.HasActivity != nil && *params.HasActivity && params.Idle != nil && *params.Idle {
+		dl.Errorf("hasActivity and idle cannot both be set for user '%v'", principal.Email)
+		return metadata.NewListSharesBadRequest().WithPayload("cannot use both hasActivity and idle filters")
+	}
+
+	// check for hasActivity or idle filter
 	var activeShareIds map[int]bool
-	if params.HasActivity != nil && *params.HasActivity {
+	if (params.HasActivity != nil && *params.HasActivity) || (params.Idle != nil && *params.Idle) {
 		// parse and validate activity duration
 		duration := 24 * time.Hour // default
 		if params.ActivityDuration != nil {
@@ -152,11 +158,18 @@ func (h *listSharesHandler) Handle(params metadata.ListSharesParams, principal *
 	}
 
 	for _, shr := range shares {
-		// apply hasActivity filter
+		// apply hasActivity/idle filter
 		hasActivity := false
 		if activeShareIds != nil {
 			hasActivity = activeShareIds[shr.Id]
+
+			// filter by hasActivity (wants active shares)
 			if params.HasActivity != nil && *params.HasActivity && !hasActivity {
+				continue
+			}
+
+			// filter by idle (wants inactive shares)
+			if params.Idle != nil && *params.Idle && hasActivity {
 				continue
 			}
 		}

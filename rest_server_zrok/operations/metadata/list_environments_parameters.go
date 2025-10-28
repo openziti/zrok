@@ -72,6 +72,10 @@ type ListEnvironmentsParams struct {
 	  In: query
 	*/
 	Host *string
+	/*filter environments WITHOUT recent activity (inverse of hasActivity)
+	  In: query
+	*/
+	Idle *bool
 	/*filter by whether agent is enrolled
 	  In: query
 	*/
@@ -148,6 +152,11 @@ func (o *ListEnvironmentsParams) BindRequest(r *http.Request, route *middleware.
 
 	qHost, qhkHost, _ := qs.GetOK("host")
 	if err := o.bindHost(qHost, qhkHost, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qIdle, qhkIdle, _ := qs.GetOK("idle")
+	if err := o.bindIdle(qIdle, qhkIdle, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -367,6 +376,29 @@ func (o *ListEnvironmentsParams) bindHost(rawData []string, hasKey bool, formats
 		return nil
 	}
 	o.Host = &raw
+
+	return nil
+}
+
+// bindIdle binds and validates parameter Idle from query.
+func (o *ListEnvironmentsParams) bindIdle(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	value, err := swag.ConvertBool(raw)
+	if err != nil {
+		return errors.InvalidType("idle", "query", "bool", raw)
+	}
+	o.Idle = &value
 
 	return nil
 }

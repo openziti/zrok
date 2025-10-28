@@ -1306,6 +1306,12 @@ func init() {
             "in": "query"
           },
           {
+            "type": "boolean",
+            "description": "filter environments WITHOUT recent activity (inverse of hasActivity)",
+            "name": "idle",
+            "in": "query"
+          },
+          {
             "type": "string",
             "description": "filter by share count with operator (e.g., \"\u003e0\", \"\u003e=5\", \"=0\", \"\u003c10\", \"\u003c=3\")",
             "name": "shareCount",
@@ -3523,6 +3529,12 @@ func init() {
             "in": "query"
           },
           {
+            "type": "boolean",
+            "description": "filter shares WITHOUT recent activity (inverse of hasActivity)",
+            "name": "idle",
+            "in": "query"
+          },
+          {
             "type": "string",
             "description": "duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)",
             "name": "activityDuration",
@@ -5589,6 +5601,12 @@ func init() {
             "type": "boolean",
             "description": "filter by whether environment has metrics within activityDuration timeframe",
             "name": "hasActivity",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "filter environments WITHOUT recent activity (inverse of hasActivity)",
+            "name": "idle",
             "in": "query"
           },
           {
@@ -7693,6 +7711,12 @@ func init() {
             "type": "boolean",
             "description": "filter shares with recent activity",
             "name": "hasActivity",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "filter shares WITHOUT recent activity (inverse of hasActivity)",
+            "name": "idle",
             "in": "query"
           },
           {

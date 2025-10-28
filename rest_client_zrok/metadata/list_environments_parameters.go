@@ -122,6 +122,12 @@ type ListEnvironmentsParams struct {
 	*/
 	Host *string
 
+	/* Idle.
+
+	   filter environments WITHOUT recent activity (inverse of hasActivity)
+	*/
+	Idle *bool
+
 	/* RemoteAgent.
 
 	   filter by whether agent is enrolled
@@ -307,6 +313,17 @@ func (o *ListEnvironmentsParams) WithHost(host *string) *ListEnvironmentsParams 
 // SetHost adds the host to the list environments params
 func (o *ListEnvironmentsParams) SetHost(host *string) {
 	o.Host = host
+}
+
+// WithIdle adds the idle to the list environments params
+func (o *ListEnvironmentsParams) WithIdle(idle *bool) *ListEnvironmentsParams {
+	o.SetIdle(idle)
+	return o
+}
+
+// SetIdle adds the idle to the list environments params
+func (o *ListEnvironmentsParams) SetIdle(idle *bool) {
+	o.Idle = idle
 }
 
 // WithRemoteAgent adds the remoteAgent to the list environments params
@@ -526,6 +543,23 @@ func (o *ListEnvironmentsParams) WriteToRequest(r runtime.ClientRequest, reg str
 		if qHost != "" {
 
 			if err := r.SetQueryParam("host", qHost); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.Idle != nil {
+
+		// query param idle
+		var qrIdle bool
+
+		if o.Idle != nil {
+			qrIdle = *o.Idle
+		}
+		qIdle := swag.FormatBool(qrIdle)
+		if qIdle != "" {
+
+			if err := r.SetQueryParam("idle", qIdle); err != nil {
 				return err
 			}
 		}

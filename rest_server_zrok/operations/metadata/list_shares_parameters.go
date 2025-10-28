@@ -56,6 +56,10 @@ type ListSharesParams struct {
 	  In: query
 	*/
 	HasActivity *bool
+	/*filter shares WITHOUT recent activity (inverse of hasActivity)
+	  In: query
+	*/
+	Idle *bool
 	/*filter by permission mode (open/closed)
 	  In: query
 	*/
@@ -120,6 +124,11 @@ func (o *ListSharesParams) BindRequest(r *http.Request, route *middleware.Matche
 
 	qHasActivity, qhkHasActivity, _ := qs.GetOK("hasActivity")
 	if err := o.bindHasActivity(qHasActivity, qhkHasActivity, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qIdle, qhkIdle, _ := qs.GetOK("idle")
+	if err := o.bindIdle(qIdle, qhkIdle, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -267,6 +276,29 @@ func (o *ListSharesParams) bindHasActivity(rawData []string, hasKey bool, format
 		return errors.InvalidType("hasActivity", "query", "bool", raw)
 	}
 	o.HasActivity = &value
+
+	return nil
+}
+
+// bindIdle binds and validates parameter Idle from query.
+func (o *ListSharesParams) bindIdle(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	value, err := swag.ConvertBool(raw)
+	if err != nil {
+		return errors.InvalidType("idle", "query", "bool", raw)
+	}
+	o.Idle = &value
 
 	return nil
 }

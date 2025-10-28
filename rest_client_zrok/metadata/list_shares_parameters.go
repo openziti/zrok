@@ -98,6 +98,12 @@ type ListSharesParams struct {
 	*/
 	HasActivity *bool
 
+	/* Idle.
+
+	   filter shares WITHOUT recent activity (inverse of hasActivity)
+	*/
+	Idle *bool
+
 	/* PermissionMode.
 
 	   filter by permission mode (open/closed)
@@ -251,6 +257,17 @@ func (o *ListSharesParams) WithHasActivity(hasActivity *bool) *ListSharesParams 
 // SetHasActivity adds the hasActivity to the list shares params
 func (o *ListSharesParams) SetHasActivity(hasActivity *bool) {
 	o.HasActivity = hasActivity
+}
+
+// WithIdle adds the idle to the list shares params
+func (o *ListSharesParams) WithIdle(idle *bool) *ListSharesParams {
+	o.SetIdle(idle)
+	return o
+}
+
+// SetIdle adds the idle to the list shares params
+func (o *ListSharesParams) SetIdle(idle *bool) {
+	o.Idle = idle
 }
 
 // WithPermissionMode adds the permissionMode to the list shares params
@@ -424,6 +441,23 @@ func (o *ListSharesParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Re
 		if qHasActivity != "" {
 
 			if err := r.SetQueryParam("hasActivity", qHasActivity); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.Idle != nil {
+
+		// query param idle
+		var qrIdle bool
+
+		if o.Idle != nil {
+			qrIdle = *o.Idle
+		}
+		qIdle := swag.FormatBool(qrIdle)
+		if qIdle != "" {
+
+			if err := r.SetQueryParam("idle", qIdle); err != nil {
 				return err
 			}
 		}

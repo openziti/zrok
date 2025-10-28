@@ -3125,6 +3125,7 @@ class MetadataApi:
         has_shares: Annotated[Optional[StrictBool], Field(description="filter by whether environment has active shares")] = None,
         has_accesses: Annotated[Optional[StrictBool], Field(description="filter by whether environment has active accesses")] = None,
         has_activity: Annotated[Optional[StrictBool], Field(description="filter by whether environment has metrics within activityDuration timeframe")] = None,
+        idle: Annotated[Optional[StrictBool], Field(description="filter environments WITHOUT recent activity (inverse of hasActivity)")] = None,
         share_count: Annotated[Optional[StrictStr], Field(description="filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")")] = None,
         access_count: Annotated[Optional[StrictStr], Field(description="filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")")] = None,
         created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 datetime, inclusive)")] = None,
@@ -3162,6 +3163,8 @@ class MetadataApi:
         :type has_accesses: bool
         :param has_activity: filter by whether environment has metrics within activityDuration timeframe
         :type has_activity: bool
+        :param idle: filter environments WITHOUT recent activity (inverse of hasActivity)
+        :type idle: bool
         :param share_count: filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")
         :type share_count: str
         :param access_count: filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")
@@ -3206,6 +3209,7 @@ class MetadataApi:
             has_shares=has_shares,
             has_accesses=has_accesses,
             has_activity=has_activity,
+            idle=idle,
             share_count=share_count,
             access_count=access_count,
             created_after=created_after,
@@ -3246,6 +3250,7 @@ class MetadataApi:
         has_shares: Annotated[Optional[StrictBool], Field(description="filter by whether environment has active shares")] = None,
         has_accesses: Annotated[Optional[StrictBool], Field(description="filter by whether environment has active accesses")] = None,
         has_activity: Annotated[Optional[StrictBool], Field(description="filter by whether environment has metrics within activityDuration timeframe")] = None,
+        idle: Annotated[Optional[StrictBool], Field(description="filter environments WITHOUT recent activity (inverse of hasActivity)")] = None,
         share_count: Annotated[Optional[StrictStr], Field(description="filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")")] = None,
         access_count: Annotated[Optional[StrictStr], Field(description="filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")")] = None,
         created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 datetime, inclusive)")] = None,
@@ -3283,6 +3288,8 @@ class MetadataApi:
         :type has_accesses: bool
         :param has_activity: filter by whether environment has metrics within activityDuration timeframe
         :type has_activity: bool
+        :param idle: filter environments WITHOUT recent activity (inverse of hasActivity)
+        :type idle: bool
         :param share_count: filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")
         :type share_count: str
         :param access_count: filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")
@@ -3327,6 +3334,7 @@ class MetadataApi:
             has_shares=has_shares,
             has_accesses=has_accesses,
             has_activity=has_activity,
+            idle=idle,
             share_count=share_count,
             access_count=access_count,
             created_after=created_after,
@@ -3367,6 +3375,7 @@ class MetadataApi:
         has_shares: Annotated[Optional[StrictBool], Field(description="filter by whether environment has active shares")] = None,
         has_accesses: Annotated[Optional[StrictBool], Field(description="filter by whether environment has active accesses")] = None,
         has_activity: Annotated[Optional[StrictBool], Field(description="filter by whether environment has metrics within activityDuration timeframe")] = None,
+        idle: Annotated[Optional[StrictBool], Field(description="filter environments WITHOUT recent activity (inverse of hasActivity)")] = None,
         share_count: Annotated[Optional[StrictStr], Field(description="filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")")] = None,
         access_count: Annotated[Optional[StrictStr], Field(description="filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")")] = None,
         created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 datetime, inclusive)")] = None,
@@ -3404,6 +3413,8 @@ class MetadataApi:
         :type has_accesses: bool
         :param has_activity: filter by whether environment has metrics within activityDuration timeframe
         :type has_activity: bool
+        :param idle: filter environments WITHOUT recent activity (inverse of hasActivity)
+        :type idle: bool
         :param share_count: filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")
         :type share_count: str
         :param access_count: filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")
@@ -3448,6 +3459,7 @@ class MetadataApi:
             has_shares=has_shares,
             has_accesses=has_accesses,
             has_activity=has_activity,
+            idle=idle,
             share_count=share_count,
             access_count=access_count,
             created_after=created_after,
@@ -3483,6 +3495,7 @@ class MetadataApi:
         has_shares,
         has_accesses,
         has_activity,
+        idle,
         share_count,
         access_count,
         created_after,
@@ -3539,6 +3552,10 @@ class MetadataApi:
         if has_activity is not None:
             
             _query_params.append(('hasActivity', has_activity))
+            
+        if idle is not None:
+            
+            _query_params.append(('idle', idle))
             
         if share_count is not None:
             
@@ -4125,6 +4142,7 @@ class MetadataApi:
         target: Annotated[Optional[StrictStr], Field(description="filter by target (substring match)")] = None,
         permission_mode: Annotated[Optional[StrictStr], Field(description="filter by permission mode (open/closed)")] = None,
         has_activity: Annotated[Optional[StrictBool], Field(description="filter shares with recent activity")] = None,
+        idle: Annotated[Optional[StrictBool], Field(description="filter shares WITHOUT recent activity (inverse of hasActivity)")] = None,
         activity_duration: Annotated[Optional[StrictStr], Field(description="duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)")] = None,
         created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
         created_before: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
@@ -4160,6 +4178,8 @@ class MetadataApi:
         :type permission_mode: str
         :param has_activity: filter shares with recent activity
         :type has_activity: bool
+        :param idle: filter shares WITHOUT recent activity (inverse of hasActivity)
+        :type idle: bool
         :param activity_duration: duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)
         :type activity_duration: str
         :param created_after: filter by created date (RFC3339 format)
@@ -4200,6 +4220,7 @@ class MetadataApi:
             target=target,
             permission_mode=permission_mode,
             has_activity=has_activity,
+            idle=idle,
             activity_duration=activity_duration,
             created_after=created_after,
             created_before=created_before,
@@ -4238,6 +4259,7 @@ class MetadataApi:
         target: Annotated[Optional[StrictStr], Field(description="filter by target (substring match)")] = None,
         permission_mode: Annotated[Optional[StrictStr], Field(description="filter by permission mode (open/closed)")] = None,
         has_activity: Annotated[Optional[StrictBool], Field(description="filter shares with recent activity")] = None,
+        idle: Annotated[Optional[StrictBool], Field(description="filter shares WITHOUT recent activity (inverse of hasActivity)")] = None,
         activity_duration: Annotated[Optional[StrictStr], Field(description="duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)")] = None,
         created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
         created_before: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
@@ -4273,6 +4295,8 @@ class MetadataApi:
         :type permission_mode: str
         :param has_activity: filter shares with recent activity
         :type has_activity: bool
+        :param idle: filter shares WITHOUT recent activity (inverse of hasActivity)
+        :type idle: bool
         :param activity_duration: duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)
         :type activity_duration: str
         :param created_after: filter by created date (RFC3339 format)
@@ -4313,6 +4337,7 @@ class MetadataApi:
             target=target,
             permission_mode=permission_mode,
             has_activity=has_activity,
+            idle=idle,
             activity_duration=activity_duration,
             created_after=created_after,
             created_before=created_before,
@@ -4351,6 +4376,7 @@ class MetadataApi:
         target: Annotated[Optional[StrictStr], Field(description="filter by target (substring match)")] = None,
         permission_mode: Annotated[Optional[StrictStr], Field(description="filter by permission mode (open/closed)")] = None,
         has_activity: Annotated[Optional[StrictBool], Field(description="filter shares with recent activity")] = None,
+        idle: Annotated[Optional[StrictBool], Field(description="filter shares WITHOUT recent activity (inverse of hasActivity)")] = None,
         activity_duration: Annotated[Optional[StrictStr], Field(description="duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)")] = None,
         created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
         created_before: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
@@ -4386,6 +4412,8 @@ class MetadataApi:
         :type permission_mode: str
         :param has_activity: filter shares with recent activity
         :type has_activity: bool
+        :param idle: filter shares WITHOUT recent activity (inverse of hasActivity)
+        :type idle: bool
         :param activity_duration: duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)
         :type activity_duration: str
         :param created_after: filter by created date (RFC3339 format)
@@ -4426,6 +4454,7 @@ class MetadataApi:
             target=target,
             permission_mode=permission_mode,
             has_activity=has_activity,
+            idle=idle,
             activity_duration=activity_duration,
             created_after=created_after,
             created_before=created_before,
@@ -4459,6 +4488,7 @@ class MetadataApi:
         target,
         permission_mode,
         has_activity,
+        idle,
         activity_duration,
         created_after,
         created_before,
@@ -4513,6 +4543,10 @@ class MetadataApi:
         if has_activity is not None:
             
             _query_params.append(('hasActivity', has_activity))
+            
+        if idle is not None:
+            
+            _query_params.append(('idle', idle))
             
         if activity_duration is not None:
             

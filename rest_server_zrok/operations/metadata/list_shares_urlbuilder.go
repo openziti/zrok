@@ -21,6 +21,7 @@ type ListSharesURL struct {
 	CreatedBefore    *string
 	EnvZID           *string
 	HasActivity      *bool
+	Idle             *bool
 	PermissionMode   *string
 	ShareMode        *string
 	ShareToken       *string
@@ -108,6 +109,14 @@ func (o *ListSharesURL) Build() (*url.URL, error) {
 	}
 	if hasActivityQ != "" {
 		qs.Set("hasActivity", hasActivityQ)
+	}
+
+	var idleQ string
+	if o.Idle != nil {
+		idleQ = swag.FormatBool(*o.Idle)
+	}
+	if idleQ != "" {
+		qs.Set("idle", idleQ)
 	}
 
 	var permissionModeQ string

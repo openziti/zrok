@@ -120,6 +120,7 @@ export interface ListEnvironmentsRequest {
     hasShares?: boolean;
     hasAccesses?: boolean;
     hasActivity?: boolean;
+    idle?: boolean;
     shareCount?: string;
     accessCount?: string;
     createdAfter?: string;
@@ -141,6 +142,7 @@ export interface ListSharesRequest {
     target?: string;
     permissionMode?: string;
     hasActivity?: boolean;
+    idle?: boolean;
     activityDuration?: string;
     createdAfter?: string;
     createdBefore?: string;
@@ -613,6 +615,10 @@ export class MetadataApi extends runtime.BaseAPI {
             queryParameters['hasActivity'] = requestParameters['hasActivity'];
         }
 
+        if (requestParameters['idle'] != null) {
+            queryParameters['idle'] = requestParameters['idle'];
+        }
+
         if (requestParameters['shareCount'] != null) {
             queryParameters['shareCount'] = requestParameters['shareCount'];
         }
@@ -768,6 +774,10 @@ export class MetadataApi extends runtime.BaseAPI {
 
         if (requestParameters['hasActivity'] != null) {
             queryParameters['hasActivity'] = requestParameters['hasActivity'];
+        }
+
+        if (requestParameters['idle'] != null) {
+            queryParameters['idle'] = requestParameters['idle'];
         }
 
         if (requestParameters['activityDuration'] != null) {

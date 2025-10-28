@@ -851,7 +851,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_environments**
-> EnvironmentsList list_environments(description=description, host=host, address=address, remote_agent=remote_agent, has_shares=has_shares, has_accesses=has_accesses, has_activity=has_activity, share_count=share_count, access_count=access_count, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before, activity_duration=activity_duration)
+> EnvironmentsList list_environments(description=description, host=host, address=address, remote_agent=remote_agent, has_shares=has_shares, has_accesses=has_accesses, has_activity=has_activity, idle=idle, share_count=share_count, access_count=access_count, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before, activity_duration=activity_duration)
 
 ### Example
 
@@ -891,6 +891,7 @@ with zrok_api.ApiClient(configuration) as api_client:
     has_shares = True # bool | filter by whether environment has active shares (optional)
     has_accesses = True # bool | filter by whether environment has active accesses (optional)
     has_activity = True # bool | filter by whether environment has metrics within activityDuration timeframe (optional)
+    idle = True # bool | filter environments WITHOUT recent activity (inverse of hasActivity) (optional)
     share_count = 'share_count_example' # str | filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\") (optional)
     access_count = 'access_count_example' # str | filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\") (optional)
     created_after = 'created_after_example' # str | filter by created date (RFC3339 datetime, inclusive) (optional)
@@ -900,7 +901,7 @@ with zrok_api.ApiClient(configuration) as api_client:
     activity_duration = 'activity_duration_example' # str | duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h) (optional)
 
     try:
-        api_response = api_instance.list_environments(description=description, host=host, address=address, remote_agent=remote_agent, has_shares=has_shares, has_accesses=has_accesses, has_activity=has_activity, share_count=share_count, access_count=access_count, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before, activity_duration=activity_duration)
+        api_response = api_instance.list_environments(description=description, host=host, address=address, remote_agent=remote_agent, has_shares=has_shares, has_accesses=has_accesses, has_activity=has_activity, idle=idle, share_count=share_count, access_count=access_count, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before, activity_duration=activity_duration)
         print("The response of MetadataApi->list_environments:\n")
         pprint(api_response)
     except Exception as e:
@@ -921,6 +922,7 @@ Name | Type | Description  | Notes
  **has_shares** | **bool**| filter by whether environment has active shares | [optional] 
  **has_accesses** | **bool**| filter by whether environment has active accesses | [optional] 
  **has_activity** | **bool**| filter by whether environment has metrics within activityDuration timeframe | [optional] 
+ **idle** | **bool**| filter environments WITHOUT recent activity (inverse of hasActivity) | [optional] 
  **share_count** | **str**| filter by share count with operator (e.g., \&quot;&gt;0\&quot;, \&quot;&gt;&#x3D;5\&quot;, \&quot;&#x3D;0\&quot;, \&quot;&lt;10\&quot;, \&quot;&lt;&#x3D;3\&quot;) | [optional] 
  **access_count** | **str**| filter by access count with operator (e.g., \&quot;&gt;0\&quot;, \&quot;&gt;&#x3D;5\&quot;, \&quot;&#x3D;0\&quot;, \&quot;&lt;10\&quot;, \&quot;&lt;&#x3D;3\&quot;) | [optional] 
  **created_after** | **str**| filter by created date (RFC3339 datetime, inclusive) | [optional] 
@@ -1101,7 +1103,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_shares**
-> SharesList list_shares(env_zid=env_zid, share_mode=share_mode, backend_mode=backend_mode, share_token=share_token, target=target, permission_mode=permission_mode, has_activity=has_activity, activity_duration=activity_duration, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before)
+> SharesList list_shares(env_zid=env_zid, share_mode=share_mode, backend_mode=backend_mode, share_token=share_token, target=target, permission_mode=permission_mode, has_activity=has_activity, idle=idle, activity_duration=activity_duration, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before)
 
 ### Example
 
@@ -1141,6 +1143,7 @@ with zrok_api.ApiClient(configuration) as api_client:
     target = 'target_example' # str | filter by target (substring match) (optional)
     permission_mode = 'permission_mode_example' # str | filter by permission mode (open/closed) (optional)
     has_activity = True # bool | filter shares with recent activity (optional)
+    idle = True # bool | filter shares WITHOUT recent activity (inverse of hasActivity) (optional)
     activity_duration = 'activity_duration_example' # str | duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h) (optional)
     created_after = 'created_after_example' # str | filter by created date (RFC3339 format) (optional)
     created_before = 'created_before_example' # str | filter by created date (RFC3339 format) (optional)
@@ -1148,7 +1151,7 @@ with zrok_api.ApiClient(configuration) as api_client:
     updated_before = 'updated_before_example' # str | filter by updated date (RFC3339 format) (optional)
 
     try:
-        api_response = api_instance.list_shares(env_zid=env_zid, share_mode=share_mode, backend_mode=backend_mode, share_token=share_token, target=target, permission_mode=permission_mode, has_activity=has_activity, activity_duration=activity_duration, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before)
+        api_response = api_instance.list_shares(env_zid=env_zid, share_mode=share_mode, backend_mode=backend_mode, share_token=share_token, target=target, permission_mode=permission_mode, has_activity=has_activity, idle=idle, activity_duration=activity_duration, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before)
         print("The response of MetadataApi->list_shares:\n")
         pprint(api_response)
     except Exception as e:
@@ -1169,6 +1172,7 @@ Name | Type | Description  | Notes
  **target** | **str**| filter by target (substring match) | [optional] 
  **permission_mode** | **str**| filter by permission mode (open/closed) | [optional] 
  **has_activity** | **bool**| filter shares with recent activity | [optional] 
+ **idle** | **bool**| filter shares WITHOUT recent activity (inverse of hasActivity) | [optional] 
  **activity_duration** | **str**| duration for hasActivity filter (e.g., \&quot;24h\&quot;, \&quot;7d\&quot;, \&quot;30d\&quot;). default \&quot;24h\&quot;, maximum \&quot;30d\&quot; (720h) | [optional] 
  **created_after** | **str**| filter by created date (RFC3339 format) | [optional] 
  **created_before** | **str**| filter by created date (RFC3339 format) | [optional] 
