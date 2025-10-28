@@ -33,11 +33,10 @@ class EnvironmentSummary(BaseModel):
     remote_agent: Optional[StrictBool] = Field(default=None, alias="remoteAgent")
     share_count: Optional[StrictInt] = Field(default=None, alias="shareCount")
     access_count: Optional[StrictInt] = Field(default=None, alias="accessCount")
-    has_activity: Optional[StrictBool] = Field(default=None, alias="hasActivity")
     limited: Optional[StrictBool] = None
     created_at: Optional[StrictInt] = Field(default=None, alias="createdAt")
     updated_at: Optional[StrictInt] = Field(default=None, alias="updatedAt")
-    __properties: ClassVar[List[str]] = ["envZId", "description", "host", "address", "remoteAgent", "shareCount", "accessCount", "hasActivity", "limited", "createdAt", "updatedAt"]
+    __properties: ClassVar[List[str]] = ["envZId", "description", "host", "address", "remoteAgent", "shareCount", "accessCount", "limited", "createdAt", "updatedAt"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -97,7 +96,6 @@ class EnvironmentSummary(BaseModel):
             "remoteAgent": obj.get("remoteAgent"),
             "shareCount": obj.get("shareCount"),
             "accessCount": obj.get("accessCount"),
-            "hasActivity": obj.get("hasActivity"),
             "limited": obj.get("limited"),
             "createdAt": obj.get("createdAt"),
             "updatedAt": obj.get("updatedAt")

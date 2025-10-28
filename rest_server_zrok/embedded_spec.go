@@ -138,6 +138,92 @@ func init() {
         }
       }
     },
+    "/accesses": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "listAccesses",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "filter by environment ziti identity",
+            "name": "envZId",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by associated share token",
+            "name": "shareToken",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by bind address (substring match)",
+            "name": "bindAddress",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by description (substring match)",
+            "name": "description",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by created date (RFC3339 format)",
+            "name": "createdAfter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by created date (RFC3339 format)",
+            "name": "createdBefore",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by updated date (RFC3339 format)",
+            "name": "updatedAfter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by updated date (RFC3339 format)",
+            "name": "updatedBefore",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list of accesses",
+            "schema": {
+              "$ref": "#/definitions/accessesList"
+            }
+          },
+          "400": {
+            "description": "bad request (e.g., activityDuration exceeds 30d, invalid date format)",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/account": {
       "post": {
         "security": [
@@ -3382,6 +3468,116 @@ func init() {
         }
       }
     },
+    "/shares": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "listShares",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "filter by environment ziti identity",
+            "name": "envZId",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by share mode (public/private)",
+            "name": "shareMode",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by backend mode",
+            "name": "backendMode",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by share token (substring match)",
+            "name": "shareToken",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by target (substring match)",
+            "name": "target",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by permission mode (open/closed)",
+            "name": "permissionMode",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "filter shares with recent activity",
+            "name": "hasActivity",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)",
+            "name": "activityDuration",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by created date (RFC3339 format)",
+            "name": "createdAfter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by created date (RFC3339 format)",
+            "name": "createdBefore",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by updated date (RFC3339 format)",
+            "name": "updatedAfter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by updated date (RFC3339 format)",
+            "name": "updatedBefore",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list of shares",
+            "schema": {
+              "$ref": "#/definitions/sharesList"
+            }
+          },
+          "400": {
+            "description": "bad request (e.g., activityDuration exceeds 30d, invalid date format)",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/sparklines": {
       "post": {
         "security": [
@@ -3610,6 +3806,52 @@ func init() {
     }
   },
   "definitions": {
+    "accessSummary": {
+      "type": "object",
+      "properties": {
+        "backendMode": {
+          "type": "string"
+        },
+        "bindAddress": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "envZId": {
+          "type": "string"
+        },
+        "frontendToken": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "limited": {
+          "type": "boolean"
+        },
+        "shareToken": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "integer"
+        }
+      }
+    },
+    "accessesList": {
+      "type": "object",
+      "properties": {
+        "accesses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/accessSummary"
+          }
+        }
+      }
+    },
     "authUser": {
       "type": "object",
       "properties": {
@@ -3707,9 +3949,6 @@ func init() {
         },
         "envZId": {
           "type": "string"
-        },
-        "hasActivity": {
-          "type": "boolean"
         },
         "host": {
           "type": "string"
@@ -4060,10 +4299,59 @@ func init() {
         }
       }
     },
+    "shareSummary": {
+      "type": "object",
+      "properties": {
+        "backendMode": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "integer"
+        },
+        "envZId": {
+          "type": "string"
+        },
+        "frontendEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limited": {
+          "type": "boolean"
+        },
+        "shareMode": {
+          "type": "string"
+        },
+        "shareToken": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "integer"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
     "shares": {
       "type": "array",
       "items": {
         "$ref": "#/definitions/share"
+      }
+    },
+    "sharesList": {
+      "type": "object",
+      "properties": {
+        "shares": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/shareSummary"
+          }
+        }
       }
     },
     "sparkData": {
@@ -4212,6 +4500,92 @@ func init() {
           },
           "500": {
             "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/accesses": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "listAccesses",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "filter by environment ziti identity",
+            "name": "envZId",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by associated share token",
+            "name": "shareToken",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by bind address (substring match)",
+            "name": "bindAddress",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by description (substring match)",
+            "name": "description",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by created date (RFC3339 format)",
+            "name": "createdAfter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by created date (RFC3339 format)",
+            "name": "createdBefore",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by updated date (RFC3339 format)",
+            "name": "updatedAfter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by updated date (RFC3339 format)",
+            "name": "updatedBefore",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list of accesses",
+            "schema": {
+              "$ref": "#/definitions/accessesList"
+            }
+          },
+          "400": {
+            "description": "bad request (e.g., activityDuration exceeds 30d, invalid date format)",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           }
         }
       }
@@ -7267,6 +7641,116 @@ func init() {
         }
       }
     },
+    "/shares": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "listShares",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "filter by environment ziti identity",
+            "name": "envZId",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by share mode (public/private)",
+            "name": "shareMode",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by backend mode",
+            "name": "backendMode",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by share token (substring match)",
+            "name": "shareToken",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by target (substring match)",
+            "name": "target",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by permission mode (open/closed)",
+            "name": "permissionMode",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "filter shares with recent activity",
+            "name": "hasActivity",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)",
+            "name": "activityDuration",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by created date (RFC3339 format)",
+            "name": "createdAfter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by created date (RFC3339 format)",
+            "name": "createdBefore",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by updated date (RFC3339 format)",
+            "name": "updatedAfter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by updated date (RFC3339 format)",
+            "name": "updatedBefore",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list of shares",
+            "schema": {
+              "$ref": "#/definitions/sharesList"
+            }
+          },
+          "400": {
+            "description": "bad request (e.g., activityDuration exceeds 30d, invalid date format)",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/sparklines": {
       "post": {
         "security": [
@@ -7782,6 +8266,52 @@ func init() {
         }
       }
     },
+    "accessSummary": {
+      "type": "object",
+      "properties": {
+        "backendMode": {
+          "type": "string"
+        },
+        "bindAddress": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "envZId": {
+          "type": "string"
+        },
+        "frontendToken": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "limited": {
+          "type": "boolean"
+        },
+        "shareToken": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "integer"
+        }
+      }
+    },
+    "accessesList": {
+      "type": "object",
+      "properties": {
+        "accesses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/accessSummary"
+          }
+        }
+      }
+    },
     "authUser": {
       "type": "object",
       "properties": {
@@ -7879,9 +8409,6 @@ func init() {
         },
         "envZId": {
           "type": "string"
-        },
-        "hasActivity": {
-          "type": "boolean"
         },
         "host": {
           "type": "string"
@@ -8201,10 +8728,59 @@ func init() {
         }
       }
     },
+    "shareSummary": {
+      "type": "object",
+      "properties": {
+        "backendMode": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "integer"
+        },
+        "envZId": {
+          "type": "string"
+        },
+        "frontendEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limited": {
+          "type": "boolean"
+        },
+        "shareMode": {
+          "type": "string"
+        },
+        "shareToken": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "integer"
+        },
+        "zId": {
+          "type": "string"
+        }
+      }
+    },
     "shares": {
       "type": "array",
       "items": {
         "$ref": "#/definitions/share"
+      }
+    },
+    "sharesList": {
+      "type": "object",
+      "properties": {
+        "shares": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/shareSummary"
+          }
+        }
       }
     },
     "sparkData": {

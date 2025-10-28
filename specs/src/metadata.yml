@@ -148,6 +148,134 @@
         schema:
           $ref: "#/definitions/errorMessage"
 
+/shares:
+  get:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: listShares
+    parameters:
+      - name: envZId
+        in: query
+        type: string
+        description: filter by environment ziti identity
+      - name: shareMode
+        in: query
+        type: string
+        description: filter by share mode (public/private)
+      - name: backendMode
+        in: query
+        type: string
+        description: filter by backend mode
+      - name: shareToken
+        in: query
+        type: string
+        description: filter by share token (substring match)
+      - name: target
+        in: query
+        type: string
+        description: filter by target (substring match)
+      - name: permissionMode
+        in: query
+        type: string
+        description: filter by permission mode (open/closed)
+      - name: hasActivity
+        in: query
+        type: boolean
+        description: filter shares with recent activity
+      - name: activityDuration
+        in: query
+        type: string
+        description: duration for hasActivity filter (e.g., "24h", "7d", "30d"). default "24h", maximum "30d" (720h)
+      - name: createdAfter
+        in: query
+        type: string
+        description: filter by created date (RFC3339 format)
+      - name: createdBefore
+        in: query
+        type: string
+        description: filter by created date (RFC3339 format)
+      - name: updatedAfter
+        in: query
+        type: string
+        description: filter by updated date (RFC3339 format)
+      - name: updatedBefore
+        in: query
+        type: string
+        description: filter by updated date (RFC3339 format)
+    responses:
+      200:
+        description: list of shares
+        schema:
+          $ref: "#/definitions/sharesList"
+      400:
+        description: bad request (e.g., activityDuration exceeds 30d, invalid date format)
+        schema:
+          $ref: "#/definitions/errorMessage"
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+        schema:
+          $ref: "#/definitions/errorMessage"
+
+/accesses:
+  get:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: listAccesses
+    parameters:
+      - name: envZId
+        in: query
+        type: string
+        description: filter by environment ziti identity
+      - name: shareToken
+        in: query
+        type: string
+        description: filter by associated share token
+      - name: bindAddress
+        in: query
+        type: string
+        description: filter by bind address (substring match)
+      - name: description
+        in: query
+        type: string
+        description: filter by description (substring match)
+      - name: createdAfter
+        in: query
+        type: string
+        description: filter by created date (RFC3339 format)
+      - name: createdBefore
+        in: query
+        type: string
+        description: filter by created date (RFC3339 format)
+      - name: updatedAfter
+        in: query
+        type: string
+        description: filter by updated date (RFC3339 format)
+      - name: updatedBefore
+        in: query
+        type: string
+        description: filter by updated date (RFC3339 format)
+    responses:
+      200:
+        description: list of accesses
+        schema:
+          $ref: "#/definitions/accessesList"
+      400:
+        description: bad request (e.g., activityDuration exceeds 30d, invalid date format)
+        schema:
+          $ref: "#/definitions/errorMessage"
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+        schema:
+          $ref: "#/definitions/errorMessage"
+
 /detail/frontend/{frontendId}:
   get:
     tags:

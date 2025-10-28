@@ -1,6 +1,10 @@
 package store
 
 import (
+	"fmt"
+	"strings"
+	"time"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -145,4 +149,110 @@ func (str *Store) DeleteShare(id int, trx *sqlx.Tx) error {
 		return errors.Wrap(err, "error executing shares delete statement")
 	}
 	return nil
+}
+
+type ShareFilter struct {
+	EnvZId         *string
+	ShareMode      *string
+	BackendMode    *string
+	ShareToken     *string
+	Target         *string
+	PermissionMode *string
+	CreatedAfter   *time.Time
+	CreatedBefore  *time.Time
+	UpdatedAfter   *time.Time
+	UpdatedBefore  *time.Time
+}
+
+func (str *Store) FindSharesForAccountWithFilter(accountId int, filter *ShareFilter, trx *sqlx.Tx) ([]*Share, error) {
+	query := `
+		select shares.*
+		from shares
+		inner join environments on shares.environment_id = environments.id
+		where environments.account_id = $1
+		and not shares.deleted
+		and not environments.deleted
+	`
+
+	args := []interface{}{accountId}
+	argIndex := 2
+
+	// text filters
+	if filter.EnvZId != nil && *filter.EnvZId != "" {
+		query += fmt.Sprintf(" and environments.z_id = $%d", argIndex)
+		args = append(args, *filter.EnvZId)
+		argIndex++
+	}
+
+	if filter.ShareMode != nil && *filter.ShareMode != "" {
+		query += fmt.Sprintf(" and shares.share_mode = $%d", argIndex)
+		args = append(args, *filter.ShareMode)
+		argIndex++
+	}
+
+	if filter.BackendMode != nil && *filter.BackendMode != "" {
+		query += fmt.Sprintf(" and shares.backend_mode = $%d", argIndex)
+		args = append(args, *filter.BackendMode)
+		argIndex++
+	}
+
+	if filter.ShareToken != nil && *filter.ShareToken != "" {
+		query += fmt.Sprintf(" and lower(shares.token) like $%d", argIndex)
+		args = append(args, "%"+strings.ToLower(*filter.ShareToken)+"%")
+		argIndex++
+	}
+
+	if filter.Target != nil && *filter.Target != "" {
+		query += fmt.Sprintf(" and lower(shares.backend_proxy_endpoint) like $%d", argIndex)
+		args = append(args, "%"+strings.ToLower(*filter.Target)+"%")
+		argIndex++
+	}
+
+	if filter.PermissionMode != nil && *filter.PermissionMode != "" {
+		query += fmt.Sprintf(" and shares.permission_mode = $%d", argIndex)
+		args = append(args, *filter.PermissionMode)
+		argIndex++
+	}
+
+	// date filters
+	if filter.CreatedAfter != nil {
+		query += fmt.Sprintf(" and shares.created_at >= $%d", argIndex)
+		args = append(args, *filter.CreatedAfter)
+		argIndex++
+	}
+
+	if filter.CreatedBefore != nil {
+		query += fmt.Sprintf(" and shares.created_at <= $%d", argIndex)
+		args = append(args, *filter.CreatedBefore)
+		argIndex++
+	}
+
+	if filter.UpdatedAfter != nil {
+		query += fmt.Sprintf(" and shares.updated_at >= $%d", argIndex)
+		args = append(args, *filter.UpdatedAfter)
+		argIndex++
+	}
+
+	if filter.UpdatedBefore != nil {
+		query += fmt.Sprintf(" and shares.updated_at <= $%d", argIndex)
+		args = append(args, *filter.UpdatedBefore)
+		argIndex++
+	}
+
+	rows, err := trx.Unsafe().Queryx(query, args...)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting shares with filter")
+	}
+	defer rows.Close()
+
+	var results []*Share
+	for rows.Next() {
+		shr := &Share{}
+		if err := rows.StructScan(shr); err != nil {
+			return nil, errors.Wrap(err, "error scanning share")
+		}
+		results = append(results, shr)
+	}
+
+	return results, nil
 }

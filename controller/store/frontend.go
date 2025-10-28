@@ -1,6 +1,10 @@
 package store
 
 import (
+	"fmt"
+	"strings"
+	"time"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -187,4 +191,181 @@ func (str *Store) DeleteFrontend(id int, trx *sqlx.Tx) error {
 		return errors.Wrap(err, "error executing frontends delete statement")
 	}
 	return nil
+}
+
+type FrontendFilter struct {
+	EnvZId        *string
+	ShareToken    *string
+	BindAddress   *string
+	Description   *string
+	Reserved      *bool
+	CreatedAfter  *time.Time
+	CreatedBefore *time.Time
+	UpdatedAfter  *time.Time
+	UpdatedBefore *time.Time
+}
+
+type FrontendWithEnvironment struct {
+	Frontend
+	EnvZId      *string
+	ShareToken  *string
+	BackendMode *string
+}
+
+func (str *Store) FindFrontendsForAccountWithFilter(accountId int, filter *FrontendFilter, trx *sqlx.Tx) ([]*FrontendWithEnvironment, error) {
+	query := `
+		select
+			frontends.*,
+			environments.z_id as env_z_id,
+			shares.token as share_token,
+			shares.backend_mode as backend_mode
+		from frontends
+		left join environments on frontends.environment_id = environments.id
+		left join shares on frontends.private_share_id = shares.id
+		where environments.account_id = $1
+		and not frontends.deleted
+		and frontends.public_name is null
+		and (environments.deleted is null or not environments.deleted)
+		and (shares.deleted is null or not shares.deleted)
+	`
+
+	args := []interface{}{accountId}
+	argIndex := 2
+
+	// text filters
+	if filter.EnvZId != nil && *filter.EnvZId != "" {
+		query += fmt.Sprintf(" and environments.z_id = $%d", argIndex)
+		args = append(args, *filter.EnvZId)
+		argIndex++
+	}
+
+	if filter.ShareToken != nil && *filter.ShareToken != "" {
+		query += fmt.Sprintf(" and shares.token = $%d", argIndex)
+		args = append(args, *filter.ShareToken)
+		argIndex++
+	}
+
+	if filter.BindAddress != nil && *filter.BindAddress != "" {
+		query += fmt.Sprintf(" and lower(frontends.bind_address) like $%d", argIndex)
+		args = append(args, "%"+strings.ToLower(*filter.BindAddress)+"%")
+		argIndex++
+	}
+
+	if filter.Description != nil && *filter.Description != "" {
+		query += fmt.Sprintf(" and lower(frontends.description) like $%d", argIndex)
+		args = append(args, "%"+strings.ToLower(*filter.Description)+"%")
+		argIndex++
+	}
+
+	// boolean filter
+	if filter.Reserved != nil {
+		query += fmt.Sprintf(" and frontends.reserved = $%d", argIndex)
+		args = append(args, *filter.Reserved)
+		argIndex++
+	}
+
+	// date filters
+	if filter.CreatedAfter != nil {
+		query += fmt.Sprintf(" and frontends.created_at >= $%d", argIndex)
+		args = append(args, *filter.CreatedAfter)
+		argIndex++
+	}
+
+	if filter.CreatedBefore != nil {
+		query += fmt.Sprintf(" and frontends.created_at <= $%d", argIndex)
+		args = append(args, *filter.CreatedBefore)
+		argIndex++
+	}
+
+	if filter.UpdatedAfter != nil {
+		query += fmt.Sprintf(" and frontends.updated_at >= $%d", argIndex)
+		args = append(args, *filter.UpdatedAfter)
+		argIndex++
+	}
+
+	if filter.UpdatedBefore != nil {
+		query += fmt.Sprintf(" and frontends.updated_at <= $%d", argIndex)
+		args = append(args, *filter.UpdatedBefore)
+		argIndex++
+	}
+
+	rows, err := trx.Queryx(query, args...)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting frontends with filter")
+	}
+	defer rows.Close()
+
+	var results []*FrontendWithEnvironment
+	for rows.Next() {
+		result := &FrontendWithEnvironment{}
+		// use MapScan to get all columns including the joined ones
+		cols := make(map[string]interface{})
+		if err := rows.MapScan(cols); err != nil {
+			return nil, errors.Wrap(err, "error scanning frontend row")
+		}
+
+		// manually populate Frontend fields from the map
+		if id, ok := cols["id"].(int64); ok {
+			result.Frontend.Id = int(id)
+		}
+		if envId, ok := cols["environment_id"].(int64); ok {
+			intVal := int(envId)
+			result.Frontend.EnvironmentId = &intVal
+		}
+		if privShareId, ok := cols["private_share_id"].(int64); ok {
+			intVal := int(privShareId)
+			result.Frontend.PrivateShareId = &intVal
+		}
+		if token, ok := cols["token"].(string); ok {
+			result.Frontend.Token = token
+		}
+		if zId, ok := cols["z_id"].(string); ok {
+			result.Frontend.ZId = zId
+		}
+		if publicName, ok := cols["public_name"].(string); ok {
+			result.Frontend.PublicName = &publicName
+		}
+		if urlTemplate, ok := cols["url_template"].(string); ok {
+			result.Frontend.UrlTemplate = &urlTemplate
+		}
+		if dynamic, ok := cols["dynamic"].(bool); ok {
+			result.Frontend.Dynamic = dynamic
+		}
+		if bindAddr, ok := cols["bind_address"].(string); ok {
+			result.Frontend.BindAddress = &bindAddr
+		}
+		if reserved, ok := cols["reserved"].(bool); ok {
+			result.Frontend.Reserved = reserved
+		}
+		if permMode, ok := cols["permission_mode"].(string); ok {
+			result.Frontend.PermissionMode = PermissionMode(permMode)
+		}
+		if desc, ok := cols["description"].(string); ok {
+			result.Frontend.Description = &desc
+		}
+		if createdAt, ok := cols["created_at"].(time.Time); ok {
+			result.Frontend.CreatedAt = createdAt
+		}
+		if updatedAt, ok := cols["updated_at"].(time.Time); ok {
+			result.Frontend.UpdatedAt = updatedAt
+		}
+		if deleted, ok := cols["deleted"].(bool); ok {
+			result.Frontend.Deleted = deleted
+		}
+
+		// extract the additional joined fields
+		if envZId, ok := cols["env_z_id"].(string); ok {
+			result.EnvZId = &envZId
+		}
+		if shareToken, ok := cols["share_token"].(string); ok {
+			result.ShareToken = &shareToken
+		}
+		if backendMode, ok := cols["backend_mode"].(string); ok {
+			result.BackendMode = &backendMode
+		}
+
+		results = append(results, result)
+	}
+
+	return results, nil
 }

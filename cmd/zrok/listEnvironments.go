@@ -179,7 +179,7 @@ func (cmd *listEnvironmentsCommand) run(_ *cobra.Command, _ []string) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleRounded)
-	t.AppendHeader(table.Row{"ZID", "Description", "Host", "Address", "Agent", "Shares", "Accesses", "Activity", "Limited", "Created"})
+	t.AppendHeader(table.Row{"ZID", "Description", "Host", "Address", "Agent", "Shares", "Accesses", "Limited", "Created"})
 
 	for _, env := range environments {
 		// format description
@@ -206,12 +206,6 @@ func (cmd *listEnvironmentsCommand) run(_ *cobra.Command, _ []string) {
 			agentStatus = "✓"
 		}
 
-		// format activity status
-		activityStatus := ""
-		if env.HasActivity {
-			activityStatus = "✓"
-		}
-
 		// format limited status
 		limitedStatus := ""
 		if env.Limited {
@@ -229,7 +223,7 @@ func (cmd *listEnvironmentsCommand) run(_ *cobra.Command, _ []string) {
 			agentStatus,
 			env.ShareCount,
 			env.AccessCount,
-			activityStatus,
+
 			limitedStatus,
 			created,
 		})

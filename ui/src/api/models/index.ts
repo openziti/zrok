@@ -2,6 +2,8 @@
 /* eslint-disable */
 export * from './Access201Response';
 export * from './AccessRequest';
+export * from './AccessSummary';
+export * from './AccessesList';
 export * from './AddFrontendGrantRequest';
 export * from './AddNamespaceFrontendMappingRequest';
 export * from './AddNamespaceGrantRequest';
@@ -72,6 +74,8 @@ export * from './ShareHttpHealthcheck200Response';
 export * from './ShareHttpHealthcheckRequest';
 export * from './ShareRequest';
 export * from './ShareResponse';
+export * from './ShareSummary';
+export * from './SharesList';
 export * from './SparkDataSample';
 export * from './UnaccessRequest';
 export * from './UnshareRequest';

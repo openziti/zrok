@@ -150,11 +150,16 @@ func (h *listEnvironmentsHandler) Handle(params metadata.ListEnvironmentsParams,
 	}
 
 	// check account limits
-	alj, err := str.FindLatestBandwidthLimitJournal(int(principal.ID), trx)
-	if err != nil {
+	isLimited := false
+	if empty, err := str.IsBandwidthLimitJournalEmpty(int(principal.ID), trx); !empty && err == nil {
+		alj, err := str.FindLatestBandwidthLimitJournal(int(principal.ID), trx)
+		if err != nil {
+			dl.Errorf("error finding account limit journal for '%v': %v", principal.Email, err)
+		}
+		isLimited = alj != nil && alj.Action == store.LimitLimitAction
+	} else if err != nil {
 		dl.Errorf("error finding account limit journal for '%v': %v", principal.Email, err)
 	}
-	isLimited := alj != nil && alj.Action == store.LimitLimitAction
 
 	// build response
 	response := &rest_model_zrok.EnvironmentsList{
@@ -187,7 +192,6 @@ func (h *listEnvironmentsHandler) Handle(params metadata.ListEnvironmentsParams,
 			RemoteAgent: agentEnvIds != nil && agentEnvIds[env.Id],
 			ShareCount:  int64(env.ShareCount),
 			AccessCount: int64(env.AccessCount),
-			HasActivity: hasActivity,
 			Limited:     isLimited,
 			CreatedAt:   env.CreatedAt.UnixMilli(),
 			UpdatedAt:   env.UpdatedAt.UnixMilli(),

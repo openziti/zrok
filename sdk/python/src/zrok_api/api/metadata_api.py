@@ -19,6 +19,7 @@ from typing_extensions import Annotated
 from pydantic import Field, StrictBool, StrictInt, StrictStr
 from typing import List, Optional
 from typing_extensions import Annotated
+from zrok_api.models.accesses_list import AccessesList
 from zrok_api.models.client_version_check_request import ClientVersionCheckRequest
 from zrok_api.models.configuration import Configuration
 from zrok_api.models.environment import Environment
@@ -32,6 +33,7 @@ from zrok_api.models.list_organization_members200_response import ListOrganizati
 from zrok_api.models.metrics import Metrics
 from zrok_api.models.overview import Overview
 from zrok_api.models.share import Share
+from zrok_api.models.shares_list import SharesList
 from zrok_api.models.version_inventory200_response import VersionInventory200Response
 
 from zrok_api.api_client import ApiClient, RequestSerialized
@@ -2726,6 +2728,394 @@ class MetadataApi:
 
 
     @validate_call
+    def list_accesses(
+        self,
+        env_zid: Annotated[Optional[StrictStr], Field(description="filter by environment ziti identity")] = None,
+        share_token: Annotated[Optional[StrictStr], Field(description="filter by associated share token")] = None,
+        bind_address: Annotated[Optional[StrictStr], Field(description="filter by bind address (substring match)")] = None,
+        description: Annotated[Optional[StrictStr], Field(description="filter by description (substring match)")] = None,
+        created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
+        created_before: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
+        updated_after: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 format)")] = None,
+        updated_before: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 format)")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> AccessesList:
+        """list_accesses
+
+
+        :param env_zid: filter by environment ziti identity
+        :type env_zid: str
+        :param share_token: filter by associated share token
+        :type share_token: str
+        :param bind_address: filter by bind address (substring match)
+        :type bind_address: str
+        :param description: filter by description (substring match)
+        :type description: str
+        :param created_after: filter by created date (RFC3339 format)
+        :type created_after: str
+        :param created_before: filter by created date (RFC3339 format)
+        :type created_before: str
+        :param updated_after: filter by updated date (RFC3339 format)
+        :type updated_after: str
+        :param updated_before: filter by updated date (RFC3339 format)
+        :type updated_before: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._list_accesses_serialize(
+            env_zid=env_zid,
+            share_token=share_token,
+            bind_address=bind_address,
+            description=description,
+            created_after=created_after,
+            created_before=created_before,
+            updated_after=updated_after,
+            updated_before=updated_before,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "AccessesList",
+            '400': "str",
+            '401': None,
+            '500': "str",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def list_accesses_with_http_info(
+        self,
+        env_zid: Annotated[Optional[StrictStr], Field(description="filter by environment ziti identity")] = None,
+        share_token: Annotated[Optional[StrictStr], Field(description="filter by associated share token")] = None,
+        bind_address: Annotated[Optional[StrictStr], Field(description="filter by bind address (substring match)")] = None,
+        description: Annotated[Optional[StrictStr], Field(description="filter by description (substring match)")] = None,
+        created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
+        created_before: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
+        updated_after: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 format)")] = None,
+        updated_before: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 format)")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[AccessesList]:
+        """list_accesses
+
+
+        :param env_zid: filter by environment ziti identity
+        :type env_zid: str
+        :param share_token: filter by associated share token
+        :type share_token: str
+        :param bind_address: filter by bind address (substring match)
+        :type bind_address: str
+        :param description: filter by description (substring match)
+        :type description: str
+        :param created_after: filter by created date (RFC3339 format)
+        :type created_after: str
+        :param created_before: filter by created date (RFC3339 format)
+        :type created_before: str
+        :param updated_after: filter by updated date (RFC3339 format)
+        :type updated_after: str
+        :param updated_before: filter by updated date (RFC3339 format)
+        :type updated_before: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._list_accesses_serialize(
+            env_zid=env_zid,
+            share_token=share_token,
+            bind_address=bind_address,
+            description=description,
+            created_after=created_after,
+            created_before=created_before,
+            updated_after=updated_after,
+            updated_before=updated_before,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "AccessesList",
+            '400': "str",
+            '401': None,
+            '500': "str",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def list_accesses_without_preload_content(
+        self,
+        env_zid: Annotated[Optional[StrictStr], Field(description="filter by environment ziti identity")] = None,
+        share_token: Annotated[Optional[StrictStr], Field(description="filter by associated share token")] = None,
+        bind_address: Annotated[Optional[StrictStr], Field(description="filter by bind address (substring match)")] = None,
+        description: Annotated[Optional[StrictStr], Field(description="filter by description (substring match)")] = None,
+        created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
+        created_before: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
+        updated_after: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 format)")] = None,
+        updated_before: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 format)")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """list_accesses
+
+
+        :param env_zid: filter by environment ziti identity
+        :type env_zid: str
+        :param share_token: filter by associated share token
+        :type share_token: str
+        :param bind_address: filter by bind address (substring match)
+        :type bind_address: str
+        :param description: filter by description (substring match)
+        :type description: str
+        :param created_after: filter by created date (RFC3339 format)
+        :type created_after: str
+        :param created_before: filter by created date (RFC3339 format)
+        :type created_before: str
+        :param updated_after: filter by updated date (RFC3339 format)
+        :type updated_after: str
+        :param updated_before: filter by updated date (RFC3339 format)
+        :type updated_before: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._list_accesses_serialize(
+            env_zid=env_zid,
+            share_token=share_token,
+            bind_address=bind_address,
+            description=description,
+            created_after=created_after,
+            created_before=created_before,
+            updated_after=updated_after,
+            updated_before=updated_before,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "AccessesList",
+            '400': "str",
+            '401': None,
+            '500': "str",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _list_accesses_serialize(
+        self,
+        env_zid,
+        share_token,
+        bind_address,
+        description,
+        created_after,
+        created_before,
+        updated_after,
+        updated_before,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        # process the query parameters
+        if env_zid is not None:
+            
+            _query_params.append(('envZId', env_zid))
+            
+        if share_token is not None:
+            
+            _query_params.append(('shareToken', share_token))
+            
+        if bind_address is not None:
+            
+            _query_params.append(('bindAddress', bind_address))
+            
+        if description is not None:
+            
+            _query_params.append(('description', description))
+            
+        if created_after is not None:
+            
+            _query_params.append(('createdAfter', created_after))
+            
+        if created_before is not None:
+            
+            _query_params.append(('createdBefore', created_before))
+            
+        if updated_after is not None:
+            
+            _query_params.append(('updatedAfter', updated_after))
+            
+        if updated_before is not None:
+            
+            _query_params.append(('updatedBefore', updated_before))
+            
+        # process the header parameters
+        # process the form parameters
+        # process the body parameter
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/zrok.v1+json'
+                ]
+            )
+
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'key'
+        ]
+
+        return self.api_client.param_serialize(
+            method='GET',
+            resource_path='/accesses',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
     def list_environments(
         self,
         description: Annotated[Optional[StrictStr], Field(description="filter by description (case-insensitive substring match)")] = None,
@@ -3710,6 +4100,462 @@ class MetadataApi:
         return self.api_client.param_serialize(
             method='GET',
             resource_path='/members/{organizationToken}',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
+    def list_shares(
+        self,
+        env_zid: Annotated[Optional[StrictStr], Field(description="filter by environment ziti identity")] = None,
+        share_mode: Annotated[Optional[StrictStr], Field(description="filter by share mode (public/private)")] = None,
+        backend_mode: Annotated[Optional[StrictStr], Field(description="filter by backend mode")] = None,
+        share_token: Annotated[Optional[StrictStr], Field(description="filter by share token (substring match)")] = None,
+        target: Annotated[Optional[StrictStr], Field(description="filter by target (substring match)")] = None,
+        permission_mode: Annotated[Optional[StrictStr], Field(description="filter by permission mode (open/closed)")] = None,
+        has_activity: Annotated[Optional[StrictBool], Field(description="filter shares with recent activity")] = None,
+        activity_duration: Annotated[Optional[StrictStr], Field(description="duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)")] = None,
+        created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
+        created_before: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
+        updated_after: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 format)")] = None,
+        updated_before: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 format)")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> SharesList:
+        """list_shares
+
+
+        :param env_zid: filter by environment ziti identity
+        :type env_zid: str
+        :param share_mode: filter by share mode (public/private)
+        :type share_mode: str
+        :param backend_mode: filter by backend mode
+        :type backend_mode: str
+        :param share_token: filter by share token (substring match)
+        :type share_token: str
+        :param target: filter by target (substring match)
+        :type target: str
+        :param permission_mode: filter by permission mode (open/closed)
+        :type permission_mode: str
+        :param has_activity: filter shares with recent activity
+        :type has_activity: bool
+        :param activity_duration: duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)
+        :type activity_duration: str
+        :param created_after: filter by created date (RFC3339 format)
+        :type created_after: str
+        :param created_before: filter by created date (RFC3339 format)
+        :type created_before: str
+        :param updated_after: filter by updated date (RFC3339 format)
+        :type updated_after: str
+        :param updated_before: filter by updated date (RFC3339 format)
+        :type updated_before: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._list_shares_serialize(
+            env_zid=env_zid,
+            share_mode=share_mode,
+            backend_mode=backend_mode,
+            share_token=share_token,
+            target=target,
+            permission_mode=permission_mode,
+            has_activity=has_activity,
+            activity_duration=activity_duration,
+            created_after=created_after,
+            created_before=created_before,
+            updated_after=updated_after,
+            updated_before=updated_before,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "SharesList",
+            '400': "str",
+            '401': None,
+            '500': "str",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def list_shares_with_http_info(
+        self,
+        env_zid: Annotated[Optional[StrictStr], Field(description="filter by environment ziti identity")] = None,
+        share_mode: Annotated[Optional[StrictStr], Field(description="filter by share mode (public/private)")] = None,
+        backend_mode: Annotated[Optional[StrictStr], Field(description="filter by backend mode")] = None,
+        share_token: Annotated[Optional[StrictStr], Field(description="filter by share token (substring match)")] = None,
+        target: Annotated[Optional[StrictStr], Field(description="filter by target (substring match)")] = None,
+        permission_mode: Annotated[Optional[StrictStr], Field(description="filter by permission mode (open/closed)")] = None,
+        has_activity: Annotated[Optional[StrictBool], Field(description="filter shares with recent activity")] = None,
+        activity_duration: Annotated[Optional[StrictStr], Field(description="duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)")] = None,
+        created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
+        created_before: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
+        updated_after: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 format)")] = None,
+        updated_before: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 format)")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[SharesList]:
+        """list_shares
+
+
+        :param env_zid: filter by environment ziti identity
+        :type env_zid: str
+        :param share_mode: filter by share mode (public/private)
+        :type share_mode: str
+        :param backend_mode: filter by backend mode
+        :type backend_mode: str
+        :param share_token: filter by share token (substring match)
+        :type share_token: str
+        :param target: filter by target (substring match)
+        :type target: str
+        :param permission_mode: filter by permission mode (open/closed)
+        :type permission_mode: str
+        :param has_activity: filter shares with recent activity
+        :type has_activity: bool
+        :param activity_duration: duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)
+        :type activity_duration: str
+        :param created_after: filter by created date (RFC3339 format)
+        :type created_after: str
+        :param created_before: filter by created date (RFC3339 format)
+        :type created_before: str
+        :param updated_after: filter by updated date (RFC3339 format)
+        :type updated_after: str
+        :param updated_before: filter by updated date (RFC3339 format)
+        :type updated_before: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._list_shares_serialize(
+            env_zid=env_zid,
+            share_mode=share_mode,
+            backend_mode=backend_mode,
+            share_token=share_token,
+            target=target,
+            permission_mode=permission_mode,
+            has_activity=has_activity,
+            activity_duration=activity_duration,
+            created_after=created_after,
+            created_before=created_before,
+            updated_after=updated_after,
+            updated_before=updated_before,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "SharesList",
+            '400': "str",
+            '401': None,
+            '500': "str",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def list_shares_without_preload_content(
+        self,
+        env_zid: Annotated[Optional[StrictStr], Field(description="filter by environment ziti identity")] = None,
+        share_mode: Annotated[Optional[StrictStr], Field(description="filter by share mode (public/private)")] = None,
+        backend_mode: Annotated[Optional[StrictStr], Field(description="filter by backend mode")] = None,
+        share_token: Annotated[Optional[StrictStr], Field(description="filter by share token (substring match)")] = None,
+        target: Annotated[Optional[StrictStr], Field(description="filter by target (substring match)")] = None,
+        permission_mode: Annotated[Optional[StrictStr], Field(description="filter by permission mode (open/closed)")] = None,
+        has_activity: Annotated[Optional[StrictBool], Field(description="filter shares with recent activity")] = None,
+        activity_duration: Annotated[Optional[StrictStr], Field(description="duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)")] = None,
+        created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
+        created_before: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 format)")] = None,
+        updated_after: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 format)")] = None,
+        updated_before: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 format)")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """list_shares
+
+
+        :param env_zid: filter by environment ziti identity
+        :type env_zid: str
+        :param share_mode: filter by share mode (public/private)
+        :type share_mode: str
+        :param backend_mode: filter by backend mode
+        :type backend_mode: str
+        :param share_token: filter by share token (substring match)
+        :type share_token: str
+        :param target: filter by target (substring match)
+        :type target: str
+        :param permission_mode: filter by permission mode (open/closed)
+        :type permission_mode: str
+        :param has_activity: filter shares with recent activity
+        :type has_activity: bool
+        :param activity_duration: duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)
+        :type activity_duration: str
+        :param created_after: filter by created date (RFC3339 format)
+        :type created_after: str
+        :param created_before: filter by created date (RFC3339 format)
+        :type created_before: str
+        :param updated_after: filter by updated date (RFC3339 format)
+        :type updated_after: str
+        :param updated_before: filter by updated date (RFC3339 format)
+        :type updated_before: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._list_shares_serialize(
+            env_zid=env_zid,
+            share_mode=share_mode,
+            backend_mode=backend_mode,
+            share_token=share_token,
+            target=target,
+            permission_mode=permission_mode,
+            has_activity=has_activity,
+            activity_duration=activity_duration,
+            created_after=created_after,
+            created_before=created_before,
+            updated_after=updated_after,
+            updated_before=updated_before,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "SharesList",
+            '400': "str",
+            '401': None,
+            '500': "str",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _list_shares_serialize(
+        self,
+        env_zid,
+        share_mode,
+        backend_mode,
+        share_token,
+        target,
+        permission_mode,
+        has_activity,
+        activity_duration,
+        created_after,
+        created_before,
+        updated_after,
+        updated_before,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        # process the query parameters
+        if env_zid is not None:
+            
+            _query_params.append(('envZId', env_zid))
+            
+        if share_mode is not None:
+            
+            _query_params.append(('shareMode', share_mode))
+            
+        if backend_mode is not None:
+            
+            _query_params.append(('backendMode', backend_mode))
+            
+        if share_token is not None:
+            
+            _query_params.append(('shareToken', share_token))
+            
+        if target is not None:
+            
+            _query_params.append(('target', target))
+            
+        if permission_mode is not None:
+            
+            _query_params.append(('permissionMode', permission_mode))
+            
+        if has_activity is not None:
+            
+            _query_params.append(('hasActivity', has_activity))
+            
+        if activity_duration is not None:
+            
+            _query_params.append(('activityDuration', activity_duration))
+            
+        if created_after is not None:
+            
+            _query_params.append(('createdAfter', created_after))
+            
+        if created_before is not None:
+            
+            _query_params.append(('createdBefore', created_before))
+            
+        if updated_after is not None:
+            
+            _query_params.append(('updatedAfter', updated_after))
+            
+        if updated_before is not None:
+            
+            _query_params.append(('updatedBefore', updated_before))
+            
+        # process the header parameters
+        # process the form parameters
+        # process the body parameter
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/zrok.v1+json'
+                ]
+            )
+
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'key'
+        ]
+
+        return self.api_client.param_serialize(
+            method='GET',
+            resource_path='/shares',
             path_params=_path_params,
             query_params=_query_params,
             header_params=_header_params,

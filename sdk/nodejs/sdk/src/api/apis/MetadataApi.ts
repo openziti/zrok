@@ -15,6 +15,7 @@
 
 import * as runtime from '../runtime';
 import type {
+  AccessesList,
   ClientVersionCheckRequest,
   Environment,
   EnvironmentAndResources,
@@ -28,9 +29,12 @@ import type {
   ModelConfiguration,
   Overview,
   Share,
+  SharesList,
   VersionInventory200Response,
 } from '../models/index';
 import {
+    AccessesListFromJSON,
+    AccessesListToJSON,
     ClientVersionCheckRequestFromJSON,
     ClientVersionCheckRequestToJSON,
     EnvironmentFromJSON,
@@ -57,6 +61,8 @@ import {
     OverviewToJSON,
     ShareFromJSON,
     ShareToJSON,
+    SharesListFromJSON,
+    SharesListToJSON,
     VersionInventory200ResponseFromJSON,
     VersionInventory200ResponseToJSON,
 } from '../models/index';
@@ -95,6 +101,17 @@ export interface GetSparklinesOperationRequest {
     body?: GetSparklinesRequest;
 }
 
+export interface ListAccessesRequest {
+    envZId?: string;
+    shareToken?: string;
+    bindAddress?: string;
+    description?: string;
+    createdAfter?: string;
+    createdBefore?: string;
+    updatedAfter?: string;
+    updatedBefore?: string;
+}
+
 export interface ListEnvironmentsRequest {
     description?: string;
     host?: string;
@@ -114,6 +131,21 @@ export interface ListEnvironmentsRequest {
 
 export interface ListOrgMembersRequest {
     organizationToken: string;
+}
+
+export interface ListSharesRequest {
+    envZId?: string;
+    shareMode?: string;
+    backendMode?: string;
+    shareToken?: string;
+    target?: string;
+    permissionMode?: string;
+    hasActivity?: boolean;
+    activityDuration?: string;
+    createdAfter?: string;
+    createdBefore?: string;
+    updatedAfter?: string;
+    updatedBefore?: string;
 }
 
 export interface OrgAccountOverviewRequest {
@@ -487,6 +519,69 @@ export class MetadataApi extends runtime.BaseAPI {
 
     /**
      */
+    async listAccessesRaw(requestParameters: ListAccessesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccessesList>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['envZId'] != null) {
+            queryParameters['envZId'] = requestParameters['envZId'];
+        }
+
+        if (requestParameters['shareToken'] != null) {
+            queryParameters['shareToken'] = requestParameters['shareToken'];
+        }
+
+        if (requestParameters['bindAddress'] != null) {
+            queryParameters['bindAddress'] = requestParameters['bindAddress'];
+        }
+
+        if (requestParameters['description'] != null) {
+            queryParameters['description'] = requestParameters['description'];
+        }
+
+        if (requestParameters['createdAfter'] != null) {
+            queryParameters['createdAfter'] = requestParameters['createdAfter'];
+        }
+
+        if (requestParameters['createdBefore'] != null) {
+            queryParameters['createdBefore'] = requestParameters['createdBefore'];
+        }
+
+        if (requestParameters['updatedAfter'] != null) {
+            queryParameters['updatedAfter'] = requestParameters['updatedAfter'];
+        }
+
+        if (requestParameters['updatedBefore'] != null) {
+            queryParameters['updatedBefore'] = requestParameters['updatedBefore'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/accesses`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AccessesListFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async listAccesses(requestParameters: ListAccessesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccessesList> {
+        const response = await this.listAccessesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async listEnvironmentsRaw(requestParameters: ListEnvironmentsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnvironmentsList>> {
         const queryParameters: any = {};
 
@@ -639,6 +734,85 @@ export class MetadataApi extends runtime.BaseAPI {
      */
     async listOrgMembers(requestParameters: ListOrgMembersRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ListOrganizationMembers200Response> {
         const response = await this.listOrgMembersRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async listSharesRaw(requestParameters: ListSharesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SharesList>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['envZId'] != null) {
+            queryParameters['envZId'] = requestParameters['envZId'];
+        }
+
+        if (requestParameters['shareMode'] != null) {
+            queryParameters['shareMode'] = requestParameters['shareMode'];
+        }
+
+        if (requestParameters['backendMode'] != null) {
+            queryParameters['backendMode'] = requestParameters['backendMode'];
+        }
+
+        if (requestParameters['shareToken'] != null) {
+            queryParameters['shareToken'] = requestParameters['shareToken'];
+        }
+
+        if (requestParameters['target'] != null) {
+            queryParameters['target'] = requestParameters['target'];
+        }
+
+        if (requestParameters['permissionMode'] != null) {
+            queryParameters['permissionMode'] = requestParameters['permissionMode'];
+        }
+
+        if (requestParameters['hasActivity'] != null) {
+            queryParameters['hasActivity'] = requestParameters['hasActivity'];
+        }
+
+        if (requestParameters['activityDuration'] != null) {
+            queryParameters['activityDuration'] = requestParameters['activityDuration'];
+        }
+
+        if (requestParameters['createdAfter'] != null) {
+            queryParameters['createdAfter'] = requestParameters['createdAfter'];
+        }
+
+        if (requestParameters['createdBefore'] != null) {
+            queryParameters['createdBefore'] = requestParameters['createdBefore'];
+        }
+
+        if (requestParameters['updatedAfter'] != null) {
+            queryParameters['updatedAfter'] = requestParameters['updatedAfter'];
+        }
+
+        if (requestParameters['updatedBefore'] != null) {
+            queryParameters['updatedBefore'] = requestParameters['updatedBefore'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/shares`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SharesListFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async listShares(requestParameters: ListSharesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SharesList> {
+        const response = await this.listSharesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

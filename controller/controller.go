@@ -116,6 +116,8 @@ func Run(inCfg *config.Config) error {
 	api.MetadataListEnvironmentsHandler = newListEnvironmentsHandler()
 	api.MetadataGetFrontendDetailHandler = newGetFrontendDetailHandler()
 	api.MetadataGetShareDetailHandler = newShareDetailHandler()
+	api.MetadataListSharesHandler = newListSharesHandler()
+	api.MetadataListAccessesHandler = newListAccessesHandler()
 	api.MetadataListMembershipsHandler = newListMembershipsHandler()
 	api.MetadataListOrgMembersHandler = newListOrgMembersHandler()
 	api.MetadataOrgAccountOverviewHandler = newOrgAccountOverviewHandler()

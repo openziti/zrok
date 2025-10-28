@@ -86,6 +86,12 @@ class TestMetadataApi(unittest.TestCase):
         """
         pass
 
+    def test_list_accesses(self) -> None:
+        """Test case for list_accesses
+
+        """
+        pass
+
     def test_list_environments(self) -> None:
         """Test case for list_environments
 
@@ -100,6 +106,12 @@ class TestMetadataApi(unittest.TestCase):
 
     def test_list_org_members(self) -> None:
         """Test case for list_org_members
+
+        """
+        pass
+
+    def test_list_shares(self) -> None:
+        """Test case for list_shares
 
         """
         pass

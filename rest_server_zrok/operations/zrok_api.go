@@ -155,6 +155,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		AdminInviteTokenGenerateHandler: admin.InviteTokenGenerateHandlerFunc(func(params admin.InviteTokenGenerateParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.InviteTokenGenerate has not yet been implemented")
 		}),
+		MetadataListAccessesHandler: metadata.ListAccessesHandlerFunc(func(params metadata.ListAccessesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.ListAccesses has not yet been implemented")
+		}),
 		ShareListAllNamesHandler: share.ListAllNamesHandlerFunc(func(params share.ListAllNamesParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.ListAllNames has not yet been implemented")
 		}),
@@ -190,6 +193,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		}),
 		ShareListShareNamespacesHandler: share.ListShareNamespacesHandlerFunc(func(params share.ListShareNamespacesParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.ListShareNamespaces has not yet been implemented")
+		}),
+		MetadataListSharesHandler: metadata.ListSharesHandlerFunc(func(params metadata.ListSharesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.ListShares has not yet been implemented")
 		}),
 		AccountLoginHandler: account.LoginHandlerFunc(func(params account.LoginParams) middleware.Responder {
 			return middleware.NotImplemented("operation account.Login has not yet been implemented")
@@ -398,6 +404,8 @@ type ZrokAPI struct {
 	AccountInviteHandler account.InviteHandler
 	// AdminInviteTokenGenerateHandler sets the operation handler for the invite token generate operation
 	AdminInviteTokenGenerateHandler admin.InviteTokenGenerateHandler
+	// MetadataListAccessesHandler sets the operation handler for the list accesses operation
+	MetadataListAccessesHandler metadata.ListAccessesHandler
 	// ShareListAllNamesHandler sets the operation handler for the list all names operation
 	ShareListAllNamesHandler share.ListAllNamesHandler
 	// MetadataListEnvironmentsHandler sets the operation handler for the list environments operation
@@ -422,6 +430,8 @@ type ZrokAPI struct {
 	AdminListOrganizationsHandler admin.ListOrganizationsHandler
 	// ShareListShareNamespacesHandler sets the operation handler for the list share namespaces operation
 	ShareListShareNamespacesHandler share.ListShareNamespacesHandler
+	// MetadataListSharesHandler sets the operation handler for the list shares operation
+	MetadataListSharesHandler metadata.ListSharesHandler
 	// AccountLoginHandler sets the operation handler for the login operation
 	AccountLoginHandler account.LoginHandler
 	// MetadataOrgAccountOverviewHandler sets the operation handler for the org account overview operation
@@ -666,6 +676,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.AdminInviteTokenGenerateHandler == nil {
 		unregistered = append(unregistered, "admin.InviteTokenGenerateHandler")
 	}
+	if o.MetadataListAccessesHandler == nil {
+		unregistered = append(unregistered, "metadata.ListAccessesHandler")
+	}
 	if o.ShareListAllNamesHandler == nil {
 		unregistered = append(unregistered, "share.ListAllNamesHandler")
 	}
@@ -701,6 +714,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.ShareListShareNamespacesHandler == nil {
 		unregistered = append(unregistered, "share.ListShareNamespacesHandler")
+	}
+	if o.MetadataListSharesHandler == nil {
+		unregistered = append(unregistered, "metadata.ListSharesHandler")
 	}
 	if o.AccountLoginHandler == nil {
 		unregistered = append(unregistered, "account.LoginHandler")
@@ -1031,6 +1047,10 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
+	o.handlers["GET"]["/accesses"] = metadata.NewListAccesses(o.context, o.MetadataListAccessesHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
 	o.handlers["GET"]["/share/names"] = share.NewListAllNames(o.context, o.ShareListAllNamesHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
@@ -1076,6 +1096,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/share/namespaces"] = share.NewListShareNamespaces(o.context, o.ShareListShareNamespacesHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/shares"] = metadata.NewListShares(o.context, o.MetadataListSharesHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

@@ -9,6 +9,8 @@ apis/index.ts
 index.ts
 models/Access201Response.ts
 models/AccessRequest.ts
+models/AccessSummary.ts
+models/AccessesList.ts
 models/AddFrontendGrantRequest.ts
 models/AddNamespaceFrontendMappingRequest.ts
 models/AddNamespaceGrantRequest.ts
@@ -79,6 +81,8 @@ models/ShareHttpHealthcheck200Response.ts
 models/ShareHttpHealthcheckRequest.ts
 models/ShareRequest.ts
 models/ShareResponse.ts
+models/ShareSummary.ts
+models/SharesList.ts
 models/SparkDataSample.ts
 models/UnaccessRequest.ts
 models/UnshareRequest.ts

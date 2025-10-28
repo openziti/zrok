@@ -32,9 +32,6 @@ type EnvironmentSummary struct {
 	// env z Id
 	EnvZID string `json:"envZId,omitempty"`
 
-	// has activity
-	HasActivity bool `json:"hasActivity,omitempty"`
-
 	// host
 	Host string `json:"host,omitempty"`
 

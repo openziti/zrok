@@ -149,9 +149,11 @@ Class | Method | HTTP request | Description
 *MetadataApi* | [**get_share_detail**](docs/MetadataApi.md#get_share_detail) | **GET** /detail/share/{shareToken} | 
 *MetadataApi* | [**get_share_metrics**](docs/MetadataApi.md#get_share_metrics) | **GET** /metrics/share/{shareToken} | 
 *MetadataApi* | [**get_sparklines**](docs/MetadataApi.md#get_sparklines) | **POST** /sparklines | 
+*MetadataApi* | [**list_accesses**](docs/MetadataApi.md#list_accesses) | **GET** /accesses | 
 *MetadataApi* | [**list_environments**](docs/MetadataApi.md#list_environments) | **GET** /environments | 
 *MetadataApi* | [**list_memberships**](docs/MetadataApi.md#list_memberships) | **GET** /memberships | 
 *MetadataApi* | [**list_org_members**](docs/MetadataApi.md#list_org_members) | **GET** /members/{organizationToken} | 
+*MetadataApi* | [**list_shares**](docs/MetadataApi.md#list_shares) | **GET** /shares | 
 *MetadataApi* | [**org_account_overview**](docs/MetadataApi.md#org_account_overview) | **GET** /overview/{organizationToken}/{accountEmail} | 
 *MetadataApi* | [**overview**](docs/MetadataApi.md#overview) | **GET** /overview | 
 *MetadataApi* | [**version**](docs/MetadataApi.md#version) | **GET** /version | 
@@ -174,6 +176,8 @@ Class | Method | HTTP request | Description
 
  - [Access201Response](docs/Access201Response.md)
  - [AccessRequest](docs/AccessRequest.md)
+ - [AccessSummary](docs/AccessSummary.md)
+ - [AccessesList](docs/AccessesList.md)
  - [AddFrontendGrantRequest](docs/AddFrontendGrantRequest.md)
  - [AddNamespaceFrontendMappingRequest](docs/AddNamespaceFrontendMappingRequest.md)
  - [AddNamespaceGrantRequest](docs/AddNamespaceGrantRequest.md)
@@ -244,6 +248,8 @@ Class | Method | HTTP request | Description
  - [ShareHttpHealthcheckRequest](docs/ShareHttpHealthcheckRequest.md)
  - [ShareRequest](docs/ShareRequest.md)
  - [ShareResponse](docs/ShareResponse.md)
+ - [ShareSummary](docs/ShareSummary.md)
+ - [SharesList](docs/SharesList.md)
  - [SparkDataSample](docs/SparkDataSample.md)
  - [UnaccessRequest](docs/UnaccessRequest.md)
  - [UnshareRequest](docs/UnshareRequest.md)

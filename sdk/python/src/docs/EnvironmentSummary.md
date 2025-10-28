@@ -12,7 +12,6 @@ Name | Type | Description | Notes
 **remote_agent** | **bool** |  | [optional] 
 **share_count** | **int** |  | [optional] 
 **access_count** | **int** |  | [optional] 
-**has_activity** | **bool** |  | [optional] 
 **limited** | **bool** |  | [optional] 
 **created_at** | **int** |  | [optional] 
 **updated_at** | **int** |  | [optional] 

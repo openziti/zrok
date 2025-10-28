@@ -44,7 +44,6 @@ class TestEnvironmentsList(unittest.TestCase):
                         remote_agent = True, 
                         share_count = 56, 
                         access_count = 56, 
-                        has_activity = True, 
                         limited = True, 
                         created_at = 56, 
                         updated_at = 56, )

@@ -35,6 +35,8 @@ __all__ = [
     "ApiException",
     "Access201Response",
     "AccessRequest",
+    "AccessSummary",
+    "AccessesList",
     "AddFrontendGrantRequest",
     "AddNamespaceFrontendMappingRequest",
     "AddNamespaceGrantRequest",
@@ -105,6 +107,8 @@ __all__ = [
     "ShareHttpHealthcheckRequest",
     "ShareRequest",
     "ShareResponse",
+    "ShareSummary",
+    "SharesList",
     "SparkDataSample",
     "UnaccessRequest",
     "UnshareRequest",
@@ -140,6 +144,8 @@ from zrok_api.exceptions import ApiException as ApiException
 # import models into sdk package
 from zrok_api.models.access201_response import Access201Response as Access201Response
 from zrok_api.models.access_request import AccessRequest as AccessRequest
+from zrok_api.models.access_summary import AccessSummary as AccessSummary
+from zrok_api.models.accesses_list import AccessesList as AccessesList
 from zrok_api.models.add_frontend_grant_request import AddFrontendGrantRequest as AddFrontendGrantRequest
 from zrok_api.models.add_namespace_frontend_mapping_request import AddNamespaceFrontendMappingRequest as AddNamespaceFrontendMappingRequest
 from zrok_api.models.add_namespace_grant_request import AddNamespaceGrantRequest as AddNamespaceGrantRequest
@@ -210,6 +216,8 @@ from zrok_api.models.share_http_healthcheck200_response import ShareHttpHealthch
 from zrok_api.models.share_http_healthcheck_request import ShareHttpHealthcheckRequest as ShareHttpHealthcheckRequest
 from zrok_api.models.share_request import ShareRequest as ShareRequest
 from zrok_api.models.share_response import ShareResponse as ShareResponse
+from zrok_api.models.share_summary import ShareSummary as ShareSummary
+from zrok_api.models.shares_list import SharesList as SharesList
 from zrok_api.models.spark_data_sample import SparkDataSample as SparkDataSample
 from zrok_api.models.unaccess_request import UnaccessRequest as UnaccessRequest
 from zrok_api.models.unshare_request import UnshareRequest as UnshareRequest

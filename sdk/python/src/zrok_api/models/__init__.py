@@ -16,6 +16,8 @@
 # import models into model package
 from zrok_api.models.access201_response import Access201Response
 from zrok_api.models.access_request import AccessRequest
+from zrok_api.models.access_summary import AccessSummary
+from zrok_api.models.accesses_list import AccessesList
 from zrok_api.models.add_frontend_grant_request import AddFrontendGrantRequest
 from zrok_api.models.add_namespace_frontend_mapping_request import AddNamespaceFrontendMappingRequest
 from zrok_api.models.add_namespace_grant_request import AddNamespaceGrantRequest
@@ -86,6 +88,8 @@ from zrok_api.models.share_http_healthcheck200_response import ShareHttpHealthch
 from zrok_api.models.share_http_healthcheck_request import ShareHttpHealthcheckRequest
 from zrok_api.models.share_request import ShareRequest
 from zrok_api.models.share_response import ShareResponse
+from zrok_api.models.share_summary import ShareSummary
+from zrok_api.models.shares_list import SharesList
 from zrok_api.models.spark_data_sample import SparkDataSample
 from zrok_api.models.unaccess_request import UnaccessRequest
 from zrok_api.models.unshare_request import UnshareRequest

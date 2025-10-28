@@ -76,8 +76,6 @@ environmentSummary:
       type: integer
     accessCount:
       type: integer
-    hasActivity:
-      type: boolean
     limited:
       type: boolean
     createdAt:
@@ -92,6 +90,72 @@ environmentsList:
       type: array
       items:
         $ref: "#/definitions/environmentSummary"
+
+shareSummary:
+  type: object
+  properties:
+    shareToken:
+      type: string
+    zId:
+      type: string
+    envZId:
+      type: string
+    shareMode:
+      type: string
+    backendMode:
+      type: string
+    frontendEndpoints:
+      type: array
+      items:
+        type: string
+    target:
+      type: string
+    limited:
+      type: boolean
+    createdAt:
+      type: integer
+    updatedAt:
+      type: integer
+
+sharesList:
+  type: object
+  properties:
+    shares:
+      type: array
+      items:
+        $ref: "#/definitions/shareSummary"
+
+accessSummary:
+  type: object
+  properties:
+    id:
+      type: integer
+    frontendToken:
+      type: string
+    envZId:
+      type: string
+    shareToken:
+      type: string
+    backendMode:
+      type: string
+    bindAddress:
+      type: string
+    description:
+      type: string
+    limited:
+      type: boolean
+    createdAt:
+      type: integer
+    updatedAt:
+      type: integer
+
+accessesList:
+  type: object
+  properties:
+    accesses:
+      type: array
+      items:
+        $ref: "#/definitions/accessSummary"
 
 errorMessage:
   type: string

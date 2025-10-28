@@ -66,12 +66,6 @@ export interface EnvironmentSummary {
      * @type {boolean}
      * @memberof EnvironmentSummary
      */
-    hasActivity?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof EnvironmentSummary
-     */
     limited?: boolean;
     /**
      * 
@@ -111,7 +105,6 @@ export function EnvironmentSummaryFromJSONTyped(json: any, ignoreDiscriminator: 
         'remoteAgent': json['remoteAgent'] == null ? undefined : json['remoteAgent'],
         'shareCount': json['shareCount'] == null ? undefined : json['shareCount'],
         'accessCount': json['accessCount'] == null ? undefined : json['accessCount'],
-        'hasActivity': json['hasActivity'] == null ? undefined : json['hasActivity'],
         'limited': json['limited'] == null ? undefined : json['limited'],
         'createdAt': json['createdAt'] == null ? undefined : json['createdAt'],
         'updatedAt': json['updatedAt'] == null ? undefined : json['updatedAt'],
@@ -136,7 +129,6 @@ export function EnvironmentSummaryToJSONTyped(value?: EnvironmentSummary | null,
         'remoteAgent': value['remoteAgent'],
         'shareCount': value['shareCount'],
         'accessCount': value['accessCount'],
-        'hasActivity': value['hasActivity'],
         'limited': value['limited'],
         'createdAt': value['createdAt'],
         'updatedAt': value['updatedAt'],
