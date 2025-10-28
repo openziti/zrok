@@ -14,6 +14,7 @@ Method | HTTP request | Description
 [**get_share_detail**](MetadataApi.md#get_share_detail) | **GET** /detail/share/{shareToken} | 
 [**get_share_metrics**](MetadataApi.md#get_share_metrics) | **GET** /metrics/share/{shareToken} | 
 [**get_sparklines**](MetadataApi.md#get_sparklines) | **POST** /sparklines | 
+[**list_environments**](MetadataApi.md#list_environments) | **GET** /environments | 
 [**list_memberships**](MetadataApi.md#list_memberships) | **GET** /memberships | 
 [**list_org_members**](MetadataApi.md#list_org_members) | **GET** /members/{organizationToken} | 
 [**org_account_overview**](MetadataApi.md#org_account_overview) | **GET** /overview/{organizationToken}/{accountEmail} | 
@@ -751,6 +752,109 @@ Name | Type | Description  | Notes
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | sparklines data |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **list_environments**
+> EnvironmentsList list_environments(description=description, host=host, address=address, remote_agent=remote_agent, has_shares=has_shares, has_accesses=has_accesses, has_activity=has_activity, share_count=share_count, access_count=access_count, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before, activity_duration=activity_duration)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.environments_list import EnvironmentsList
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+    description = 'description_example' # str | filter by description (case-insensitive substring match) (optional)
+    host = 'host_example' # str | filter by host (case-insensitive substring match) (optional)
+    address = 'address_example' # str | filter by address (exact match) (optional)
+    remote_agent = True # bool | filter by whether agent is enrolled (optional)
+    has_shares = True # bool | filter by whether environment has active shares (optional)
+    has_accesses = True # bool | filter by whether environment has active accesses (optional)
+    has_activity = True # bool | filter by whether environment has metrics within activityDuration timeframe (optional)
+    share_count = 'share_count_example' # str | filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\") (optional)
+    access_count = 'access_count_example' # str | filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\") (optional)
+    created_after = 'created_after_example' # str | filter by created date (RFC3339 datetime, inclusive) (optional)
+    created_before = 'created_before_example' # str | filter by created date (RFC3339 datetime, inclusive) (optional)
+    updated_after = 'updated_after_example' # str | filter by updated date (RFC3339 datetime, inclusive) (optional)
+    updated_before = 'updated_before_example' # str | filter by updated date (RFC3339 datetime, inclusive) (optional)
+    activity_duration = 'activity_duration_example' # str | duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h) (optional)
+
+    try:
+        api_response = api_instance.list_environments(description=description, host=host, address=address, remote_agent=remote_agent, has_shares=has_shares, has_accesses=has_accesses, has_activity=has_activity, share_count=share_count, access_count=access_count, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before, activity_duration=activity_duration)
+        print("The response of MetadataApi->list_environments:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->list_environments: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **description** | **str**| filter by description (case-insensitive substring match) | [optional] 
+ **host** | **str**| filter by host (case-insensitive substring match) | [optional] 
+ **address** | **str**| filter by address (exact match) | [optional] 
+ **remote_agent** | **bool**| filter by whether agent is enrolled | [optional] 
+ **has_shares** | **bool**| filter by whether environment has active shares | [optional] 
+ **has_accesses** | **bool**| filter by whether environment has active accesses | [optional] 
+ **has_activity** | **bool**| filter by whether environment has metrics within activityDuration timeframe | [optional] 
+ **share_count** | **str**| filter by share count with operator (e.g., \&quot;&gt;0\&quot;, \&quot;&gt;&#x3D;5\&quot;, \&quot;&#x3D;0\&quot;, \&quot;&lt;10\&quot;, \&quot;&lt;&#x3D;3\&quot;) | [optional] 
+ **access_count** | **str**| filter by access count with operator (e.g., \&quot;&gt;0\&quot;, \&quot;&gt;&#x3D;5\&quot;, \&quot;&#x3D;0\&quot;, \&quot;&lt;10\&quot;, \&quot;&lt;&#x3D;3\&quot;) | [optional] 
+ **created_after** | **str**| filter by created date (RFC3339 datetime, inclusive) | [optional] 
+ **created_before** | **str**| filter by created date (RFC3339 datetime, inclusive) | [optional] 
+ **updated_after** | **str**| filter by updated date (RFC3339 datetime, inclusive) | [optional] 
+ **updated_before** | **str**| filter by updated date (RFC3339 datetime, inclusive) | [optional] 
+ **activity_duration** | **str**| duration for hasActivity filter (e.g., \&quot;24h\&quot;, \&quot;7d\&quot;, \&quot;30d\&quot;). default \&quot;24h\&quot;, maximum \&quot;30d\&quot; (720h) | [optional] 
+
+### Return type
+
+[**EnvironmentsList**](EnvironmentsList.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | list of environments |  -  |
+**400** | bad request (e.g., activityDuration exceeds 30d, invalid date format, invalid operator) |  -  |
 **401** | unauthorized |  -  |
 **500** | internal server error |  -  |
 

@@ -149,6 +149,7 @@ Class | Method | HTTP request | Description
 *MetadataApi* | [**get_share_detail**](docs/MetadataApi.md#get_share_detail) | **GET** /detail/share/{shareToken} | 
 *MetadataApi* | [**get_share_metrics**](docs/MetadataApi.md#get_share_metrics) | **GET** /metrics/share/{shareToken} | 
 *MetadataApi* | [**get_sparklines**](docs/MetadataApi.md#get_sparklines) | **POST** /sparklines | 
+*MetadataApi* | [**list_environments**](docs/MetadataApi.md#list_environments) | **GET** /environments | 
 *MetadataApi* | [**list_memberships**](docs/MetadataApi.md#list_memberships) | **GET** /memberships | 
 *MetadataApi* | [**list_org_members**](docs/MetadataApi.md#list_org_members) | **GET** /members/{organizationToken} | 
 *MetadataApi* | [**org_account_overview**](docs/MetadataApi.md#org_account_overview) | **GET** /overview/{organizationToken}/{accountEmail} | 
@@ -197,6 +198,8 @@ Class | Method | HTTP request | Description
  - [EnrollRequest](docs/EnrollRequest.md)
  - [Environment](docs/Environment.md)
  - [EnvironmentAndResources](docs/EnvironmentAndResources.md)
+ - [EnvironmentSummary](docs/EnvironmentSummary.md)
+ - [EnvironmentsList](docs/EnvironmentsList.md)
  - [Frontend](docs/Frontend.md)
  - [GetSparklines200Response](docs/GetSparklines200Response.md)
  - [GetSparklinesRequest](docs/GetSparklinesRequest.md)

@@ -1165,6 +1165,128 @@ func init() {
         }
       }
     },
+    "/environments": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "listEnvironments",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "filter by description (case-insensitive substring match)",
+            "name": "description",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by host (case-insensitive substring match)",
+            "name": "host",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by address (exact match)",
+            "name": "address",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "filter by whether agent is enrolled",
+            "name": "remoteAgent",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "filter by whether environment has active shares",
+            "name": "hasShares",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "filter by whether environment has active accesses",
+            "name": "hasAccesses",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "filter by whether environment has metrics within activityDuration timeframe",
+            "name": "hasActivity",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by share count with operator (e.g., \"\u003e0\", \"\u003e=5\", \"=0\", \"\u003c10\", \"\u003c=3\")",
+            "name": "shareCount",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by access count with operator (e.g., \"\u003e0\", \"\u003e=5\", \"=0\", \"\u003c10\", \"\u003c=3\")",
+            "name": "accessCount",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by created date (RFC3339 datetime, inclusive)",
+            "name": "createdAfter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by created date (RFC3339 datetime, inclusive)",
+            "name": "createdBefore",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by updated date (RFC3339 datetime, inclusive)",
+            "name": "updatedAfter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by updated date (RFC3339 datetime, inclusive)",
+            "name": "updatedBefore",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)",
+            "name": "activityDuration",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list of environments",
+            "schema": {
+              "$ref": "#/definitions/environmentsList"
+            }
+          },
+          "400": {
+            "description": "bad request (e.g., activityDuration exceeds 30d, invalid date format, invalid operator)",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          }
+        }
+      }
+    },
     "/frontend": {
       "post": {
         "security": [
@@ -3568,10 +3690,59 @@ func init() {
         }
       }
     },
+    "environmentSummary": {
+      "type": "object",
+      "properties": {
+        "accessCount": {
+          "type": "integer"
+        },
+        "address": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "envZId": {
+          "type": "string"
+        },
+        "hasActivity": {
+          "type": "boolean"
+        },
+        "host": {
+          "type": "string"
+        },
+        "limited": {
+          "type": "boolean"
+        },
+        "remoteAgent": {
+          "type": "boolean"
+        },
+        "shareCount": {
+          "type": "integer"
+        },
+        "updatedAt": {
+          "type": "integer"
+        }
+      }
+    },
     "environments": {
       "type": "array",
       "items": {
         "$ref": "#/definitions/environment"
+      }
+    },
+    "environmentsList": {
+      "type": "object",
+      "properties": {
+        "environments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/environmentSummary"
+          }
+        }
       }
     },
     "errorMessage": {
@@ -4988,6 +5159,128 @@ func init() {
           },
           "500": {
             "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/environments": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "metadata"
+        ],
+        "operationId": "listEnvironments",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "filter by description (case-insensitive substring match)",
+            "name": "description",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by host (case-insensitive substring match)",
+            "name": "host",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by address (exact match)",
+            "name": "address",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "filter by whether agent is enrolled",
+            "name": "remoteAgent",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "filter by whether environment has active shares",
+            "name": "hasShares",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "filter by whether environment has active accesses",
+            "name": "hasAccesses",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "filter by whether environment has metrics within activityDuration timeframe",
+            "name": "hasActivity",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by share count with operator (e.g., \"\u003e0\", \"\u003e=5\", \"=0\", \"\u003c10\", \"\u003c=3\")",
+            "name": "shareCount",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by access count with operator (e.g., \"\u003e0\", \"\u003e=5\", \"=0\", \"\u003c10\", \"\u003c=3\")",
+            "name": "accessCount",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by created date (RFC3339 datetime, inclusive)",
+            "name": "createdAfter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by created date (RFC3339 datetime, inclusive)",
+            "name": "createdBefore",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by updated date (RFC3339 datetime, inclusive)",
+            "name": "updatedAfter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "filter by updated date (RFC3339 datetime, inclusive)",
+            "name": "updatedBefore",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)",
+            "name": "activityDuration",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list of environments",
+            "schema": {
+              "$ref": "#/definitions/environmentsList"
+            }
+          },
+          "400": {
+            "description": "bad request (e.g., activityDuration exceeds 30d, invalid date format, invalid operator)",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           }
         }
       }
@@ -7569,10 +7862,59 @@ func init() {
         }
       }
     },
+    "environmentSummary": {
+      "type": "object",
+      "properties": {
+        "accessCount": {
+          "type": "integer"
+        },
+        "address": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "envZId": {
+          "type": "string"
+        },
+        "hasActivity": {
+          "type": "boolean"
+        },
+        "host": {
+          "type": "string"
+        },
+        "limited": {
+          "type": "boolean"
+        },
+        "remoteAgent": {
+          "type": "boolean"
+        },
+        "shareCount": {
+          "type": "integer"
+        },
+        "updatedAt": {
+          "type": "integer"
+        }
+      }
+    },
     "environments": {
       "type": "array",
       "items": {
         "$ref": "#/definitions/environment"
+      }
+    },
+    "environmentsList": {
+      "type": "object",
+      "properties": {
+        "environments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/environmentSummary"
+          }
+        }
       }
     },
     "errorMessage": {

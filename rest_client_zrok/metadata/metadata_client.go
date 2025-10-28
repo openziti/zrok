@@ -50,6 +50,8 @@ type ClientService interface {
 
 	GetSparklines(params *GetSparklinesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetSparklinesOK, error)
 
+	ListEnvironments(params *ListEnvironmentsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListEnvironmentsOK, error)
+
 	ListMemberships(params *ListMembershipsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListMembershipsOK, error)
 
 	ListOrgMembers(params *ListOrgMembersParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListOrgMembersOK, error)
@@ -450,6 +452,45 @@ func (a *Client) GetSparklines(params *GetSparklinesParams, authInfo runtime.Cli
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for getSparklines: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+ListEnvironments list environments API
+*/
+func (a *Client) ListEnvironments(params *ListEnvironmentsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListEnvironmentsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewListEnvironmentsParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "listEnvironments",
+		Method:             "GET",
+		PathPattern:        "/environments",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ListEnvironmentsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ListEnvironmentsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listEnvironments: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

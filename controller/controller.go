@@ -113,6 +113,7 @@ func Run(inCfg *config.Config) error {
 		api.MetadataGetShareMetricsHandler = newGetShareMetricsHandler(cfg.Metrics.Influx)
 	}
 	api.MetadataGetEnvironmentDetailHandler = newEnvironmentDetailHandler()
+	api.MetadataListEnvironmentsHandler = newListEnvironmentsHandler()
 	api.MetadataGetFrontendDetailHandler = newGetFrontendDetailHandler()
 	api.MetadataGetShareDetailHandler = newShareDetailHandler()
 	api.MetadataListMembershipsHandler = newListMembershipsHandler()

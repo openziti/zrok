@@ -59,6 +59,8 @@ __all__ = [
     "EnrollRequest",
     "Environment",
     "EnvironmentAndResources",
+    "EnvironmentSummary",
+    "EnvironmentsList",
     "Frontend",
     "GetSparklines200Response",
     "GetSparklinesRequest",
@@ -162,6 +164,8 @@ from zrok_api.models.enroll200_response import Enroll200Response as Enroll200Res
 from zrok_api.models.enroll_request import EnrollRequest as EnrollRequest
 from zrok_api.models.environment import Environment as Environment
 from zrok_api.models.environment_and_resources import EnvironmentAndResources as EnvironmentAndResources
+from zrok_api.models.environment_summary import EnvironmentSummary as EnvironmentSummary
+from zrok_api.models.environments_list import EnvironmentsList as EnvironmentsList
 from zrok_api.models.frontend import Frontend as Frontend
 from zrok_api.models.get_sparklines200_response import GetSparklines200Response as GetSparklines200Response
 from zrok_api.models.get_sparklines_request import GetSparklinesRequest as GetSparklinesRequest

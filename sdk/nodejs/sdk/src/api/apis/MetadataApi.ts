@@ -18,6 +18,7 @@ import type {
   ClientVersionCheckRequest,
   Environment,
   EnvironmentAndResources,
+  EnvironmentsList,
   Frontend,
   GetSparklines200Response,
   GetSparklinesRequest,
@@ -36,6 +37,8 @@ import {
     EnvironmentToJSON,
     EnvironmentAndResourcesFromJSON,
     EnvironmentAndResourcesToJSON,
+    EnvironmentsListFromJSON,
+    EnvironmentsListToJSON,
     FrontendFromJSON,
     FrontendToJSON,
     GetSparklines200ResponseFromJSON,
@@ -90,6 +93,23 @@ export interface GetShareMetricsRequest {
 
 export interface GetSparklinesOperationRequest {
     body?: GetSparklinesRequest;
+}
+
+export interface ListEnvironmentsRequest {
+    description?: string;
+    host?: string;
+    address?: string;
+    remoteAgent?: boolean;
+    hasShares?: boolean;
+    hasAccesses?: boolean;
+    hasActivity?: boolean;
+    shareCount?: string;
+    accessCount?: string;
+    createdAfter?: string;
+    createdBefore?: string;
+    updatedAfter?: string;
+    updatedBefore?: string;
+    activityDuration?: string;
 }
 
 export interface ListOrgMembersRequest {
@@ -462,6 +482,93 @@ export class MetadataApi extends runtime.BaseAPI {
      */
     async getSparklines(requestParameters: GetSparklinesOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetSparklines200Response> {
         const response = await this.getSparklinesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async listEnvironmentsRaw(requestParameters: ListEnvironmentsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnvironmentsList>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['description'] != null) {
+            queryParameters['description'] = requestParameters['description'];
+        }
+
+        if (requestParameters['host'] != null) {
+            queryParameters['host'] = requestParameters['host'];
+        }
+
+        if (requestParameters['address'] != null) {
+            queryParameters['address'] = requestParameters['address'];
+        }
+
+        if (requestParameters['remoteAgent'] != null) {
+            queryParameters['remoteAgent'] = requestParameters['remoteAgent'];
+        }
+
+        if (requestParameters['hasShares'] != null) {
+            queryParameters['hasShares'] = requestParameters['hasShares'];
+        }
+
+        if (requestParameters['hasAccesses'] != null) {
+            queryParameters['hasAccesses'] = requestParameters['hasAccesses'];
+        }
+
+        if (requestParameters['hasActivity'] != null) {
+            queryParameters['hasActivity'] = requestParameters['hasActivity'];
+        }
+
+        if (requestParameters['shareCount'] != null) {
+            queryParameters['shareCount'] = requestParameters['shareCount'];
+        }
+
+        if (requestParameters['accessCount'] != null) {
+            queryParameters['accessCount'] = requestParameters['accessCount'];
+        }
+
+        if (requestParameters['createdAfter'] != null) {
+            queryParameters['createdAfter'] = requestParameters['createdAfter'];
+        }
+
+        if (requestParameters['createdBefore'] != null) {
+            queryParameters['createdBefore'] = requestParameters['createdBefore'];
+        }
+
+        if (requestParameters['updatedAfter'] != null) {
+            queryParameters['updatedAfter'] = requestParameters['updatedAfter'];
+        }
+
+        if (requestParameters['updatedBefore'] != null) {
+            queryParameters['updatedBefore'] = requestParameters['updatedBefore'];
+        }
+
+        if (requestParameters['activityDuration'] != null) {
+            queryParameters['activityDuration'] = requestParameters['activityDuration'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/environments`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EnvironmentsListFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async listEnvironments(requestParameters: ListEnvironmentsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnvironmentsList> {
+        const response = await this.listEnvironmentsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

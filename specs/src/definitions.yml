@@ -59,6 +59,40 @@ environmentAndResources:
     shares:
       $ref: "#/definitions/shares"
 
+environmentSummary:
+  type: object
+  properties:
+    envZId:
+      type: string
+    description:
+      type: string
+    host:
+      type: string
+    address:
+      type: string
+    remoteAgent:
+      type: boolean
+    shareCount:
+      type: integer
+    accessCount:
+      type: integer
+    hasActivity:
+      type: boolean
+    limited:
+      type: boolean
+    createdAt:
+      type: integer
+    updatedAt:
+      type: integer
+
+environmentsList:
+  type: object
+  properties:
+    environments:
+      type: array
+      items:
+        $ref: "#/definitions/environmentSummary"
+
 errorMessage:
   type: string
 

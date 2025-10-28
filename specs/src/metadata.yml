@@ -68,6 +68,86 @@
       500:
         description: internal server error
 
+/environments:
+  get:
+    tags:
+      - metadata
+    security:
+      - key: []
+    operationId: listEnvironments
+    parameters:
+      - name: description
+        in: query
+        type: string
+        description: filter by description (case-insensitive substring match)
+      - name: host
+        in: query
+        type: string
+        description: filter by host (case-insensitive substring match)
+      - name: address
+        in: query
+        type: string
+        description: filter by address (exact match)
+      - name: remoteAgent
+        in: query
+        type: boolean
+        description: filter by whether agent is enrolled
+      - name: hasShares
+        in: query
+        type: boolean
+        description: filter by whether environment has active shares
+      - name: hasAccesses
+        in: query
+        type: boolean
+        description: filter by whether environment has active accesses
+      - name: hasActivity
+        in: query
+        type: boolean
+        description: filter by whether environment has metrics within activityDuration timeframe
+      - name: shareCount
+        in: query
+        type: string
+        description: filter by share count with operator (e.g., ">0", ">=5", "=0", "<10", "<=3")
+      - name: accessCount
+        in: query
+        type: string
+        description: filter by access count with operator (e.g., ">0", ">=5", "=0", "<10", "<=3")
+      - name: createdAfter
+        in: query
+        type: string
+        description: filter by created date (RFC3339 datetime, inclusive)
+      - name: createdBefore
+        in: query
+        type: string
+        description: filter by created date (RFC3339 datetime, inclusive)
+      - name: updatedAfter
+        in: query
+        type: string
+        description: filter by updated date (RFC3339 datetime, inclusive)
+      - name: updatedBefore
+        in: query
+        type: string
+        description: filter by updated date (RFC3339 datetime, inclusive)
+      - name: activityDuration
+        in: query
+        type: string
+        description: duration for hasActivity filter (e.g., "24h", "7d", "30d"). default "24h", maximum "30d" (720h)
+    responses:
+      200:
+        description: list of environments
+        schema:
+          $ref: "#/definitions/environmentsList"
+      400:
+        description: bad request (e.g., activityDuration exceeds 30d, invalid date format, invalid operator)
+        schema:
+          $ref: "#/definitions/errorMessage"
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+        schema:
+          $ref: "#/definitions/errorMessage"
+
 /detail/frontend/{frontendId}:
   get:
     tags:

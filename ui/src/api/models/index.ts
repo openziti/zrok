@@ -25,6 +25,8 @@ export * from './Enroll200Response';
 export * from './EnrollRequest';
 export * from './Environment';
 export * from './EnvironmentAndResources';
+export * from './EnvironmentSummary';
+export * from './EnvironmentsList';
 export * from './Frontend';
 export * from './GetSparklines200Response';
 export * from './GetSparklinesRequest';

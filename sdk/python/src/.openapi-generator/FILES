@@ -30,6 +30,8 @@ docs/EnrollRequest.md
 docs/Environment.md
 docs/EnvironmentAndResources.md
 docs/EnvironmentApi.md
+docs/EnvironmentSummary.md
+docs/EnvironmentsList.md
 docs/Frontend.md
 docs/GetSparklines200Response.md
 docs/GetSparklinesRequest.md
@@ -120,6 +122,8 @@ test/test_enroll_request.py
 test/test_environment.py
 test/test_environment_and_resources.py
 test/test_environment_api.py
+test/test_environment_summary.py
+test/test_environments_list.py
 test/test_frontend.py
 test/test_get_sparklines200_response.py
 test/test_get_sparklines_request.py
@@ -216,6 +220,8 @@ zrok_api/models/enroll200_response.py
 zrok_api/models/enroll_request.py
 zrok_api/models/environment.py
 zrok_api/models/environment_and_resources.py
+zrok_api/models/environment_summary.py
+zrok_api/models/environments_list.py
 zrok_api/models/frontend.py
 zrok_api/models/get_sparklines200_response.py
 zrok_api/models/get_sparklines_request.py

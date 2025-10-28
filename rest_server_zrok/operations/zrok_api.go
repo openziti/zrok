@@ -158,6 +158,9 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		ShareListAllNamesHandler: share.ListAllNamesHandlerFunc(func(params share.ListAllNamesParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation share.ListAllNames has not yet been implemented")
 		}),
+		MetadataListEnvironmentsHandler: metadata.ListEnvironmentsHandlerFunc(func(params metadata.ListEnvironmentsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation metadata.ListEnvironments has not yet been implemented")
+		}),
 		AdminListFrontendNamespaceMappingsHandler: admin.ListFrontendNamespaceMappingsHandlerFunc(func(params admin.ListFrontendNamespaceMappingsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin.ListFrontendNamespaceMappings has not yet been implemented")
 		}),
@@ -397,6 +400,8 @@ type ZrokAPI struct {
 	AdminInviteTokenGenerateHandler admin.InviteTokenGenerateHandler
 	// ShareListAllNamesHandler sets the operation handler for the list all names operation
 	ShareListAllNamesHandler share.ListAllNamesHandler
+	// MetadataListEnvironmentsHandler sets the operation handler for the list environments operation
+	MetadataListEnvironmentsHandler metadata.ListEnvironmentsHandler
 	// AdminListFrontendNamespaceMappingsHandler sets the operation handler for the list frontend namespace mappings operation
 	AdminListFrontendNamespaceMappingsHandler admin.ListFrontendNamespaceMappingsHandler
 	// AdminListFrontendsHandler sets the operation handler for the list frontends operation
@@ -663,6 +668,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.ShareListAllNamesHandler == nil {
 		unregistered = append(unregistered, "share.ListAllNamesHandler")
+	}
+	if o.MetadataListEnvironmentsHandler == nil {
+		unregistered = append(unregistered, "metadata.ListEnvironmentsHandler")
 	}
 	if o.AdminListFrontendNamespaceMappingsHandler == nil {
 		unregistered = append(unregistered, "admin.ListFrontendNamespaceMappingsHandler")
@@ -1024,6 +1032,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/share/names"] = share.NewListAllNames(o.context, o.ShareListAllNamesHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/environments"] = metadata.NewListEnvironments(o.context, o.MetadataListEnvironmentsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

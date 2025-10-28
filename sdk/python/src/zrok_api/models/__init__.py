@@ -40,6 +40,8 @@ from zrok_api.models.enroll200_response import Enroll200Response
 from zrok_api.models.enroll_request import EnrollRequest
 from zrok_api.models.environment import Environment
 from zrok_api.models.environment_and_resources import EnvironmentAndResources
+from zrok_api.models.environment_summary import EnvironmentSummary
+from zrok_api.models.environments_list import EnvironmentsList
 from zrok_api.models.frontend import Frontend
 from zrok_api.models.get_sparklines200_response import GetSparklines200Response
 from zrok_api.models.get_sparklines_request import GetSparklinesRequest

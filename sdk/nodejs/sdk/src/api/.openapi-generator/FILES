@@ -32,6 +32,8 @@ models/Enroll200Response.ts
 models/EnrollRequest.ts
 models/Environment.ts
 models/EnvironmentAndResources.ts
+models/EnvironmentSummary.ts
+models/EnvironmentsList.ts
 models/Frontend.ts
 models/GetSparklines200Response.ts
 models/GetSparklinesRequest.ts

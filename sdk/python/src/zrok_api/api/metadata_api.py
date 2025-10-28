@@ -16,12 +16,14 @@ from pydantic import validate_call, Field, StrictFloat, StrictStr, StrictInt
 from typing import Any, Dict, List, Optional, Tuple, Union
 from typing_extensions import Annotated
 
-from pydantic import StrictInt, StrictStr
+from pydantic import Field, StrictBool, StrictInt, StrictStr
 from typing import List, Optional
+from typing_extensions import Annotated
 from zrok_api.models.client_version_check_request import ClientVersionCheckRequest
 from zrok_api.models.configuration import Configuration
 from zrok_api.models.environment import Environment
 from zrok_api.models.environment_and_resources import EnvironmentAndResources
+from zrok_api.models.environments_list import EnvironmentsList
 from zrok_api.models.frontend import Frontend
 from zrok_api.models.get_sparklines200_response import GetSparklines200Response
 from zrok_api.models.get_sparklines_request import GetSparklinesRequest
@@ -2708,6 +2710,496 @@ class MetadataApi:
         return self.api_client.param_serialize(
             method='POST',
             resource_path='/sparklines',
+            path_params=_path_params,
+            query_params=_query_params,
+            header_params=_header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            auth_settings=_auth_settings,
+            collection_formats=_collection_formats,
+            _host=_host,
+            _request_auth=_request_auth
+        )
+
+
+
+
+    @validate_call
+    def list_environments(
+        self,
+        description: Annotated[Optional[StrictStr], Field(description="filter by description (case-insensitive substring match)")] = None,
+        host: Annotated[Optional[StrictStr], Field(description="filter by host (case-insensitive substring match)")] = None,
+        address: Annotated[Optional[StrictStr], Field(description="filter by address (exact match)")] = None,
+        remote_agent: Annotated[Optional[StrictBool], Field(description="filter by whether agent is enrolled")] = None,
+        has_shares: Annotated[Optional[StrictBool], Field(description="filter by whether environment has active shares")] = None,
+        has_accesses: Annotated[Optional[StrictBool], Field(description="filter by whether environment has active accesses")] = None,
+        has_activity: Annotated[Optional[StrictBool], Field(description="filter by whether environment has metrics within activityDuration timeframe")] = None,
+        share_count: Annotated[Optional[StrictStr], Field(description="filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")")] = None,
+        access_count: Annotated[Optional[StrictStr], Field(description="filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")")] = None,
+        created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 datetime, inclusive)")] = None,
+        created_before: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 datetime, inclusive)")] = None,
+        updated_after: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 datetime, inclusive)")] = None,
+        updated_before: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 datetime, inclusive)")] = None,
+        activity_duration: Annotated[Optional[StrictStr], Field(description="duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> EnvironmentsList:
+        """list_environments
+
+
+        :param description: filter by description (case-insensitive substring match)
+        :type description: str
+        :param host: filter by host (case-insensitive substring match)
+        :type host: str
+        :param address: filter by address (exact match)
+        :type address: str
+        :param remote_agent: filter by whether agent is enrolled
+        :type remote_agent: bool
+        :param has_shares: filter by whether environment has active shares
+        :type has_shares: bool
+        :param has_accesses: filter by whether environment has active accesses
+        :type has_accesses: bool
+        :param has_activity: filter by whether environment has metrics within activityDuration timeframe
+        :type has_activity: bool
+        :param share_count: filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")
+        :type share_count: str
+        :param access_count: filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")
+        :type access_count: str
+        :param created_after: filter by created date (RFC3339 datetime, inclusive)
+        :type created_after: str
+        :param created_before: filter by created date (RFC3339 datetime, inclusive)
+        :type created_before: str
+        :param updated_after: filter by updated date (RFC3339 datetime, inclusive)
+        :type updated_after: str
+        :param updated_before: filter by updated date (RFC3339 datetime, inclusive)
+        :type updated_before: str
+        :param activity_duration: duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)
+        :type activity_duration: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._list_environments_serialize(
+            description=description,
+            host=host,
+            address=address,
+            remote_agent=remote_agent,
+            has_shares=has_shares,
+            has_accesses=has_accesses,
+            has_activity=has_activity,
+            share_count=share_count,
+            access_count=access_count,
+            created_after=created_after,
+            created_before=created_before,
+            updated_after=updated_after,
+            updated_before=updated_before,
+            activity_duration=activity_duration,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "EnvironmentsList",
+            '400': "str",
+            '401': None,
+            '500': "str",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        ).data
+
+
+    @validate_call
+    def list_environments_with_http_info(
+        self,
+        description: Annotated[Optional[StrictStr], Field(description="filter by description (case-insensitive substring match)")] = None,
+        host: Annotated[Optional[StrictStr], Field(description="filter by host (case-insensitive substring match)")] = None,
+        address: Annotated[Optional[StrictStr], Field(description="filter by address (exact match)")] = None,
+        remote_agent: Annotated[Optional[StrictBool], Field(description="filter by whether agent is enrolled")] = None,
+        has_shares: Annotated[Optional[StrictBool], Field(description="filter by whether environment has active shares")] = None,
+        has_accesses: Annotated[Optional[StrictBool], Field(description="filter by whether environment has active accesses")] = None,
+        has_activity: Annotated[Optional[StrictBool], Field(description="filter by whether environment has metrics within activityDuration timeframe")] = None,
+        share_count: Annotated[Optional[StrictStr], Field(description="filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")")] = None,
+        access_count: Annotated[Optional[StrictStr], Field(description="filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")")] = None,
+        created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 datetime, inclusive)")] = None,
+        created_before: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 datetime, inclusive)")] = None,
+        updated_after: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 datetime, inclusive)")] = None,
+        updated_before: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 datetime, inclusive)")] = None,
+        activity_duration: Annotated[Optional[StrictStr], Field(description="duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> ApiResponse[EnvironmentsList]:
+        """list_environments
+
+
+        :param description: filter by description (case-insensitive substring match)
+        :type description: str
+        :param host: filter by host (case-insensitive substring match)
+        :type host: str
+        :param address: filter by address (exact match)
+        :type address: str
+        :param remote_agent: filter by whether agent is enrolled
+        :type remote_agent: bool
+        :param has_shares: filter by whether environment has active shares
+        :type has_shares: bool
+        :param has_accesses: filter by whether environment has active accesses
+        :type has_accesses: bool
+        :param has_activity: filter by whether environment has metrics within activityDuration timeframe
+        :type has_activity: bool
+        :param share_count: filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")
+        :type share_count: str
+        :param access_count: filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")
+        :type access_count: str
+        :param created_after: filter by created date (RFC3339 datetime, inclusive)
+        :type created_after: str
+        :param created_before: filter by created date (RFC3339 datetime, inclusive)
+        :type created_before: str
+        :param updated_after: filter by updated date (RFC3339 datetime, inclusive)
+        :type updated_after: str
+        :param updated_before: filter by updated date (RFC3339 datetime, inclusive)
+        :type updated_before: str
+        :param activity_duration: duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)
+        :type activity_duration: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._list_environments_serialize(
+            description=description,
+            host=host,
+            address=address,
+            remote_agent=remote_agent,
+            has_shares=has_shares,
+            has_accesses=has_accesses,
+            has_activity=has_activity,
+            share_count=share_count,
+            access_count=access_count,
+            created_after=created_after,
+            created_before=created_before,
+            updated_after=updated_after,
+            updated_before=updated_before,
+            activity_duration=activity_duration,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "EnvironmentsList",
+            '400': "str",
+            '401': None,
+            '500': "str",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        response_data.read()
+        return self.api_client.response_deserialize(
+            response_data=response_data,
+            response_types_map=_response_types_map,
+        )
+
+
+    @validate_call
+    def list_environments_without_preload_content(
+        self,
+        description: Annotated[Optional[StrictStr], Field(description="filter by description (case-insensitive substring match)")] = None,
+        host: Annotated[Optional[StrictStr], Field(description="filter by host (case-insensitive substring match)")] = None,
+        address: Annotated[Optional[StrictStr], Field(description="filter by address (exact match)")] = None,
+        remote_agent: Annotated[Optional[StrictBool], Field(description="filter by whether agent is enrolled")] = None,
+        has_shares: Annotated[Optional[StrictBool], Field(description="filter by whether environment has active shares")] = None,
+        has_accesses: Annotated[Optional[StrictBool], Field(description="filter by whether environment has active accesses")] = None,
+        has_activity: Annotated[Optional[StrictBool], Field(description="filter by whether environment has metrics within activityDuration timeframe")] = None,
+        share_count: Annotated[Optional[StrictStr], Field(description="filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")")] = None,
+        access_count: Annotated[Optional[StrictStr], Field(description="filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")")] = None,
+        created_after: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 datetime, inclusive)")] = None,
+        created_before: Annotated[Optional[StrictStr], Field(description="filter by created date (RFC3339 datetime, inclusive)")] = None,
+        updated_after: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 datetime, inclusive)")] = None,
+        updated_before: Annotated[Optional[StrictStr], Field(description="filter by updated date (RFC3339 datetime, inclusive)")] = None,
+        activity_duration: Annotated[Optional[StrictStr], Field(description="duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)")] = None,
+        _request_timeout: Union[
+            None,
+            Annotated[StrictFloat, Field(gt=0)],
+            Tuple[
+                Annotated[StrictFloat, Field(gt=0)],
+                Annotated[StrictFloat, Field(gt=0)]
+            ]
+        ] = None,
+        _request_auth: Optional[Dict[StrictStr, Any]] = None,
+        _content_type: Optional[StrictStr] = None,
+        _headers: Optional[Dict[StrictStr, Any]] = None,
+        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
+    ) -> RESTResponseType:
+        """list_environments
+
+
+        :param description: filter by description (case-insensitive substring match)
+        :type description: str
+        :param host: filter by host (case-insensitive substring match)
+        :type host: str
+        :param address: filter by address (exact match)
+        :type address: str
+        :param remote_agent: filter by whether agent is enrolled
+        :type remote_agent: bool
+        :param has_shares: filter by whether environment has active shares
+        :type has_shares: bool
+        :param has_accesses: filter by whether environment has active accesses
+        :type has_accesses: bool
+        :param has_activity: filter by whether environment has metrics within activityDuration timeframe
+        :type has_activity: bool
+        :param share_count: filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")
+        :type share_count: str
+        :param access_count: filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\")
+        :type access_count: str
+        :param created_after: filter by created date (RFC3339 datetime, inclusive)
+        :type created_after: str
+        :param created_before: filter by created date (RFC3339 datetime, inclusive)
+        :type created_before: str
+        :param updated_after: filter by updated date (RFC3339 datetime, inclusive)
+        :type updated_after: str
+        :param updated_before: filter by updated date (RFC3339 datetime, inclusive)
+        :type updated_before: str
+        :param activity_duration: duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h)
+        :type activity_duration: str
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :type _request_timeout: int, tuple(int, int), optional
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the
+                              authentication in the spec for a single request.
+        :type _request_auth: dict, optional
+        :param _content_type: force content-type for the request.
+        :type _content_type: str, Optional
+        :param _headers: set to override the headers for a single
+                         request; this effectively ignores the headers
+                         in the spec for a single request.
+        :type _headers: dict, optional
+        :param _host_index: set to override the host_index for a single
+                            request; this effectively ignores the host_index
+                            in the spec for a single request.
+        :type _host_index: int, optional
+        :return: Returns the result object.
+        """ # noqa: E501
+
+        _param = self._list_environments_serialize(
+            description=description,
+            host=host,
+            address=address,
+            remote_agent=remote_agent,
+            has_shares=has_shares,
+            has_accesses=has_accesses,
+            has_activity=has_activity,
+            share_count=share_count,
+            access_count=access_count,
+            created_after=created_after,
+            created_before=created_before,
+            updated_after=updated_after,
+            updated_before=updated_before,
+            activity_duration=activity_duration,
+            _request_auth=_request_auth,
+            _content_type=_content_type,
+            _headers=_headers,
+            _host_index=_host_index
+        )
+
+        _response_types_map: Dict[str, Optional[str]] = {
+            '200': "EnvironmentsList",
+            '400': "str",
+            '401': None,
+            '500': "str",
+        }
+        response_data = self.api_client.call_api(
+            *_param,
+            _request_timeout=_request_timeout
+        )
+        return response_data.response
+
+
+    def _list_environments_serialize(
+        self,
+        description,
+        host,
+        address,
+        remote_agent,
+        has_shares,
+        has_accesses,
+        has_activity,
+        share_count,
+        access_count,
+        created_after,
+        created_before,
+        updated_after,
+        updated_before,
+        activity_duration,
+        _request_auth,
+        _content_type,
+        _headers,
+        _host_index,
+    ) -> RequestSerialized:
+
+        _host = None
+
+        _collection_formats: Dict[str, str] = {
+        }
+
+        _path_params: Dict[str, str] = {}
+        _query_params: List[Tuple[str, str]] = []
+        _header_params: Dict[str, Optional[str]] = _headers or {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[
+            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
+        ] = {}
+        _body_params: Optional[bytes] = None
+
+        # process the path parameters
+        # process the query parameters
+        if description is not None:
+            
+            _query_params.append(('description', description))
+            
+        if host is not None:
+            
+            _query_params.append(('host', host))
+            
+        if address is not None:
+            
+            _query_params.append(('address', address))
+            
+        if remote_agent is not None:
+            
+            _query_params.append(('remoteAgent', remote_agent))
+            
+        if has_shares is not None:
+            
+            _query_params.append(('hasShares', has_shares))
+            
+        if has_accesses is not None:
+            
+            _query_params.append(('hasAccesses', has_accesses))
+            
+        if has_activity is not None:
+            
+            _query_params.append(('hasActivity', has_activity))
+            
+        if share_count is not None:
+            
+            _query_params.append(('shareCount', share_count))
+            
+        if access_count is not None:
+            
+            _query_params.append(('accessCount', access_count))
+            
+        if created_after is not None:
+            
+            _query_params.append(('createdAfter', created_after))
+            
+        if created_before is not None:
+            
+            _query_params.append(('createdBefore', created_before))
+            
+        if updated_after is not None:
+            
+            _query_params.append(('updatedAfter', updated_after))
+            
+        if updated_before is not None:
+            
+            _query_params.append(('updatedBefore', updated_before))
+            
+        if activity_duration is not None:
+            
+            _query_params.append(('activityDuration', activity_duration))
+            
+        # process the header parameters
+        # process the form parameters
+        # process the body parameter
+
+
+        # set the HTTP header `Accept`
+        if 'Accept' not in _header_params:
+            _header_params['Accept'] = self.api_client.select_header_accept(
+                [
+                    'application/zrok.v1+json'
+                ]
+            )
+
+
+        # authentication setting
+        _auth_settings: List[str] = [
+            'key'
+        ]
+
+        return self.api_client.param_serialize(
+            method='GET',
+            resource_path='/environments',
             path_params=_path_params,
             query_params=_query_params,
             header_params=_header_params,

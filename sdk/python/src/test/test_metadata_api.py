@@ -86,6 +86,12 @@ class TestMetadataApi(unittest.TestCase):
         """
         pass
 
+    def test_list_environments(self) -> None:
+        """Test case for list_environments
+
+        """
+        pass
+
     def test_list_memberships(self) -> None:
         """Test case for list_memberships
 
