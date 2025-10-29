@@ -103,7 +103,7 @@ func (h *listEnvironmentsHandler) Handle(params metadata.ListEnvironmentsParams,
 	envs, err := str.FindEnvironmentsForAccountWithFilter(int(principal.ID), filter, trx)
 	if err != nil {
 		dl.Errorf("error finding environments for user '%v': %v", principal.Email, err)
-		return metadata.NewListEnvironmentsInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return metadata.NewListEnvironmentsInternalServerError()
 	}
 
 	// validate that hasActivity and idle are not both set
@@ -151,7 +151,7 @@ func (h *listEnvironmentsHandler) Handle(params metadata.ListEnvironmentsParams,
 		agentEnvIds, err = findEnvironmentsWithAgents(envs, trx)
 		if err != nil {
 			dl.Errorf("error checking remote agents for user '%v': %v", principal.Email, err)
-			return metadata.NewListEnvironmentsInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+			return metadata.NewListEnvironmentsInternalServerError()
 		}
 	}
 

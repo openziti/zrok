@@ -98,7 +98,7 @@ func (h *listSharesHandler) Handle(params metadata.ListSharesParams, principal *
 	shares, err := str.FindSharesForAccountWithFilter(int(principal.ID), filter, trx)
 	if err != nil {
 		dl.Errorf("error finding shares for user '%v': %v", principal.Email, err)
-		return metadata.NewListSharesInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return metadata.NewListSharesInternalServerError()
 	}
 
 	// validate that hasActivity and idle are not both set

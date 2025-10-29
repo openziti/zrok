@@ -84,7 +84,7 @@ func (h *listAccessesHandler) Handle(params metadata.ListAccessesParams, princip
 	frontends, err := str.FindFrontendsForAccountWithFilter(int(principal.ID), filter, trx)
 	if err != nil {
 		dl.Errorf("error finding frontends for user '%v': %v", principal.Email, err)
-		return metadata.NewListAccessesInternalServerError().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+		return metadata.NewListAccessesInternalServerError()
 	}
 
 	// check account limits
