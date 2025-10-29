@@ -8,7 +8,10 @@ FEATURE: `zrok share private` now includes a `--share-token` flag, which allows 
 
 FEATURE: `zrok modify name` command available to "upgrade" an ephemeral share name to a reserved share name. If you share something ephemerally and later decide that you want to persist that name for future use you can just `zrok modify name -r` that name and retain it indefinitely (or conversely `zrok modify name -r=false` to schedule a reserved name to be released when an associated share is terminated). (https://github.com/openziti/zrok/issues/1066)
 
-FEATURE: New `zrok list environments` command available to query the environments contained in the user's account; supports filtering on activity, accesses, shares, descriptions, host, ip address, and other relevant search criteria. By default outputs human-readable tabular output, but has a `--json` option to emit the values as JSON. (https://github.com/openziti/zrok/issues/1107)
+FEATURE: New `zrok list environments`, `zrok list shares`, and `zrok list accesses` commands available to query the environments, shares, and accesses contained in the user's account; supports filtering on activity, accesses, shares, descriptions, host, ip address, and other relevant search criteria. By default outputs human-readable tabular output, but has a `--json` option to emit the values as JSON. (https://github.com/openziti/zrok/issues/1107)
+
+FEATURE: New `zrok delete environment` command that allows for deleting environments other than the current enabled environment. Use `zrok list environments --idle` to find idle environments and remove them using `zrok delete environment`. (https://github.com/openziti/zrok/issues/1107)
+
 
 FEATURE: New `zrok access dynamicProxy` which is designed to work with the new namespaces/names functionality. Rather than parsing the `Host` header and trying to extract a share token, the new `dynamicProxy` receives mapping updates from the zrok controller, allowing it to support any kind of mapped name. See the [zrok dynamicProxy Guide](https://docs.zrok.io) for details on setting up the new frontend. `zrok access public` remains available for legacy-style setups. (https://github.com/openziti/zrok/issues/1041)
 
@@ -19,6 +22,8 @@ FEATURE: The zrok Agent has been updated for v2 name selections. Now that "reser
 FEATURE: `zrok overview` now includes a human-readable default output, that formats the details of your zrok account in an easy-to-understand format. The classic JSON output is still available using the `--json` flag. (https://github.com/openziti/zrok/issues/1064)
 
 FEATURE: `zrok admin migrate` now supports a `--down <n>` flag, which allows for reverse-migration by a specified number of migrations
+
+CHANGE: `zrok status` now shows `EnvZId` instead of `Ziti Identity` in output. (https://github.com/openziti/zrok/issues/1107)
 
 CHANGE: `defaultFrontend` configuration replaced with new `defaultNamespace`, which provides the logical equivalent of the old name-handling configuration (https://github.com/openziti/zrok/issues/1065)
 
