@@ -71,7 +71,7 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 		t.AppendHeader(table.Row{"Property", "Value"})
 		if cmd.secrets {
 			t.AppendRow(table.Row{"Account Token", env.Environment().AccountToken})
-			t.AppendRow(table.Row{"Ziti Identity", env.Environment().ZitiIdentity})
+			t.AppendRow(table.Row{"EnvZId", env.Environment().ZitiIdentity})
 		} else {
 			secretToken := "<<SET>>"
 			if env.Environment().AccountToken == "" {
@@ -83,7 +83,7 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 			if env.Environment().ZitiIdentity == "" {
 				zId = "<<UNSET>>"
 			}
-			t.AppendRow(table.Row{"Ziti Identity", zId})
+			t.AppendRow(table.Row{"EnvZId", zId})
 		}
 		t.Render()
 	}

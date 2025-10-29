@@ -41,6 +41,28 @@ func mustGetEnvironmentAuth() (env_core.Root, runtime.ClientAuthInfoWriter) {
 	return env, auth
 }
 
+// getEnvironmentAuthOptional returns environment and auth from either local environment or provided account token (for
+// non-enabled shells).
+func getEnvironmentAuthOptional(accountToken string) (env_core.Root, runtime.ClientAuthInfoWriter, error) {
+	env, err := environment.LoadRoot()
+
+	if err == nil && env.IsEnabled() && accountToken != "" {
+		return nil, nil, fmt.Errorf("cannot use --account-token when an enabled environment exists")
+	}
+
+	var token string
+	if err == nil && env != nil && env.IsEnabled() {
+		token = env.Environment().AccountToken
+	} else if accountToken != "" {
+		token = accountToken
+	} else {
+		return nil, nil, fmt.Errorf("no local environemnt found and no --acount-token provider; either enable an environ")
+	}
+
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", token)
+	return env, auth, nil
+}
+
 func parseUrl(in string) (string, error) {
 	// parse port-only urls
 	if iv, err := strconv.ParseInt(in, 10, 0); err == nil {
