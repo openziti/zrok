@@ -30,10 +30,11 @@ class ListFrontends200ResponseInner(BaseModel):
     z_id: Optional[StrictStr] = Field(default=None, alias="zId")
     url_template: Optional[StrictStr] = Field(default=None, alias="urlTemplate")
     public_name: Optional[StrictStr] = Field(default=None, alias="publicName")
+    permission_mode: Optional[StrictStr] = Field(default=None, alias="permissionMode")
     dynamic: Optional[StrictBool] = None
     created_at: Optional[StrictInt] = Field(default=None, alias="createdAt")
     updated_at: Optional[StrictInt] = Field(default=None, alias="updatedAt")
-    __properties: ClassVar[List[str]] = ["frontendToken", "zId", "urlTemplate", "publicName", "dynamic", "createdAt", "updatedAt"]
+    __properties: ClassVar[List[str]] = ["frontendToken", "zId", "urlTemplate", "publicName", "permissionMode", "dynamic", "createdAt", "updatedAt"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -90,6 +91,7 @@ class ListFrontends200ResponseInner(BaseModel):
             "zId": obj.get("zId"),
             "urlTemplate": obj.get("urlTemplate"),
             "publicName": obj.get("publicName"),
+            "permissionMode": obj.get("permissionMode"),
             "dynamic": obj.get("dynamic"),
             "createdAt": obj.get("createdAt"),
             "updatedAt": obj.get("updatedAt")

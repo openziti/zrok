@@ -45,6 +45,12 @@ export interface ListFrontends200ResponseInner {
     publicName?: string;
     /**
      * 
+     * @type {string}
+     * @memberof ListFrontends200ResponseInner
+     */
+    permissionMode?: string;
+    /**
+     * 
      * @type {boolean}
      * @memberof ListFrontends200ResponseInner
      */
@@ -84,6 +90,7 @@ export function ListFrontends200ResponseInnerFromJSONTyped(json: any, ignoreDisc
         'zId': json['zId'] == null ? undefined : json['zId'],
         'urlTemplate': json['urlTemplate'] == null ? undefined : json['urlTemplate'],
         'publicName': json['publicName'] == null ? undefined : json['publicName'],
+        'permissionMode': json['permissionMode'] == null ? undefined : json['permissionMode'],
         'dynamic': json['dynamic'] == null ? undefined : json['dynamic'],
         'createdAt': json['createdAt'] == null ? undefined : json['createdAt'],
         'updatedAt': json['updatedAt'] == null ? undefined : json['updatedAt'],
@@ -105,6 +112,7 @@ export function ListFrontends200ResponseInnerToJSONTyped(value?: ListFrontends20
         'zId': value['zId'],
         'urlTemplate': value['urlTemplate'],
         'publicName': value['publicName'],
+        'permissionMode': value['permissionMode'],
         'dynamic': value['dynamic'],
         'createdAt': value['createdAt'],
         'updatedAt': value['updatedAt'],

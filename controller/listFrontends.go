@@ -35,11 +35,12 @@ func (h *listFrontendsHandler) Handle(params admin.ListFrontendsParams, principa
 	var frontends []*admin.ListFrontendsOKBodyItems0
 	for _, sfe := range sfes {
 		frontend := &admin.ListFrontendsOKBodyItems0{
-			FrontendToken: sfe.Token,
-			ZID:           sfe.ZId,
-			CreatedAt:     sfe.CreatedAt.UnixMilli(),
-			UpdatedAt:     sfe.UpdatedAt.UnixMilli(),
-			Dynamic:       sfe.Dynamic,
+			FrontendToken:  sfe.Token,
+			ZID:            sfe.ZId,
+			CreatedAt:      sfe.CreatedAt.UnixMilli(),
+			UpdatedAt:      sfe.UpdatedAt.UnixMilli(),
+			Dynamic:        sfe.Dynamic,
+			PermissionMode: string(sfe.PermissionMode),
 		}
 		if sfe.UrlTemplate != nil {
 			frontend.URLTemplate = *sfe.UrlTemplate

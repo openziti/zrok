@@ -55,9 +55,9 @@ func (cmd *adminListFrontendsCommand) run(_ *cobra.Command, _ []string) {
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleRounded)
 	if cmd.extra {
-		t.AppendHeader(table.Row{"Frontend Token", "zId", "Public Name", "Url Template", "Dynamic", "Created At", "Updated At"})
+		t.AppendHeader(table.Row{"Frontend Token", "zId", "Public Name", "Url Template", "Permission Mode", "Dynamic", "Created At", "Updated At"})
 	} else {
-		t.AppendHeader(table.Row{"Frontend Token", "zId", "Public Name", "Dynamic", "Updated At"})
+		t.AppendHeader(table.Row{"Frontend Token", "zId", "Public Name", "Permission Mode", "Dynamic", "Updated At"})
 	}
 	for _, pfe := range resp.Payload {
 		if cmd.extra {
@@ -66,6 +66,7 @@ func (cmd *adminListFrontendsCommand) run(_ *cobra.Command, _ []string) {
 				pfe.ZID,
 				pfe.PublicName,
 				pfe.URLTemplate,
+				pfe.PermissionMode,
 				pfe.Dynamic,
 				time.UnixMilli(pfe.CreatedAt),
 				time.UnixMilli(pfe.UpdatedAt),
@@ -75,6 +76,7 @@ func (cmd *adminListFrontendsCommand) run(_ *cobra.Command, _ []string) {
 				pfe.FrontendToken,
 				pfe.ZID,
 				pfe.PublicName,
+				pfe.PermissionMode,
 				pfe.Dynamic,
 				time.UnixMilli(pfe.UpdatedAt),
 			})

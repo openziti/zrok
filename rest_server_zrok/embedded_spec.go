@@ -1712,6 +1712,9 @@ func init() {
                   "frontendToken": {
                     "type": "string"
                   },
+                  "permissionMode": {
+                    "type": "string"
+                  },
                   "publicName": {
                     "type": "string"
                   },
@@ -8087,6 +8090,9 @@ func init() {
           "type": "boolean"
         },
         "frontendToken": {
+          "type": "string"
+        },
+        "permissionMode": {
           "type": "string"
         },
         "publicName": {

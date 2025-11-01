@@ -87,6 +87,9 @@ type ListFrontendsOKBodyItems0 struct {
 	// frontend token
 	FrontendToken string `json:"frontendToken,omitempty"`
 
+	// permission mode
+	PermissionMode string `json:"permissionMode,omitempty"`
+
 	// public name
 	PublicName string `json:"publicName,omitempty"`
 

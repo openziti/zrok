@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **z_id** | **str** |  | [optional] 
 **url_template** | **str** |  | [optional] 
 **public_name** | **str** |  | [optional] 
+**permission_mode** | **str** |  | [optional] 
 **dynamic** | **bool** |  | [optional] 
 **created_at** | **int** |  | [optional] 
 **updated_at** | **int** |  | [optional] 

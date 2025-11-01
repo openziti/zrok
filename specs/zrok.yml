@@ -481,6 +481,8 @@ paths:
                   type: string
                 publicName:
                   type: string
+                permissionMode:
+                  type: string
                 dynamic:
                   type: boolean
                 createdAt:
