@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -15,7 +16,8 @@ func init() {
 }
 
 type listNamespacesCommand struct {
-	cmd *cobra.Command
+	cmd  *cobra.Command
+	json bool
 }
 
 func newListNamespacesCommand() *listNamespacesCommand {
@@ -25,6 +27,7 @@ func newListNamespacesCommand() *listNamespacesCommand {
 		Args:  cobra.NoArgs,
 	}
 	command := &listNamespacesCommand{cmd: cmd}
+	cmd.Flags().BoolVar(&command.json, "json", false, "output raw JSON instead of formatted tables")
 	cmd.Run = command.run
 	return command
 }
@@ -41,6 +44,15 @@ func (cmd *listNamespacesCommand) run(_ *cobra.Command, _ []string) {
 	resp, err := zrok.Share.ListShareNamespaces(req, auth)
 	if err != nil {
 		dl.Fatal(err)
+	}
+
+	if cmd.json {
+		jsonBytes, err := json.MarshalIndent(resp.Payload, "", "  ")
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(jsonBytes))
+		return
 	}
 
 	fmt.Println()

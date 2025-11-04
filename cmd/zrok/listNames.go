@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"time"
@@ -18,6 +19,7 @@ func init() {
 type listNamesCommand struct {
 	cmd            *cobra.Command
 	namespaceToken string
+	json           bool
 }
 
 func newListNamesCommand() *listNamesCommand {
@@ -28,6 +30,7 @@ func newListNamesCommand() *listNamesCommand {
 	}
 	command := &listNamesCommand{cmd: cmd}
 	cmd.Flags().StringVarP(&command.namespaceToken, "namespace-token", "n", "", "namespace token")
+	cmd.Flags().BoolVar(&command.json, "json", false, "output raw JSON instead of formatted tables")
 	cmd.Run = command.run
 	return command
 }
@@ -56,6 +59,15 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 			panic(err)
 		}
 
+		if cmd.json {
+			jsonBytes, err := json.MarshalIndent(resp.Payload, "", "  ")
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println(string(jsonBytes))
+			return
+		}
+
 		for _, name := range resp.Payload {
 			t.AppendRow(table.Row{
 				util.NameInNamespace(name.Name, name.NamespaceName),
@@ -73,6 +85,15 @@ func (cmd *listNamesCommand) run(_ *cobra.Command, args []string) {
 		resp, err := zrok.Share.ListAllNames(req, auth)
 		if err != nil {
 			panic(err)
+		}
+
+		if cmd.json {
+			jsonBytes, err := json.MarshalIndent(resp.Payload, "", "  ")
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println(string(jsonBytes))
+			return
 		}
 
 		for _, name := range resp.Payload {
