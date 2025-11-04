@@ -1,0 +1,205 @@
+/changePassword:
+  post:
+    tags:
+      - account
+    security:
+      - key: []
+    operationId: changePassword
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            email:
+              type: string
+            oldPassword:
+              type: string
+            newPassword:
+              type: string
+    responses:
+      200:
+        description: password changed
+      400:
+        description: password not changed
+      401:
+        description: unauthorized
+      422:
+        description: password validation failure
+        schema:
+          $ref: '#/definitions/errorMessage'
+      500:
+        description: internal server error
+
+/invite:
+  post:
+    tags:
+      - account
+    operationId: invite
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            email:
+              type: string
+            inviteToken:
+              type: string
+    responses:
+      201:
+        description: invitation created
+      400:
+        description: invitation not created (already exists)
+        schema:
+          $ref: '#/definitions/errorMessage'
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+/login:
+  post:
+    tags:
+      - account
+    operationId: login
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            email:
+              type: string
+            password:
+              type: string
+    responses:
+      200:
+        description: login successful
+        schema:
+          type: string
+      401:
+        description: invalid login
+
+/regenerateAccountToken:
+  post:
+    tags:
+      - account
+    security:
+      - key: []
+    operationId: regenerateAccountToken
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            emailAddress:
+              type: string
+    responses:
+      200:
+        description: regenerate account token
+        schema:
+          properties:
+            accountToken:
+              type: string
+      404:
+        description: account not found
+      500:
+        description: internal server error
+
+/register:
+  post:
+    tags:
+      - account
+    operationId: register
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            registerToken:
+              type: string
+            password:
+              type: string
+    responses:
+      200:
+        description: account created
+        schema:
+          properties:
+            accountToken:
+              type: string
+      404:
+        description: request not found
+      422:
+        description: password validation failure
+        schema:
+          $ref: '#/definitions/errorMessage'
+      500:
+        description: internal server error
+
+/resetPassword:
+  post:
+    tags:
+      - account
+    operationId: resetPassword
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            resetToken:
+              type: string
+            password:
+              type: string
+    responses:
+      200:
+        description: password reset
+      404:
+        description: request not found
+      422:
+        description: password validation failure
+        schema:
+          $ref: '#/definitions/errorMessage'
+      500:
+        description: internal server error
+
+/resetPasswordRequest:
+  post:
+    tags:
+      - account
+    operationId: resetPasswordRequest
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            emailAddress:
+              type: string
+    responses:
+      201:
+        description: reset password request created
+      400:
+        description: reset password request not created
+      500:
+        description: internal server error
+
+/verify:
+  post:
+    tags:
+      - account
+    operationId: verify
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            registerToken:
+              type: string
+    responses:
+      200:
+        description: registration token ready
+        schema:
+          properties:
+            email:
+              type: string
+      404:
+        description: registration token not found
+      500:
+        description: internal server error

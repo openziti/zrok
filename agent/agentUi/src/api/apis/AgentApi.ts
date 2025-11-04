@@ -16,7 +16,7 @@
 import * as runtime from '../runtime';
 import type {
   AccessPrivateResponse,
-  RpcStatus,
+  GooglerpcStatus,
   ShareHttpHealthcheckResponse,
   SharePrivateResponse,
   SharePublicResponse,
@@ -26,8 +26,8 @@ import type {
 import {
     AccessPrivateResponseFromJSON,
     AccessPrivateResponseToJSON,
-    RpcStatusFromJSON,
-    RpcStatusToJSON,
+    GooglerpcStatusFromJSON,
+    GooglerpcStatusToJSON,
     ShareHttpHealthcheckResponseFromJSON,
     ShareHttpHealthcheckResponseToJSON,
     SharePrivateResponseFromJSON,
@@ -68,6 +68,7 @@ export interface AgentShareHttpHealthcheckRequest {
 
 export interface AgentSharePrivateRequest {
     target?: string;
+    privateShareToken?: string;
     backendMode?: string;
     insecure?: boolean;
     closed?: boolean;
@@ -77,12 +78,11 @@ export interface AgentSharePrivateRequest {
 export interface AgentSharePublicRequest {
     target?: string;
     basicAuth?: Array<string>;
-    frontendSelection?: Array<string>;
     backendMode?: string;
     insecure?: boolean;
     oauthProvider?: string;
-    oauthEmailAddressPatterns?: Array<string>;
-    oauthCheckInterval?: string;
+    oauthEmailDomains?: Array<string>;
+    oauthRefreshInterval?: string;
     closed?: boolean;
     accessGrants?: Array<string>;
 }
@@ -265,6 +265,10 @@ export class AgentApi extends runtime.BaseAPI {
             queryParameters['target'] = requestParameters['target'];
         }
 
+        if (requestParameters['privateShareToken'] != null) {
+            queryParameters['privateShareToken'] = requestParameters['privateShareToken'];
+        }
+
         if (requestParameters['backendMode'] != null) {
             queryParameters['backendMode'] = requestParameters['backendMode'];
         }
@@ -316,10 +320,6 @@ export class AgentApi extends runtime.BaseAPI {
             queryParameters['basicAuth'] = requestParameters['basicAuth'];
         }
 
-        if (requestParameters['frontendSelection'] != null) {
-            queryParameters['frontendSelection'] = requestParameters['frontendSelection'];
-        }
-
         if (requestParameters['backendMode'] != null) {
             queryParameters['backendMode'] = requestParameters['backendMode'];
         }
@@ -332,12 +332,12 @@ export class AgentApi extends runtime.BaseAPI {
             queryParameters['oauthProvider'] = requestParameters['oauthProvider'];
         }
 
-        if (requestParameters['oauthEmailAddressPatterns'] != null) {
-            queryParameters['oauthEmailAddressPatterns'] = requestParameters['oauthEmailAddressPatterns'];
+        if (requestParameters['oauthEmailDomains'] != null) {
+            queryParameters['oauthEmailDomains'] = requestParameters['oauthEmailDomains'];
         }
 
-        if (requestParameters['oauthCheckInterval'] != null) {
-            queryParameters['oauthCheckInterval'] = requestParameters['oauthCheckInterval'];
+        if (requestParameters['oauthRefreshInterval'] != null) {
+            queryParameters['oauthRefreshInterval'] = requestParameters['oauthRefreshInterval'];
         }
 
         if (requestParameters['closed'] != null) {

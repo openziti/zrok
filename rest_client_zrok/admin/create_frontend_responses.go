@@ -359,6 +359,9 @@ swagger:model CreateFrontendBody
 */
 type CreateFrontendBody struct {
 
+	// dynamic
+	Dynamic bool `json:"dynamic,omitempty"`
+
 	// permission mode
 	// Enum: [open closed]
 	PermissionMode string `json:"permissionMode,omitempty"`

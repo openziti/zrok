@@ -47,12 +47,12 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 	_, _ = fmt.Fprintln(os.Stdout, tui.Code.Render("Config")+":\n")
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleColoredDark)
+	t.SetStyle(table.StyleRounded)
 	t.AppendHeader(table.Row{"Config", "Value", "Source"})
 	apiEndpoint, apiEndpointFrom := env.ApiEndpoint()
 	t.AppendRow(table.Row{"apiEndpoint", apiEndpoint, apiEndpointFrom})
-	defaultFrontend, defaultFrontendFrom := env.DefaultFrontend()
-	t.AppendRow(table.Row{"defaultFrontend", defaultFrontend, defaultFrontendFrom})
+	defaultNamespace, defaultNamespaceFrom := env.DefaultNamespace()
+	t.AppendRow(table.Row{"defaultNamespace", defaultNamespace, defaultNamespaceFrom})
 	headless, headlessFrom := env.Headless()
 	t.AppendRow(table.Row{"headless", headless, headlessFrom})
 	superNetwork, superNetworkFrom := env.SuperNetwork()
@@ -67,11 +67,11 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
-		t.SetStyle(table.StyleColoredDark)
+		t.SetStyle(table.StyleRounded)
 		t.AppendHeader(table.Row{"Property", "Value"})
 		if cmd.secrets {
 			t.AppendRow(table.Row{"Account Token", env.Environment().AccountToken})
-			t.AppendRow(table.Row{"Ziti Identity", env.Environment().ZitiIdentity})
+			t.AppendRow(table.Row{"EnvZId", env.Environment().ZitiIdentity})
 		} else {
 			secretToken := "<<SET>>"
 			if env.Environment().AccountToken == "" {
@@ -83,7 +83,7 @@ func (cmd *statusCommand) run(_ *cobra.Command, _ []string) {
 			if env.Environment().ZitiIdentity == "" {
 				zId = "<<UNSET>>"
 			}
-			t.AppendRow(table.Row{"Ziti Identity", zId})
+			t.AppendRow(table.Row{"EnvZId", zId})
 		}
 		t.Render()
 	}

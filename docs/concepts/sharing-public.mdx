@@ -18,6 +18,20 @@ As with `private` sharing, `public` sharing does not require you to open any fir
 
 Using `public` shares is easy and is accomplished using the `zrok share public` command. Run `zrok share public` to see the command-line help and to learn how to use `public` shares.
 
+:::tip v2.0 persistent public shares
+In zrok v2.0, you can create persistent public shares using reserved names in namespaces:
+
+```bash
+# create a reserved name
+zrok create name -n public myapp
+
+# share using the name
+zrok share public localhost:8080 -n public:myapp
+```
+
+This allows you to maintain the same public URL across multiple share sessions. See [reserved names and namespaces](./sharing-reserved.md) for comprehensive details about the v2.0 namespace/name system.
+:::
+
 ## Public Backend Modes
 
 The default backend mode is `proxy` which targets an HTTP URL that must be reachable by the backend.

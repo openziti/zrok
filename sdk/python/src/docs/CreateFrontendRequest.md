@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **url_template** | **str** |  | [optional] 
 **public_name** | **str** |  | [optional] 
 **permission_mode** | **str** |  | [optional] 
+**dynamic** | **bool** |  | [optional] 
 
 ## Example
 

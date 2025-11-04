@@ -20,13 +20,16 @@ Here's a short article with an overview of [public sharing with zrok](/concepts/
 
 ## How it Works
 
-The Docker Compose project uses your zrok account token to reserve a public subdomain and keep sharing the backend
-target.
+The Docker Compose project uses your zrok account token to create a persistent public share and keep sharing the backend target.
+
+:::note v2.0 update
+The Docker Compose configuration may use v1.x semantics for backward compatibility. In zrok v2.0, the preferred approach is to use namespaces and reserved names instead of the legacy reserved share system. The workflow remains similar but uses `zrok create name` and `zrok share public -n <namespace>:<name>` commands.
+:::
 
 When the project runs it will:
 
 1. enable a zrok environment unless `/mnt/.zrok/environment.json` exists in the `zrok_env` volume
-1. reserve a public subdomain for the service unless `/mnt/.zrok/reserved.json` exists
+1. create a reserved name or reserved share (depending on zrok version) for the service unless persistence data exists
 1. start sharing the target specified in the `ZROK_TARGET` environment variable
 
 ## Create the Docker Project
@@ -46,6 +49,10 @@ When the project runs it will:
     ```bash title=".env"
     ZROK_UNIQUE_NAME="toaster"
     ```
+
+    :::tip v2.0 naming
+    In v2.0, you can alternatively set `ZROK_DEFAULT_NAMESPACE` to specify which namespace to use, and the share name will be created in that namespace. The `ZROK_UNIQUE_NAME` variable still works for backward compatibility.
+    :::
 
 1. Run the Compose project to start sharing the built-in demo web server. Be sure to `--detach` so the project runs in the background if you want it to auto-restart when your computer reboots.
 

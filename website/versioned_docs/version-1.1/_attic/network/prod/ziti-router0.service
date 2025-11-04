@@ -1,0 +1,15 @@
+[Unit]
+Description=ziti-router0
+After=ziti-ctrl
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+ExecStart=/home/ubuntu/local/ziti/bin/ziti-router run /home/ubuntu/local/etc/zrok.io/ziti-router0.yml
+Restart=always
+RestartSec=2
+LimitNOFILE=65535
+Environment="PFXLOG_NO_JSON=true"
+
+[Install]
+WantedBy=multi-user.target

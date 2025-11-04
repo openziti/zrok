@@ -1,6 +1,6 @@
 # zrok_api.MetadataApi
 
-All URIs are relative to */api/v1*
+All URIs are relative to */api/v2*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -14,9 +14,11 @@ Method | HTTP request | Description
 [**get_share_detail**](MetadataApi.md#get_share_detail) | **GET** /detail/share/{shareToken} | 
 [**get_share_metrics**](MetadataApi.md#get_share_metrics) | **GET** /metrics/share/{shareToken} | 
 [**get_sparklines**](MetadataApi.md#get_sparklines) | **POST** /sparklines | 
+[**list_accesses**](MetadataApi.md#list_accesses) | **GET** /accesses | 
+[**list_environments**](MetadataApi.md#list_environments) | **GET** /environments | 
 [**list_memberships**](MetadataApi.md#list_memberships) | **GET** /memberships | 
 [**list_org_members**](MetadataApi.md#list_org_members) | **GET** /members/{organizationToken} | 
-[**list_public_frontends_for_account**](MetadataApi.md#list_public_frontends_for_account) | **GET** /overview/public-frontends | 
+[**list_shares**](MetadataApi.md#list_shares) | **GET** /shares | 
 [**org_account_overview**](MetadataApi.md#org_account_overview) | **GET** /overview/{organizationToken}/{accountEmail} | 
 [**overview**](MetadataApi.md#overview) | **GET** /overview | 
 [**version**](MetadataApi.md#version) | **GET** /version | 
@@ -35,10 +37,10 @@ from zrok_api.models.client_version_check_request import ClientVersionCheckReque
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 
@@ -97,10 +99,10 @@ from zrok_api.models.configuration import Configuration
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 
@@ -157,10 +159,10 @@ from zrok_api.models.environment import Environment
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -228,10 +230,10 @@ from zrok_api.models.metrics import Metrics
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -304,10 +306,10 @@ from zrok_api.models.environment_and_resources import EnvironmentAndResources
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -381,10 +383,10 @@ from zrok_api.models.metrics import Metrics
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -460,10 +462,10 @@ from zrok_api.models.frontend import Frontend
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -537,10 +539,10 @@ from zrok_api.models.share import Share
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -614,10 +616,10 @@ from zrok_api.models.metrics import Metrics
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -694,10 +696,10 @@ from zrok_api.models.get_sparklines_request import GetSparklinesRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -757,6 +759,202 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **list_accesses**
+> AccessesList list_accesses(env_zid=env_zid, share_token=share_token, bind_address=bind_address, description=description, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.accesses_list import AccessesList
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+    env_zid = 'env_zid_example' # str | filter by environment ziti identity (optional)
+    share_token = 'share_token_example' # str | filter by associated share token (optional)
+    bind_address = 'bind_address_example' # str | filter by bind address (substring match) (optional)
+    description = 'description_example' # str | filter by description (substring match) (optional)
+    created_after = 'created_after_example' # str | filter by created date (RFC3339 format) (optional)
+    created_before = 'created_before_example' # str | filter by created date (RFC3339 format) (optional)
+    updated_after = 'updated_after_example' # str | filter by updated date (RFC3339 format) (optional)
+    updated_before = 'updated_before_example' # str | filter by updated date (RFC3339 format) (optional)
+
+    try:
+        api_response = api_instance.list_accesses(env_zid=env_zid, share_token=share_token, bind_address=bind_address, description=description, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before)
+        print("The response of MetadataApi->list_accesses:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->list_accesses: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **env_zid** | **str**| filter by environment ziti identity | [optional] 
+ **share_token** | **str**| filter by associated share token | [optional] 
+ **bind_address** | **str**| filter by bind address (substring match) | [optional] 
+ **description** | **str**| filter by description (substring match) | [optional] 
+ **created_after** | **str**| filter by created date (RFC3339 format) | [optional] 
+ **created_before** | **str**| filter by created date (RFC3339 format) | [optional] 
+ **updated_after** | **str**| filter by updated date (RFC3339 format) | [optional] 
+ **updated_before** | **str**| filter by updated date (RFC3339 format) | [optional] 
+
+### Return type
+
+[**AccessesList**](AccessesList.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | list of accesses |  -  |
+**400** | bad request (e.g., activityDuration exceeds 30d, invalid date format) |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **list_environments**
+> EnvironmentsList list_environments(description=description, host=host, address=address, remote_agent=remote_agent, has_shares=has_shares, has_accesses=has_accesses, has_activity=has_activity, idle=idle, share_count=share_count, access_count=access_count, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before, activity_duration=activity_duration)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.environments_list import EnvironmentsList
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.MetadataApi(api_client)
+    description = 'description_example' # str | filter by description (case-insensitive substring match) (optional)
+    host = 'host_example' # str | filter by host (case-insensitive substring match) (optional)
+    address = 'address_example' # str | filter by address (exact match) (optional)
+    remote_agent = True # bool | filter by whether agent is enrolled (optional)
+    has_shares = True # bool | filter by whether environment has active shares (optional)
+    has_accesses = True # bool | filter by whether environment has active accesses (optional)
+    has_activity = True # bool | filter by whether environment has metrics within activityDuration timeframe (optional)
+    idle = True # bool | filter environments WITHOUT recent activity (inverse of hasActivity) (optional)
+    share_count = 'share_count_example' # str | filter by share count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\") (optional)
+    access_count = 'access_count_example' # str | filter by access count with operator (e.g., \">0\", \">=5\", \"=0\", \"<10\", \"<=3\") (optional)
+    created_after = 'created_after_example' # str | filter by created date (RFC3339 datetime, inclusive) (optional)
+    created_before = 'created_before_example' # str | filter by created date (RFC3339 datetime, inclusive) (optional)
+    updated_after = 'updated_after_example' # str | filter by updated date (RFC3339 datetime, inclusive) (optional)
+    updated_before = 'updated_before_example' # str | filter by updated date (RFC3339 datetime, inclusive) (optional)
+    activity_duration = 'activity_duration_example' # str | duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h) (optional)
+
+    try:
+        api_response = api_instance.list_environments(description=description, host=host, address=address, remote_agent=remote_agent, has_shares=has_shares, has_accesses=has_accesses, has_activity=has_activity, idle=idle, share_count=share_count, access_count=access_count, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before, activity_duration=activity_duration)
+        print("The response of MetadataApi->list_environments:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling MetadataApi->list_environments: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **description** | **str**| filter by description (case-insensitive substring match) | [optional] 
+ **host** | **str**| filter by host (case-insensitive substring match) | [optional] 
+ **address** | **str**| filter by address (exact match) | [optional] 
+ **remote_agent** | **bool**| filter by whether agent is enrolled | [optional] 
+ **has_shares** | **bool**| filter by whether environment has active shares | [optional] 
+ **has_accesses** | **bool**| filter by whether environment has active accesses | [optional] 
+ **has_activity** | **bool**| filter by whether environment has metrics within activityDuration timeframe | [optional] 
+ **idle** | **bool**| filter environments WITHOUT recent activity (inverse of hasActivity) | [optional] 
+ **share_count** | **str**| filter by share count with operator (e.g., \&quot;&gt;0\&quot;, \&quot;&gt;&#x3D;5\&quot;, \&quot;&#x3D;0\&quot;, \&quot;&lt;10\&quot;, \&quot;&lt;&#x3D;3\&quot;) | [optional] 
+ **access_count** | **str**| filter by access count with operator (e.g., \&quot;&gt;0\&quot;, \&quot;&gt;&#x3D;5\&quot;, \&quot;&#x3D;0\&quot;, \&quot;&lt;10\&quot;, \&quot;&lt;&#x3D;3\&quot;) | [optional] 
+ **created_after** | **str**| filter by created date (RFC3339 datetime, inclusive) | [optional] 
+ **created_before** | **str**| filter by created date (RFC3339 datetime, inclusive) | [optional] 
+ **updated_after** | **str**| filter by updated date (RFC3339 datetime, inclusive) | [optional] 
+ **updated_before** | **str**| filter by updated date (RFC3339 datetime, inclusive) | [optional] 
+ **activity_duration** | **str**| duration for hasActivity filter (e.g., \&quot;24h\&quot;, \&quot;7d\&quot;, \&quot;30d\&quot;). default \&quot;24h\&quot;, maximum \&quot;30d\&quot; (720h) | [optional] 
+
+### Return type
+
+[**EnvironmentsList**](EnvironmentsList.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | list of environments |  -  |
+**400** | bad request (e.g., activityDuration exceeds 30d, invalid date format, invalid operator) |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **list_memberships**
 > ListMemberships200Response list_memberships()
 
@@ -770,10 +968,10 @@ from zrok_api.models.list_memberships200_response import ListMemberships200Respo
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -841,10 +1039,10 @@ from zrok_api.models.list_organization_members200_response import ListOrganizati
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -904,8 +1102,8 @@ Name | Type | Description  | Notes
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **list_public_frontends_for_account**
-> ListPublicFrontendsForAccount200Response list_public_frontends_for_account()
+# **list_shares**
+> SharesList list_shares(env_zid=env_zid, share_mode=share_mode, backend_mode=backend_mode, share_token=share_token, target=target, permission_mode=permission_mode, has_activity=has_activity, idle=idle, activity_duration=activity_duration, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before)
 
 ### Example
 
@@ -913,14 +1111,14 @@ Name | Type | Description  | Notes
 
 ```python
 import zrok_api
-from zrok_api.models.list_public_frontends_for_account200_response import ListPublicFrontendsForAccount200Response
+from zrok_api.models.shares_list import SharesList
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -938,24 +1136,52 @@ configuration.api_key['key'] = os.environ["API_KEY"]
 with zrok_api.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = zrok_api.MetadataApi(api_client)
+    env_zid = 'env_zid_example' # str | filter by environment ziti identity (optional)
+    share_mode = 'share_mode_example' # str | filter by share mode (public/private) (optional)
+    backend_mode = 'backend_mode_example' # str | filter by backend mode (optional)
+    share_token = 'share_token_example' # str | filter by share token (substring match) (optional)
+    target = 'target_example' # str | filter by target (substring match) (optional)
+    permission_mode = 'permission_mode_example' # str | filter by permission mode (open/closed) (optional)
+    has_activity = True # bool | filter shares with recent activity (optional)
+    idle = True # bool | filter shares WITHOUT recent activity (inverse of hasActivity) (optional)
+    activity_duration = 'activity_duration_example' # str | duration for hasActivity filter (e.g., \"24h\", \"7d\", \"30d\"). default \"24h\", maximum \"30d\" (720h) (optional)
+    created_after = 'created_after_example' # str | filter by created date (RFC3339 format) (optional)
+    created_before = 'created_before_example' # str | filter by created date (RFC3339 format) (optional)
+    updated_after = 'updated_after_example' # str | filter by updated date (RFC3339 format) (optional)
+    updated_before = 'updated_before_example' # str | filter by updated date (RFC3339 format) (optional)
 
     try:
-        api_response = api_instance.list_public_frontends_for_account()
-        print("The response of MetadataApi->list_public_frontends_for_account:\n")
+        api_response = api_instance.list_shares(env_zid=env_zid, share_mode=share_mode, backend_mode=backend_mode, share_token=share_token, target=target, permission_mode=permission_mode, has_activity=has_activity, idle=idle, activity_duration=activity_duration, created_after=created_after, created_before=created_before, updated_after=updated_after, updated_before=updated_before)
+        print("The response of MetadataApi->list_shares:\n")
         pprint(api_response)
     except Exception as e:
-        print("Exception when calling MetadataApi->list_public_frontends_for_account: %s\n" % e)
+        print("Exception when calling MetadataApi->list_shares: %s\n" % e)
 ```
 
 
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **env_zid** | **str**| filter by environment ziti identity | [optional] 
+ **share_mode** | **str**| filter by share mode (public/private) | [optional] 
+ **backend_mode** | **str**| filter by backend mode | [optional] 
+ **share_token** | **str**| filter by share token (substring match) | [optional] 
+ **target** | **str**| filter by target (substring match) | [optional] 
+ **permission_mode** | **str**| filter by permission mode (open/closed) | [optional] 
+ **has_activity** | **bool**| filter shares with recent activity | [optional] 
+ **idle** | **bool**| filter shares WITHOUT recent activity (inverse of hasActivity) | [optional] 
+ **activity_duration** | **str**| duration for hasActivity filter (e.g., \&quot;24h\&quot;, \&quot;7d\&quot;, \&quot;30d\&quot;). default \&quot;24h\&quot;, maximum \&quot;30d\&quot; (720h) | [optional] 
+ **created_after** | **str**| filter by created date (RFC3339 format) | [optional] 
+ **created_before** | **str**| filter by created date (RFC3339 format) | [optional] 
+ **updated_after** | **str**| filter by updated date (RFC3339 format) | [optional] 
+ **updated_before** | **str**| filter by updated date (RFC3339 format) | [optional] 
 
 ### Return type
 
-[**ListPublicFrontendsForAccount200Response**](ListPublicFrontendsForAccount200Response.md)
+[**SharesList**](SharesList.md)
 
 ### Authorization
 
@@ -970,7 +1196,8 @@ This endpoint does not need any parameter.
 
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-**200** | public frontends list returned |  -  |
+**200** | list of shares |  -  |
+**400** | bad request (e.g., activityDuration exceeds 30d, invalid date format) |  -  |
 **401** | unauthorized |  -  |
 **500** | internal server error |  -  |
 
@@ -989,10 +1216,10 @@ from zrok_api.models.overview import Overview
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -1067,10 +1294,10 @@ from zrok_api.models.overview import Overview
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -1136,10 +1363,10 @@ import zrok_api
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 
@@ -1195,10 +1422,10 @@ from zrok_api.models.version_inventory200_response import VersionInventory200Res
 from zrok_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to /api/v1
+# Defining the host is optional and defaults to /api/v2
 # See configuration.py for a list of all supported configuration parameters.
 configuration = zrok_api.Configuration(
-    host = "/api/v1"
+    host = "/api/v2"
 )
 
 

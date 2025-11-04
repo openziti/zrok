@@ -6,7 +6,6 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **share_token** | **str** |  | [optional] 
-**backend_proxy_endpoint** | **str** |  | [optional] 
 **add_access_grants** | **List[str]** |  | [optional] 
 **remove_access_grants** | **List[str]** |  | [optional] 
 

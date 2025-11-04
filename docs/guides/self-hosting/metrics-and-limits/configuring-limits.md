@@ -26,6 +26,15 @@ Limits can be specified to control the amount of data that can be transferred wi
 
 zrok limits can be specified _globally_, applying to all users in a service instance. Limit _classes_ can be created to provide additional levels of resource allocation. Limit classes can then be _applied_ to multiple accounts, to alter their limit allocation beyond what's configured in the global configuration.
 
+:::note v2.0 terminology
+In zrok v2.0, the namespace and name system replaced the v1.x reserved share workflow:
+- `reserved_shares` now refers to reserved names created with `zrok create name -n <namespace> <name>`
+- `unique_names` still exists; the effective number of reserved names is the minimum of `reserved_shares` and `unique_names`
+- For private shares, using `--share-token` creates a persistent share that is not counted against the number of reserved names
+
+The limit configuration uses the same fields for backward compatibility, but they apply to the new namespace/name system.
+:::
+
 ## The Global Configuration
 
 The reference configuration for the zrok controller (found at [`etc/ctrl.yaml`](https://github.com/openziti/zrok/blob/main/etc/ctrl.yml) in the [repository](https://github.com/openziti/zrok)) contains the global limits configuration, which looks like this:

@@ -61,26 +61,32 @@ Default IP/subnet setting can be overridden by adding `<target>` parameter:
 sudo -E zrok share private --headless --backend-mode vpn 192.168.42.12/24
 ```
 
-## Reserve a VPN Share Token
+## Create a Persistent VPN Share Name
 
-As with all backend modes, you can reserve a share token for a VPN share.
+As with all backend modes, you can create a private share using a custom share token.
+
+In v2.0, use the `--share-token` flag to create a VPN share with a custom name:
 
 ```bash
-eugene@hermes $ zrok reserve private --backend-mode vpn
-[   0.297]    INFO main.(*reserveCommand).run: your reserved share token is 'k77y2cl7jmjl'
-
-eugene@hermes $ sudo -E zrok share reserved k77y2cl7jmjl --headless
-[   0.211]    INFO main.(*shareReservedCommand).run: sharing target: '10.122.0.1/16'
-[   0.211]    INFO main.(*shareReservedCommand).run: using existing backend target: 10.122.0.1/16
-[   0.463]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[22c5708d-e2f2-41aa-a507-454055f8bfcc]} new service session
-[   0.641]    INFO main.(*shareReservedCommand).run: use this command to access your zrok share: 'zrok access private k77y2cl7jmjl'
-[
+eugene@hermes $ sudo -E zrok share private --backend-mode vpn --share-token my-vpn --headless
+[   0.542]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[589d443c-f59d-4fc8-8c48-76609b7fb402]} new service session
+[   0.705]    INFO main.(*sharePrivateCommand).run: allow other to access your share with the following command:
+zrok access private my-vpn
+[   0.705]    INFO zrok/endpoints/vpn.(*Backend).Run: started
 ```
+
+The share token `my-vpn` will persist across share restarts. When using the zrok agent, shares with `--share-token` automatically restart after abnormal exit or agent restart.
+
+:::note v1.x compatibility
+In zrok v1.x, you would use `zrok reserve private --backend-mode vpn` followed by `zrok share reserved <token>`. The v2.0 approach with `--share-token` provides the same persistence with a simpler workflow.
+:::
 
 ## Access the VPN Share
 
+Use the share token (either the randomly generated one or your custom `--share-token`) to access the VPN:
+
 ```bash
-eugene@calculon % sudo -E zrok access private --headless k77y2cl7jmjl
+eugene@calculon % sudo -E zrok access private --headless my-vpn
 [   0.201]    INFO main.(*accessPrivateCommand).run: allocated frontend '50B5hloP1s1X'
 [   0.662]    INFO main.(*accessPrivateCommand).run: access the zrok share at the following endpoint: VPN:
 [   0.662]    INFO main.(*accessPrivateCommand).run: 10.122.0.1 -> CONNECTED Welcome to zrok VPN

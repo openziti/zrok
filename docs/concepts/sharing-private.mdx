@@ -31,6 +31,16 @@ The peer-to-peer capabilities of `zrok` are an important property of the underly
 
 Creating `private` shares is easy and is accomplished using the `zrok share private` command. Run `zrok share private` to see the usage output and to further learn how to use the command.
 
+:::tip v2.0 persistent private shares
+In zrok v2.0, you can create persistent private shares using the `--share-token` flag:
+
+```bash
+zrok share private localhost:8080 --share-token my-api
+```
+
+This creates a private share with a custom vanity token that persists across share restarts. When using the zrok agent, shares with `--share-token` automatically restart after abnormal exit or agent restart. See [reserved names and namespaces](./sharing-reserved.md) for more details.
+:::
+
 ## Private Backend Modes
 
 The default backend mode is `proxy` which targets an HTTP URL that must be reachable by the backend.

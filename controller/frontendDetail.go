@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
-	"github.com/sirupsen/logrus"
 )
 
 type getFrontendDetailHandler struct{}
@@ -16,23 +16,23 @@ func newGetFrontendDetailHandler() *getFrontendDetailHandler {
 func (h *getFrontendDetailHandler) Handle(params metadata.GetFrontendDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return metadata.NewGetFrontendDetailInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 	fe, err := str.GetFrontend(int(params.FrontendID), trx)
 	if err != nil {
-		logrus.Errorf("error finding share '%d': %v", params.FrontendID, err)
+		dl.Errorf("error finding share '%d': %v", params.FrontendID, err)
 		return metadata.NewGetFrontendDetailNotFound()
 	}
 	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("error finding environments for account '%v': %v", principal.Email, err)
+		dl.Errorf("error finding environments for account '%v': %v", principal.Email, err)
 		return metadata.NewGetFrontendDetailInternalServerError()
 	}
 	found := false
 	if fe.EnvironmentId == nil {
-		logrus.Errorf("non owned environment '%d' for '%v'", fe.Id, principal.Email)
+		dl.Errorf("non owned environment '%d' for '%v'", fe.Id, principal.Email)
 		return metadata.NewGetFrontendDetailNotFound()
 	}
 	for _, env := range envs {
@@ -42,7 +42,7 @@ func (h *getFrontendDetailHandler) Handle(params metadata.GetFrontendDetailParam
 		}
 	}
 	if !found {
-		logrus.Errorf("environment not matched for frontend '%d' for account '%v'", fe.Id, principal.Email)
+		dl.Errorf("environment not matched for frontend '%d' for account '%v'", fe.Id, principal.Email)
 		return metadata.NewGetFrontendDetailNotFound()
 	}
 	payload := &rest_model_zrok.Frontend{
@@ -61,7 +61,7 @@ func (h *getFrontendDetailHandler) Handle(params metadata.GetFrontendDetailParam
 	if fe.PrivateShareId != nil {
 		shr, err := str.GetShare(*fe.PrivateShareId, trx)
 		if err != nil {
-			logrus.Errorf("error getting share for frontend '%d': %v", fe.Id, err)
+			dl.Errorf("error getting share for frontend '%d': %v", fe.Id, err)
 			return metadata.NewGetFrontendDetailInternalServerError()
 		}
 		payload.ShareToken = shr.Token

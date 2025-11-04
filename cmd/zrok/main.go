@@ -1,10 +1,12 @@
 package main
 
 import (
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/michaelquigley/pfxlog"
 	"github.com/openziti/cobra-to-md"
 	"github.com/openziti/transport/v2"
@@ -16,8 +18,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const trimPrefix = "github.com/openziti/"
+
 func init() {
-	pfxlog.GlobalInit(logrus.InfoLevel, pfxlog.DefaultOptions().SetTrimPrefix("github.com/openziti/"))
+	// dd/dl Logging
+	dl.Init(dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo))
+	dl.ConfigureChannel("mappings", dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo))
+
+	// legacy pfxlog
+	pfxlog.GlobalInit(logrus.InfoLevel, pfxlog.DefaultOptions().SetTrimPrefix(trimPrefix))
+
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	rootCmd.PersistentFlags().BoolVarP(&panicInstead, "panic", "p", false, "Panic instead of showing pretty errors")
 	rootCmd.AddCommand(accessCmd)
@@ -30,6 +40,9 @@ func init() {
 	agentCmd.AddCommand(agentShareCmd)
 	rootCmd.AddCommand(adminCmd)
 	rootCmd.AddCommand(configCmd)
+	rootCmd.AddCommand(createCmd)
+	rootCmd.AddCommand(deleteCmd)
+	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(modifyCmd)
 	organizationCmd.AddCommand(organizationAdminCmd)
 	rootCmd.AddCommand(organizationCmd)
@@ -47,6 +60,7 @@ var rootCmd = &cobra.Command{
 	Short: "zrok",
 	PersistentPreRun: func(_ *cobra.Command, _ []string) {
 		if verbose {
+			dl.Init(dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo))
 			logrus.SetLevel(logrus.DebugLevel)
 		}
 	},
@@ -103,6 +117,23 @@ var agentShareCmd = &cobra.Command{
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Configure your zrok environment",
+}
+
+var createCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create resources",
+}
+
+var deleteCmd = &cobra.Command{
+	Use:     "delete",
+	Aliases: []string{"rm"},
+	Short:   "Delete resources",
+}
+
+var listCmd = &cobra.Command{
+	Use:     "list",
+	Aliases: []string{"ls"},
+	Short:   "List resources",
 }
 
 var modifyCmd = &cobra.Command{

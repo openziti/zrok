@@ -3,13 +3,14 @@ package limits
 import (
 	"context"
 	"fmt"
-	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	"github.com/influxdata/influxdb-client-go/v2/api"
-	"github.com/openziti/zrok/controller/metrics"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"strings"
 	"time"
+
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/influxdata/influxdb-client-go/v2/api"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/controller/metrics"
+	"github.com/pkg/errors"
 )
 
 type influxReader struct {
@@ -74,7 +75,7 @@ func (r *influxReader) runQueryForRxTx(query string) (rx int64, tx int64, err er
 			case "rx":
 				rx = v
 			default:
-				logrus.Warnf("field '%v'?", result.Record().Field())
+				dl.Warnf("field '%v'?", result.Record().Field())
 			}
 		} else {
 			return -1, -1, errors.New("error asserting value type")

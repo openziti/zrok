@@ -90,7 +90,7 @@ const config = {
           lastVersion: 'current',
           versions: {
             current: {
-              label: '1.1',
+              label: '2.0',
             },
           },
 

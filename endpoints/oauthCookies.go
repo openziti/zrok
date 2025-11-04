@@ -11,11 +11,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"github.com/michaelquigley/df/dl"
+	"github.com/pkg/errors"
 )
 
-// OAuthCookieConfig defines the interface for OAuth cookie configuration
-// This allows different proxy types to implement their own config structs while sharing cookie utilities
+// OAuthCookieConfig defines the interface that OAuth configurations must implement
+// to work with the shared cookie utilities
 type OAuthCookieConfig interface {
 	GetCookieName() string
 	GetCookieDomain() string
@@ -23,175 +24,170 @@ type OAuthCookieConfig interface {
 	GetSessionLifetime() time.Duration
 }
 
-// CompressToken compresses a token string using gzip and returns base64-encoded result
+// CompressToken compresses a JWT token string using gzip and returns a base64-encoded string
 func CompressToken(token string) (string, error) {
 	var buf bytes.Buffer
-	gzipWriter := gzip.NewWriter(&buf)
-	if _, err := gzipWriter.Write([]byte(token)); err != nil {
-		return "", fmt.Errorf("error writing to gzip writer: %w", err)
+	gzWriter := gzip.NewWriter(&buf)
+
+	if _, err := gzWriter.Write([]byte(token)); err != nil {
+		return "", errors.Wrap(err, "failed to write to gzip writer")
 	}
-	if err := gzipWriter.Close(); err != nil {
-		return "", fmt.Errorf("error closing gzip writer: %w", err)
+
+	if err := gzWriter.Close(); err != nil {
+		return "", errors.Wrap(err, "failed to close gzip writer")
 	}
+
 	return base64.URLEncoding.EncodeToString(buf.Bytes()), nil
 }
 
-// DecompressToken decompresses a base64-encoded, gzip-compressed token string
+// DecompressToken decompresses a base64-encoded gzip string back to the original JWT token
 func DecompressToken(compressed string) (string, error) {
 	data, err := base64.URLEncoding.DecodeString(compressed)
 	if err != nil {
-		return "", fmt.Errorf("error decoding base64: %w", err)
+		return "", errors.Wrap(err, "failed to decode base64")
 	}
 
-	gzipReader, err := gzip.NewReader(bytes.NewReader(data))
+	gzReader, err := gzip.NewReader(bytes.NewReader(data))
 	if err != nil {
-		return "", fmt.Errorf("error creating gzip reader: %w", err)
+		return "", errors.Wrap(err, "failed to create gzip reader")
 	}
-	defer gzipReader.Close()
+	defer gzReader.Close()
 
-	decompressed, err := io.ReadAll(gzipReader)
+	decompressed, err := io.ReadAll(gzReader)
 	if err != nil {
-		return "", fmt.Errorf("error reading from gzip reader: %w", err)
+		return "", errors.Wrap(err, "failed to read decompressed data")
 	}
 
 	return string(decompressed), nil
 }
 
-// GetSessionCookie retrieves and reassembles a session cookie that may be striped across multiple cookies
+// GetSessionCookie retrieves and reassembles a session cookie, handling both single and striped cookies
 func GetSessionCookie(r *http.Request, cookieName string) (*http.Cookie, error) {
-	baseCookie, err := r.Cookie(cookieName)
+	// get the first cookie
+	cookie, err := r.Cookie(cookieName)
 	if err != nil {
 		return nil, err
 	}
 
-	// check if this is a striped cookie by looking for the count prefix
-	parts := strings.SplitN(baseCookie.Value, "|", 2)
-	if len(parts) != 2 {
-		// not striped, decompress and return
-		decompressed, err := DecompressToken(baseCookie.Value)
-		if err != nil {
-			return nil, fmt.Errorf("error decompressing cookie: %w", err)
+	var compressedValue string
+
+	// check if the cookie value has the stripe count prefix: {count}|{data}
+	if strings.Contains(cookie.Value, "|") {
+		parts := strings.SplitN(cookie.Value, "|", 2)
+		if len(parts) == 2 {
+			count, err := strconv.Atoi(parts[0])
+			if err == nil && count > 0 {
+				// this is a striped cookie
+				chunks := make([]string, count)
+				chunks[0] = parts[1]
+
+				// fetch the remaining chunks
+				for i := 1; i < count; i++ {
+					chunkCookie, err := r.Cookie(fmt.Sprintf("%s_%d", cookieName, i))
+					if err != nil {
+						return nil, errors.Errorf("missing cookie chunk '%s_%d'", cookieName, i)
+					}
+					chunks[i] = chunkCookie.Value
+				}
+
+				// reassemble the compressed value
+				compressedValue = strings.Join(chunks, "")
+			} else {
+				// not a valid stripe prefix, treat as single cookie
+				compressedValue = cookie.Value
+			}
+		} else {
+			compressedValue = cookie.Value
 		}
-		return &http.Cookie{
-			Name:  cookieName,
-			Value: decompressed,
-		}, nil
+	} else {
+		// single cookie, no striping
+		compressedValue = cookie.Value
 	}
 
-	// striped cookie - reassemble all chunks
-	count, err := strconv.Atoi(parts[0])
+	// decompress the value
+	decompressedValue, err := DecompressToken(compressedValue)
 	if err != nil {
-		return nil, fmt.Errorf("invalid cookie count prefix: %w", err)
+		return nil, errors.Wrap(err, "failed to decompress cookie value")
 	}
 
-	// start with the data from the base cookie
-	var reassembled strings.Builder
-	reassembled.WriteString(parts[1])
-
-	// retrieve and append the numbered chunks
-	for i := 1; i < count; i++ {
-		chunkName := fmt.Sprintf("%s_%d", cookieName, i)
-		chunk, err := r.Cookie(chunkName)
-		if err != nil {
-			return nil, fmt.Errorf("missing cookie chunk %s: %w", chunkName, err)
-		}
-		reassembled.WriteString(chunk.Value)
-	}
-
-	// decompress the reassembled data
-	decompressed, err := DecompressToken(reassembled.String())
-	if err != nil {
-		return nil, fmt.Errorf("error decompressing reassembled cookie: %w", err)
-	}
-
+	// return a cookie with the decompressed JWT value
 	return &http.Cookie{
 		Name:  cookieName,
-		Value: decompressed,
+		Value: decompressedValue,
 	}, nil
 }
 
-// SetSessionCookie compresses and stripes a session cookie across multiple cookies if needed
+// SetSessionCookie sets a session cookie, compressing and striping it if necessary
 func SetSessionCookie(w http.ResponseWriter, cookieName string, tokenValue string, cfg OAuthCookieConfig) error {
-	// compress the token
-	compressed, err := CompressToken(tokenValue)
+	// compress the JWT token
+	compressedToken, err := CompressToken(tokenValue)
 	if err != nil {
-		return fmt.Errorf("error compressing token: %w", err)
+		return errors.Wrap(err, "failed to compress token")
 	}
 
-	maxSize := cfg.GetMaxCookieSize()
-	if maxSize == 0 {
-		maxSize = 3072
+	// use default max cookie size if not configured
+	maxCookieSize := cfg.GetMaxCookieSize()
+	if maxCookieSize == 0 {
+		maxCookieSize = 2048
 	}
 
-	// if compressed data fits in a single cookie, set it directly
-	if len(compressed) <= maxSize {
-		http.SetCookie(w, &http.Cookie{
-			Name:     cookieName,
-			Value:    compressed,
-			MaxAge:   int(cfg.GetSessionLifetime().Seconds()),
-			Domain:   cfg.GetCookieDomain(),
-			Path:     "/",
-			Expires:  time.Now().Add(cfg.GetSessionLifetime()),
-			HttpOnly: true,
-			SameSite: http.SameSiteLaxMode,
-		})
-		return nil
+	// common cookie attributes
+	cookieAttrs := &http.Cookie{
+		MaxAge:  int(cfg.GetSessionLifetime().Seconds()),
+		Domain:  cfg.GetCookieDomain(),
+		Path:    "/",
+		Expires: time.Now().Add(cfg.GetSessionLifetime()),
+		// Secure:  true, // pending server tls feature https://github.com/openziti/zrok/issues/24
+		HttpOnly: true,                 // enabled because zrok frontend is the only intended consumer of this cookie, not client-side scripts
+		SameSite: http.SameSiteLaxMode, // explicitly set to the default Lax mode which allows the zrok share to be navigated to from another site and receive the cookie
 	}
 
-	// need to stripe across multiple cookies
-	logrus.Debugf("cookie size %d exceeds max %d, striping across multiple cookies", len(compressed), maxSize)
+	// check if we need to stripe the cookie
+	if len(compressedToken) > maxCookieSize {
+		// calculate number of chunks needed
+		chunkCount := (len(compressedToken) + maxCookieSize - 1) / maxCookieSize
 
-	// calculate how many cookies we need
-	// account for the count prefix in the first cookie (e.g., "3|")
-	countPrefixSize := len(fmt.Sprintf("%d|", (len(compressed)/maxSize)+2)) // estimate
-	firstChunkSize := maxSize - countPrefixSize
-	remainingSize := len(compressed) - firstChunkSize
-	additionalChunks := (remainingSize + maxSize - 1) / maxSize // ceiling division
-	totalCookies := additionalChunks + 1
-
-	// set the base cookie with count prefix
-	firstChunkData := compressed[:firstChunkSize]
-	baseValue := fmt.Sprintf("%d|%s", totalCookies, firstChunkData)
-
-	http.SetCookie(w, &http.Cookie{
-		Name:     cookieName,
-		Value:    baseValue,
-		MaxAge:   int(cfg.GetSessionLifetime().Seconds()),
-		Domain:   cfg.GetCookieDomain(),
-		Path:     "/",
-		Expires:  time.Now().Add(cfg.GetSessionLifetime()),
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-	})
-
-	// set the numbered chunks
-	offset := firstChunkSize
-	for i := 1; i < totalCookies; i++ {
-		chunkName := fmt.Sprintf("%s_%d", cookieName, i)
-		end := offset + maxSize
-		if end > len(compressed) {
-			end = len(compressed)
+		// calculate chunk size (leaving room for the count prefix in first cookie)
+		prefixLen := len(fmt.Sprintf("%d|", chunkCount))
+		firstChunkSize := maxCookieSize - prefixLen
+		if firstChunkSize <= 0 {
+			return errors.New("max cookie size too small for striping")
 		}
-		chunkData := compressed[offset:end]
 
-		http.SetCookie(w, &http.Cookie{
-			Name:     chunkName,
-			Value:    chunkData,
-			MaxAge:   int(cfg.GetSessionLifetime().Seconds()),
-			Domain:   cfg.GetCookieDomain(),
-			Path:     "/",
-			Expires:  time.Now().Add(cfg.GetSessionLifetime()),
-			HttpOnly: true,
-			SameSite: http.SameSiteLaxMode,
-		})
+		// set first cookie with count prefix
+		firstChunk := compressedToken[:min(firstChunkSize, len(compressedToken))]
+		firstCookie := *cookieAttrs
+		firstCookie.Name = cookieName
+		firstCookie.Value = fmt.Sprintf("%d|%s", chunkCount, firstChunk)
+		http.SetCookie(w, &firstCookie)
 
-		offset = end
+		// set remaining chunks
+		offset := firstChunkSize
+		for i := 1; i < chunkCount; i++ {
+			end := min(offset+maxCookieSize, len(compressedToken))
+			chunk := compressedToken[offset:end]
+
+			chunkCookie := *cookieAttrs
+			chunkCookie.Name = fmt.Sprintf("%s_%d", cookieName, i)
+			chunkCookie.Value = chunk
+			http.SetCookie(w, &chunkCookie)
+
+			offset = end
+		}
+
+		dl.Debugf("striped session cookie into '%d' chunks", chunkCount)
+	} else {
+		// single cookie is sufficient
+		cookie := *cookieAttrs
+		cookie.Name = cookieName
+		cookie.Value = compressedToken
+		http.SetCookie(w, &cookie)
 	}
 
 	return nil
 }
 
-// ClearSessionCookies clears all session cookies including any striped chunks
+// ClearSessionCookies clears all session cookies including striped cookie chunks
 func ClearSessionCookies(w http.ResponseWriter, r *http.Request, cookieName string, cfg OAuthCookieConfig) {
 	// iterate through all cookies and clear any that match the session cookie pattern
 	for _, cookie := range r.Cookies() {
@@ -209,16 +205,24 @@ func ClearSessionCookies(w http.ResponseWriter, r *http.Request, cookieName stri
 	}
 }
 
-// FilterSessionCookies filters out session cookies (including striped chunks) from a cookie list
+// FilterSessionCookies filters out session cookies and their striped chunks from a cookie list
 func FilterSessionCookies(cookies []*http.Cookie, cookieName string) []*http.Cookie {
-	var filtered []*http.Cookie
+	filtered := make([]*http.Cookie, 0, len(cookies))
 	for _, cookie := range cookies {
-		// skip the base cookie
+		// filter out the base session cookie
 		if cookie.Name == cookieName {
 			continue
 		}
-		// skip numbered chunks (e.g., "cookieName_1", "cookieName_2", etc.)
+		// filter out striped session cookie chunks (e.g., cookieName_1, cookieName_2)
 		if strings.HasPrefix(cookie.Name, cookieName+"_") {
+			// check if the suffix is a number
+			suffix := strings.TrimPrefix(cookie.Name, cookieName+"_")
+			if _, err := strconv.Atoi(suffix); err == nil {
+				continue
+			}
+		}
+		// filter out pkce cookie
+		if cookie.Name == "pkce" {
 			continue
 		}
 		filtered = append(filtered, cookie)

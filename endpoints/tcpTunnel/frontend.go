@@ -4,13 +4,13 @@ import (
 	"net"
 	"time"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/endpoints"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type FrontendConfig struct {
@@ -68,7 +68,7 @@ func (f *Frontend) Run() error {
 	for {
 		if conn, err := l.Accept(); err == nil {
 			go f.accept(conn)
-			logrus.Debugf("accepted tcp connection from '%v'", conn.RemoteAddr())
+			dl.Debugf("accepted tcp connection from '%v'", conn.RemoteAddr())
 		} else {
 			return err
 		}
@@ -88,7 +88,7 @@ func (f *Frontend) accept(conn net.Conn) {
 			}
 		}
 	} else {
-		logrus.Errorf("error dialing '%v': %v", f.cfg.ShrToken, err)
+		dl.Errorf("error dialing '%v': %v", f.cfg.ShrToken, err)
 		_ = conn.Close()
 	}
 }
