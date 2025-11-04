@@ -35,6 +35,8 @@ CHANGE: Updated `github.com/openziti/sdk-golang` to `v1.2.4`.
 
 CHANGE: All logging migrated from `githhub.com/michaelquigley/pfxlog` and `github.com/sirupsen/logrus` to `github.com/michaelquigley/df/dl` and `log/slog`. Use environment variable `DL_USE_JSON=true` to force JSON output. Use `DL_USE_COLOR` to force colorized output. (https://github.com/openziti/zrok/issues/1078)
 
+FIX: Updated the unique constraint on the `accounts.email` column to only be unique when `is not deleted`. This only fixes PostgreSQL databases; fixing SQLite databases effectively requires rebuilding the entire database, see the comment in the issue for details. (https://github.com/openziti/zrok/issues/1109)
+
 ## v1.1.9
 
 CHANGE: The `publicProxy` now supports "striped session cookies" to support larger authentication payloads when working with OIDC providers that use larger tokens/payloads. (https://github.com/openziti/zrok/issues/1101)
