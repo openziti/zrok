@@ -392,6 +392,7 @@
 
                     <h2>{{ .Now }}</h2>
 
+                    {{ if not .Unsafe }}
                     <h3>At This Endpoint:</h3>
                     <table>
                         <tr><td>Remote Address</td><td>{{ .RemoteAddr }}</td></tr>
@@ -400,6 +401,7 @@
                         <tr><td>Local IP Addresses</td><td>{{ .Ips }}</td></tr>
                         <tr><td>Host Header</td><td>{{ .HostHeader }}</td></tr>
                     </table>
+                    {{ end }}
 
                     <h3>Extended Headers:</h3>
                     <table>

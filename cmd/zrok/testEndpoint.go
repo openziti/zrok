@@ -36,6 +36,7 @@ type testEndpointCommand struct {
 	enableZiti       bool
 	serviceName      string
 	identityJsonFile string
+	unsafe           bool
 }
 
 func newTestEndpointCommand() *testEndpointCommand {
@@ -58,6 +59,7 @@ func newTestEndpointCommand() *testEndpointCommand {
 	cmd.Flags().BoolVar(&command.enableZiti, "ziti", false, "Enable the usage of a ziti network")
 	cmd.Flags().StringVar(&command.identityJsonFile, "ziti-identity", "", "Path to Ziti Identity json file")
 	cmd.Flags().StringVar(&command.serviceName, "ziti-name", "", "Name of the Ziti Service")
+	cmd.Flags().BoolVar(&command.unsafe, "unsafe", false, "Prevent emission of endpoint details")
 
 	cmd.Run = command.run
 	return command
@@ -121,7 +123,7 @@ func (cmd *testEndpointCommand) run(_ *cobra.Command, _ []string) {
 
 func (cmd *testEndpointCommand) serveIndex(w http.ResponseWriter, r *http.Request) {
 	dl.Infof("%v {%v} | %v -> /index.gohtml", r.RemoteAddr, r.Host, r.RequestURI)
-	if err := cmd.t.Execute(w, newEndpointData(r)); err != nil {
+	if err := cmd.t.Execute(w, newEndpointData(r, cmd.unsafe)); err != nil {
 		dl.Error(err)
 	}
 }
@@ -185,18 +187,22 @@ type endpointData struct {
 	Ips           string
 	HostHeader    string
 	Headers       map[string][]string
+	Unsafe        bool
 }
 
-func newEndpointData(r *http.Request) *endpointData {
+func newEndpointData(r *http.Request, unsafe bool) *endpointData {
 	ed := &endpointData{
 		RequestedPath: r.RequestURI,
 		Now:           time.Now(),
 		HostHeader:    r.Host,
 		Headers:       r.Header,
 		RemoteAddr:    r.RemoteAddr,
+		Unsafe:        unsafe,
 	}
-	ed.getHostInfo()
-	ed.getIps()
+	if !unsafe {
+		ed.getHostInfo()
+		ed.getIps()
+	}
 	return ed
 }
 
