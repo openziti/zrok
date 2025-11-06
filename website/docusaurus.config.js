@@ -99,6 +99,7 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          routeBasePath: '/docs/zrok',
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl:
             'https://github.com/openziti/zrok/blob/main/docs',
