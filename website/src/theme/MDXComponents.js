@@ -1,13 +1,13 @@
 import React from 'react';
 // Importing the original mapper + our components according to the Docusaurus doc
 import MDXComponents from '@theme-original/MDXComponents';
-import Card from '@site/src/components/Card';
-import CardBody from '@site/src/components/Card/CardBody';
-import CardFooter from '@site/src/components/Card/CardFooter';
-import CardHeader from '@site/src/components/Card/CardHeader';
-import CardImage from '@site/src/components/Card/CardImage';
-import Columns from '@site/src/components/Columns';
-import Column from '@site/src/components/Column';
+import Card from '@zrokroot/src/components/Card';
+import CardBody from '@zrokroot/src/components/Card/CardBody';
+import CardFooter from '@zrokroot/src/components/Card/CardFooter';
+import CardHeader from '@zrokroot/src/components/Card/CardHeader';
+import CardImage from '@zrokroot/src/components/Card/CardImage';
+import Columns from '@zrokroot/src/components/Columns';
+import Column from '@zrokroot/src/components/Column';
 export default {
   // Reusing the default mapping
   ...MDXComponents,

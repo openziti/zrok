@@ -1,7 +1,7 @@
 // download-card.jsx
 import React from 'react';
-import { useAssets } from '@site/src/components/assets-context';
-import styles from '@site/src/css/download-card.module.css';
+import { useAssets } from '@zrokroot/src/components/assets-context';
+import styles from '@zrokroot/src/css/download-card.module.css';
 import { useColorMode } from '@docusaurus/theme-common';
 
 const getFilenamePattern = (osName) => {

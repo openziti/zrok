@@ -1,5 +1,6 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
+const path = require('path');
 
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
@@ -13,10 +14,14 @@ const config = {
   baseUrl: '/',
   trailingSlash: true,
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
   favicon: 'img/zrok-favicon.png',
 
-  markdown: { mermaid: true },
+  markdown: {
+      hooks: {
+          onBrokenMarkdownLinks: "throw",
+      },
+      mermaid: true
+  },
   themes: ['@docusaurus/theme-mermaid'],
 
   // GitHub pages deployment config.
@@ -72,6 +77,20 @@ const config = {
         },
       };
     },
+    function aliasZrokRoot() {
+      return {
+        name: 'alias-zrok-root',
+          configureWebpack() {
+          return {
+            resolve: {
+              alias: {
+                '@zrokroot': path.resolve(__dirname)    // same behavior as @zrokroot
+              }
+            }
+          };
+        }
+      };
+    }
   ],
   
   presets: [
@@ -93,7 +112,16 @@ const config = {
               label: '1.1',
             },
           },
-
+            remarkPlugins: [
+                function forbidSite() {
+                    return (tree, file) => {
+                        const src = String(file);
+                        if (src.includes('@site')) {
+                            throw new Error(`[FORBIDDEN] @zrokroot is not allowed in docs - use @zrokroot.\nFile: ${file.path}`);
+                        }
+                    };
+                }
+            ],
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
