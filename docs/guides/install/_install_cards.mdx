@@ -1,26 +1,27 @@
 import { AssetsProvider } from '@zrokroot/src/components/assets-context';
 import DownloadCard from '@zrokroot/src/components/download-card';
 import DownloadCardStyles from '@zrokroot/src/css/download-card.module.css';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 <AssetsProvider>
   <div className={DownloadCardStyles.downloadContainer}>
     <DownloadCard
       osName="Windows"
-      osLogo="/img/logo-windows.svg"
+      osLogo={useBaseUrl('/img/logo-windows.svg')}
       infoText="Download EXE"
-      guideLink="/docs/guides/install/windows"
+      guideLink={useBaseUrl('/guides/install/windows')}
     />
     <DownloadCard
       osName="macOS"
-      osLogo="/img/logo-apple.svg"
+      osLogo={useBaseUrl('/img/logo-apple.svg')}
       infoText="Homebrew or Download"
-      guideLink="/docs/guides/install/macos"
+      guideLink={useBaseUrl('/guides/install/macos')}
     />
     <DownloadCard
       osName="Linux"
-      osLogo="/img/logo-linux.svg"
+      osLogo={useBaseUrl('/img/logo-linux.svg')}
       infoText="RPM/DEB/AUR or Homebrew"
-      guideLink="/docs/guides/install/linux"
+      guideLink={useBaseUrl('/guides/install/linux')}
     />
   </div>
 </AssetsProvider>

@@ -18,20 +18,17 @@ const getFilenamePattern = (osName) => {
 };
 
 const getArchitecturePattern = (arch) => {
+    if (!arch) return '';
     switch (arch) {
-        case 'amd64':
-            return 'x86_64';
-        case 'arm64':
-            return 'ARM64';
-        case 'armv7':
-            return 'ARM';
-        default:
-            return arch.toUpperCase();
+        case 'amd64': return 'x86_64';
+        case 'arm64': return 'ARM64';
+        case 'armv7': return 'ARM';
+        default: return arch.toUpperCase();
     }
-}
+};
+
 
 const DownloadCard = ({ osName, osLogo, infoText, guideLink }) => {
-    const { colorMode } = useColorMode();
     const assets = useAssets();
     console.log("Assets in DownloadCard:", assets);
     const filenamePattern = getFilenamePattern(osName);
