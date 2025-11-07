@@ -4,11 +4,12 @@ const path = require('path');
 
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const zrok = '/docs/zrok'
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'zrok',
-  staticDirectories: ['static', '../docs/images', '../docker/compose', '../etc/caddy'],
+  staticDirectories: ['static', 'docs/images', '../docker/compose', '../etc/caddy'],
   tagline: 'Globally distributed reverse proxy',
   url: 'https://docs.zrok.io',
   baseUrl: '/',
@@ -42,20 +43,20 @@ const config = {
       {
         redirects: [
           {
-            to: '/docs/guides/self-hosting/linux',
-            from: ['/docs/guides/self-hosting/self_hosting_guide'],
+            to: `${zrok}/guides/self-hosting/linux`,
+            from: [`${zrok}/guides/self-hosting/self_hosting_guide`],
           },
           {
-            to: '/docs/guides/self-hosting/linux/nginx',
-            from: ['/docs/guides/self-hosting/nginx_tls_guide/']
+            to: `${zrok}/guides/self-hosting/linux/nginx`,
+            from: [`${zrok}/guides/self-hosting/nginx_tls_guide/`]
           },
           {
-            to: '/docs/guides/self-hosting/metrics-and-limits/configuring-limits',
-            from: ['/docs/guides/metrics-and-limits/configuring-limits'],
+            to: `${zrok}/guides/self-hosting/metrics-and-limits/configuring-limits`,
+            from: [`${zrok}/guides/metrics-and-limits/configuring-limits`],
           },
           {
-            to: '/docs/guides/self-hosting/metrics-and-limits/configuring-metrics',
-            from: ['/docs/guides/metrics-and-limits/configuring-metrics'],
+            to: `${zrok}/guides/self-hosting/metrics-and-limits/configuring-metrics`,
+            from: [`${zrok}/guides/metrics-and-limits/configuring-metrics`],
           }
         ]
       }
@@ -99,11 +100,11 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          routeBasePath: '/docs/zrok',
+          routeBasePath: `${zrok}`,
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl:
             'https://github.com/openziti/zrok/blob/main/docs',
-          path: '../docs',
+          path: 'docs',
           include: ['**/*.md', '**/*.mdx'],
 
           // Uncomment these lines when we're ready to show the 1.0 docs by default

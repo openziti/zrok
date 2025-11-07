@@ -7,8 +7,8 @@ sidebar_position: 10
 import { AssetsProvider } from '@zrokroot/src/components/assets-context';
 import DownloadCard from '@zrokroot/src/components/download-card.jsx';
 import DownloadCardStyles from '@zrokroot/src/css/download-card.module.css';
-
-import InstallCards from '@zrokroot/../docs/guides/install/_install_cards.mdx';
+import InstallCards from '@zrokroot/docs/guides/install/_install_cards.mdx';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## Your Secure Internet Sharing Perimeter
 
@@ -54,7 +54,7 @@ Here's a quick overview of what's involved in getting started with `zrok`:
                 Run a zrok instance on Linux, Docker, or Kubernetes.
             </CardBody>
             <CardFooter>
-                <a href="/docs/category/self-hosting/">
+                <a href={useBaseUrl("/docs/category/self-hosting/")}>
                     <button className='button button--secondary button--block'>Guides</button>
                 </a>
             </CardFooter>

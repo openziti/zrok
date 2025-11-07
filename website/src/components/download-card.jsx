@@ -30,10 +30,10 @@ const getArchitecturePattern = (arch) => {
 
 const DownloadCard = ({ osName, osLogo, infoText, guideLink }) => {
     const assets = useAssets();
-    console.log("Assets in DownloadCard:", assets);
+    // console.log("Assets in DownloadCard:", assets);
     const filenamePattern = getFilenamePattern(osName);
     const filteredLinks = assets.filter(asset => asset.name.includes(filenamePattern));
-    console.log("Filtered assets for", osName, "in DownloadCard:", filteredLinks);
+    // console.log("Filtered assets for", osName, "in DownloadCard:", filteredLinks);
 
     return (
         // <div className={colorMode === 'dark' ? styles.downloadCardDark : styles.downloadCardLight}>
