@@ -3,7 +3,7 @@ title: Upgrading From 0.4 to 1.0
 ---
 
 ## Upgrading an existing 0.4 environment
-If you have not already, [install the latest 1.x zrok binary](/docs/guides/install) into your environment.
+If you have not already, [install the latest 1.x zrok binary](../guides/install/index.mdx) into your environment.
 
 :::note
 As of zrok `1.0.2`, the zrok rebase is automatic and the configuration will automatically be updated to the v1 API.
