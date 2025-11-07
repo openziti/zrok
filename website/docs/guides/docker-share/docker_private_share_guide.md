@@ -12,7 +12,7 @@ Privately share a Docker Compose service with a separate zrok environment and a 
 
 With zrok, you can privately share a service that's running in Docker. You need a zrok private share running somewhere that it can reach the service you're sharing, and a zrok private access running somewhere else where you want to use the private share. Together, the private share and private access form a private point-to-point tunnel.
 
-Here's a short article with an overview of [private sharing with zrok](/concepts/sharing-private.mdx).
+Here's a short article with an overview of [private sharing with zrok](../../concepts/sharing-private.mdx).
 
 ## Walkthrough Video
 

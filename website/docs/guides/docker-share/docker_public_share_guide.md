@@ -12,7 +12,7 @@ Publicly share a Docker Compose service with a separate zrok environment and a p
 
 With zrok, you can publicly share a service that's running in Docker. You need a zrok public share running somewhere that it can reach the service you're sharing. As long as that public share is running and your service is available, anyone with the address can use your service.
 
-Here's a short article with an overview of [public sharing with zrok](/concepts/sharing-public.mdx).
+Here's a short article with an overview of [public sharing with zrok](../../concepts/sharing-public.mdx).
 
 ## Walkthrough Video
 
