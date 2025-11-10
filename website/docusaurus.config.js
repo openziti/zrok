@@ -23,7 +23,16 @@ const config = {
         },
         mermaid: true
     },
-    themes: ['@docusaurus/theme-mermaid'],
+
+    themes: [
+        '@docusaurus/theme-mermaid',
+        [
+            '@docusaurus/theme-classic',
+            {
+                customCss: require.resolve('./src/css/custom.css')
+            }
+        ]
+    ],
 
     // GitHub pages deployment config.
     // If you aren't using GitHub pages, you don't need these.
@@ -91,51 +100,47 @@ const config = {
                     };
                 },
             };
-        }
-    ],
-
-    presets: [
+        },
         [
-            'classic',
-            /** @type {import('@docusaurus/preset-classic').Options} */
-            ({
-                docs: {
-                    routeBasePath: `${zrok}`,
-                    sidebarPath: require.resolve('./sidebars.js'),
-                    editUrl:
-                        'https://github.com/openziti/zrok/blob/main/docs',
-                    path: 'docs',
-                    include: ['**/*.md', '**/*.mdx'],
+            '@docusaurus/plugin-content-docs',
+            {
+                id: 'zrok',
+                routeBasePath: `${zrok}`,
+                sidebarPath: require.resolve('./sidebars.js'),
+                editUrl: 'https://github.com/openziti/zrok/blob/main/docs',
+                path: 'docs',
+                include: ['**/*.md', '**/*.mdx'],
+                lastVersion: 'current',
+                versions: {
+                    current: { label: '1.1' },
+                },
 
-                    // Uncomment these lines when we're ready to show the 1.0 docs by default
-                    lastVersion: 'current',
-                    versions: {
-                        current: {
-                            label: '1.1',
-                        },
-                    },
-                    remarkPlugins: [
-                        function forbidSite() {
-                            return (tree, file) => {
-                                const src = String(file);
-                                if (src.includes('@site')) {
-                                    throw new Error(`[FORBIDDEN] @site is not allowed in docs - use @zrokroot.\nFile: ${file.path}`);
-                                }
-                            };
+                remarkPlugins: [
+                    function forbidSite() {
+                        return (tree, file) => {
+                            const src = String(file)
+                            if (src.includes('@site')) {
+                                throw new Error(
+                                    `[FORBIDDEN] @site is not allowed in docs - use @zrokroot.\nFile: ${file.path}`
+                                )
+                            }
                         }
-                    ],
-                },
-                theme: {
-                    customCss: require.resolve('./src/css/custom.css'),
-                },
-                pages: {
-                    path: './src/pages'
-                },
-                googleTagManager: {
-                    containerId: 'GTM-MDFLZPK8',
-                },
-                sitemap: {}
-            }),
+                    }
+                ]
+            }
+        ],
+        [
+            '@docusaurus/plugin-content-pages',
+            {
+                path: './src/pages'
+            }
+        ],
+        [
+            '@docusaurus/plugin-google-gtag',
+            {
+                trackingID: 'GTM-MDFLZPK8',
+                anonymizeIP: true
+            }
         ],
     ],
 
@@ -153,6 +158,7 @@ const config = {
                 items: [
                     {
                         type: 'docsVersionDropdown',
+                        docsPluginId: 'zrok',
                     },
                     {
                         href: 'https://zrok.io/pricing/',
