@@ -1,6 +1,26 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 const path = require('path');
+const ZROK_ROOT = path.resolve(__dirname);
+const resolvePath = (p) => path.resolve(ZROK_ROOT, p);
+
+// absolute paths
+const ZROK_CUSTOM_CSS = resolvePath('src/css/custom.css');
+const ZROK_SIDEBARS = resolvePath('sidebars.js');
+const ZROK_STATIC = resolvePath('static');
+const ZROK_DOCS_IMAGES = resolvePath('docs/images');
+const ZROK_DOCKER_COMPOSE = resolvePath('../docker/compose');
+const ZROK_ETC_CADDY = resolvePath('../etc/caddy');
+
+// logs
+console.log('ZROK_ROOT:', ZROK_ROOT);
+console.log('ZROK_CUSTOM_CSS:', ZROK_CUSTOM_CSS);
+console.log('ZROK_SIDEBARS:', ZROK_SIDEBARS);
+console.log('ZROK_STATIC:', ZROK_STATIC);
+console.log('ZROK_DOCS_IMAGES:', ZROK_DOCS_IMAGES);
+console.log('ZROK_DOCKER_COMPOSE:', ZROK_DOCKER_COMPOSE);
+console.log('ZROK_ETC_CADDY:', ZROK_ETC_CADDY);
+
 
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
@@ -9,7 +29,7 @@ const zrok = '/docs/zrok'
 /** @type {import('@docusaurus/types').Config} */
 const config = {
     title: 'zrok',
-    staticDirectories: ['static', 'docs/images', '../docker/compose', '../etc/caddy'],
+    staticDirectories: [ZROK_STATIC, ZROK_DOCS_IMAGES, ZROK_DOCKER_COMPOSE, ZROK_ETC_CADDY],
     tagline: 'Globally distributed reverse proxy',
     url: 'https://docs.zrok.io',
     baseUrl: '/',
@@ -29,7 +49,7 @@ const config = {
         [
             '@docusaurus/theme-classic',
             {
-                customCss: require.resolve('./src/css/custom.css')
+                customCss: ZROK_CUSTOM_CSS,
             }
         ]
     ],
@@ -53,9 +73,7 @@ const config = {
                 configureWebpack(config, isServer) {
                     return {
                         resolve: {
-                            alias: {
-                                '@zrokroot': path.resolve(__dirname),
-                            },
+                            alias: { '@zrokroot': ZROK_ROOT }
                         },
                     };
                 }
@@ -106,7 +124,7 @@ const config = {
             {
                 id: 'zrok',
                 routeBasePath: `${zrok}`,
-                sidebarPath: require.resolve('./sidebars.js'),
+                sidebarPath: ZROK_SIDEBARS,
                 editUrl: 'https://github.com/openziti/zrok/blob/main/docs',
                 path: 'docs',
                 include: ['**/*.md', '**/*.mdx'],
