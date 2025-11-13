@@ -10,7 +10,7 @@ const ZROK_SIDEBARS = resolvePath('sidebars.js');
 const ZROK_STATIC = resolvePath('static');
 const ZROK_DOCS_IMAGES = resolvePath('docs/images');
 const ZROK_DOCKER_COMPOSE = resolvePath('../docker/compose');
-const ZROK_ETC_CADDY = resolvePath('../etc/caddy');
+const ZROK_ETC = resolvePath('../etc');
 
 // logs
 console.log('ZROK_ROOT:', ZROK_ROOT);
@@ -19,7 +19,7 @@ console.log('ZROK_SIDEBARS:', ZROK_SIDEBARS);
 console.log('ZROK_STATIC:', ZROK_STATIC);
 console.log('ZROK_DOCS_IMAGES:', ZROK_DOCS_IMAGES);
 console.log('ZROK_DOCKER_COMPOSE:', ZROK_DOCKER_COMPOSE);
-console.log('ZROK_ETC_CADDY:', ZROK_ETC_CADDY);
+console.log('ZROK_ETC_CADDY:', ZROK_ETC);
 
 
 const lightCodeTheme = require('prism-react-renderer/themes/github');
@@ -29,7 +29,7 @@ const zrok = '/docs/zrok'
 /** @type {import('@docusaurus/types').Config} */
 const config = {
     title: 'zrok',
-    staticDirectories: [ZROK_STATIC, ZROK_DOCS_IMAGES, ZROK_DOCKER_COMPOSE, ZROK_ETC_CADDY],
+    staticDirectories: [ZROK_STATIC, ZROK_DOCS_IMAGES, ZROK_DOCKER_COMPOSE, ZROK_ETC],
     tagline: 'Globally distributed reverse proxy',
     url: 'https://docs.zrok.io',
     baseUrl: '/',
