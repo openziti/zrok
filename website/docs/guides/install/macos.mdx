@@ -7,6 +7,7 @@ import { AssetsProvider } from '@zrokroot/src/components/assets-context';
 import DownloadCard from '@zrokroot/src/components/download-card';
 import styles from '@zrokroot/src/css/download-card.module.css';
 import Homebrew from './_homebrew.mdx';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## Homebrew
 
@@ -18,7 +19,7 @@ import Homebrew from './_homebrew.mdx';
   <div className={styles.downloadContainer}>
     <DownloadCard
       osName="macOS"
-      osLogo="/img/logo-apple.svg"
+      osLogo={useBaseUrl("/img/logo-apple.svg")}
     />
   </div>
 </AssetsProvider>

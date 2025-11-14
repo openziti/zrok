@@ -9,6 +9,7 @@ import styles from '@zrokroot/src/css/download-card.module.css';
 import AnsibleRepoSetup from './_ansible_repo_setup.yaml'
 import ConcatenateYamlSnippets from '@zrokroot/src/components/cat-yaml.jsx'
 import Homebrew from '@zrokroot/docs/guides/install/_homebrew.mdx';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## Install `zrok` from the Repository
 
@@ -53,7 +54,7 @@ Check out [zrok frontdoor](/guides/frontdoor.mdx?os=Linux) for running `zrok` as
   <div className={styles.downloadContainer}>
     <DownloadCard
       osName="Linux"
-      osLogo="/img/logo-linux.svg"
+      osLogo={useBaseUrl('/img/logo-linux.svg')}
     />
   </div>
 </AssetsProvider>

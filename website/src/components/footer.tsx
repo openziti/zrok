@@ -1,9 +1,10 @@
 import {defaultNetFoundryFooterProps, defaultSocialProps} from "@openclint/docusaurus-shared/ui";
 
-export const zlanFooter = {
+export const zrokFooter = {
     ...defaultNetFoundryFooterProps(),
     description:
-        'zLAN is a zero trust & micro-segmentation solution that makes it easy to create secure, software-defined networks.',
+        'zrok is an open-source, self-hostable sharing platform that simplifies shielding ' +
+        'and sharing network services or files.',
     socialProps: {
         ...defaultSocialProps,
         githubUrl: 'https://github.com/netfoundry/',
@@ -12,7 +13,7 @@ export const zlanFooter = {
         twitterUrl: 'https://twitter.com/netfoundry/',
     },
     documentationLinks: [
-        <a key="new" href="/docs/zrok/guides/getting_started">Getting Started zLAN</a>
+        <a key="new" href="/docs/zrok/getting-started">Get started with zrok</a>
     ],
     communityLinks: [
         <a key="new" href="https://openziti.discourse.group/" target="_blank" rel="noopener noreferrer">Discourse Forum</a>

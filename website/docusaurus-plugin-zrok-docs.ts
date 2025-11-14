@@ -16,7 +16,7 @@ export function zrokDocsPluginConfig(rootDir: string): PluginConfig {
             lastVersion: 'current',
             includeCurrentVersion: true,
             versions: {
-                current: { label: '1.1', path: '' },
+                current: { label: '1.1 (Current)', path: '' },
                 '1.0': { label: '1.0', path: '1.0' },
                 '0.4': { label: '0.4', path: '0.4' },
             },
