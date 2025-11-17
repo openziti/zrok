@@ -9,7 +9,7 @@ export function zrokDocsPluginConfig(rootDir: string): PluginConfig {
     return [
         '@docusaurus/plugin-content-docs',
         {
-            id: 'zrok',
+            id: 'zrok', // do not change - affects algolia search
             path: zp,
             routeBasePath: 'zrok',
             sidebarPath: zsbp,
