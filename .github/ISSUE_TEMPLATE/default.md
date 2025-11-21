@@ -1,3 +1,8 @@
+---
+name: Issue
+about: Create an issue
+---
+
 *** IMPORTANT: THIS ISSUE DATABASE IS NOT FOR SUPPORT ***
 
 If you think you have found a bug in zrok, or you need help with a specific issue, please reach out for support on the OpenZiti Discourse group at:
