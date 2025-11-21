@@ -6,8 +6,12 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"time"
 
+	"github.com/corazawaf/coraza/v3"
+	txhttp "github.com/corazawaf/coraza/v3/http"
+	"github.com/corazawaf/coraza/v3/types"
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
@@ -29,6 +33,7 @@ type Backend struct {
 	cfg      *BackendConfig
 	listener edge.Listener
 	handler  http.Handler
+	waf      coraza.WAF
 }
 
 func NewBackend(cfg *BackendConfig) (*Backend, error) {
@@ -57,12 +62,36 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 		return nil, err
 	}
 
-	handler := util.NewRequestsWrapper(proxy)
-	return &Backend{
+	requestsHandler := util.NewRequestsWrapper(proxy)
+
+	b := &Backend{
 		cfg:      cfg,
 		listener: listener,
-		handler:  handler,
-	}, nil
+	}
+
+	waf, err := createWaf(b)
+	if err != nil {
+		return nil, err
+	}
+	b.waf = waf
+
+	b.handler = txhttp.WrapHandler(waf, requestsHandler)
+
+	return b, nil
+}
+
+func createWaf(b *Backend) (coraza.WAF, error) {
+	directivesFile := "./default.conf"
+	if s := os.Getenv("ZROK_WAF_DIRECTIVES_FILE"); s != "" {
+		directivesFile = s
+	}
+
+	waf, err := coraza.NewWAF(coraza.NewWAFConfig().WithErrorCallback(b.logError).WithDirectivesFromFile(directivesFile))
+	if err != nil {
+		return nil, err
+	}
+
+	return waf, nil
 }
 
 func (b *Backend) Run() error {
@@ -74,6 +103,10 @@ func (b *Backend) Run() error {
 
 func (b *Backend) Stop() error {
 	return b.listener.Close()
+}
+
+func (b *Backend) logError(error types.MatchedRule) {
+	dl.Errorf("WAF error: %v", error.ErrorLog())
 }
 
 func newReverseProxy(cfg *BackendConfig) (*httputil.ReverseProxy, error) {
