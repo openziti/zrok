@@ -8,6 +8,7 @@ require (
 	github.com/charmbracelet/bubbles v0.14.0
 	github.com/charmbracelet/bubbletea v0.23.1
 	github.com/charmbracelet/lipgloss v0.6.0
+	github.com/corazawaf/coraza/v3 v3.3.3
 	github.com/go-jose/go-jose/v4 v4.0.5
 	github.com/go-openapi/errors v0.22.3
 	github.com/go-openapi/loads v0.23.1
@@ -99,7 +100,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/chzyer/readline v1.5.1 // indirect
 	github.com/containerd/console v1.0.3 // indirect
-	github.com/corazawaf/coraza/v3 v3.3.3 // indirect
 	github.com/corazawaf/libinjection-go v0.2.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
 	github.com/crewjam/httperr v0.2.0 // indirect
