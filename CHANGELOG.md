@@ -2,6 +2,8 @@
 
 ## v1.1.11
 
+CHANGE: Updated `github.com/greenpau/caddy-security` to `v1.1.31`. Updated `github.com/smallstep/certificates` to `v0.29.0` (CVE-2025-66406 was reported, but only effects indirect dependencies and not relevant to any viable `caddy-security` use cases) (https://github.com/openziti/zrok/issues/1120)
+
 FIX: the `zrok-share.bash` wrapper script for Docker and Linux services was updated to use the new spelling of the `--oauth-email-address-pattern` option (it was `--oauth-email-domains` until v0.4.26 when it changed to `--oauth-email-address-patterns`)
 
 ## v1.1.9
