@@ -4,6 +4,8 @@
 
 CHANGE: The `vpn` backend mode has been removed from zrok due to dependency management issues. The underlying TUN device libraries created conflicts that prevented updates to critical dependencies. See the [VPN removal guide](https://docs.zrok.io/docs/guides/vpn/) for migration alternatives and future plans.
 
+CHANGE: Updated `github.com/greenpau/caddy-security` to `v1.1.31`. Updated `github.com/smallstep/certificates` to `v0.29.0` (CVE-2025-66406 was reported, but only effects indirect dependencies and not relevant to any viable `caddy-security` use cases) (https://github.com/openziti/zrok/issues/1120)
+
 FIX: the `zrok-share.bash` wrapper script for Docker and Linux services was updated to use the new spelling of the `--oauth-email-address-pattern` option (it was `--oauth-email-domains` until v0.4.26 when it changed to `--oauth-email-address-patterns`)
 
 ## v1.1.9
@@ -711,7 +713,7 @@ CHANGE: Incorporate initial docker image build (https://github.com/openziti/zrok
 CHANGE: Improve target URL parsing for `zrok share` when using `--backend-mode` proxy (https://github.com/openziti/zrok/issues/211)
 
 	New and improved URL handling for proxy backends:
-	
+
 	9090 -> http://127.0.0.1:9090
 	localhost:9090 -> http://127.0.0.1:9090
 	https://localhost:9090 -> https://localhost:9090
