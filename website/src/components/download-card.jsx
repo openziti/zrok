@@ -1,7 +1,7 @@
 // download-card.jsx
 import React from 'react';
-import { useAssets } from '@site/src/components/assets-context';
-import styles from '@site/src/css/download-card.module.css';
+import { useAssets } from '@zrokroot/src/components/assets-context';
+import styles from '@zrokroot/src/css/download-card.module.css';
 import { useColorMode } from '@docusaurus/theme-common';
 
 const getFilenamePattern = (osName) => {
@@ -18,25 +18,22 @@ const getFilenamePattern = (osName) => {
 };
 
 const getArchitecturePattern = (arch) => {
+    if (!arch) return '';
     switch (arch) {
-        case 'amd64':
-            return 'x86_64';
-        case 'arm64':
-            return 'ARM64';
-        case 'armv7':
-            return 'ARM';
-        default:
-            return arch.toUpperCase();
+        case 'amd64': return 'x86_64';
+        case 'arm64': return 'ARM64';
+        case 'armv7': return 'ARM';
+        default: return arch.toUpperCase();
     }
-}
+};
+
 
 const DownloadCard = ({ osName, osLogo, infoText, guideLink }) => {
-    const { colorMode } = useColorMode();
     const assets = useAssets();
-    console.log("Assets in DownloadCard:", assets);
+    // console.log("Assets in DownloadCard:", assets);
     const filenamePattern = getFilenamePattern(osName);
     const filteredLinks = assets.filter(asset => asset.name.includes(filenamePattern));
-    console.log("Filtered assets for", osName, "in DownloadCard:", filteredLinks);
+    // console.log("Filtered assets for", osName, "in DownloadCard:", filteredLinks);
 
     return (
         // <div className={colorMode === 'dark' ? styles.downloadCardDark : styles.downloadCardLight}>

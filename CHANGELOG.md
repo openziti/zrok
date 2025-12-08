@@ -37,6 +37,10 @@ CHANGE: All logging migrated from `githhub.com/michaelquigley/pfxlog` and `githu
 
 FIX: Updated the unique constraint on the `accounts.email` column to only be unique when `is not deleted`. This only fixes PostgreSQL databases; fixing SQLite databases effectively requires rebuilding the entire database, see the comment in the issue for details. (https://github.com/openziti/zrok/issues/1109)
 
+## v1.1.11
+
+FIX: the `zrok-share.bash` wrapper script for Docker and Linux services was updated to use the new spelling of the `--oauth-email-address-pattern` option (it was `--oauth-email-domains` until v0.4.26 when it changed to `--oauth-email-address-patterns`)
+
 ## v1.1.9
 
 CHANGE: The `publicProxy` now supports "striped session cookies" to support larger authentication payloads when working with OIDC providers that use larger tokens/payloads. (https://github.com/openziti/zrok/issues/1101)
