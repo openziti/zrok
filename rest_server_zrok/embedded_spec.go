@@ -510,8 +510,7 @@ func init() {
                     "udpTunnel",
                     "caddy",
                     "drive",
-                    "socks",
-                    "vpn"
+                    "socks"
                   ]
                 },
                 "basicAuth": {
@@ -4247,8 +4246,7 @@ func init() {
             "udpTunnel",
             "caddy",
             "drive",
-            "socks",
-            "vpn"
+            "socks"
           ]
         },
         "basicAuthUsers": {
@@ -4891,8 +4889,7 @@ func init() {
                     "udpTunnel",
                     "caddy",
                     "drive",
-                    "socks",
-                    "vpn"
+                    "socks"
                   ]
                 },
                 "basicAuth": {
@@ -8691,8 +8688,7 @@ func init() {
             "udpTunnel",
             "caddy",
             "drive",
-            "socks",
-            "vpn"
+            "socks"
           ]
         },
         "basicAuthUsers": {

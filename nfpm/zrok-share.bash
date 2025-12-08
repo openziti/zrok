@@ -122,7 +122,7 @@ case "${ZROK_BACKEND_MODE}" in
       echo "INFO: validated backend mode ${ZROK_BACKEND_MODE} and target ${ZROK_TARGET}"
     fi
     ;;
-  tcpTunnel|udpTunnel|socks|vpn)
+  tcpTunnel|udpTunnel|socks)
     if ! [[ "${ZROK_FRONTEND_MODE}" =~ -private$ ]]; then
       echo "ERROR: ZROK_BACKEND_MODE='${ZROK_BACKEND_MODE}' is a private share backend mode and cannot be used with ZROK_FRONTEND_MODE='${ZROK_FRONTEND_MODE}'" >&2
       exit 1
@@ -130,15 +130,6 @@ case "${ZROK_BACKEND_MODE}" in
       case "${ZROK_BACKEND_MODE}" in
         tcpTunnel|udpTunnel)
           echo "INFO: ${ZROK_BACKEND_MODE} backend mode has target '${ZROK_TARGET}'"
-          ;;
-        vpn)
-          if [[ -n "${ZROK_TARGET}" ]]; then
-            if ! systemctl cat zrok-share.service | grep -qE '^AmbientCapabilities=.*CAP_NET_ADMIN' >/dev/null; then
-              echo "ERROR: you must 'systemctl edit zrok-share.service' and uncomment
-              'AmbientCapabilities=CAP_NET_ADMIN' to enable VPN mode" >&2
-              exit 1
-            fi
-          fi
           ;;
         socks)
           if [[ -n "${ZROK_TARGET}" ]]; then

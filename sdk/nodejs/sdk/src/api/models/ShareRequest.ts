@@ -134,8 +134,7 @@ export const ShareRequestBackendModeEnum = {
     UdpTunnel: 'udpTunnel',
     Caddy: 'caddy',
     Drive: 'drive',
-    Socks: 'socks',
-    Vpn: 'vpn'
+    Socks: 'socks'
 } as const;
 export type ShareRequestBackendModeEnum = typeof ShareRequestBackendModeEnum[keyof typeof ShareRequestBackendModeEnum];
 
