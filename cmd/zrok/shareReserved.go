@@ -17,7 +17,6 @@ import (
 	"github.com/openziti/zrok/endpoints/socks"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
-	"github.com/openziti/zrok/endpoints/vpn"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/rest_client_zrok/metadata"
@@ -299,26 +298,6 @@ func (cmd *shareReservedCommand) shareLocal(args []string, root env_core.Root) {
 		go func() {
 			if err := be.Run(); err != nil {
 				logrus.Errorf("error running socks backend: %v", err)
-			}
-		}()
-
-	case "vpn":
-		cfg := &vpn.BackendConfig{
-			IdentityPath:    zif,
-			EndpointAddress: target,
-			ShrToken:        shrToken,
-			RequestsChan:    requests,
-			SuperNetwork:    superNetwork,
-		}
-
-		be, err := vpn.NewBackend(cfg)
-		if err != nil {
-			cmd.error("unable to create 'vpn' backend", err)
-		}
-
-		go func() {
-			if err := be.Run(); err != nil {
-				logrus.Errorf("error running VPN backend: %v", err)
 			}
 		}()
 

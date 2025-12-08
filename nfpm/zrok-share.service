@@ -13,8 +13,5 @@ ExecStart=/opt/openziti/bin/zrok-share.bash
 Restart=always
 RestartSec=3
 
-# allow adding tun device and IP routes and iptables rules; required when ZROK_BACKEND_MODE=vpn
-# AmbientCapabilities=CAP_NET_ADMIN
-
 [Install]
 WantedBy=multi-user.target
