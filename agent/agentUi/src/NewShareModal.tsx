@@ -107,7 +107,6 @@ const NewShareModal = ({ close, isOpen }: NewShareModalProps) => {
                             <MenuItem value="caddy">caddy</MenuItem>
                             <MenuItem value="drive">drive</MenuItem>
                             <MenuItem value="socks">socks</MenuItem>
-                            <MenuItem value="vpn">vpn</MenuItem>
                         </TextField>
                     )}
                     <TextField

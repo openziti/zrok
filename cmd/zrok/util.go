@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
-	"net"
 	"net/url"
 	"os"
 	"strconv"
@@ -14,7 +13,6 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/agent/agentClient"
 	"github.com/openziti/zrok/cmd/zrok/subordinate"
-	"github.com/openziti/zrok/endpoints/vpn"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/tui"
@@ -182,20 +180,6 @@ func validateBackendMode(mode string, args []string, allowedModes []string) (tar
 			parseTarget:   nil,
 			forceHeadless: false,
 		},
-		"vpn": {
-			expectsTarget: false, // vpn is optional - can use default
-			parseTarget: func(s string) (string, error) {
-				if s == "" {
-					return vpn.DefaultTarget(), nil
-				}
-				_, _, err := net.ParseCIDR(s)
-				if err != nil {
-					return "", errors.New("the 'vpn' backend mode expects a valid CIDR <target>")
-				}
-				return s, nil
-			},
-			forceHeadless: false,
-		},
 	}
 
 	// check if mode is allowed
@@ -233,20 +217,6 @@ func validateBackendMode(mode string, args []string, allowedModes []string) (tar
 			return "", false, errors.New("the 'socks' backend mode does not expect a <target>")
 		}
 		return "socks", config.forceHeadless, nil
-
-	case "vpn":
-		// vpn has optional target
-		if len(args) == 0 {
-			return vpn.DefaultTarget(), config.forceHeadless, nil
-		} else if len(args) == 1 {
-			target, err = config.parseTarget(args[0])
-			if err != nil {
-				return "", false, errors.Wrap(err, "unable to create share")
-			}
-			return target, config.forceHeadless, nil
-		} else {
-			return "", false, errors.New("the 'vpn' backend mode expects at most one <target>")
-		}
 
 	default:
 		// standard modes that expect exactly one target

@@ -133,8 +133,7 @@ export const RemoteShareRequestBackendModeEnum = {
     UdpTunnel: 'udpTunnel',
     Caddy: 'caddy',
     Drive: 'drive',
-    Socks: 'socks',
-    Vpn: 'vpn'
+    Socks: 'socks'
 } as const;
 export type RemoteShareRequestBackendModeEnum = typeof RemoteShareRequestBackendModeEnum[keyof typeof RemoteShareRequestBackendModeEnum];
 

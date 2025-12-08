@@ -1154,7 +1154,7 @@ paths:
                 type: string
               backendMode:
                 type: string
-                enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks", "vpn"]
+                enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks"]
               insecure:
                 type: boolean
               oauthProvider:
@@ -2697,7 +2697,7 @@ definitions:
         type: string
       backendMode:
         type: string
-        enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks", "vpn"]
+        enum: ["proxy", "web", "tcpTunnel", "udpTunnel", "caddy", "drive", "socks"]
       target:
         type: string
       authScheme:

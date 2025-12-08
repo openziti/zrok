@@ -59,8 +59,8 @@ class RemoteShareRequest(BaseModel):
         if value is None:
             return value
 
-        if value not in set(['proxy', 'web', 'tcpTunnel', 'udpTunnel', 'caddy', 'drive', 'socks', 'vpn']):
-            raise ValueError("must be one of enum values ('proxy', 'web', 'tcpTunnel', 'udpTunnel', 'caddy', 'drive', 'socks', 'vpn')")
+        if value not in set(['proxy', 'web', 'tcpTunnel', 'udpTunnel', 'caddy', 'drive', 'socks']):
+            raise ValueError("must be one of enum values ('proxy', 'web', 'tcpTunnel', 'udpTunnel', 'caddy', 'drive', 'socks')")
         return value
 
     model_config = ConfigDict(
