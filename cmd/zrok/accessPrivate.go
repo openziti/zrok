@@ -22,7 +22,6 @@ import (
 	"github.com/openziti/zrok/endpoints/proxyUi"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
-	"github.com/openziti/zrok/endpoints/vpn"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/rest_client_zrok"
@@ -220,27 +219,6 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 	case "socks":
 		fe, err := tcpTunnel.NewFrontend(&tcpTunnel.FrontendConfig{
 			BindAddress:  bindAddress,
-			IdentityName: root.EnvironmentIdentityName(),
-			ShrToken:     args[0],
-			RequestsChan: requests,
-			SuperNetwork: superNetwork,
-		})
-		if err != nil {
-			cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
-			cmd.error(err)
-		}
-		go func() {
-			if err := fe.Run(); err != nil {
-				cmd.shutdown(accessResp.Payload.FrontendToken, root.Environment().ZitiIdentity, shrToken, zrok, auth)
-				cmd.error(err)
-			}
-		}()
-
-	case "vpn":
-		endpointUrl = &url.URL{
-			Scheme: "VPN",
-		}
-		fe, err := vpn.NewFrontend(&vpn.FrontendConfig{
 			IdentityName: root.EnvironmentIdentityName(),
 			ShrToken:     args[0],
 			RequestsChan: requests,

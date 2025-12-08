@@ -3,11 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"net"
 	"slices"
 	"time"
 
-	"github.com/openziti/zrok/endpoints/vpn"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/sdk/golang/sdk"
 	"github.com/openziti/zrok/tui"
@@ -48,7 +46,7 @@ func newReserveCommand() *reserveCommand {
 	}
 	cmd.Flags().StringVarP(&command.uniqueName, "unique-name", "n", "", "A unique name for the reserved share (defaults to generated identifier)")
 	cmd.Flags().StringArrayVar(&command.frontendSelection, "frontend", defaultFrontends, "Selected frontends to use for the share")
-	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode (public|private: proxy, web, caddy, drive) (private: tcpTunnel, udpTunnel, socks, vpn)")
+	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode (public|private: proxy, web, caddy, drive) (private: tcpTunnel, udpTunnel, socks)")
 	cmd.Flags().BoolVarP(&command.jsonOutput, "json-output", "j", false, "Emit JSON describing the created reserved share")
 	cmd.Flags().StringArrayVar(&command.basicAuth, "basic-auth", []string{}, "Basic authentication users (<username:password>,...)")
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Select named OAuth provider (configured in selected frontend)")
@@ -64,7 +62,7 @@ func newReserveCommand() *reserveCommand {
 
 func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 	shareMode := sdk.ShareMode(args[0])
-	privateOnlyModes := []string{"tcpTunnel", "udpTunnel", "socks", "vpn"}
+	privateOnlyModes := []string{"tcpTunnel", "udpTunnel", "socks"}
 	if shareMode != sdk.PublicShareMode && shareMode != sdk.PrivateShareMode {
 		tui.Error("invalid sharing mode; expecting 'public' or 'private'", nil)
 	} else if shareMode == sdk.PublicShareMode && slices.Contains(privateOnlyModes, cmd.backendMode) {
@@ -122,20 +120,9 @@ func (cmd *reserveCommand) run(_ *cobra.Command, args []string) {
 			tui.Error("the 'socks' backend mode does not expect <target>", nil)
 		}
 
-	case "vpn":
-		if len(args) == 2 {
-			_, _, err := net.ParseCIDR(args[1])
-			if err != nil {
-				tui.Error("the 'vpn' backend expect valid CIDR <target>", err)
-			}
-			target = args[1]
-		} else {
-			target = vpn.DefaultTarget()
-		}
-
 	default:
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'; "+
-			"expected {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks, vpn}", cmd.backendMode), nil)
+			"expected {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks}", cmd.backendMode), nil)
 	}
 
 	env, err := environment.LoadRoot()

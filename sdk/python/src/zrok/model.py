@@ -9,7 +9,6 @@ UDP_TUNNEL_BACKEND_MODE: BackendMode = "udpTunnel"
 CADDY_BACKEND_MODE: BackendMode = "caddy"
 DRIVE_BACKEND_MODE: BackendMode = "drive"
 SOCKS_BACKEND_MODE: BackendMode = "socks"
-VPN_BACKEND_MODE: BackendMode = "vpn"
 
 ShareMode = str
 

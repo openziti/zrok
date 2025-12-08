@@ -85,7 +85,7 @@ type RemoteShareBody struct {
 	AccessGrants []string `json:"accessGrants"`
 
 	// backend mode
-	// Enum: [proxy web tcpTunnel udpTunnel caddy drive socks vpn]
+	// Enum: [proxy web tcpTunnel udpTunnel caddy drive socks]
 	BackendMode string `json:"backendMode,omitempty"`
 
 	// basic auth
@@ -145,7 +145,7 @@ var remoteShareBodyTypeBackendModePropEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["proxy","web","tcpTunnel","udpTunnel","caddy","drive","socks","vpn"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["proxy","web","tcpTunnel","udpTunnel","caddy","drive","socks"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
@@ -175,9 +175,6 @@ const (
 
 	// RemoteShareBodyBackendModeSocks captures enum value "socks"
 	RemoteShareBodyBackendModeSocks string = "socks"
-
-	// RemoteShareBodyBackendModeVpn captures enum value "vpn"
-	RemoteShareBodyBackendModeVpn string = "vpn"
 )
 
 // prop value enum
