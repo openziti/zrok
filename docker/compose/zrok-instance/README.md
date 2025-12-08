@@ -173,7 +173,7 @@ docker compose exec zrok-controller zrok admin create account <email> <password>
 
 You must enable each device environment with the account token obtained when the account was created. This is separate from the account password that's used to log in to the web console.
 
-Follow [the getting started guide](/docs/getting-started#installing-the-zrok-command) to install the zrok CLI on some device and enable a zrok environment.
+Follow [the getting started guide](https://docs.zrok.io/docs/getting-started#installing-the-zrok-command) to install the zrok CLI on some device and enable a zrok environment.
 
 1. Configure the environment with the zrok API endpoint:
 
