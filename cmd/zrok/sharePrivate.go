@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -21,7 +20,6 @@ import (
 	"github.com/openziti/zrok/endpoints/socks"
 	"github.com/openziti/zrok/endpoints/tcpTunnel"
 	"github.com/openziti/zrok/endpoints/udpTunnel"
-	"github.com/openziti/zrok/endpoints/vpn"
 	"github.com/openziti/zrok/environment"
 	"github.com/openziti/zrok/environment/env_core"
 	"github.com/openziti/zrok/sdk/golang/sdk"
@@ -58,7 +56,7 @@ func newSharePrivateCommand() *sharePrivateCommand {
 	if root, err := environment.LoadRoot(); err == nil {
 		headless, _ = root.Headless()
 	}
-	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks, vpn}")
+	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks}")
 	cmd.Flags().BoolVar(&command.headless, "headless", headless, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
 	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
@@ -157,19 +155,8 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 		}
 		target = "socks"
 
-	case "vpn":
-		if len(args) == 1 {
-			_, _, err := net.ParseCIDR(args[0])
-			if err != nil {
-				cmd.error("unable to create share", errors.New("the 'vpn' backend mode expects a valid CIDR <target>"))
-			}
-			target = args[0]
-		} else {
-			target = vpn.DefaultTarget()
-		}
-
 	default:
-		cmd.error("unable to create share", fmt.Errorf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy, drive}", cmd.backendMode))
+		cmd.error("unable to create share", fmt.Errorf("invalid backend mode '%v'; expected {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks}", cmd.backendMode))
 	}
 
 	root, err := environment.LoadRoot()
@@ -356,26 +343,6 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 			}
 		}()
 
-	case "vpn":
-		cfg := &vpn.BackendConfig{
-			IdentityPath:    zif,
-			EndpointAddress: target,
-			ShrToken:        shr.Token,
-			RequestsChan:    requests,
-			SuperNetwork:    superNetwork,
-		}
-
-		be, err := vpn.NewBackend(cfg)
-		if err != nil {
-			cmd.error("unable to create 'vpn' backend", err)
-		}
-
-		go func() {
-			if err := be.Run(); err != nil {
-				logrus.Errorf("error running VPN backend: %v", err)
-			}
-		}()
-
 	default:
 		cmd.error("unable to create share", errors.New("invalid backend mode"))
 	}
@@ -532,17 +499,6 @@ func (cmd *sharePrivateCommand) shareAgent(args []string, root env_core.Root) {
 			tui.Error("the 'socks' backend mode does not expect <target>", nil)
 		}
 		target = "socks"
-
-	case "vpn":
-		if len(args) == 1 {
-			_, _, err := net.ParseCIDR(args[0])
-			if err != nil {
-				tui.Error("the 'vpn' backend expect valid CIDR <target>", err)
-			}
-			target = args[0]
-		} else {
-			target = vpn.DefaultTarget()
-		}
 
 	default:
 		tui.Error(fmt.Sprintf("invalid backend mode '%v'", cmd.backendMode), nil)
