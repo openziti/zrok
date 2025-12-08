@@ -2,7 +2,7 @@
 
 ## v1.1.11
 
-CHANGE: The `vpn` backend mode has been removed from zrok due to dependency management issues. The underlying TUN device libraries created conflicts that prevented updates to critical dependencies. See the [VPN removal guide](https://docs.zrok.io/docs/guides/vpn-removed/) for migration alternatives and future plans.
+CHANGE: The `vpn` backend mode has been removed from zrok due to dependency management issues. The underlying TUN device libraries created conflicts that prevented updates to critical dependencies. See the [VPN removal guide](https://docs.zrok.io/docs/guides/vpn/) for migration alternatives and future plans.
 
 FIX: the `zrok-share.bash` wrapper script for Docker and Linux services was updated to use the new spelling of the `--oauth-email-address-pattern` option (it was `--oauth-email-domains` until v0.4.26 when it changed to `--oauth-email-address-patterns`)
 
