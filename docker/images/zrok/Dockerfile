@@ -21,13 +21,15 @@ USER root
 
 ### add licenses to this directory
 RUN mkdir -p -m0755 /licenses
-COPY ./LICENSE /licenses/apache.txt
+COPY ${DOCKER_BUILD_DIR}/LICENSE /licenses/apache.txt
 
 RUN mkdir -p /usr/local/bin
 COPY --chmod=0755 ${ARTIFACTS_DIR}/${TARGETARCH}/${TARGETOS}/zrok \
-      ./nfpm/zrok-enable.bash \
-      ./nfpm/zrok-share.bash \
+      ${DOCKER_BUILD_DIR}/nfpm/zrok-enable.bash \
+      ${DOCKER_BUILD_DIR}/nfpm/zrok-share.bash \
       /usr/local/bin/
 
+COPY --chmod=0755 ${DOCKER_BUILD_DIR}/docker/images/zrok/entrypoint.bash /entrypoint.bash
+
 USER ziggy
-ENTRYPOINT [ "zrok" ]
+ENTRYPOINT [ "/entrypoint.bash", "zrok" ]

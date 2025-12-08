@@ -25,6 +25,8 @@ RUN wget -qO- https://deb.nodesource.com/setup_20.x | bash \
     && apt-get -y install \
         nodejs
 
+RUN git config --global --add safe.directory /mnt
+
 COPY --from=golang /usr/local/go /usr/local/go
 
 COPY ./linux-build.sh /usr/local/bin/linux-build.sh
