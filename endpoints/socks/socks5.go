@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/endpoints"
+	"github.com/openziti/zrok/v2/endpoints"
 )
 
 // Authentication METHODs described in RFC 1928, section 3.

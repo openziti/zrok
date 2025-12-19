@@ -7,14 +7,14 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/dd"
-	"github.com/openziti/zrok/controller/agentController"
-	"github.com/openziti/zrok/controller/automation"
-	"github.com/openziti/zrok/controller/dynamicProxyController"
-	"github.com/openziti/zrok/controller/emailUi"
-	"github.com/openziti/zrok/controller/env"
-	"github.com/openziti/zrok/controller/limits"
-	"github.com/openziti/zrok/controller/metrics"
-	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/v2/controller/agentController"
+	"github.com/openziti/zrok/v2/controller/automation"
+	"github.com/openziti/zrok/v2/controller/dynamicProxyController"
+	"github.com/openziti/zrok/v2/controller/emailUi"
+	"github.com/openziti/zrok/v2/controller/env"
+	"github.com/openziti/zrok/v2/controller/limits"
+	"github.com/openziti/zrok/v2/controller/metrics"
+	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/pkg/errors"
 )
 

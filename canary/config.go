@@ -3,7 +3,7 @@ package canary
 import (
 	"github.com/michaelquigley/df/dd"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/metrics"
+	"github.com/openziti/zrok/v2/controller/metrics"
 	"github.com/pkg/errors"
 )
 

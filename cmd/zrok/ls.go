@@ -8,11 +8,11 @@ import (
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/drives/sync"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/drives/sync"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/tui"
+	"github.com/openziti/zrok/v2/util"
 	"github.com/spf13/cobra"
 )
 

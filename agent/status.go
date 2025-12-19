@@ -4,7 +4,7 @@ import (
 	"context"
 	"sort"
 
-	"github.com/openziti/zrok/agent/agentGrpc"
+	"github.com/openziti/zrok/v2/agent/agentGrpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

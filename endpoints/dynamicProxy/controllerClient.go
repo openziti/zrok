@@ -8,7 +8,7 @@ import (
 	"github.com/michaelquigley/df/da"
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/zrok/controller/dynamicProxyController"
+	"github.com/openziti/zrok/v2/controller/dynamicProxyController"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

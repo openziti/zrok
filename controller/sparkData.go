@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/v2/controller/store"
 )
 
 func sparkDataForEnvironments(envs []*store.Environment) (rx, tx map[int][]int64, err error) {

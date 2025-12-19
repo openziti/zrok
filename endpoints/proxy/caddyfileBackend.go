@@ -13,8 +13,8 @@ import (
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp/fileserver"
 	_ "github.com/greenpau/caddy-security"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/endpoints"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
 
 //go:embed browse.html

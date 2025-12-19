@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/environment/env_v0_3"
+	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/environment/env_v0_3"
 	"github.com/pkg/errors"
 )
 

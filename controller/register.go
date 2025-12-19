@@ -3,10 +3,10 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/config"
-	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/account"
+	"github.com/openziti/zrok/v2/controller/config"
+	"github.com/openziti/zrok/v2/controller/store"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/account"
 )
 
 type registerHandler struct {

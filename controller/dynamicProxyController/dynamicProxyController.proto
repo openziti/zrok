@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/openziti/zrok/controller/dynamicProxyController";
+option go_package = "github.com/openziti/zrok/v2/controller/dynamicProxyController";
 
 service DynamicProxyController {
   rpc FrontendMappings(FrontendMappingsRequest) returns (FrontendMappingsResponse);

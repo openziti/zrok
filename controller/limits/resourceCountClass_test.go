@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/stretchr/testify/assert"
 )
 

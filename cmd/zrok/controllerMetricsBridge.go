@@ -8,8 +8,8 @@ import (
 
 	"github.com/michaelquigley/df/dd"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/config"
-	"github.com/openziti/zrok/controller/metrics"
+	"github.com/openziti/zrok/v2/controller/config"
+	"github.com/openziti/zrok/v2/controller/metrics"
 	"github.com/spf13/cobra"
 )
 

@@ -23,6 +23,8 @@ FEATURE: `zrok overview` now includes a human-readable default output, that form
 
 FEATURE: `zrok admin migrate` now supports a `--down <n>` flag, which allows for reverse-migration by a specified number of migrations
 
+CHANGE: The root package path was migrated from `github.com/openziti/zrok` to `github.com/openziti/zrok/v2` to accomodate golang v2+ package naming semantics.
+
 CHANGE: `zrok status` now shows `EnvZId` instead of `Ziti Identity` in output. (https://github.com/openziti/zrok/issues/1107)
 
 CHANGE: `defaultFrontend` configuration replaced with new `defaultNamespace`, which provides the logical equivalent of the old name-handling configuration (https://github.com/openziti/zrok/issues/1065)

@@ -10,7 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/michaelquigley/df/dd"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/endpoints/proxyUi"
+	"github.com/openziti/zrok/v2/endpoints/proxyUi"
 	"github.com/pkg/errors"
 )
 

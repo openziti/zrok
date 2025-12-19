@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/build"
-	"github.com/openziti/zrok/tui"
+	"github.com/openziti/zrok/v2/build"
+	"github.com/openziti/zrok/v2/tui"
 	"github.com/spf13/cobra"
 )
 

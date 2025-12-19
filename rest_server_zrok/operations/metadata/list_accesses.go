@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
 
 // ListAccessesHandlerFunc turns a function with the right signature into a list accesses handler

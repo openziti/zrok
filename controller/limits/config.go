@@ -1,7 +1,7 @@
 package limits
 
 import (
-	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/v2/controller/store"
 	"time"
 )
 

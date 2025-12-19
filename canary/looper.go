@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/util"
 )
 
 type LooperOptions struct {

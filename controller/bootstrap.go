@@ -8,11 +8,11 @@ import (
 	"github.com/michaelquigley/df/dl"
 	restModelEdge "github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/zrok/controller/automation"
-	"github.com/openziti/zrok/controller/config"
-	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/controller/automation"
+	"github.com/openziti/zrok/v2/controller/config"
+	"github.com/openziti/zrok/v2/controller/store"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 	"github.com/pkg/errors"
 )
 

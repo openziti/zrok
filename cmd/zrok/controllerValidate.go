@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/michaelquigley/df/dd"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/config"
-	"github.com/openziti/zrok/tui"
+	"github.com/openziti/zrok/v2/controller/config"
+	"github.com/openziti/zrok/v2/tui"
 	"github.com/spf13/cobra"
 )
 

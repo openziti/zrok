@@ -14,9 +14,9 @@ import (
 
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/zrok/cmd/zrok/endpointUi"
-	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/cmd/zrok/endpointUi"
+	"github.com/openziti/zrok/v2/tui"
+	"github.com/openziti/zrok/v2/util"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.org/x/time/rate"

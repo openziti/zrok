@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
 
 type DisablerOptions struct {

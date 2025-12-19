@@ -16,7 +16,7 @@ import (
 	"strings"
 	"testing"
 
-	ixml "github.com/openziti/zrok/drives/davServer/internal/xml"
+	ixml "github.com/openziti/zrok/v2/drives/davServer/internal/xml"
 )
 
 func TestReadLockInfo(t *testing.T) {

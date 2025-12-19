@@ -5,9 +5,9 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/agent/agentGrpc"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/agent"
+	"github.com/openziti/zrok/v2/agent/agentGrpc"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/agent"
 )
 
 type agentRemoteShareHandler struct{}

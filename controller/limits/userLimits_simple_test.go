@@ -3,8 +3,8 @@ package limits
 import (
 	"testing"
 
-	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/controller/store"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 	"github.com/stretchr/testify/assert"
 )
 

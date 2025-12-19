@@ -6,10 +6,10 @@ import (
 	"fmt"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/agent/agentGrpc"
-	"github.com/openziti/zrok/agent/proctree"
-	"github.com/openziti/zrok/cmd/zrok/subordinate"
-	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/v2/agent/agentGrpc"
+	"github.com/openziti/zrok/v2/agent/proctree"
+	"github.com/openziti/zrok/v2/cmd/zrok/subordinate"
+	"github.com/openziti/zrok/v2/environment"
 )
 
 func (a *Agent) AccessPrivate(req *AccessPrivateRequest) (frontendToken string, err error) {

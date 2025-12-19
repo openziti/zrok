@@ -2,7 +2,7 @@ package limits
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/v2/controller/store"
 )
 
 type AccountAction interface {

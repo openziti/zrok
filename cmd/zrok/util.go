@@ -11,11 +11,11 @@ import (
 
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti/zrok/agent/agentClient"
-	"github.com/openziti/zrok/cmd/zrok/subordinate"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/tui"
+	"github.com/openziti/zrok/v2/agent/agentClient"
+	"github.com/openziti/zrok/v2/cmd/zrok/subordinate"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/tui"
 	"github.com/pkg/errors"
 )
 

@@ -9,7 +9,7 @@ import (
 	"github.com/michaelquigley/df/da"
 	"github.com/michaelquigley/df/dd"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/dynamicProxyController"
+	"github.com/openziti/zrok/v2/controller/dynamicProxyController"
 	"github.com/pkg/errors"
 	amqp "github.com/rabbitmq/amqp091-go"
 )

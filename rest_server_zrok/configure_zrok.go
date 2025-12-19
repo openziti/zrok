@@ -7,11 +7,11 @@ import (
 	"net/http"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/ui"
+	"github.com/openziti/zrok/v2/ui"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
-	"github.com/openziti/zrok/rest_server_zrok/operations"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations"
 )
 
 var HealthCheck func(w http.ResponseWriter, r *http.Request)

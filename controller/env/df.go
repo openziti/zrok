@@ -2,7 +2,7 @@ package env
 
 import (
 	"github.com/michaelquigley/df/dd"
-	"github.com/openziti/zrok/controller/metrics"
+	"github.com/openziti/zrok/v2/controller/metrics"
 )
 
 var ddOpts *dd.Options

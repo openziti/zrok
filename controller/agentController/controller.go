@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/zrok/agent/agentGrpc"
+	"github.com/openziti/zrok/v2/agent/agentGrpc"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

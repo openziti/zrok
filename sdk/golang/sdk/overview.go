@@ -3,7 +3,7 @@ package sdk
 import (
 	"errors"
 	"fmt"
-	"github.com/openziti/zrok/environment/env_core"
+	"github.com/openziti/zrok/v2/environment/env_core"
 	"io"
 	"net/http"
 )

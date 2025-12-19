@@ -6,9 +6,9 @@ import (
 	"syscall"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/endpoints/dynamicProxy"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/tui"
+	"github.com/openziti/zrok/v2/endpoints/dynamicProxy"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/tui"
 	"github.com/spf13/cobra"
 )
 

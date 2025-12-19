@@ -6,9 +6,9 @@ import (
 	"html/template"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/build"
+	"github.com/openziti/zrok/v2/build"
 
-	"github.com/openziti/zrok/controller/emailUi"
+	"github.com/openziti/zrok/v2/controller/emailUi"
 	"github.com/pkg/errors"
 	"github.com/wneessen/go-mail"
 )

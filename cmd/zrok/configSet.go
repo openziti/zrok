@@ -6,9 +6,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/tui"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/tui"
 	"github.com/spf13/cobra"
 )
 

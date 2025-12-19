@@ -5,9 +5,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/emailUi"
-	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/controller/emailUi"
+	"github.com/openziti/zrok/v2/controller/store"
+	"github.com/openziti/zrok/v2/util"
 	"github.com/pkg/errors"
 )
 

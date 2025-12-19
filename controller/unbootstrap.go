@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/automation"
-	"github.com/openziti/zrok/controller/config"
-	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/controller/automation"
+	"github.com/openziti/zrok/v2/controller/config"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
 
 func Unbootstrap(cfg *config.Config) error {

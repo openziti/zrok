@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/automation"
-	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/controller/automation"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 	"github.com/pkg/errors"
 )
 

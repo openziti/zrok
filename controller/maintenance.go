@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/config"
+	"github.com/openziti/zrok/v2/controller/config"
 
 	"github.com/pkg/errors"
 )

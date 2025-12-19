@@ -4,8 +4,8 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/share"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/share"
 	"github.com/pkg/errors"
 )
 

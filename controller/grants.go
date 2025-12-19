@@ -3,10 +3,10 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/automation"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
-	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/controller/automation"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/admin"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
 
 type grantsHandler struct{}

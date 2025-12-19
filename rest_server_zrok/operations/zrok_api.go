@@ -19,13 +19,13 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/account"
-	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
-	"github.com/openziti/zrok/rest_server_zrok/operations/agent"
-	"github.com/openziti/zrok/rest_server_zrok/operations/environment"
-	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
-	"github.com/openziti/zrok/rest_server_zrok/operations/share"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/account"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/admin"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/agent"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/environment"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/metadata"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/share"
 )
 
 // NewZrokAPI creates a new Zrok instance

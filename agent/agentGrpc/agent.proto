@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/openziti/zrok/agent/agentGrpc";
+option go_package = "github.com/openziti/zrok/v2/agent/agentGrpc";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";

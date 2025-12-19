@@ -16,7 +16,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
 
 // GetSparklinesReader is a Reader for the GetSparklines structure.

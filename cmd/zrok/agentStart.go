@@ -5,9 +5,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/openziti/zrok/agent"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/tui"
+	"github.com/openziti/zrok/v2/agent"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/tui"
 	"github.com/spf13/cobra"
 )
 

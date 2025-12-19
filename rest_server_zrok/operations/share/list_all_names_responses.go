@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
 
 // ListAllNamesOKCode is the HTTP code returned for type ListAllNamesOK

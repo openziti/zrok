@@ -3,8 +3,8 @@ package sdk
 import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/rest_client_zrok/share"
+	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/rest_client_zrok/share"
 	"github.com/pkg/errors"
 )
 

@@ -3,8 +3,8 @@ package store
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/util"
 	"github.com/pkg/errors"
 )
 

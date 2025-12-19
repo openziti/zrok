@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
 
 // ListNamesForNamespaceHandlerFunc turns a function with the right signature into a list names for namespace handler

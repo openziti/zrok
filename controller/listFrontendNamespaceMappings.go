@@ -3,8 +3,8 @@ package controller
 import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/admin"
 )
 
 type listFrontendNamespaceMappingsHandler struct{}

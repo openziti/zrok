@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/openziti/zrok/rest_client_zrok/metadata"
+	"github.com/openziti/zrok/v2/rest_client_zrok/metadata"
 	"github.com/spf13/cobra"
 )
 

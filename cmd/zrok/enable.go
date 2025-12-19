@@ -9,11 +9,11 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/environment/env_core"
-	restEnvironment "github.com/openziti/zrok/rest_client_zrok/environment"
-	"github.com/openziti/zrok/tui"
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/environment/env_core"
+	restEnvironment "github.com/openziti/zrok/v2/rest_client_zrok/environment"
+	"github.com/openziti/zrok/v2/tui"
+	"github.com/openziti/zrok/v2/util"
 	"github.com/spf13/cobra"
 )
 

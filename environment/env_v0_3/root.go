@@ -2,7 +2,7 @@ package env_v0_3
 
 import (
 	"encoding/json"
-	"github.com/openziti/zrok/environment/env_core"
+	"github.com/openziti/zrok/v2/environment/env_core"
 	"github.com/pkg/errors"
 	"os"
 	"path/filepath"

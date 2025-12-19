@@ -4,9 +4,9 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/agent/proctree"
-	"github.com/openziti/zrok/cmd/zrok/subordinate"
-	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/agent/proctree"
+	"github.com/openziti/zrok/v2/cmd/zrok/subordinate"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
 
 type SharePrivateRequest struct {

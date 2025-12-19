@@ -24,7 +24,7 @@ import (
 	flags "github.com/jessevdk/go-flags"
 	"golang.org/x/net/netutil"
 
-	"github.com/openziti/zrok/rest_server_zrok/operations"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations"
 )
 
 const (

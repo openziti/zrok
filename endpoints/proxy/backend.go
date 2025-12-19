@@ -11,8 +11,8 @@ import (
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
-	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/endpoints"
+	"github.com/openziti/zrok/v2/util"
 	"github.com/pkg/errors"
 )
 

@@ -3,7 +3,7 @@ package sdk
 import (
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
-	"github.com/openziti/zrok/environment/env_core"
+	"github.com/openziti/zrok/v2/environment/env_core"
 	"github.com/pkg/errors"
 	"time"
 )

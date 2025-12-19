@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/openziti/zrok/agent/agentClient"
-	"github.com/openziti/zrok/agent/agentGrpc"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/tui"
+	"github.com/openziti/zrok/v2/agent/agentClient"
+	"github.com/openziti/zrok/v2/agent/agentGrpc"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/tui"
 	"github.com/spf13/cobra"
 )
 

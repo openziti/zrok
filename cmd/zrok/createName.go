@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/rest_client_zrok/share"
-	"github.com/openziti/zrok/tui"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/rest_client_zrok/share"
+	"github.com/openziti/zrok/v2/tui"
 	"github.com/spf13/cobra"
 )
 

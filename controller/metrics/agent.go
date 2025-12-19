@@ -2,7 +2,7 @@ package metrics
 
 import (
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/pkg/errors"
 )
 

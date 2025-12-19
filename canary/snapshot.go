@@ -2,7 +2,7 @@ package canary
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/util"
 	"time"
 )
 

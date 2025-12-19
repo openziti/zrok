@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/rest_client_zrok/admin"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/rest_client_zrok/admin"
 	"github.com/spf13/cobra"
 )
 

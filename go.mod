@@ -1,4 +1,4 @@
-module github.com/openziti/zrok
+module github.com/openziti/zrok/v2
 
 go 1.25.3
 

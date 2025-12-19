@@ -6,11 +6,11 @@ import (
 	"fmt"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/agent/agentGrpc"
-	"github.com/openziti/zrok/agent/proctree"
-	"github.com/openziti/zrok/cmd/zrok/subordinate"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/agent/agentGrpc"
+	"github.com/openziti/zrok/v2/agent/proctree"
+	"github.com/openziti/zrok/v2/cmd/zrok/subordinate"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
 
 func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err error) {

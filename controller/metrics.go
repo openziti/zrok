@@ -9,9 +9,9 @@ import (
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/metrics"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
+	"github.com/openziti/zrok/v2/controller/metrics"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/metadata"
 )
 
 type getAccountMetricsHandler struct {

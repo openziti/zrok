@@ -12,8 +12,8 @@ import (
 	"github.com/openziti/transport/v2"
 	"github.com/openziti/transport/v2/tcp"
 	"github.com/openziti/transport/v2/udp"
-	_ "github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/tui"
+	_ "github.com/openziti/zrok/v2/endpoints"
+	"github.com/openziti/zrok/v2/tui"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

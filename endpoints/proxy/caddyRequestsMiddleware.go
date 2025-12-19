@@ -2,7 +2,7 @@ package proxy
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/endpoints"
+	"github.com/openziti/zrok/v2/endpoints"
 	"net/http"
 	"time"
 

@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/canary"
-	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/v2/canary"
+	"github.com/openziti/zrok/v2/environment"
 	"github.com/spf13/cobra"
 )
 

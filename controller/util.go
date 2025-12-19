@@ -10,10 +10,10 @@ import (
 	"github.com/jaevor/go-nanoid"
 	"github.com/jmoiron/sqlx"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/config"
-	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/controller/config"
+	"github.com/openziti/zrok/v2/controller/store"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/util"
 )
 
 type zrokAuthenticator struct {

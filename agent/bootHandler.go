@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/cmd/zrok/subordinate"
-	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/cmd/zrok/subordinate"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
 
 // BootHandlerConfig defines the field mappings for extracting values from boot messages

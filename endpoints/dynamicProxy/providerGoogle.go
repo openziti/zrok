@@ -9,14 +9,14 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/openziti/zrok/endpoints"
+	"github.com/openziti/zrok/v2/endpoints"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/michaelquigley/df/dd"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/endpoints/proxyUi"
+	"github.com/openziti/zrok/v2/endpoints/proxyUi"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	zhttp "github.com/zitadel/oidc/v2/pkg/http"
 	"github.com/zitadel/oidc/v2/pkg/oidc"

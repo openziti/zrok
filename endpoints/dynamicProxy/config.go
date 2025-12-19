@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/michaelquigley/df/dd"
-	"github.com/openziti/zrok/endpoints"
+	"github.com/openziti/zrok/v2/endpoints"
 )
 
 type config struct {

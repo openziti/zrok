@@ -9,8 +9,8 @@ import (
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/michaelquigley/df/dl"
-	postgresql_schema "github.com/openziti/zrok/controller/store/sql/postgresql"
-	sqlite3_schema "github.com/openziti/zrok/controller/store/sql/sqlite3"
+	postgresql_schema "github.com/openziti/zrok/v2/controller/store/sql/postgresql"
+	sqlite3_schema "github.com/openziti/zrok/v2/controller/store/sql/sqlite3"
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
 )

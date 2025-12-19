@@ -7,8 +7,8 @@ import (
 
 	"github.com/michaelquigley/df/dd"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/proxyUi"
+	"github.com/openziti/zrok/v2/endpoints"
+	"github.com/openziti/zrok/v2/endpoints/proxyUi"
 	"github.com/pkg/errors"
 	zhttp "github.com/zitadel/oidc/v2/pkg/http"
 )

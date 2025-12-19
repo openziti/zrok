@@ -6,7 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/v2/controller/store"
 	"google.golang.org/grpc"
 )
 

@@ -8,7 +8,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/michaelquigley/df/da"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/dynamicProxyController"
+	"github.com/openziti/zrok/v2/controller/dynamicProxyController"
 	"github.com/pkg/errors"
 )
 

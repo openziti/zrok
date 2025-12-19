@@ -18,7 +18,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
 
 // RemoteShareReader is a Reader for the RemoteShare structure.

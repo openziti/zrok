@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/michaelquigley/df/dl"
-	restEnvironment "github.com/openziti/zrok/rest_client_zrok/environment"
-	"github.com/openziti/zrok/tui"
+	restEnvironment "github.com/openziti/zrok/v2/rest_client_zrok/environment"
+	"github.com/openziti/zrok/v2/tui"
 	"github.com/spf13/cobra"
 )
 

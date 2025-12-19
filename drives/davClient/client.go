@@ -3,7 +3,7 @@ package davClient
 import (
 	"context"
 	"fmt"
-	"github.com/openziti/zrok/drives/davClient/internal"
+	"github.com/openziti/zrok/v2/drives/davClient/internal"
 	"io"
 	"net/http"
 	"time"

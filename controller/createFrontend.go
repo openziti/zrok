@@ -7,10 +7,10 @@ import (
 	"github.com/lib/pq"
 	"github.com/mattn/go-sqlite3"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/automation"
-	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
+	"github.com/openziti/zrok/v2/controller/automation"
+	"github.com/openziti/zrok/v2/controller/store"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/admin"
 )
 
 type createFrontendHandler struct{}

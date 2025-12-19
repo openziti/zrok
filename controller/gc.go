@@ -4,9 +4,9 @@ import (
 	"strings"
 
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/controller/automation"
-	zrok_config "github.com/openziti/zrok/controller/config"
-	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/v2/controller/automation"
+	zrok_config "github.com/openziti/zrok/v2/controller/config"
+	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/pkg/errors"
 )
 

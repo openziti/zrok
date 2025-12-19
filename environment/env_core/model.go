@@ -1,6 +1,6 @@
 package env_core
 
-import "github.com/openziti/zrok/rest_client_zrok"
+import "github.com/openziti/zrok/v2/rest_client_zrok"
 
 // Root is the primary interface encapsulating the on-disk environment data.
 type Root interface {

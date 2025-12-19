@@ -8,7 +8,7 @@ import (
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/util"
 )
 
 type influxWriter struct {

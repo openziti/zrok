@@ -2,7 +2,7 @@ package automation
 
 import (
 	"github.com/openziti/edge-api/rest_model"
-	"github.com/openziti/zrok/build"
+	"github.com/openziti/zrok/v2/build"
 )
 
 type Tags struct {
