@@ -23,7 +23,7 @@ package main
 import (
     "context"
     "fmt"
-    "github.com/openziti/zrok/sdk/golang/pubsub"
+    "github.com/openziti/zrok/v2/sdk/golang/pubsub"
     "github.com/sirupsen/logrus"
 )
 
@@ -67,7 +67,7 @@ import (
     "context"
     "fmt"
     "time"
-    "github.com/openziti/zrok/sdk/golang/pubsub"
+    "github.com/openziti/zrok/v2/sdk/golang/pubsub"
     "github.com/sirupsen/logrus"
 )
 
@@ -159,7 +159,7 @@ package main
 import (
     "context"
     "time"
-    "github.com/openziti/zrok/sdk/golang/pubsub"
+    "github.com/openziti/zrok/v2/sdk/golang/pubsub"
     "github.com/sirupsen/logrus"
 )
 
@@ -214,7 +214,7 @@ package main
 import (
     "context"
     "time"
-    "github.com/openziti/zrok/sdk/golang/pubsub"
+    "github.com/openziti/zrok/v2/sdk/golang/pubsub"
     "github.com/sirupsen/logrus"
 )
 

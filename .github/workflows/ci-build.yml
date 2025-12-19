@@ -55,7 +55,7 @@ jobs:
           
       - name: go install
         shell: bash
-        run: go install -ldflags "-X github.com/openziti/zrok/build.Version=${{ github.ref }} -X github.com/openziti/zrok/build.Hash=${{ github.sha }}" ./...
+        run: go install -ldflags "-X github.com/openziti/zrok/v2/build.Version=${{ github.ref }} -X github.com/openziti/zrok/v2/build.Hash=${{ github.sha }}" ./...
 
       - name: go test
         shell: bash

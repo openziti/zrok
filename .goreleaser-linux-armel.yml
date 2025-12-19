@@ -7,7 +7,7 @@ builds:
   main: ./cmd/zrok
   binary: zrok
   ldflags: 
-    - "-s -w -X github.com/openziti/zrok/build.Version={{.Tag}} -X github.com/openziti/zrok/build.Hash={{.ShortCommit}}"
+    - "-s -w -X github.com/openziti/zrok/v2/build.Version={{.Tag}} -X github.com/openziti/zrok/v2/build.Hash={{.ShortCommit}}"
   env:
     - CC=arm-linux-gnueabi-gcc
     - CGO_ENABLED=1

@@ -58,7 +58,7 @@ else
 fi
 
 for ARCH in "${JOBS[@]}"; do
-    LDFLAGS="-s -w -X 'github.com/openziti/zrok/build.Version=${VERSION}' -X 'github.com/openziti/zrok/build.Hash=${HASH}'"
+    LDFLAGS="-s -w -X 'github.com/openziti/zrok/v2/build.Version=${VERSION}' -X 'github.com/openziti/zrok/v2/build.Hash=${HASH}'"
     GOOS=linux GOARCH=$(resolveArch "${ARCH}") \
     go build -o "./dist/$(resolveArch "${ARCH}")/linux/zrok" \
     -ldflags "${LDFLAGS}" \
