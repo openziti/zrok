@@ -12,6 +12,9 @@ import TabularView from "./TabularView.tsx";
 import {Node} from "@xyflow/react";
 import {getMetadataApi} from "./model/api.ts";
 import {User} from "./model/user.ts";
+import {PanelWrapper} from "./extensions/PanelWrapper.tsx";
+import {Slot} from "./extensions/SlotRenderer.tsx";
+import {SLOTS} from "./extensions/types.ts";
 
 interface ApiConsoleProps {
     logout: () => void;
@@ -158,19 +161,35 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         if(selectedNode) {
             switch(selectedNode.type) {
                 case "account":
-                    setSidePanel(<AccountPanel account={selectedNode} />);
+                    setSidePanel(
+                        <PanelWrapper nodeType="account" node={selectedNode}>
+                            <AccountPanel account={selectedNode} />
+                        </PanelWrapper>
+                    );
                     break;
 
                 case "environment":
-                    setSidePanel(<EnvironmentPanel environment={selectedNode} />);
+                    setSidePanel(
+                        <PanelWrapper nodeType="environment" node={selectedNode}>
+                            <EnvironmentPanel environment={selectedNode} />
+                        </PanelWrapper>
+                    );
                     break;
 
                 case "share":
-                    setSidePanel(<SharePanel share={selectedNode} />);
+                    setSidePanel(
+                        <PanelWrapper nodeType="share" node={selectedNode}>
+                            <SharePanel share={selectedNode} />
+                        </PanelWrapper>
+                    );
                     break;
 
                 case "access":
-                    setSidePanel(<AccessPanel access={selectedNode} />);
+                    setSidePanel(
+                        <PanelWrapper nodeType="access" node={selectedNode}>
+                            <AccessPanel access={selectedNode} />
+                        </PanelWrapper>
+                    );
                     break;
             }
         } else {
@@ -181,12 +200,18 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     return (
         <div>
             <NavBar logout={logout} visualizer={visualizerEnabled} toggleMode={setVisualizerEnabled} />
+            {/* Extension slot: top of console area */}
+            <Slot name={SLOTS.CONSOLE_TOP} user={user} selectedNode={selectedNode} />
             <Grid2 container spacing={2} columns={{ xs: 4, sm: 10, md: 12 }}>
                 <Grid2 size="grow">
                     {mainPanel}
                 </Grid2>
                 {sidePanel ? <Grid2 container size={5}><Grid2 >{sidePanel}</Grid2></Grid2> : null}
+                {/* Extension slot: sidebar area */}
+                <Slot name={SLOTS.CONSOLE_SIDEBAR} user={user} selectedNode={selectedNode} />
             </Grid2>
+            {/* Extension slot: bottom of console area */}
+            <Slot name={SLOTS.CONSOLE_BOTTOM} user={user} selectedNode={selectedNode} />
         </div>
     );
 }
