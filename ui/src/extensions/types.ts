@@ -58,6 +58,45 @@ export interface ExtensionManifest {
 
   /** Called when a user logs out */
   onUserLogout?: (context: ExtensionContext) => void;
+
+  /**
+   * Scripts to inject into the <head> element at build time.
+   * Use for analytics, tracking, or other scripts that need to load early.
+   */
+  headScripts?: ScriptDefinition[];
+
+  /**
+   * Scripts to inject before </body> at build time.
+   * Use for scripts that should load after the page content.
+   */
+  bodyScripts?: ScriptDefinition[];
+}
+
+/**
+ * Defines a script to be injected into the HTML document.
+ * Used for both build-time and runtime script injection.
+ */
+export interface ScriptDefinition {
+  /** External script URL (mutually exclusive with content) */
+  src?: string;
+
+  /** Inline script content (mutually exclusive with src) */
+  content?: string;
+
+  /** Load script asynchronously */
+  async?: boolean;
+
+  /** Defer script execution until document is parsed */
+  defer?: boolean;
+
+  /** Script type (default: "text/javascript") */
+  type?: string;
+
+  /** Script ID for identification and deduplication */
+  id?: string;
+
+  /** Additional HTML attributes to add to the script tag */
+  attributes?: Record<string, string>;
 }
 
 /**

@@ -5,7 +5,7 @@
  * Demonstrates how extensions can add complete pages to the UI.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -16,13 +16,15 @@ import {
   Typography,
   AppBar,
   Toolbar,
+  Chip,
 } from '@mui/material';
 import { useNavigate } from 'react-router';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { ExtensionRouteProps } from '../../../src/extensions';
+import CodeIcon from '@mui/icons-material/Code';
+import { ExtensionRouteProps, ScriptInjector, useScriptInjector } from '../../../src/extensions';
 import { DemoExtensionState } from './index';
 
 const DemoPage: React.FC<ExtensionRouteProps> = ({ user, context, logout }) => {
@@ -32,6 +34,11 @@ const DemoPage: React.FC<ExtensionRouteProps> = ({ user, context, logout }) => {
   const state = context.getState<DemoExtensionState>();
   const counter = state?.counter ?? 0;
   const lastVisited = state?.lastVisited;
+
+  // Runtime script injection demo
+  const [runtimeScriptLoaded, setRuntimeScriptLoaded] = useState(false);
+  const [hookScriptLoaded, setHookScriptLoaded] = useState(false);
+  const { injectScript, removeScript, isLoaded } = useScriptInjector();
 
   const handleIncrement = () => {
     context.setState<DemoExtensionState>({ counter: counter + 1 });
@@ -49,6 +56,31 @@ const DemoPage: React.FC<ExtensionRouteProps> = ({ user, context, logout }) => {
 
   const handleSettings = () => {
     navigate('/demo/settings');
+  };
+
+  // Handler for useScriptInjector hook demo
+  const handleInjectScript = async () => {
+    try {
+      await injectScript({
+        id: 'demo-hook-injected-script',
+        content: `
+          console.log('[Demo Extension] Script injected via useScriptInjector hook!');
+          window.demoHookInjected = true;
+        `,
+      });
+      setHookScriptLoaded(true);
+      context.notify('Script injected via hook!', 'success');
+    } catch (error) {
+      context.notify('Failed to inject script', 'error');
+    }
+  };
+
+  const handleRemoveScript = () => {
+    const removed = removeScript('demo-hook-injected-script');
+    if (removed) {
+      setHookScriptLoaded(false);
+      context.notify('Script removed!', 'info');
+    }
   };
 
   return (
@@ -141,6 +173,78 @@ const DemoPage: React.FC<ExtensionRouteProps> = ({ user, context, logout }) => {
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
+                  <CodeIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Runtime Script Injection Demo
+                </Typography>
+                <Typography variant="body2" paragraph>
+                  Extensions can inject scripts at runtime using the <code>ScriptInjector</code> component
+                  or the <code>useScriptInjector</code> hook. Check the browser console to see the output.
+                </Typography>
+
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    ScriptInjector Component (Declarative)
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    The ScriptInjector component below is rendered when this page loads.
+                    It automatically injects an inline script and removes it on unmount.
+                  </Typography>
+                  <Chip
+                    label={runtimeScriptLoaded ? 'Script Loaded' : 'Loading...'}
+                    color={runtimeScriptLoaded ? 'success' : 'default'}
+                    size="small"
+                  />
+                  {/* Declarative script injection via component */}
+                  <ScriptInjector
+                    id="demo-component-injected-script"
+                    content={`
+                      console.log('[Demo Extension] Script injected via ScriptInjector component!');
+                      window.demoComponentInjected = true;
+                    `}
+                    onLoad={() => setRuntimeScriptLoaded(true)}
+                    removeOnUnmount={true}
+                  />
+                </Box>
+
+                <Box>
+                  <Typography variant="subtitle2" gutterBottom>
+                    useScriptInjector Hook (Imperative)
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    Use the hook for programmatic control over script injection.
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={handleInjectScript}
+                      disabled={hookScriptLoaded}
+                    >
+                      Inject Script
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={handleRemoveScript}
+                      disabled={!hookScriptLoaded}
+                    >
+                      Remove Script
+                    </Button>
+                    <Chip
+                      label={hookScriptLoaded ? 'Script Loaded' : 'Not Loaded'}
+                      color={hookScriptLoaded ? 'success' : 'default'}
+                      size="small"
+                    />
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid2>
+
+          <Grid2 size={{ xs: 12 }}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
                   Extension Capabilities Demonstrated
                 </Typography>
                 <ul>
@@ -150,6 +254,9 @@ const DemoPage: React.FC<ExtensionRouteProps> = ({ user, context, logout }) => {
                   <li>User information access</li>
                   <li>Notification system</li>
                   <li>Navigation between pages</li>
+                  <li>Build-time script injection (headScripts/bodyScripts)</li>
+                  <li>Runtime script injection (ScriptInjector component)</li>
+                  <li>Imperative script injection (useScriptInjector hook)</li>
                 </ul>
               </CardContent>
             </Card>

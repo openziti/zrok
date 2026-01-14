@@ -31,6 +31,7 @@ export type {
   ExtensionContext,
   SlotProps,
   SlotName,
+  ScriptDefinition,
 } from './types';
 
 // Constants
@@ -45,3 +46,9 @@ export { createExtensionContext, useExtensionState } from './context';
 // Components
 export { Slot } from './SlotRenderer';
 export { PanelWrapper } from './PanelWrapper';
+export { ScriptInjector } from './ScriptInjector';
+export type { ScriptInjectorProps } from './ScriptInjector';
+
+// Hooks
+export { useScriptInjector } from './useScriptInjector';
+export type { InjectScriptOptions, UseScriptInjectorReturn } from './useScriptInjector';

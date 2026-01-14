@@ -14,11 +14,12 @@ This guide explains how to create extensions for the zrok web UI. Extensions all
 8. [State Management](#state-management)
 9. [Extension Context](#extension-context)
 10. [Lifecycle Hooks](#lifecycle-hooks)
-11. [Development Workflow](#development-workflow)
-12. [Deployment](#deployment)
-13. [API Reference](#api-reference)
-14. [Best Practices](#best-practices)
-15. [Troubleshooting](#troubleshooting)
+11. [Script Injection](#script-injection)
+12. [Development Workflow](#development-workflow)
+13. [Deployment](#deployment)
+14. [API Reference](#api-reference)
+15. [Best Practices](#best-practices)
+16. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -860,6 +861,247 @@ onUserLogout: (context) => {
 
 ---
 
+## Script Injection
+
+Extensions can inject scripts into the zrok UI using two approaches:
+
+1. **Build-time injection** - Scripts are added to index.html during the Vite build
+2. **Runtime injection** - Scripts are dynamically added via React components or hooks
+
+### When to Use Each Approach
+
+| Approach | Best For |
+|----------|----------|
+| Build-time | Analytics, tracking pixels, third-party SDKs that need to load early |
+| Runtime | Scripts that depend on user state, conditional loading, scripts that should be removed on unmount |
+
+### Build-Time Script Injection
+
+Add scripts to your manifest's `headScripts` (loads in `<head>`) or `bodyScripts` (loads before `</body>`):
+
+```typescript
+import { ExtensionManifest, ScriptDefinition } from '@openziti/zrok-ui/extensions';
+
+const headScripts: ScriptDefinition[] = [
+  // Inline script for early initialization
+  {
+    id: 'analytics-init',
+    content: `
+      window.analytics = window.analytics || [];
+      window.analytics.push(['init', { key: 'abc123' }]);
+    `,
+  },
+  // External script
+  {
+    id: 'analytics-sdk',
+    src: 'https://cdn.example.com/analytics.js',
+    async: true,
+  },
+];
+
+const bodyScripts: ScriptDefinition[] = [
+  // Deferred script that runs after page loads
+  {
+    id: 'tracking',
+    content: `
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('Page loaded, initializing tracking');
+      });
+    `,
+  },
+];
+
+const manifest: ExtensionManifest = {
+  id: 'my-extension',
+  name: 'My Extension',
+  version: '1.0.0',
+
+  headScripts,
+  bodyScripts,
+};
+
+export default manifest;
+```
+
+#### Enabling the Vite Plugin
+
+To enable build-time injection, update `vite.config.ts`:
+
+```typescript
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { extensionScriptsPlugin } from './vite-plugin-extension-scripts';
+import myExtension from '@myorg/my-extension';
+
+export default defineConfig({
+  plugins: [
+    react(),
+    extensionScriptsPlugin({
+      extensions: [myExtension],
+      verbose: true, // Enable to see injection logs during build
+    }),
+  ],
+});
+```
+
+#### ScriptDefinition Options
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `src` | `string` | External script URL (mutually exclusive with `content`) |
+| `content` | `string` | Inline script code (mutually exclusive with `src`) |
+| `async` | `boolean` | Load script asynchronously |
+| `defer` | `boolean` | Defer execution until document is parsed |
+| `type` | `string` | Script type (default: `text/javascript`) |
+| `id` | `string` | Script ID for identification and deduplication |
+| `attributes` | `Record<string, string>` | Additional HTML attributes |
+
+### Runtime Script Injection
+
+For dynamic script loading, use the `ScriptInjector` component or `useScriptInjector` hook.
+
+#### ScriptInjector Component (Declarative)
+
+Use when you want script lifecycle tied to component lifecycle:
+
+```typescript
+import React from 'react';
+import { ScriptInjector } from '@openziti/zrok-ui/extensions';
+
+const MyComponent: React.FC = () => {
+  const [loaded, setLoaded] = React.useState(false);
+
+  return (
+    <div>
+      <ScriptInjector
+        id="my-runtime-script"
+        src="https://cdn.example.com/widget.js"
+        async
+        onLoad={() => {
+          setLoaded(true);
+          console.log('Widget script loaded!');
+        }}
+        onError={(error) => console.error('Failed to load:', error)}
+        removeOnUnmount={true} // Removes script when component unmounts
+      />
+      {loaded && <div>Widget loaded!</div>}
+    </div>
+  );
+};
+```
+
+#### ScriptInjector Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `src` | `string` | - | External script URL |
+| `content` | `string` | - | Inline script content |
+| `async` | `boolean` | `false` | Load asynchronously |
+| `defer` | `boolean` | `false` | Defer execution |
+| `type` | `string` | - | Script type |
+| `id` | `string` | - | Script ID |
+| `attributes` | `Record<string, string>` | - | Additional attributes |
+| `target` | `'head' \| 'body'` | `'body'` | Where to inject |
+| `onLoad` | `() => void` | - | Called when script loads |
+| `onError` | `(error: Error) => void` | - | Called on load error |
+| `removeOnUnmount` | `boolean` | `true` | Remove script on unmount |
+
+#### useScriptInjector Hook (Imperative)
+
+Use when you need programmatic control over script injection:
+
+```typescript
+import React, { useEffect } from 'react';
+import { useScriptInjector } from '@openziti/zrok-ui/extensions';
+
+const MyComponent: React.FC = () => {
+  const { injectScript, removeScript, isLoaded } = useScriptInjector();
+
+  const handleLoadWidget = async () => {
+    try {
+      await injectScript({
+        id: 'payment-widget',
+        src: 'https://cdn.example.com/payment.js',
+        async: true,
+      });
+      console.log('Payment widget loaded!');
+    } catch (error) {
+      console.error('Failed to load payment widget:', error);
+    }
+  };
+
+  const handleRemoveWidget = () => {
+    const removed = removeScript('payment-widget');
+    console.log('Widget removed:', removed);
+  };
+
+  return (
+    <div>
+      <button onClick={handleLoadWidget} disabled={isLoaded('payment-widget')}>
+        Load Payment Widget
+      </button>
+      <button onClick={handleRemoveWidget}>Remove Widget</button>
+    </div>
+  );
+};
+```
+
+#### useScriptInjector API
+
+```typescript
+interface UseScriptInjectorReturn {
+  // Inject a script, returns Promise that resolves on load
+  injectScript: (options: InjectScriptOptions) => Promise<void>;
+
+  // Remove a script by ID, returns true if found and removed
+  removeScript: (id: string) => boolean;
+
+  // Remove a script by src URL
+  removeScriptBySrc: (src: string) => boolean;
+
+  // Check if a script with the given ID is in the DOM
+  isLoaded: (id: string) => boolean;
+
+  // Check if a script with the given src is in the DOM
+  isLoadedBySrc: (src: string) => boolean;
+}
+```
+
+### Script Injection Flow
+
+```mermaid
+flowchart TB
+    subgraph buildtime["Build-Time Injection"]
+        manifest["ExtensionManifest<br/>headScripts / bodyScripts"]
+        vite["Vite Plugin<br/>extensionScriptsPlugin"]
+        html["index.html<br/>(scripts embedded)"]
+
+        manifest --> vite
+        vite -->|"transformIndexHtml"| html
+    end
+
+    subgraph runtime["Runtime Injection"]
+        comp["ScriptInjector Component"]
+        hook["useScriptInjector Hook"]
+        dom["DOM<br/>(scripts added dynamically)"]
+
+        comp -->|"useEffect"| dom
+        hook -->|"injectScript()"| dom
+    end
+
+    subgraph output["Browser"]
+        head["<head><br/>headScripts + runtime"]
+        body["<body><br/>App + bodyScripts + runtime"]
+    end
+
+    html --> head
+    html --> body
+    dom --> head
+    dom --> body
+```
+
+---
+
 ## Development Workflow
 
 ```mermaid
@@ -1068,9 +1310,22 @@ interface ExtensionManifest {
   nodeTypes?: Record<string, ComponentType<any>>;
   edgeTypes?: Record<string, ComponentType<any>>;
   initialState?: Record<string, unknown>;
+  headScripts?: ScriptDefinition[];  // Build-time <head> scripts
+  bodyScripts?: ScriptDefinition[];  // Build-time </body> scripts
   onInit?: (context: ExtensionContext) => void | Promise<void>;
   onUserLogin?: (user: User, context: ExtensionContext) => void;
   onUserLogout?: (context: ExtensionContext) => void;
+}
+
+// Script definition for build-time and runtime injection
+interface ScriptDefinition {
+  src?: string;                      // External script URL
+  content?: string;                  // Inline script content
+  async?: boolean;                   // Async loading
+  defer?: boolean;                   // Defer execution
+  type?: string;                     // Script type
+  id?: string;                       // Script ID
+  attributes?: Record<string, string>; // Additional attributes
 }
 
 // Route definition
