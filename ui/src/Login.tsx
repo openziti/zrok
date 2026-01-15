@@ -4,6 +4,8 @@ import {useEffect, useState} from "react";
 import {AccountApi, MetadataApi} from "./api";
 import {Link} from "react-router";
 import zroket from "./assets/zrok-1.0.0-rocket-purple.svg";
+import MfaVerifyModal from "./MfaVerifyModal.tsx";
+import {Login202ResponseFromJSON} from "./api/models/Login202Response.ts";
 
 interface LoginProps {
     onLogin: (user: User) => void;
@@ -15,6 +17,10 @@ const Login = ({ onLogin }: LoginProps) => {
     const [message, setMessage] = useState("");
     const [tou, setTou] = useState<string>("");
     const [newAccountLink, setNewAccountLink] = useState<string>("");
+
+    // MFA state
+    const [showMfaModal, setShowMfaModal] = useState(false);
+    const [pendingToken, setPendingToken] = useState("");
 
     useEffect(() => {
         new MetadataApi()._configuration()
@@ -35,15 +41,46 @@ const Login = ({ onLogin }: LoginProps) => {
     const login = async e => {
         e.preventDefault();
 
-        new AccountApi().login({body: {"email": email, "password": password}})
-            .then(d => {
-                onLogin({email: email, token: d.toString()});
-            })
-            .catch(e => {
-                console.log(e);
-                setMessage("login failed!")
-            });
+        try {
+            const api = new AccountApi();
+            const response = await api.loginRaw({body: {"email": email, "password": password}});
+            const rawResponse = response.raw;
+
+            if (rawResponse.status === 202) {
+                // MFA required - parse the pending token
+                const data = Login202ResponseFromJSON(await rawResponse.json());
+                if (data.pendingToken) {
+                    setPendingToken(data.pendingToken);
+                    setShowMfaModal(true);
+                } else {
+                    setMessage("MFA required but no pending token received");
+                }
+            } else {
+                // Normal login - token is in the response body
+                const token = await response.value();
+                onLogin({email: email, token: token.toString()});
+            }
+        } catch (e: any) {
+            console.log(e);
+            if (e.response?.status === 403) {
+                setMessage("MFA is required for this account but not enabled. Please contact support.");
+            } else {
+                setMessage("login failed!");
+            }
+        }
     }
+
+    const handleMfaSuccess = (token: string) => {
+        setShowMfaModal(false);
+        setPendingToken("");
+        onLogin({email: email, token: token});
+    };
+
+    const handleMfaCancel = () => {
+        setShowMfaModal(false);
+        setPendingToken("");
+        setMessage("MFA verification cancelled");
+    };
 
     return (
         <Typography component="div">
@@ -100,6 +137,13 @@ const Login = ({ onLogin }: LoginProps) => {
                     </Box>
                 </Box>
             </Container>
+
+            <MfaVerifyModal
+                isOpen={showMfaModal}
+                pendingToken={pendingToken}
+                onSuccess={handleMfaSuccess}
+                onCancel={handleMfaCancel}
+            />
         </Typography>
     );
 }

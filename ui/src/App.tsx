@@ -7,6 +7,7 @@ import useApiConsoleStore from "./model/store.ts";
 import ForgotPassword from "./ForgotPassword.tsx";
 import Register from "./Register.tsx";
 import ResetPassword from "./ResetPassword.tsx";
+import {MfaProvider} from "./MfaContext.tsx";
 
 const App = () => {
     const user = useApiConsoleStore((state) => state.user);
@@ -38,7 +39,11 @@ const App = () => {
         localStorage.clear();
     }
 
-    const consoleRoot = user ? <ApiConsole logout={logout}/> : <Login onLogin={login}/>
+    const consoleRoot = user ? (
+        <MfaProvider user={user}>
+            <ApiConsole logout={logout}/>
+        </MfaProvider>
+    ) : <Login onLogin={login}/>
 
     return (
         <BrowserRouter>
