@@ -27,7 +27,6 @@ func NewRegisterParams() RegisterParams {
 //
 // swagger:parameters register
 type RegisterParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *RegisterParams) BindRequest(r *http.Request, route *middleware.MatchedR
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body RegisterBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

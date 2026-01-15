@@ -7,6 +7,8 @@ package account
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type RegenerateAccountTokenReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *RegenerateAccountTokenReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *RegenerateAccountTokenReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewRegenerateAccountTokenOK()
@@ -91,11 +93,13 @@ func (o *RegenerateAccountTokenOK) Code() int {
 }
 
 func (o *RegenerateAccountTokenOK) Error() string {
-	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenOK %s", 200, payload)
 }
 
 func (o *RegenerateAccountTokenOK) String() string {
-	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenOK %s", 200, payload)
 }
 
 func (o *RegenerateAccountTokenOK) GetPayload() *RegenerateAccountTokenOKBody {
@@ -107,7 +111,7 @@ func (o *RegenerateAccountTokenOK) readResponse(response runtime.ClientResponse,
 	o.Payload = new(RegenerateAccountTokenOKBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -158,11 +162,11 @@ func (o *RegenerateAccountTokenNotFound) Code() int {
 }
 
 func (o *RegenerateAccountTokenNotFound) Error() string {
-	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenNotFound ", 404)
+	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenNotFound", 404)
 }
 
 func (o *RegenerateAccountTokenNotFound) String() string {
-	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenNotFound ", 404)
+	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenNotFound", 404)
 }
 
 func (o *RegenerateAccountTokenNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -214,11 +218,11 @@ func (o *RegenerateAccountTokenInternalServerError) Code() int {
 }
 
 func (o *RegenerateAccountTokenInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenInternalServerError ", 500)
+	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenInternalServerError", 500)
 }
 
 func (o *RegenerateAccountTokenInternalServerError) String() string {
-	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenInternalServerError ", 500)
+	return fmt.Sprintf("[POST /regenerateAccountToken][%d] regenerateAccountTokenInternalServerError", 500)
 }
 
 func (o *RegenerateAccountTokenInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

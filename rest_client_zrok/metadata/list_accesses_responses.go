@@ -6,6 +6,8 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type ListAccessesReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *ListAccessesReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *ListAccessesReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewListAccessesOK()
@@ -97,11 +99,13 @@ func (o *ListAccessesOK) Code() int {
 }
 
 func (o *ListAccessesOK) Error() string {
-	return fmt.Sprintf("[GET /accesses][%d] listAccessesOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /accesses][%d] listAccessesOK %s", 200, payload)
 }
 
 func (o *ListAccessesOK) String() string {
-	return fmt.Sprintf("[GET /accesses][%d] listAccessesOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /accesses][%d] listAccessesOK %s", 200, payload)
 }
 
 func (o *ListAccessesOK) GetPayload() *rest_model_zrok.AccessesList {
@@ -113,7 +117,7 @@ func (o *ListAccessesOK) readResponse(response runtime.ClientResponse, consumer 
 	o.Payload = new(rest_model_zrok.AccessesList)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -165,11 +169,13 @@ func (o *ListAccessesBadRequest) Code() int {
 }
 
 func (o *ListAccessesBadRequest) Error() string {
-	return fmt.Sprintf("[GET /accesses][%d] listAccessesBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /accesses][%d] listAccessesBadRequest %s", 400, payload)
 }
 
 func (o *ListAccessesBadRequest) String() string {
-	return fmt.Sprintf("[GET /accesses][%d] listAccessesBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /accesses][%d] listAccessesBadRequest %s", 400, payload)
 }
 
 func (o *ListAccessesBadRequest) GetPayload() rest_model_zrok.ErrorMessage {
@@ -179,7 +185,7 @@ func (o *ListAccessesBadRequest) GetPayload() rest_model_zrok.ErrorMessage {
 func (o *ListAccessesBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -230,11 +236,11 @@ func (o *ListAccessesUnauthorized) Code() int {
 }
 
 func (o *ListAccessesUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /accesses][%d] listAccessesUnauthorized ", 401)
+	return fmt.Sprintf("[GET /accesses][%d] listAccessesUnauthorized", 401)
 }
 
 func (o *ListAccessesUnauthorized) String() string {
-	return fmt.Sprintf("[GET /accesses][%d] listAccessesUnauthorized ", 401)
+	return fmt.Sprintf("[GET /accesses][%d] listAccessesUnauthorized", 401)
 }
 
 func (o *ListAccessesUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -287,11 +293,13 @@ func (o *ListAccessesInternalServerError) Code() int {
 }
 
 func (o *ListAccessesInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /accesses][%d] listAccessesInternalServerError  %+v", 500, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /accesses][%d] listAccessesInternalServerError %s", 500, payload)
 }
 
 func (o *ListAccessesInternalServerError) String() string {
-	return fmt.Sprintf("[GET /accesses][%d] listAccessesInternalServerError  %+v", 500, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /accesses][%d] listAccessesInternalServerError %s", 500, payload)
 }
 
 func (o *ListAccessesInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
@@ -301,7 +309,7 @@ func (o *ListAccessesInternalServerError) GetPayload() rest_model_zrok.ErrorMess
 func (o *ListAccessesInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 

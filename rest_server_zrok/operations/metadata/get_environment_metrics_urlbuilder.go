@@ -46,7 +46,7 @@ func (o *GetEnvironmentMetricsURL) Build() (*url.URL, error) {
 
 	envID := o.EnvID
 	if envID != "" {
-		_path = strings.Replace(_path, "{envId}", envID, -1)
+		_path = strings.ReplaceAll(_path, "{envId}", envID)
 	} else {
 		return nil, errors.New("envId is required on GetEnvironmentMetricsURL")
 	}

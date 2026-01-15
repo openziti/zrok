@@ -7,6 +7,8 @@ package share
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -23,7 +25,7 @@ type UnshareReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *UnshareReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *UnshareReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewUnshareOK()
@@ -98,11 +100,11 @@ func (o *UnshareOK) Code() int {
 }
 
 func (o *UnshareOK) Error() string {
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareOK ", 200)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareOK", 200)
 }
 
 func (o *UnshareOK) String() string {
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareOK ", 200)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareOK", 200)
 }
 
 func (o *UnshareOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -154,11 +156,11 @@ func (o *UnshareUnauthorized) Code() int {
 }
 
 func (o *UnshareUnauthorized) Error() string {
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareUnauthorized ", 401)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareUnauthorized", 401)
 }
 
 func (o *UnshareUnauthorized) String() string {
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareUnauthorized ", 401)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareUnauthorized", 401)
 }
 
 func (o *UnshareUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -210,11 +212,11 @@ func (o *UnshareNotFound) Code() int {
 }
 
 func (o *UnshareNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareNotFound ", 404)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareNotFound", 404)
 }
 
 func (o *UnshareNotFound) String() string {
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareNotFound ", 404)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareNotFound", 404)
 }
 
 func (o *UnshareNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -267,11 +269,13 @@ func (o *UnshareInternalServerError) Code() int {
 }
 
 func (o *UnshareInternalServerError) Error() string {
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareInternalServerError  %+v", 500, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareInternalServerError %s", 500, payload)
 }
 
 func (o *UnshareInternalServerError) String() string {
-	return fmt.Sprintf("[DELETE /unshare][%d] unshareInternalServerError  %+v", 500, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareInternalServerError %s", 500, payload)
 }
 
 func (o *UnshareInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
@@ -281,7 +285,7 @@ func (o *UnshareInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
 func (o *UnshareInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 

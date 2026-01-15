@@ -27,7 +27,6 @@ func NewDeleteOrganizationParams() DeleteOrganizationParams {
 //
 // swagger:parameters deleteOrganization
 type DeleteOrganizationParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *DeleteOrganizationParams) BindRequest(r *http.Request, route *middlewar
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body DeleteOrganizationBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

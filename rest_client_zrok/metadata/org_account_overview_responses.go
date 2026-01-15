@@ -6,6 +6,8 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type OrgAccountOverviewReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *OrgAccountOverviewReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *OrgAccountOverviewReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewOrgAccountOverviewOK()
@@ -91,11 +93,13 @@ func (o *OrgAccountOverviewOK) Code() int {
 }
 
 func (o *OrgAccountOverviewOK) Error() string {
-	return fmt.Sprintf("[GET /overview/{organizationToken}/{accountEmail}][%d] orgAccountOverviewOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /overview/{organizationToken}/{accountEmail}][%d] orgAccountOverviewOK %s", 200, payload)
 }
 
 func (o *OrgAccountOverviewOK) String() string {
-	return fmt.Sprintf("[GET /overview/{organizationToken}/{accountEmail}][%d] orgAccountOverviewOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /overview/{organizationToken}/{accountEmail}][%d] orgAccountOverviewOK %s", 200, payload)
 }
 
 func (o *OrgAccountOverviewOK) GetPayload() *rest_model_zrok.Overview {
@@ -107,7 +111,7 @@ func (o *OrgAccountOverviewOK) readResponse(response runtime.ClientResponse, con
 	o.Payload = new(rest_model_zrok.Overview)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -158,11 +162,11 @@ func (o *OrgAccountOverviewNotFound) Code() int {
 }
 
 func (o *OrgAccountOverviewNotFound) Error() string {
-	return fmt.Sprintf("[GET /overview/{organizationToken}/{accountEmail}][%d] orgAccountOverviewNotFound ", 404)
+	return fmt.Sprintf("[GET /overview/{organizationToken}/{accountEmail}][%d] orgAccountOverviewNotFound", 404)
 }
 
 func (o *OrgAccountOverviewNotFound) String() string {
-	return fmt.Sprintf("[GET /overview/{organizationToken}/{accountEmail}][%d] orgAccountOverviewNotFound ", 404)
+	return fmt.Sprintf("[GET /overview/{organizationToken}/{accountEmail}][%d] orgAccountOverviewNotFound", 404)
 }
 
 func (o *OrgAccountOverviewNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -214,11 +218,11 @@ func (o *OrgAccountOverviewInternalServerError) Code() int {
 }
 
 func (o *OrgAccountOverviewInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /overview/{organizationToken}/{accountEmail}][%d] orgAccountOverviewInternalServerError ", 500)
+	return fmt.Sprintf("[GET /overview/{organizationToken}/{accountEmail}][%d] orgAccountOverviewInternalServerError", 500)
 }
 
 func (o *OrgAccountOverviewInternalServerError) String() string {
-	return fmt.Sprintf("[GET /overview/{organizationToken}/{accountEmail}][%d] orgAccountOverviewInternalServerError ", 500)
+	return fmt.Sprintf("[GET /overview/{organizationToken}/{accountEmail}][%d] orgAccountOverviewInternalServerError", 500)
 }
 
 func (o *OrgAccountOverviewInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

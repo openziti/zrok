@@ -8,6 +8,7 @@ package agent
 import (
 	"context"
 	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -27,7 +28,7 @@ type RemoteShareReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *RemoteShareReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *RemoteShareReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewRemoteShareOK()
@@ -103,11 +104,13 @@ func (o *RemoteShareOK) Code() int {
 }
 
 func (o *RemoteShareOK) Error() string {
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareOK %s", 200, payload)
 }
 
 func (o *RemoteShareOK) String() string {
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareOK %s", 200, payload)
 }
 
 func (o *RemoteShareOK) GetPayload() *RemoteShareOKBody {
@@ -119,7 +122,7 @@ func (o *RemoteShareOK) readResponse(response runtime.ClientResponse, consumer r
 	o.Payload = new(RemoteShareOKBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -170,11 +173,11 @@ func (o *RemoteShareUnauthorized) Code() int {
 }
 
 func (o *RemoteShareUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareUnauthorized ", 401)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareUnauthorized", 401)
 }
 
 func (o *RemoteShareUnauthorized) String() string {
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareUnauthorized ", 401)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareUnauthorized", 401)
 }
 
 func (o *RemoteShareUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -226,11 +229,11 @@ func (o *RemoteShareInternalServerError) Code() int {
 }
 
 func (o *RemoteShareInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareInternalServerError ", 500)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareInternalServerError", 500)
 }
 
 func (o *RemoteShareInternalServerError) String() string {
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareInternalServerError ", 500)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareInternalServerError", 500)
 }
 
 func (o *RemoteShareInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -282,11 +285,11 @@ func (o *RemoteShareBadGateway) Code() int {
 }
 
 func (o *RemoteShareBadGateway) Error() string {
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareBadGateway ", 502)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareBadGateway", 502)
 }
 
 func (o *RemoteShareBadGateway) String() string {
-	return fmt.Sprintf("[POST /agent/share][%d] remoteShareBadGateway ", 502)
+	return fmt.Sprintf("[POST /agent/share][%d] remoteShareBadGateway", 502)
 }
 
 func (o *RemoteShareBadGateway) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -304,7 +307,7 @@ type RemoteShareBody struct {
 	AccessGrants []string `json:"accessGrants"`
 
 	// backend mode
-	// Enum: [proxy web tcpTunnel udpTunnel caddy drive socks]
+	// Enum: ["proxy","web","tcpTunnel","udpTunnel","caddy","drive","socks"]
 	BackendMode string `json:"backendMode,omitempty"`
 
 	// basic auth
@@ -335,7 +338,7 @@ type RemoteShareBody struct {
 	PrivateShareToken string `json:"privateShareToken,omitempty"`
 
 	// share mode
-	// Enum: [public private]
+	// Enum: ["public","private"]
 	ShareMode string `json:"shareMode,omitempty"`
 
 	// target
@@ -367,7 +370,7 @@ func (o *RemoteShareBody) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-var remoteShareBodyTypeBackendModePropEnum []interface{}
+var remoteShareBodyTypeBackendModePropEnum []any
 
 func init() {
 	var res []string
@@ -436,11 +439,15 @@ func (o *RemoteShareBody) validateNameSelections(formats strfmt.Registry) error 
 
 		if o.NameSelections[i] != nil {
 			if err := o.NameSelections[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("body" + "." + "nameSelections" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("body" + "." + "nameSelections" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -450,7 +457,7 @@ func (o *RemoteShareBody) validateNameSelections(formats strfmt.Registry) error 
 	return nil
 }
 
-var remoteShareBodyTypeShareModePropEnum []interface{}
+var remoteShareBodyTypeShareModePropEnum []any
 
 func init() {
 	var res []string
@@ -517,11 +524,15 @@ func (o *RemoteShareBody) contextValidateNameSelections(ctx context.Context, for
 			}
 
 			if err := o.NameSelections[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("body" + "." + "nameSelections" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("body" + "." + "nameSelections" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}

@@ -7,6 +7,8 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type ListFrontendsReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *ListFrontendsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *ListFrontendsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewListFrontendsOK()
@@ -91,11 +93,13 @@ func (o *ListFrontendsOK) Code() int {
 }
 
 func (o *ListFrontendsOK) Error() string {
-	return fmt.Sprintf("[GET /frontends][%d] listFrontendsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /frontends][%d] listFrontendsOK %s", 200, payload)
 }
 
 func (o *ListFrontendsOK) String() string {
-	return fmt.Sprintf("[GET /frontends][%d] listFrontendsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /frontends][%d] listFrontendsOK %s", 200, payload)
 }
 
 func (o *ListFrontendsOK) GetPayload() []*ListFrontendsOKBodyItems0 {
@@ -105,7 +109,7 @@ func (o *ListFrontendsOK) GetPayload() []*ListFrontendsOKBodyItems0 {
 func (o *ListFrontendsOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -156,11 +160,11 @@ func (o *ListFrontendsUnauthorized) Code() int {
 }
 
 func (o *ListFrontendsUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /frontends][%d] listFrontendsUnauthorized ", 401)
+	return fmt.Sprintf("[GET /frontends][%d] listFrontendsUnauthorized", 401)
 }
 
 func (o *ListFrontendsUnauthorized) String() string {
-	return fmt.Sprintf("[GET /frontends][%d] listFrontendsUnauthorized ", 401)
+	return fmt.Sprintf("[GET /frontends][%d] listFrontendsUnauthorized", 401)
 }
 
 func (o *ListFrontendsUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -212,11 +216,11 @@ func (o *ListFrontendsInternalServerError) Code() int {
 }
 
 func (o *ListFrontendsInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /frontends][%d] listFrontendsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /frontends][%d] listFrontendsInternalServerError", 500)
 }
 
 func (o *ListFrontendsInternalServerError) String() string {
-	return fmt.Sprintf("[GET /frontends][%d] listFrontendsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /frontends][%d] listFrontendsInternalServerError", 500)
 }
 
 func (o *ListFrontendsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

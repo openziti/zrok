@@ -33,7 +33,7 @@ func NewChangePasswordOK() *ChangePasswordOK {
 // WriteResponse to the client
 func (o *ChangePasswordOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(200)
 }
@@ -58,7 +58,7 @@ func NewChangePasswordBadRequest() *ChangePasswordBadRequest {
 // WriteResponse to the client
 func (o *ChangePasswordBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(400)
 }
@@ -83,7 +83,7 @@ func NewChangePasswordUnauthorized() *ChangePasswordUnauthorized {
 // WriteResponse to the client
 func (o *ChangePasswordUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -151,7 +151,7 @@ func NewChangePasswordInternalServerError() *ChangePasswordInternalServerError {
 // WriteResponse to the client
 func (o *ChangePasswordInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

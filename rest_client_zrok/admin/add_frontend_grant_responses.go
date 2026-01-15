@@ -7,6 +7,8 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -23,7 +25,7 @@ type AddFrontendGrantReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *AddFrontendGrantReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *AddFrontendGrantReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewAddFrontendGrantOK()
@@ -98,11 +100,11 @@ func (o *AddFrontendGrantOK) Code() int {
 }
 
 func (o *AddFrontendGrantOK) Error() string {
-	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantOK ", 200)
+	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantOK", 200)
 }
 
 func (o *AddFrontendGrantOK) String() string {
-	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantOK ", 200)
+	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantOK", 200)
 }
 
 func (o *AddFrontendGrantOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -154,11 +156,11 @@ func (o *AddFrontendGrantUnauthorized) Code() int {
 }
 
 func (o *AddFrontendGrantUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantUnauthorized ", 401)
+	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantUnauthorized", 401)
 }
 
 func (o *AddFrontendGrantUnauthorized) String() string {
-	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantUnauthorized ", 401)
+	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantUnauthorized", 401)
 }
 
 func (o *AddFrontendGrantUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -211,11 +213,13 @@ func (o *AddFrontendGrantNotFound) Code() int {
 }
 
 func (o *AddFrontendGrantNotFound) Error() string {
-	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantNotFound %s", 404, payload)
 }
 
 func (o *AddFrontendGrantNotFound) String() string {
-	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantNotFound %s", 404, payload)
 }
 
 func (o *AddFrontendGrantNotFound) GetPayload() rest_model_zrok.ErrorMessage {
@@ -225,7 +229,7 @@ func (o *AddFrontendGrantNotFound) GetPayload() rest_model_zrok.ErrorMessage {
 func (o *AddFrontendGrantNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -276,11 +280,11 @@ func (o *AddFrontendGrantInternalServerError) Code() int {
 }
 
 func (o *AddFrontendGrantInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantInternalServerError ", 500)
+	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantInternalServerError", 500)
 }
 
 func (o *AddFrontendGrantInternalServerError) String() string {
-	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantInternalServerError ", 500)
+	return fmt.Sprintf("[POST /frontend/grant][%d] addFrontendGrantInternalServerError", 500)
 }
 
 func (o *AddFrontendGrantInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

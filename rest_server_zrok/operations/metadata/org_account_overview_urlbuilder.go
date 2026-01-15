@@ -45,14 +45,14 @@ func (o *OrgAccountOverviewURL) Build() (*url.URL, error) {
 
 	accountEmail := o.AccountEmail
 	if accountEmail != "" {
-		_path = strings.Replace(_path, "{accountEmail}", accountEmail, -1)
+		_path = strings.ReplaceAll(_path, "{accountEmail}", accountEmail)
 	} else {
 		return nil, errors.New("accountEmail is required on OrgAccountOverviewURL")
 	}
 
 	organizationToken := o.OrganizationToken
 	if organizationToken != "" {
-		_path = strings.Replace(_path, "{organizationToken}", organizationToken, -1)
+		_path = strings.ReplaceAll(_path, "{organizationToken}", organizationToken)
 	} else {
 		return nil, errors.New("organizationToken is required on OrgAccountOverviewURL")
 	}

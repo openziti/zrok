@@ -27,7 +27,6 @@ func NewCreateOrganizationParams() CreateOrganizationParams {
 //
 // swagger:parameters createOrganization
 type CreateOrganizationParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *CreateOrganizationParams) BindRequest(r *http.Request, route *middlewar
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body CreateOrganizationBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

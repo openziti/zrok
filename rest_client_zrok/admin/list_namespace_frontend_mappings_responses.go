@@ -7,6 +7,8 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type ListNamespaceFrontendMappingsReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *ListNamespaceFrontendMappingsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *ListNamespaceFrontendMappingsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewListNamespaceFrontendMappingsOK()
@@ -97,11 +99,13 @@ func (o *ListNamespaceFrontendMappingsOK) Code() int {
 }
 
 func (o *ListNamespaceFrontendMappingsOK) Error() string {
-	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsOK %s", 200, payload)
 }
 
 func (o *ListNamespaceFrontendMappingsOK) String() string {
-	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsOK %s", 200, payload)
 }
 
 func (o *ListNamespaceFrontendMappingsOK) GetPayload() []*ListNamespaceFrontendMappingsOKBodyItems0 {
@@ -111,7 +115,7 @@ func (o *ListNamespaceFrontendMappingsOK) GetPayload() []*ListNamespaceFrontendM
 func (o *ListNamespaceFrontendMappingsOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -162,11 +166,11 @@ func (o *ListNamespaceFrontendMappingsUnauthorized) Code() int {
 }
 
 func (o *ListNamespaceFrontendMappingsUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsUnauthorized ", 401)
+	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsUnauthorized", 401)
 }
 
 func (o *ListNamespaceFrontendMappingsUnauthorized) String() string {
-	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsUnauthorized ", 401)
+	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsUnauthorized", 401)
 }
 
 func (o *ListNamespaceFrontendMappingsUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -218,11 +222,11 @@ func (o *ListNamespaceFrontendMappingsNotFound) Code() int {
 }
 
 func (o *ListNamespaceFrontendMappingsNotFound) Error() string {
-	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsNotFound ", 404)
+	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsNotFound", 404)
 }
 
 func (o *ListNamespaceFrontendMappingsNotFound) String() string {
-	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsNotFound ", 404)
+	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsNotFound", 404)
 }
 
 func (o *ListNamespaceFrontendMappingsNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -274,11 +278,11 @@ func (o *ListNamespaceFrontendMappingsInternalServerError) Code() int {
 }
 
 func (o *ListNamespaceFrontendMappingsInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsInternalServerError", 500)
 }
 
 func (o *ListNamespaceFrontendMappingsInternalServerError) String() string {
-	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /namespace/frontend/mapping/{namespaceToken}][%d] listNamespaceFrontendMappingsInternalServerError", 500)
 }
 
 func (o *ListNamespaceFrontendMappingsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

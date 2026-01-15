@@ -69,6 +69,7 @@ func (o *ListNamespaceFrontendMappings) ServeHTTP(rw http.ResponseWriter, r *htt
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

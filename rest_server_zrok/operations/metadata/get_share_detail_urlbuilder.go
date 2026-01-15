@@ -44,7 +44,7 @@ func (o *GetShareDetailURL) Build() (*url.URL, error) {
 
 	shareToken := o.ShareToken
 	if shareToken != "" {
-		_path = strings.Replace(_path, "{shareToken}", shareToken, -1)
+		_path = strings.ReplaceAll(_path, "{shareToken}", shareToken)
 	} else {
 		return nil, errors.New("shareToken is required on GetShareDetailURL")
 	}

@@ -31,7 +31,7 @@ func NewDeleteFrontendOK() *DeleteFrontendOK {
 // WriteResponse to the client
 func (o *DeleteFrontendOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(200)
 }
@@ -56,7 +56,7 @@ func NewDeleteFrontendUnauthorized() *DeleteFrontendUnauthorized {
 // WriteResponse to the client
 func (o *DeleteFrontendUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -81,7 +81,7 @@ func NewDeleteFrontendNotFound() *DeleteFrontendNotFound {
 // WriteResponse to the client
 func (o *DeleteFrontendNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -106,7 +106,7 @@ func NewDeleteFrontendInternalServerError() *DeleteFrontendInternalServerError {
 // WriteResponse to the client
 func (o *DeleteFrontendInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

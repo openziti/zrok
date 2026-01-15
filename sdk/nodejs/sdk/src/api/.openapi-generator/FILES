@@ -51,9 +51,17 @@ models/ListOrganizationMembers200ResponseMembersInner.ts
 models/ListOrganizations200Response.ts
 models/ListOrganizations200ResponseOrganizationsInner.ts
 models/ListShareNamespaces200ResponseInner.ts
+models/Login202Response.ts
 models/LoginRequest.ts
 models/Metrics.ts
 models/MetricsSample.ts
+models/MfaAuthenticateRequest.ts
+models/MfaChallenge200Response.ts
+models/MfaDisableRequest.ts
+models/MfaSetup200Response.ts
+models/MfaStatus200Response.ts
+models/MfaVerify200Response.ts
+models/MfaVerifyRequest.ts
 models/ModelConfiguration.ts
 models/Name.ts
 models/NameSelection.ts

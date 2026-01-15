@@ -27,7 +27,6 @@ func NewChangePasswordParams() ChangePasswordParams {
 //
 // swagger:parameters changePassword
 type ChangePasswordParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *ChangePasswordParams) BindRequest(r *http.Request, route *middleware.Ma
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body ChangePasswordBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

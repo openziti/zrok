@@ -31,7 +31,7 @@ func NewUnenrollOK() *UnenrollOK {
 // WriteResponse to the client
 func (o *UnenrollOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(200)
 }
@@ -56,7 +56,7 @@ func NewUnenrollBadRequest() *UnenrollBadRequest {
 // WriteResponse to the client
 func (o *UnenrollBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(400)
 }
@@ -81,7 +81,7 @@ func NewUnenrollUnauthorized() *UnenrollUnauthorized {
 // WriteResponse to the client
 func (o *UnenrollUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -106,7 +106,7 @@ func NewUnenrollInternalServerError() *UnenrollInternalServerError {
 // WriteResponse to the client
 func (o *UnenrollInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

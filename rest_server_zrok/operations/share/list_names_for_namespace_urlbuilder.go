@@ -44,7 +44,7 @@ func (o *ListNamesForNamespaceURL) Build() (*url.URL, error) {
 
 	namespaceToken := o.NamespaceToken
 	if namespaceToken != "" {
-		_path = strings.Replace(_path, "{namespaceToken}", namespaceToken, -1)
+		_path = strings.ReplaceAll(_path, "{namespaceToken}", namespaceToken)
 	} else {
 		return nil, errors.New("namespaceToken is required on ListNamesForNamespaceURL")
 	}

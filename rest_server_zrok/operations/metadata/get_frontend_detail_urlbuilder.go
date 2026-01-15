@@ -46,7 +46,7 @@ func (o *GetFrontendDetailURL) Build() (*url.URL, error) {
 
 	frontendID := swag.FormatInt64(o.FrontendID)
 	if frontendID != "" {
-		_path = strings.Replace(_path, "{frontendId}", frontendID, -1)
+		_path = strings.ReplaceAll(_path, "{frontendId}", frontendID)
 	} else {
 		return nil, errors.New("frontendId is required on GetFrontendDetailURL")
 	}

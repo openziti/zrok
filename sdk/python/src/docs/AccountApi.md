@@ -7,6 +7,13 @@ Method | HTTP request | Description
 [**change_password**](AccountApi.md#change_password) | **POST** /changePassword | 
 [**invite**](AccountApi.md#invite) | **POST** /invite | 
 [**login**](AccountApi.md#login) | **POST** /login | 
+[**mfa_authenticate**](AccountApi.md#mfa_authenticate) | **POST** /mfa/authenticate | 
+[**mfa_challenge**](AccountApi.md#mfa_challenge) | **POST** /mfa/challenge | 
+[**mfa_disable**](AccountApi.md#mfa_disable) | **POST** /mfa/disable | 
+[**mfa_recovery_codes**](AccountApi.md#mfa_recovery_codes) | **POST** /mfa/recoveryCodes | 
+[**mfa_setup**](AccountApi.md#mfa_setup) | **POST** /mfa/setup | 
+[**mfa_status**](AccountApi.md#mfa_status) | **GET** /mfa/status | 
+[**mfa_verify**](AccountApi.md#mfa_verify) | **POST** /mfa/verify | 
 [**regenerate_account_token**](AccountApi.md#regenerate_account_token) | **POST** /regenerateAccountToken | 
 [**register**](AccountApi.md#register) | **POST** /register | 
 [**reset_password**](AccountApi.md#reset_password) | **POST** /resetPassword | 
@@ -214,7 +221,528 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | login successful |  -  |
+**202** | mfa required |  -  |
 **401** | invalid login |  -  |
+**403** | mfa enrollment required (when mfaRequired is enabled and user has no MFA) |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **mfa_authenticate**
+> str mfa_authenticate(body=body)
+
+### Example
+
+
+```python
+import zrok_api
+from zrok_api.models.mfa_authenticate_request import MfaAuthenticateRequest
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+    body = zrok_api.MfaAuthenticateRequest() # MfaAuthenticateRequest |  (optional)
+
+    try:
+        api_response = api_instance.mfa_authenticate(body=body)
+        print("The response of AccountApi->mfa_authenticate:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AccountApi->mfa_authenticate: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**MfaAuthenticateRequest**](MfaAuthenticateRequest.md)|  | [optional] 
+
+### Return type
+
+**str**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | authentication successful |  -  |
+**401** | invalid pending token or code |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **mfa_challenge**
+> MfaChallenge200Response mfa_challenge(body=body)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.mfa_challenge200_response import MfaChallenge200Response
+from zrok_api.models.mfa_verify_request import MfaVerifyRequest
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+    body = zrok_api.MfaVerifyRequest() # MfaVerifyRequest |  (optional)
+
+    try:
+        api_response = api_instance.mfa_challenge(body=body)
+        print("The response of AccountApi->mfa_challenge:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AccountApi->mfa_challenge: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**MfaVerifyRequest**](MfaVerifyRequest.md)|  | [optional] 
+
+### Return type
+
+[**MfaChallenge200Response**](MfaChallenge200Response.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | challenge token issued |  -  |
+**400** | invalid code or mfa not enabled |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **mfa_disable**
+> mfa_disable(body=body)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.mfa_disable_request import MfaDisableRequest
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+    body = zrok_api.MfaDisableRequest() # MfaDisableRequest |  (optional)
+
+    try:
+        api_instance.mfa_disable(body=body)
+    except Exception as e:
+        print("Exception when calling AccountApi->mfa_disable: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**MfaDisableRequest**](MfaDisableRequest.md)|  | [optional] 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: Not defined
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | mfa disabled |  -  |
+**400** | invalid password or code |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **mfa_recovery_codes**
+> MfaVerify200Response mfa_recovery_codes(body=body)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.mfa_verify200_response import MfaVerify200Response
+from zrok_api.models.mfa_verify_request import MfaVerifyRequest
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+    body = zrok_api.MfaVerifyRequest() # MfaVerifyRequest |  (optional)
+
+    try:
+        api_response = api_instance.mfa_recovery_codes(body=body)
+        print("The response of AccountApi->mfa_recovery_codes:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AccountApi->mfa_recovery_codes: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**MfaVerifyRequest**](MfaVerifyRequest.md)|  | [optional] 
+
+### Return type
+
+[**MfaVerify200Response**](MfaVerify200Response.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | new recovery codes generated |  -  |
+**400** | invalid code or mfa not enabled |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **mfa_setup**
+> MfaSetup200Response mfa_setup()
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.mfa_setup200_response import MfaSetup200Response
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+
+    try:
+        api_response = api_instance.mfa_setup()
+        print("The response of AccountApi->mfa_setup:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AccountApi->mfa_setup: %s\n" % e)
+```
+
+
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**MfaSetup200Response**](MfaSetup200Response.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | mfa setup initiated |  -  |
+**400** | mfa already enabled |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **mfa_status**
+> MfaStatus200Response mfa_status()
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.mfa_status200_response import MfaStatus200Response
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+
+    try:
+        api_response = api_instance.mfa_status()
+        print("The response of AccountApi->mfa_status:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AccountApi->mfa_status: %s\n" % e)
+```
+
+
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**MfaStatus200Response**](MfaStatus200Response.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | mfa status |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **mfa_verify**
+> MfaVerify200Response mfa_verify(body=body)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.mfa_verify200_response import MfaVerify200Response
+from zrok_api.models.mfa_verify_request import MfaVerifyRequest
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AccountApi(api_client)
+    body = zrok_api.MfaVerifyRequest() # MfaVerifyRequest |  (optional)
+
+    try:
+        api_response = api_instance.mfa_verify(body=body)
+        print("The response of AccountApi->mfa_verify:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AccountApi->mfa_verify: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**MfaVerifyRequest**](MfaVerifyRequest.md)|  | [optional] 
+
+### Return type
+
+[**MfaVerify200Response**](MfaVerify200Response.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | mfa enabled |  -  |
+**400** | invalid code or no pending setup |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

@@ -25,7 +25,6 @@ func NewListAllNamesParams() ListAllNamesParams {
 //
 // swagger:parameters listAllNames
 type ListAllNamesParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 }

@@ -6,6 +6,8 @@ package share
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type ShareReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *ShareReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *ShareReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 201:
 		result := NewShareCreated()
@@ -109,11 +111,13 @@ func (o *ShareCreated) Code() int {
 }
 
 func (o *ShareCreated) Error() string {
-	return fmt.Sprintf("[POST /share][%d] shareCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /share][%d] shareCreated %s", 201, payload)
 }
 
 func (o *ShareCreated) String() string {
-	return fmt.Sprintf("[POST /share][%d] shareCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /share][%d] shareCreated %s", 201, payload)
 }
 
 func (o *ShareCreated) GetPayload() *rest_model_zrok.ShareResponse {
@@ -125,7 +129,7 @@ func (o *ShareCreated) readResponse(response runtime.ClientResponse, consumer ru
 	o.Payload = new(rest_model_zrok.ShareResponse)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -176,11 +180,11 @@ func (o *ShareUnauthorized) Code() int {
 }
 
 func (o *ShareUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /share][%d] shareUnauthorized ", 401)
+	return fmt.Sprintf("[POST /share][%d] shareUnauthorized", 401)
 }
 
 func (o *ShareUnauthorized) String() string {
-	return fmt.Sprintf("[POST /share][%d] shareUnauthorized ", 401)
+	return fmt.Sprintf("[POST /share][%d] shareUnauthorized", 401)
 }
 
 func (o *ShareUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -232,11 +236,11 @@ func (o *ShareNotFound) Code() int {
 }
 
 func (o *ShareNotFound) Error() string {
-	return fmt.Sprintf("[POST /share][%d] shareNotFound ", 404)
+	return fmt.Sprintf("[POST /share][%d] shareNotFound", 404)
 }
 
 func (o *ShareNotFound) String() string {
-	return fmt.Sprintf("[POST /share][%d] shareNotFound ", 404)
+	return fmt.Sprintf("[POST /share][%d] shareNotFound", 404)
 }
 
 func (o *ShareNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -289,11 +293,13 @@ func (o *ShareConflict) Code() int {
 }
 
 func (o *ShareConflict) Error() string {
-	return fmt.Sprintf("[POST /share][%d] shareConflict  %+v", 409, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /share][%d] shareConflict %s", 409, payload)
 }
 
 func (o *ShareConflict) String() string {
-	return fmt.Sprintf("[POST /share][%d] shareConflict  %+v", 409, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /share][%d] shareConflict %s", 409, payload)
 }
 
 func (o *ShareConflict) GetPayload() rest_model_zrok.ErrorMessage {
@@ -303,7 +309,7 @@ func (o *ShareConflict) GetPayload() rest_model_zrok.ErrorMessage {
 func (o *ShareConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -354,11 +360,11 @@ func (o *ShareUnprocessableEntity) Code() int {
 }
 
 func (o *ShareUnprocessableEntity) Error() string {
-	return fmt.Sprintf("[POST /share][%d] shareUnprocessableEntity ", 422)
+	return fmt.Sprintf("[POST /share][%d] shareUnprocessableEntity", 422)
 }
 
 func (o *ShareUnprocessableEntity) String() string {
-	return fmt.Sprintf("[POST /share][%d] shareUnprocessableEntity ", 422)
+	return fmt.Sprintf("[POST /share][%d] shareUnprocessableEntity", 422)
 }
 
 func (o *ShareUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -411,11 +417,13 @@ func (o *ShareInternalServerError) Code() int {
 }
 
 func (o *ShareInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /share][%d] shareInternalServerError  %+v", 500, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /share][%d] shareInternalServerError %s", 500, payload)
 }
 
 func (o *ShareInternalServerError) String() string {
-	return fmt.Sprintf("[POST /share][%d] shareInternalServerError  %+v", 500, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /share][%d] shareInternalServerError %s", 500, payload)
 }
 
 func (o *ShareInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
@@ -425,7 +433,7 @@ func (o *ShareInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
 func (o *ShareInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 

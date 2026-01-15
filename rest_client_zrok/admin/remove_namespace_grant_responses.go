@@ -20,7 +20,7 @@ type RemoveNamespaceGrantReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *RemoveNamespaceGrantReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *RemoveNamespaceGrantReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewRemoveNamespaceGrantOK()
@@ -95,11 +95,11 @@ func (o *RemoveNamespaceGrantOK) Code() int {
 }
 
 func (o *RemoveNamespaceGrantOK) Error() string {
-	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantOK ", 200)
+	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantOK", 200)
 }
 
 func (o *RemoveNamespaceGrantOK) String() string {
-	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantOK ", 200)
+	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantOK", 200)
 }
 
 func (o *RemoveNamespaceGrantOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *RemoveNamespaceGrantUnauthorized) Code() int {
 }
 
 func (o *RemoveNamespaceGrantUnauthorized) Error() string {
-	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantUnauthorized ", 401)
+	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantUnauthorized", 401)
 }
 
 func (o *RemoveNamespaceGrantUnauthorized) String() string {
-	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantUnauthorized ", 401)
+	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantUnauthorized", 401)
 }
 
 func (o *RemoveNamespaceGrantUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *RemoveNamespaceGrantNotFound) Code() int {
 }
 
 func (o *RemoveNamespaceGrantNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantNotFound ", 404)
+	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantNotFound", 404)
 }
 
 func (o *RemoveNamespaceGrantNotFound) String() string {
-	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantNotFound ", 404)
+	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantNotFound", 404)
 }
 
 func (o *RemoveNamespaceGrantNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *RemoveNamespaceGrantInternalServerError) Code() int {
 }
 
 func (o *RemoveNamespaceGrantInternalServerError) Error() string {
-	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantInternalServerError ", 500)
+	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantInternalServerError", 500)
 }
 
 func (o *RemoveNamespaceGrantInternalServerError) String() string {
-	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantInternalServerError ", 500)
+	return fmt.Sprintf("[DELETE /namespace/grant][%d] removeNamespaceGrantInternalServerError", 500)
 }
 
 func (o *RemoveNamespaceGrantInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

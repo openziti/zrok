@@ -31,7 +31,7 @@ func NewInviteTokenGenerateCreated() *InviteTokenGenerateCreated {
 // WriteResponse to the client
 func (o *InviteTokenGenerateCreated) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(201)
 }
@@ -56,7 +56,7 @@ func NewInviteTokenGenerateBadRequest() *InviteTokenGenerateBadRequest {
 // WriteResponse to the client
 func (o *InviteTokenGenerateBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(400)
 }
@@ -81,7 +81,7 @@ func NewInviteTokenGenerateUnauthorized() *InviteTokenGenerateUnauthorized {
 // WriteResponse to the client
 func (o *InviteTokenGenerateUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -106,7 +106,7 @@ func NewInviteTokenGenerateInternalServerError() *InviteTokenGenerateInternalSer
 // WriteResponse to the client
 func (o *InviteTokenGenerateInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

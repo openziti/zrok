@@ -6,6 +6,8 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type ListSharesReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *ListSharesReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *ListSharesReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewListSharesOK()
@@ -97,11 +99,13 @@ func (o *ListSharesOK) Code() int {
 }
 
 func (o *ListSharesOK) Error() string {
-	return fmt.Sprintf("[GET /shares][%d] listSharesOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /shares][%d] listSharesOK %s", 200, payload)
 }
 
 func (o *ListSharesOK) String() string {
-	return fmt.Sprintf("[GET /shares][%d] listSharesOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /shares][%d] listSharesOK %s", 200, payload)
 }
 
 func (o *ListSharesOK) GetPayload() *rest_model_zrok.SharesList {
@@ -113,7 +117,7 @@ func (o *ListSharesOK) readResponse(response runtime.ClientResponse, consumer ru
 	o.Payload = new(rest_model_zrok.SharesList)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -165,11 +169,13 @@ func (o *ListSharesBadRequest) Code() int {
 }
 
 func (o *ListSharesBadRequest) Error() string {
-	return fmt.Sprintf("[GET /shares][%d] listSharesBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /shares][%d] listSharesBadRequest %s", 400, payload)
 }
 
 func (o *ListSharesBadRequest) String() string {
-	return fmt.Sprintf("[GET /shares][%d] listSharesBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /shares][%d] listSharesBadRequest %s", 400, payload)
 }
 
 func (o *ListSharesBadRequest) GetPayload() rest_model_zrok.ErrorMessage {
@@ -179,7 +185,7 @@ func (o *ListSharesBadRequest) GetPayload() rest_model_zrok.ErrorMessage {
 func (o *ListSharesBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -230,11 +236,11 @@ func (o *ListSharesUnauthorized) Code() int {
 }
 
 func (o *ListSharesUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /shares][%d] listSharesUnauthorized ", 401)
+	return fmt.Sprintf("[GET /shares][%d] listSharesUnauthorized", 401)
 }
 
 func (o *ListSharesUnauthorized) String() string {
-	return fmt.Sprintf("[GET /shares][%d] listSharesUnauthorized ", 401)
+	return fmt.Sprintf("[GET /shares][%d] listSharesUnauthorized", 401)
 }
 
 func (o *ListSharesUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -287,11 +293,13 @@ func (o *ListSharesInternalServerError) Code() int {
 }
 
 func (o *ListSharesInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /shares][%d] listSharesInternalServerError  %+v", 500, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /shares][%d] listSharesInternalServerError %s", 500, payload)
 }
 
 func (o *ListSharesInternalServerError) String() string {
-	return fmt.Sprintf("[GET /shares][%d] listSharesInternalServerError  %+v", 500, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /shares][%d] listSharesInternalServerError %s", 500, payload)
 }
 
 func (o *ListSharesInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
@@ -301,7 +309,7 @@ func (o *ListSharesInternalServerError) GetPayload() rest_model_zrok.ErrorMessag
 func (o *ListSharesInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 

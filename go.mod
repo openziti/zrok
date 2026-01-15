@@ -87,6 +87,7 @@ require (
 	github.com/beevik/etree v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/biogo/store v0.0.0-20200525035639-8c94ae1e7c9c // indirect
+	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc // indirect
 	github.com/caddyserver/certmagic v0.21.6 // indirect
 	github.com/caddyserver/zerossl v0.1.3 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
@@ -203,6 +204,7 @@ require (
 	github.com/pires/go-proxyproto v0.7.1-0.20240628150027-b718e7ce4964 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
+	github.com/pquerna/otp v1.4.0 // indirect
 	github.com/prometheus/client_golang v1.19.1 // indirect
 	github.com/prometheus/client_model v0.6.0 // indirect
 	github.com/prometheus/common v0.48.0 // indirect

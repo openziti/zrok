@@ -26,7 +26,6 @@ func NewOrgAccountOverviewParams() OrgAccountOverviewParams {
 //
 // swagger:parameters orgAccountOverview
 type OrgAccountOverviewParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -35,6 +34,7 @@ type OrgAccountOverviewParams struct {
 	  In: path
 	*/
 	AccountEmail string
+
 	/*
 	  Required: true
 	  In: path

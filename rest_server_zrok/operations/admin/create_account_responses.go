@@ -76,7 +76,7 @@ func NewCreateAccountUnauthorized() *CreateAccountUnauthorized {
 // WriteResponse to the client
 func (o *CreateAccountUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -101,7 +101,7 @@ func NewCreateAccountInternalServerError() *CreateAccountInternalServerError {
 // WriteResponse to the client
 func (o *CreateAccountInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

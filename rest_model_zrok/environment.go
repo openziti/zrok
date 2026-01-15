@@ -7,6 +7,7 @@ package rest_model_zrok
 
 import (
 	"context"
+	stderrors "errors"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -66,11 +67,15 @@ func (m *Environment) validateActivity(formats strfmt.Registry) error {
 	}
 
 	if err := m.Activity.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
+		ve := new(errors.Validation)
+		if stderrors.As(err, &ve) {
 			return ve.ValidateName("activity")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
+		}
+		ce := new(errors.CompositeError)
+		if stderrors.As(err, &ce) {
 			return ce.ValidateName("activity")
 		}
+
 		return err
 	}
 
@@ -94,11 +99,15 @@ func (m *Environment) ContextValidate(ctx context.Context, formats strfmt.Regist
 func (m *Environment) contextValidateActivity(ctx context.Context, formats strfmt.Registry) error {
 
 	if err := m.Activity.ContextValidate(ctx, formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
+		ve := new(errors.Validation)
+		if stderrors.As(err, &ve) {
 			return ve.ValidateName("activity")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
+		}
+		ce := new(errors.CompositeError)
+		if stderrors.As(err, &ce) {
 			return ce.ValidateName("activity")
 		}
+
 		return err
 	}
 

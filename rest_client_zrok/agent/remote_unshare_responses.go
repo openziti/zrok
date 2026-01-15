@@ -20,7 +20,7 @@ type RemoteUnshareReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *RemoteUnshareReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *RemoteUnshareReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewRemoteUnshareOK()
@@ -95,11 +95,11 @@ func (o *RemoteUnshareOK) Code() int {
 }
 
 func (o *RemoteUnshareOK) Error() string {
-	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareOK ", 200)
+	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareOK", 200)
 }
 
 func (o *RemoteUnshareOK) String() string {
-	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareOK ", 200)
+	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareOK", 200)
 }
 
 func (o *RemoteUnshareOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *RemoteUnshareUnauthorized) Code() int {
 }
 
 func (o *RemoteUnshareUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareUnauthorized ", 401)
+	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareUnauthorized", 401)
 }
 
 func (o *RemoteUnshareUnauthorized) String() string {
-	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareUnauthorized ", 401)
+	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareUnauthorized", 401)
 }
 
 func (o *RemoteUnshareUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *RemoteUnshareInternalServerError) Code() int {
 }
 
 func (o *RemoteUnshareInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareInternalServerError ", 500)
+	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareInternalServerError", 500)
 }
 
 func (o *RemoteUnshareInternalServerError) String() string {
-	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareInternalServerError ", 500)
+	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareInternalServerError", 500)
 }
 
 func (o *RemoteUnshareInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *RemoteUnshareBadGateway) Code() int {
 }
 
 func (o *RemoteUnshareBadGateway) Error() string {
-	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareBadGateway ", 502)
+	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareBadGateway", 502)
 }
 
 func (o *RemoteUnshareBadGateway) String() string {
-	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareBadGateway ", 502)
+	return fmt.Sprintf("[POST /agent/unshare][%d] remoteUnshareBadGateway", 502)
 }
 
 func (o *RemoteUnshareBadGateway) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

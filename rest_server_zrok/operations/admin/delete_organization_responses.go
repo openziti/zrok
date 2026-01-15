@@ -31,7 +31,7 @@ func NewDeleteOrganizationOK() *DeleteOrganizationOK {
 // WriteResponse to the client
 func (o *DeleteOrganizationOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(200)
 }
@@ -56,7 +56,7 @@ func NewDeleteOrganizationUnauthorized() *DeleteOrganizationUnauthorized {
 // WriteResponse to the client
 func (o *DeleteOrganizationUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -81,7 +81,7 @@ func NewDeleteOrganizationNotFound() *DeleteOrganizationNotFound {
 // WriteResponse to the client
 func (o *DeleteOrganizationNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -106,7 +106,7 @@ func NewDeleteOrganizationInternalServerError() *DeleteOrganizationInternalServe
 // WriteResponse to the client
 func (o *DeleteOrganizationInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

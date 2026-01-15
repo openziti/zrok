@@ -78,7 +78,7 @@ func NewShareUnauthorized() *ShareUnauthorized {
 // WriteResponse to the client
 func (o *ShareUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -103,7 +103,7 @@ func NewShareNotFound() *ShareNotFound {
 // WriteResponse to the client
 func (o *ShareNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -171,7 +171,7 @@ func NewShareUnprocessableEntity() *ShareUnprocessableEntity {
 // WriteResponse to the client
 func (o *ShareUnprocessableEntity) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(422)
 }

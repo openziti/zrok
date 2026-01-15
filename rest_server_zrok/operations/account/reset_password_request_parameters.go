@@ -27,7 +27,6 @@ func NewResetPasswordRequestParams() ResetPasswordRequestParams {
 //
 // swagger:parameters resetPasswordRequest
 type ResetPasswordRequestParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *ResetPasswordRequestParams) BindRequest(r *http.Request, route *middlew
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body ResetPasswordRequestBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

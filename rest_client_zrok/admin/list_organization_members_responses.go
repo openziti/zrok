@@ -7,6 +7,8 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -23,7 +25,7 @@ type ListOrganizationMembersReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *ListOrganizationMembersReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *ListOrganizationMembersReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewListOrganizationMembersOK()
@@ -99,11 +101,13 @@ func (o *ListOrganizationMembersOK) Code() int {
 }
 
 func (o *ListOrganizationMembersOK) Error() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersOK %s", 200, payload)
 }
 
 func (o *ListOrganizationMembersOK) String() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersOK %s", 200, payload)
 }
 
 func (o *ListOrganizationMembersOK) GetPayload() *ListOrganizationMembersOKBody {
@@ -115,7 +119,7 @@ func (o *ListOrganizationMembersOK) readResponse(response runtime.ClientResponse
 	o.Payload = new(ListOrganizationMembersOKBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -166,11 +170,11 @@ func (o *ListOrganizationMembersUnauthorized) Code() int {
 }
 
 func (o *ListOrganizationMembersUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersUnauthorized ", 401)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersUnauthorized", 401)
 }
 
 func (o *ListOrganizationMembersUnauthorized) String() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersUnauthorized ", 401)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersUnauthorized", 401)
 }
 
 func (o *ListOrganizationMembersUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -222,11 +226,11 @@ func (o *ListOrganizationMembersNotFound) Code() int {
 }
 
 func (o *ListOrganizationMembersNotFound) Error() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersNotFound ", 404)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersNotFound", 404)
 }
 
 func (o *ListOrganizationMembersNotFound) String() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersNotFound ", 404)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersNotFound", 404)
 }
 
 func (o *ListOrganizationMembersNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -278,11 +282,11 @@ func (o *ListOrganizationMembersInternalServerError) Code() int {
 }
 
 func (o *ListOrganizationMembersInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersInternalServerError ", 500)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersInternalServerError", 500)
 }
 
 func (o *ListOrganizationMembersInternalServerError) String() string {
-	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersInternalServerError ", 500)
+	return fmt.Sprintf("[POST /organization/list][%d] listOrganizationMembersInternalServerError", 500)
 }
 
 func (o *ListOrganizationMembersInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -364,11 +368,15 @@ func (o *ListOrganizationMembersOKBody) validateMembers(formats strfmt.Registry)
 
 		if o.Members[i] != nil {
 			if err := o.Members[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("listOrganizationMembersOK" + "." + "members" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("listOrganizationMembersOK" + "." + "members" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -403,11 +411,15 @@ func (o *ListOrganizationMembersOKBody) contextValidateMembers(ctx context.Conte
 			}
 
 			if err := o.Members[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("listOrganizationMembersOK" + "." + "members" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("listOrganizationMembersOK" + "." + "members" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}

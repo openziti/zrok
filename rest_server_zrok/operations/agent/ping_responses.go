@@ -76,7 +76,7 @@ func NewPingUnauthorized() *PingUnauthorized {
 // WriteResponse to the client
 func (o *PingUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -101,7 +101,7 @@ func NewPingInternalServerError() *PingInternalServerError {
 // WriteResponse to the client
 func (o *PingInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }
@@ -126,7 +126,7 @@ func NewPingBadGateway() *PingBadGateway {
 // WriteResponse to the client
 func (o *PingBadGateway) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(502)
 }

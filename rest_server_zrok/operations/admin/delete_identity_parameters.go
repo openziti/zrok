@@ -27,7 +27,6 @@ func NewDeleteIdentityParams() DeleteIdentityParams {
 //
 // swagger:parameters deleteIdentity
 type DeleteIdentityParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *DeleteIdentityParams) BindRequest(r *http.Request, route *middleware.Ma
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body DeleteIdentityBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

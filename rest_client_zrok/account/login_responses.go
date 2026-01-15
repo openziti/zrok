@@ -7,6 +7,8 @@ package account
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type LoginReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *LoginReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *LoginReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewLoginOK()
@@ -29,8 +31,20 @@ func (o *LoginReader) ReadResponse(response runtime.ClientResponse, consumer run
 			return nil, err
 		}
 		return result, nil
+	case 202:
+		result := NewLoginAccepted()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return result, nil
 	case 401:
 		result := NewLoginUnauthorized()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 403:
+		result := NewLoginForbidden()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -85,11 +99,13 @@ func (o *LoginOK) Code() int {
 }
 
 func (o *LoginOK) Error() string {
-	return fmt.Sprintf("[POST /login][%d] loginOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /login][%d] loginOK %s", 200, payload)
 }
 
 func (o *LoginOK) String() string {
-	return fmt.Sprintf("[POST /login][%d] loginOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /login][%d] loginOK %s", 200, payload)
 }
 
 func (o *LoginOK) GetPayload() string {
@@ -99,7 +115,77 @@ func (o *LoginOK) GetPayload() string {
 func (o *LoginOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
+		return err
+	}
+
+	return nil
+}
+
+// NewLoginAccepted creates a LoginAccepted with default headers values
+func NewLoginAccepted() *LoginAccepted {
+	return &LoginAccepted{}
+}
+
+/*
+LoginAccepted describes a response with status code 202, with default header values.
+
+mfa required
+*/
+type LoginAccepted struct {
+	Payload *LoginAcceptedBody
+}
+
+// IsSuccess returns true when this login accepted response has a 2xx status code
+func (o *LoginAccepted) IsSuccess() bool {
+	return true
+}
+
+// IsRedirect returns true when this login accepted response has a 3xx status code
+func (o *LoginAccepted) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this login accepted response has a 4xx status code
+func (o *LoginAccepted) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this login accepted response has a 5xx status code
+func (o *LoginAccepted) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this login accepted response a status code equal to that given
+func (o *LoginAccepted) IsCode(code int) bool {
+	return code == 202
+}
+
+// Code gets the status code for the login accepted response
+func (o *LoginAccepted) Code() int {
+	return 202
+}
+
+func (o *LoginAccepted) Error() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /login][%d] loginAccepted %s", 202, payload)
+}
+
+func (o *LoginAccepted) String() string {
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /login][%d] loginAccepted %s", 202, payload)
+}
+
+func (o *LoginAccepted) GetPayload() *LoginAcceptedBody {
+	return o.Payload
+}
+
+func (o *LoginAccepted) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(LoginAcceptedBody)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -150,15 +236,109 @@ func (o *LoginUnauthorized) Code() int {
 }
 
 func (o *LoginUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /login][%d] loginUnauthorized ", 401)
+	return fmt.Sprintf("[POST /login][%d] loginUnauthorized", 401)
 }
 
 func (o *LoginUnauthorized) String() string {
-	return fmt.Sprintf("[POST /login][%d] loginUnauthorized ", 401)
+	return fmt.Sprintf("[POST /login][%d] loginUnauthorized", 401)
 }
 
 func (o *LoginUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	return nil
+}
+
+// NewLoginForbidden creates a LoginForbidden with default headers values
+func NewLoginForbidden() *LoginForbidden {
+	return &LoginForbidden{}
+}
+
+/*
+LoginForbidden describes a response with status code 403, with default header values.
+
+mfa enrollment required (when mfaRequired is enabled and user has no MFA)
+*/
+type LoginForbidden struct {
+}
+
+// IsSuccess returns true when this login forbidden response has a 2xx status code
+func (o *LoginForbidden) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this login forbidden response has a 3xx status code
+func (o *LoginForbidden) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this login forbidden response has a 4xx status code
+func (o *LoginForbidden) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns true when this login forbidden response has a 5xx status code
+func (o *LoginForbidden) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this login forbidden response a status code equal to that given
+func (o *LoginForbidden) IsCode(code int) bool {
+	return code == 403
+}
+
+// Code gets the status code for the login forbidden response
+func (o *LoginForbidden) Code() int {
+	return 403
+}
+
+func (o *LoginForbidden) Error() string {
+	return fmt.Sprintf("[POST /login][%d] loginForbidden", 403)
+}
+
+func (o *LoginForbidden) String() string {
+	return fmt.Sprintf("[POST /login][%d] loginForbidden", 403)
+}
+
+func (o *LoginForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+/*
+LoginAcceptedBody login accepted body
+swagger:model LoginAcceptedBody
+*/
+type LoginAcceptedBody struct {
+
+	// pending token
+	PendingToken string `json:"pendingToken,omitempty"`
+}
+
+// Validate validates this login accepted body
+func (o *LoginAcceptedBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this login accepted body based on context it is used
+func (o *LoginAcceptedBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *LoginAcceptedBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *LoginAcceptedBody) UnmarshalBinary(b []byte) error {
+	var res LoginAcceptedBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
 	return nil
 }
 

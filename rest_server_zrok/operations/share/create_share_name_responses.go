@@ -33,7 +33,7 @@ func NewCreateShareNameCreated() *CreateShareNameCreated {
 // WriteResponse to the client
 func (o *CreateShareNameCreated) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(201)
 }
@@ -58,7 +58,7 @@ func NewCreateShareNameUnauthorized() *CreateShareNameUnauthorized {
 // WriteResponse to the client
 func (o *CreateShareNameUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -83,7 +83,7 @@ func NewCreateShareNameNotFound() *CreateShareNameNotFound {
 // WriteResponse to the client
 func (o *CreateShareNameNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -151,7 +151,7 @@ func NewCreateShareNameInternalServerError() *CreateShareNameInternalServerError
 // WriteResponse to the client
 func (o *CreateShareNameInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

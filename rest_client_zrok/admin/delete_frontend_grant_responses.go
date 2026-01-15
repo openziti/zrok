@@ -7,6 +7,8 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -23,7 +25,7 @@ type DeleteFrontendGrantReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *DeleteFrontendGrantReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *DeleteFrontendGrantReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewDeleteFrontendGrantOK()
@@ -98,11 +100,11 @@ func (o *DeleteFrontendGrantOK) Code() int {
 }
 
 func (o *DeleteFrontendGrantOK) Error() string {
-	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantOK ", 200)
+	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantOK", 200)
 }
 
 func (o *DeleteFrontendGrantOK) String() string {
-	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantOK ", 200)
+	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantOK", 200)
 }
 
 func (o *DeleteFrontendGrantOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -154,11 +156,11 @@ func (o *DeleteFrontendGrantUnauthorized) Code() int {
 }
 
 func (o *DeleteFrontendGrantUnauthorized) Error() string {
-	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantUnauthorized ", 401)
+	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantUnauthorized", 401)
 }
 
 func (o *DeleteFrontendGrantUnauthorized) String() string {
-	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantUnauthorized ", 401)
+	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantUnauthorized", 401)
 }
 
 func (o *DeleteFrontendGrantUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -211,11 +213,13 @@ func (o *DeleteFrontendGrantNotFound) Code() int {
 }
 
 func (o *DeleteFrontendGrantNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantNotFound %s", 404, payload)
 }
 
 func (o *DeleteFrontendGrantNotFound) String() string {
-	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantNotFound  %+v", 404, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantNotFound %s", 404, payload)
 }
 
 func (o *DeleteFrontendGrantNotFound) GetPayload() rest_model_zrok.ErrorMessage {
@@ -225,7 +229,7 @@ func (o *DeleteFrontendGrantNotFound) GetPayload() rest_model_zrok.ErrorMessage 
 func (o *DeleteFrontendGrantNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -276,11 +280,11 @@ func (o *DeleteFrontendGrantInternalServerError) Code() int {
 }
 
 func (o *DeleteFrontendGrantInternalServerError) Error() string {
-	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantInternalServerError ", 500)
+	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantInternalServerError", 500)
 }
 
 func (o *DeleteFrontendGrantInternalServerError) String() string {
-	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantInternalServerError ", 500)
+	return fmt.Sprintf("[DELETE /frontend/grant][%d] deleteFrontendGrantInternalServerError", 500)
 }
 
 func (o *DeleteFrontendGrantInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

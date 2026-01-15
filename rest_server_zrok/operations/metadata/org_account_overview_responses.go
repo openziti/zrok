@@ -78,7 +78,7 @@ func NewOrgAccountOverviewNotFound() *OrgAccountOverviewNotFound {
 // WriteResponse to the client
 func (o *OrgAccountOverviewNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -103,7 +103,7 @@ func NewOrgAccountOverviewInternalServerError() *OrgAccountOverviewInternalServe
 // WriteResponse to the client
 func (o *OrgAccountOverviewInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

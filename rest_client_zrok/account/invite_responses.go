@@ -7,6 +7,8 @@ package account
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -23,7 +25,7 @@ type InviteReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *InviteReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *InviteReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 201:
 		result := NewInviteCreated()
@@ -98,11 +100,11 @@ func (o *InviteCreated) Code() int {
 }
 
 func (o *InviteCreated) Error() string {
-	return fmt.Sprintf("[POST /invite][%d] inviteCreated ", 201)
+	return fmt.Sprintf("[POST /invite][%d] inviteCreated", 201)
 }
 
 func (o *InviteCreated) String() string {
-	return fmt.Sprintf("[POST /invite][%d] inviteCreated ", 201)
+	return fmt.Sprintf("[POST /invite][%d] inviteCreated", 201)
 }
 
 func (o *InviteCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -155,11 +157,13 @@ func (o *InviteBadRequest) Code() int {
 }
 
 func (o *InviteBadRequest) Error() string {
-	return fmt.Sprintf("[POST /invite][%d] inviteBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /invite][%d] inviteBadRequest %s", 400, payload)
 }
 
 func (o *InviteBadRequest) String() string {
-	return fmt.Sprintf("[POST /invite][%d] inviteBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /invite][%d] inviteBadRequest %s", 400, payload)
 }
 
 func (o *InviteBadRequest) GetPayload() rest_model_zrok.ErrorMessage {
@@ -169,7 +173,7 @@ func (o *InviteBadRequest) GetPayload() rest_model_zrok.ErrorMessage {
 func (o *InviteBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -220,11 +224,11 @@ func (o *InviteUnauthorized) Code() int {
 }
 
 func (o *InviteUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /invite][%d] inviteUnauthorized ", 401)
+	return fmt.Sprintf("[POST /invite][%d] inviteUnauthorized", 401)
 }
 
 func (o *InviteUnauthorized) String() string {
-	return fmt.Sprintf("[POST /invite][%d] inviteUnauthorized ", 401)
+	return fmt.Sprintf("[POST /invite][%d] inviteUnauthorized", 401)
 }
 
 func (o *InviteUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -276,11 +280,11 @@ func (o *InviteInternalServerError) Code() int {
 }
 
 func (o *InviteInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /invite][%d] inviteInternalServerError ", 500)
+	return fmt.Sprintf("[POST /invite][%d] inviteInternalServerError", 500)
 }
 
 func (o *InviteInternalServerError) String() string {
-	return fmt.Sprintf("[POST /invite][%d] inviteInternalServerError ", 500)
+	return fmt.Sprintf("[POST /invite][%d] inviteInternalServerError", 500)
 }
 
 func (o *InviteInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

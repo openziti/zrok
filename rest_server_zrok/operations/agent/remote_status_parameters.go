@@ -27,7 +27,6 @@ func NewRemoteStatusParams() RemoteStatusParams {
 //
 // swagger:parameters remoteStatus
 type RemoteStatusParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *RemoteStatusParams) BindRequest(r *http.Request, route *middleware.Matc
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body RemoteStatusBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

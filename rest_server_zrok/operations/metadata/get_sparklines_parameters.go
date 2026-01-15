@@ -27,7 +27,6 @@ func NewGetSparklinesParams() GetSparklinesParams {
 //
 // swagger:parameters getSparklines
 type GetSparklinesParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *GetSparklinesParams) BindRequest(r *http.Request, route *middleware.Mat
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body GetSparklinesBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

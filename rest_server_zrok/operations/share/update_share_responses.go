@@ -31,7 +31,7 @@ func NewUpdateShareOK() *UpdateShareOK {
 // WriteResponse to the client
 func (o *UpdateShareOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(200)
 }
@@ -56,7 +56,7 @@ func NewUpdateShareBadRequest() *UpdateShareBadRequest {
 // WriteResponse to the client
 func (o *UpdateShareBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(400)
 }
@@ -81,7 +81,7 @@ func NewUpdateShareUnauthorized() *UpdateShareUnauthorized {
 // WriteResponse to the client
 func (o *UpdateShareUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -106,7 +106,7 @@ func NewUpdateShareNotFound() *UpdateShareNotFound {
 // WriteResponse to the client
 func (o *UpdateShareNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -131,7 +131,7 @@ func NewUpdateShareInternalServerError() *UpdateShareInternalServerError {
 // WriteResponse to the client
 func (o *UpdateShareInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

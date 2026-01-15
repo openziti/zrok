@@ -1977,8 +1977,21 @@ func init() {
               "type": "string"
             }
           },
+          "202": {
+            "description": "mfa required",
+            "schema": {
+              "properties": {
+                "pendingToken": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "401": {
             "description": "invalid login"
+          },
+          "403": {
+            "description": "mfa enrollment required (when mfaRequired is enabled and user has no MFA)"
           }
         }
       }
@@ -2183,6 +2196,312 @@ func init() {
           },
           "400": {
             "description": "bad request"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/mfa/authenticate": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "operationId": "mfaAuthenticate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "pendingToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "authentication successful",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "401": {
+            "description": "invalid pending token or code"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/mfa/challenge": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "mfaChallenge",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "challenge token issued",
+            "schema": {
+              "properties": {
+                "challengeToken": {
+                  "type": "string"
+                },
+                "expiresAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid code or mfa not enabled"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/mfa/disable": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "mfaDisable",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "mfa disabled"
+          },
+          "400": {
+            "description": "invalid password or code"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/mfa/recoveryCodes": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "mfaRecoveryCodes",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "new recovery codes generated",
+            "schema": {
+              "properties": {
+                "recoveryCodes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid code or mfa not enabled"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/mfa/setup": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "mfaSetup",
+        "responses": {
+          "200": {
+            "description": "mfa setup initiated",
+            "schema": {
+              "properties": {
+                "provisioningUri": {
+                  "type": "string"
+                },
+                "qrCode": {
+                  "type": "string"
+                },
+                "secret": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "mfa already enabled"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/mfa/status": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "mfaStatus",
+        "responses": {
+          "200": {
+            "description": "mfa status",
+            "schema": {
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "recoveryCodesRemaining": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/mfa/verify": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "mfaVerify",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "mfa enabled",
+            "schema": {
+              "properties": {
+                "recoveryCodes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid code or no pending setup"
           },
           "401": {
             "description": "unauthorized"
@@ -6236,8 +6555,21 @@ func init() {
               "type": "string"
             }
           },
+          "202": {
+            "description": "mfa required",
+            "schema": {
+              "properties": {
+                "pendingToken": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "401": {
             "description": "invalid login"
+          },
+          "403": {
+            "description": "mfa enrollment required (when mfaRequired is enabled and user has no MFA)"
           }
         }
       }
@@ -6425,6 +6757,312 @@ func init() {
           },
           "400": {
             "description": "bad request"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/mfa/authenticate": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "operationId": "mfaAuthenticate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "pendingToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "authentication successful",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "401": {
+            "description": "invalid pending token or code"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/mfa/challenge": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "mfaChallenge",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "challenge token issued",
+            "schema": {
+              "properties": {
+                "challengeToken": {
+                  "type": "string"
+                },
+                "expiresAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid code or mfa not enabled"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/mfa/disable": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "mfaDisable",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "mfa disabled"
+          },
+          "400": {
+            "description": "invalid password or code"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/mfa/recoveryCodes": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "mfaRecoveryCodes",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "new recovery codes generated",
+            "schema": {
+              "properties": {
+                "recoveryCodes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid code or mfa not enabled"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/mfa/setup": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "mfaSetup",
+        "responses": {
+          "200": {
+            "description": "mfa setup initiated",
+            "schema": {
+              "properties": {
+                "provisioningUri": {
+                  "type": "string"
+                },
+                "qrCode": {
+                  "type": "string"
+                },
+                "secret": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "mfa already enabled"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/mfa/status": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "mfaStatus",
+        "responses": {
+          "200": {
+            "description": "mfa status",
+            "schema": {
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "recoveryCodesRemaining": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/mfa/verify": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "account"
+        ],
+        "operationId": "mfaVerify",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "mfa enabled",
+            "schema": {
+              "properties": {
+                "recoveryCodes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid code or no pending setup"
           },
           "401": {
             "description": "unauthorized"

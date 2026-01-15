@@ -44,7 +44,7 @@ func (o *ListOrgMembersURL) Build() (*url.URL, error) {
 
 	organizationToken := o.OrganizationToken
 	if organizationToken != "" {
-		_path = strings.Replace(_path, "{organizationToken}", organizationToken, -1)
+		_path = strings.ReplaceAll(_path, "{organizationToken}", organizationToken)
 	} else {
 		return nil, errors.New("organizationToken is required on ListOrgMembersURL")
 	}

@@ -78,7 +78,7 @@ func NewGetEnvironmentMetricsBadRequest() *GetEnvironmentMetricsBadRequest {
 // WriteResponse to the client
 func (o *GetEnvironmentMetricsBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(400)
 }
@@ -103,7 +103,7 @@ func NewGetEnvironmentMetricsUnauthorized() *GetEnvironmentMetricsUnauthorized {
 // WriteResponse to the client
 func (o *GetEnvironmentMetricsUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -128,7 +128,7 @@ func NewGetEnvironmentMetricsInternalServerError() *GetEnvironmentMetricsInterna
 // WriteResponse to the client
 func (o *GetEnvironmentMetricsInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

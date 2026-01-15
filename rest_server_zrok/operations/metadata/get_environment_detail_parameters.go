@@ -26,7 +26,6 @@ func NewGetEnvironmentDetailParams() GetEnvironmentDetailParams {
 //
 // swagger:parameters getEnvironmentDetail
 type GetEnvironmentDetailParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 

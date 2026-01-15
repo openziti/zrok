@@ -76,7 +76,7 @@ func NewListOrgMembersNotFound() *ListOrgMembersNotFound {
 // WriteResponse to the client
 func (o *ListOrgMembersNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -101,7 +101,7 @@ func NewListOrgMembersInternalServerError() *ListOrgMembersInternalServerError {
 // WriteResponse to the client
 func (o *ListOrgMembersInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

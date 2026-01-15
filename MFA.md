@@ -43,6 +43,15 @@ create table mfa_pending_auth (
     expires_at            timestamptz not null,
     created_at            timestamptz not null default(current_timestamp)
 );
+
+-- MFA challenge tokens for step-up authentication
+create table mfa_challenge_tokens (
+    id                    serial primary key,
+    account_id            integer not null references accounts(id),
+    challenge_token       varchar(64) not null unique,
+    expires_at            timestamptz not null,
+    created_at            timestamptz not null default(current_timestamp)
+);
 ```
 
 **Files to create:**
@@ -109,7 +118,8 @@ openssl rand -base64 32
 | `controller/mfaAuthenticate.go` | `POST /mfa/authenticate` - complete login with TOTP code |
 | `controller/mfaStatus.go` | `GET /mfa/status` - check if MFA enabled |
 | `controller/mfaRecoveryCodes.go` | `POST /mfa/recoveryCodes` - regenerate recovery codes |
-| `controller/maintenanceMfaPendingAuth.go` | Cleanup expired pending auth tokens |
+| `controller/mfaChallenge.go` | `POST /mfa/challenge` - step-up auth, returns challenge token |
+| `controller/maintenanceMfaPendingAuth.go` | Cleanup expired pending auth and challenge tokens |
 
 ### Files to Modify
 
@@ -130,6 +140,7 @@ openssl rand -base64 32
 | `GET /mfa/status` | Token | Returns `{enabled, recoveryCodesRemaining}` |
 | `POST /mfa/recoveryCodes` | Token | Body: `{code}` → Returns new codes |
 | `POST /mfa/authenticate` | None | Body: `{pendingToken, code}` → Returns account token |
+| `POST /mfa/challenge` | Token | Body: `{code}` → Returns `{challengeToken, expiresAt}` |
 
 ### Modified Login Flow
 
@@ -174,6 +185,35 @@ type Config struct {
 
 In both modes, the MFA setup/disable endpoints are available and functional.
 
+### Step-Up Authentication (MFA Challenge)
+
+For sensitive operations, UI extensions (e.g., billing) can require users to re-verify MFA even when already logged in.
+
+**Flow:**
+```
+Extension calls context.requireMfaChallenge()
+    ↓
+MfaChallengeModal opens
+    ↓
+User enters TOTP code
+    ↓
+POST /mfa/challenge {code}
+    ↓
+Code valid?
+    ↓ No → 401 Unauthorized
+    ↓ Yes → 200 OK {challengeToken, expiresAt}
+    ↓
+Promise resolves with challengeToken
+    ↓
+Extension uses token for sensitive API calls
+```
+
+**Challenge token properties:**
+- Short-lived (10 minutes default, configurable)
+- Tied to the authenticated account
+- Can be validated by external systems via shared secret or API call
+- Cleaned up by maintenance agent
+
 ---
 
 ## Frontend Implementation
@@ -187,6 +227,7 @@ In both modes, the MFA setup/disable endpoints are available and functional.
 | `ui/src/MfaDisableModal.tsx` | Confirm disable: password + TOTP code |
 | `ui/src/MfaRecoveryCodesModal.tsx` | View remaining codes, regenerate |
 | `ui/src/RecoveryCodesDownload.tsx` | Download codes as text file |
+| `ui/src/MfaChallengeModal.tsx` | Step-up auth: enter TOTP code for sensitive actions |
 
 ### Files to Modify
 
@@ -195,6 +236,43 @@ In both modes, the MFA setup/disable endpoints are available and functional.
 | `ui/src/Login.tsx` | Handle 202 response, show `MfaVerifyModal` |
 | `ui/src/AccountPanel.tsx` | Add MFA status indicator and setup/manage button |
 | `ui/src/model/user.ts` | Add `mfaEnabled?: boolean` to User interface |
+| `ui/src/extensions/context.ts` | Add `isMfaEnabled()` and `requireMfaChallenge()` to ExtensionContext |
+
+### Extension Context Additions
+
+Add to `ExtensionContext` interface for UI extensions:
+
+```typescript
+interface ExtensionContext {
+  // ...existing methods...
+
+  // Returns true if current user has MFA enabled
+  isMfaEnabled: () => boolean;
+
+  // Shows MFA challenge modal, resolves with challenge token on success
+  // Rejects if user cancels or MFA not enabled for account
+  requireMfaChallenge: () => Promise<string>;
+}
+```
+
+**Extension usage example:**
+```typescript
+async function showSensitiveData(context: ExtensionContext) {
+  if (!context.isMfaEnabled()) {
+    context.notify('MFA required to access this feature', 'warning');
+    return;
+  }
+
+  try {
+    const challengeToken = await context.requireMfaChallenge();
+    // Use challengeToken to call sensitive APIs
+    const data = await fetchSensitiveData(challengeToken);
+    // Display data...
+  } catch (e) {
+    // User cancelled MFA challenge
+  }
+}
+```
 
 ### UI Flow - Enrollment
 
@@ -225,6 +303,7 @@ In both modes, the MFA setup/disable endpoints are available and functional.
 - **Rate limiting**: Consider limiting `/mfa/authenticate` attempts per pending token
 - **Time drift**: Accept codes within ±1 time period (30 seconds)
 - **Key management**: MfaSecretKey must be securely stored and backed up
+- **Challenge tokens**: Short-lived (10 min), cryptographically random, cleaned up by maintenance
 
 ---
 
@@ -249,24 +328,30 @@ In both modes, the MFA setup/disable endpoints are available and functional.
 
 ### Phase 4: Management APIs
 12. Implement `mfaDisable.go`, `mfaRecoveryCodes.go`
-13. Add global enforcement config option
+13. Implement `mfaChallenge.go` for step-up authentication
+14. Add global enforcement config option
 
 ### Phase 5: Frontend - Enrollment
-14. Regenerate TypeScript API client
-15. Create `MfaSetupModal.tsx`, `RecoveryCodesDownload.tsx`
-16. Update `AccountPanel.tsx`
+15. Regenerate TypeScript API client
+16. Create `MfaSetupModal.tsx`, `RecoveryCodesDownload.tsx`
+17. Update `AccountPanel.tsx`
 
 ### Phase 6: Frontend - Login
-17. Create `MfaVerifyModal.tsx`
-18. Update `Login.tsx`
+18. Create `MfaVerifyModal.tsx`
+19. Update `Login.tsx`
 
 ### Phase 7: Frontend - Management
-19. Create `MfaDisableModal.tsx`, `MfaRecoveryCodesModal.tsx`
+20. Create `MfaDisableModal.tsx`, `MfaRecoveryCodesModal.tsx`
 
-### Phase 8: Testing
-20. Unit tests for TOTP functions
-21. Integration tests for MFA flow
-22. Manual testing of full enrollment and login flows
+### Phase 8: Extension Integration
+21. Create `MfaChallengeModal.tsx`
+22. Add `isMfaEnabled()` and `requireMfaChallenge()` to ExtensionContext
+23. Wire up modal trigger via context method
+
+### Phase 9: Testing
+24. Unit tests for TOTP functions
+25. Integration tests for MFA flow
+26. Manual testing of full enrollment, login, and step-up flows
 
 ---
 
@@ -279,3 +364,5 @@ In both modes, the MFA setup/disable endpoints are available and functional.
 - `ui/src/AccountPasswordChangeModal.tsx` - Modal pattern to follow
 - `ui/src/Login.tsx` - Login page to modify
 - `ui/src/AccountPanel.tsx` - Settings page to add MFA controls
+- `ui/src/extensions/context.ts` - Extension context to add MFA methods
+- `ui/src/extensions/types.ts` - Extension type definitions

@@ -7,6 +7,8 @@ package agent
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -23,7 +25,7 @@ type RemoteAccessReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *RemoteAccessReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *RemoteAccessReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewRemoteAccessOK()
@@ -99,11 +101,13 @@ func (o *RemoteAccessOK) Code() int {
 }
 
 func (o *RemoteAccessOK) Error() string {
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessOK %s", 200, payload)
 }
 
 func (o *RemoteAccessOK) String() string {
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessOK %s", 200, payload)
 }
 
 func (o *RemoteAccessOK) GetPayload() *RemoteAccessOKBody {
@@ -115,7 +119,7 @@ func (o *RemoteAccessOK) readResponse(response runtime.ClientResponse, consumer 
 	o.Payload = new(RemoteAccessOKBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -166,11 +170,11 @@ func (o *RemoteAccessUnauthorized) Code() int {
 }
 
 func (o *RemoteAccessUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessUnauthorized ", 401)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessUnauthorized", 401)
 }
 
 func (o *RemoteAccessUnauthorized) String() string {
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessUnauthorized ", 401)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessUnauthorized", 401)
 }
 
 func (o *RemoteAccessUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -222,11 +226,11 @@ func (o *RemoteAccessInternalServerError) Code() int {
 }
 
 func (o *RemoteAccessInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessInternalServerError ", 500)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessInternalServerError", 500)
 }
 
 func (o *RemoteAccessInternalServerError) String() string {
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessInternalServerError ", 500)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessInternalServerError", 500)
 }
 
 func (o *RemoteAccessInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -278,11 +282,11 @@ func (o *RemoteAccessBadGateway) Code() int {
 }
 
 func (o *RemoteAccessBadGateway) Error() string {
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessBadGateway ", 502)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessBadGateway", 502)
 }
 
 func (o *RemoteAccessBadGateway) String() string {
-	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessBadGateway ", 502)
+	return fmt.Sprintf("[POST /agent/access][%d] remoteAccessBadGateway", 502)
 }
 
 func (o *RemoteAccessBadGateway) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

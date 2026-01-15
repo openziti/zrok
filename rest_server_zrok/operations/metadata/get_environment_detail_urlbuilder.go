@@ -44,7 +44,7 @@ func (o *GetEnvironmentDetailURL) Build() (*url.URL, error) {
 
 	envZID := o.EnvZID
 	if envZID != "" {
-		_path = strings.Replace(_path, "{envZId}", envZID, -1)
+		_path = strings.ReplaceAll(_path, "{envZId}", envZID)
 	} else {
 		return nil, errors.New("envZId is required on GetEnvironmentDetailURL")
 	}

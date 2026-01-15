@@ -6,6 +6,8 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type GetEnvironmentDetailReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *GetEnvironmentDetailReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *GetEnvironmentDetailReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewGetEnvironmentDetailOK()
@@ -97,11 +99,13 @@ func (o *GetEnvironmentDetailOK) Code() int {
 }
 
 func (o *GetEnvironmentDetailOK) Error() string {
-	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailOK %s", 200, payload)
 }
 
 func (o *GetEnvironmentDetailOK) String() string {
-	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailOK %s", 200, payload)
 }
 
 func (o *GetEnvironmentDetailOK) GetPayload() *rest_model_zrok.EnvironmentAndResources {
@@ -113,7 +117,7 @@ func (o *GetEnvironmentDetailOK) readResponse(response runtime.ClientResponse, c
 	o.Payload = new(rest_model_zrok.EnvironmentAndResources)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -164,11 +168,11 @@ func (o *GetEnvironmentDetailUnauthorized) Code() int {
 }
 
 func (o *GetEnvironmentDetailUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailUnauthorized ", 401)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailUnauthorized", 401)
 }
 
 func (o *GetEnvironmentDetailUnauthorized) String() string {
-	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailUnauthorized ", 401)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailUnauthorized", 401)
 }
 
 func (o *GetEnvironmentDetailUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -220,11 +224,11 @@ func (o *GetEnvironmentDetailNotFound) Code() int {
 }
 
 func (o *GetEnvironmentDetailNotFound) Error() string {
-	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailNotFound ", 404)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailNotFound", 404)
 }
 
 func (o *GetEnvironmentDetailNotFound) String() string {
-	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailNotFound ", 404)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailNotFound", 404)
 }
 
 func (o *GetEnvironmentDetailNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -276,11 +280,11 @@ func (o *GetEnvironmentDetailInternalServerError) Code() int {
 }
 
 func (o *GetEnvironmentDetailInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailInternalServerError ", 500)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailInternalServerError", 500)
 }
 
 func (o *GetEnvironmentDetailInternalServerError) String() string {
-	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailInternalServerError ", 500)
+	return fmt.Sprintf("[GET /detail/environment/{envZId}][%d] getEnvironmentDetailInternalServerError", 500)
 }
 
 func (o *GetEnvironmentDetailInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

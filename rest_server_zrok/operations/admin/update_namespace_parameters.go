@@ -27,7 +27,6 @@ func NewUpdateNamespaceParams() UpdateNamespaceParams {
 //
 // swagger:parameters updateNamespace
 type UpdateNamespaceParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *UpdateNamespaceParams) BindRequest(r *http.Request, route *middleware.M
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body UpdateNamespaceBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

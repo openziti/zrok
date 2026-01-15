@@ -31,7 +31,7 @@ func NewUpdateNamespaceOK() *UpdateNamespaceOK {
 // WriteResponse to the client
 func (o *UpdateNamespaceOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(200)
 }
@@ -56,7 +56,7 @@ func NewUpdateNamespaceUnauthorized() *UpdateNamespaceUnauthorized {
 // WriteResponse to the client
 func (o *UpdateNamespaceUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -81,7 +81,7 @@ func NewUpdateNamespaceNotFound() *UpdateNamespaceNotFound {
 // WriteResponse to the client
 func (o *UpdateNamespaceNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -106,7 +106,7 @@ func NewUpdateNamespaceInternalServerError() *UpdateNamespaceInternalServerError
 // WriteResponse to the client
 func (o *UpdateNamespaceInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

@@ -33,6 +33,7 @@ type Config struct {
 	Limits                 *limits.Config
 	Maintenance            *MaintenanceConfig
 	Metrics                *metrics.Config
+	Mfa                    *MfaConfig
 	Registration           *RegistrationConfig
 	ResetPassword          *ResetPasswordConfig
 	Store                  *store.Config
@@ -61,6 +62,12 @@ type InvitesConfig struct {
 type MaintenanceConfig struct {
 	ResetPassword *ResetPasswordMaintenanceConfig
 	Registration  *RegistrationMaintenanceConfig
+	Mfa           *MfaMaintenanceConfig
+}
+
+type MfaMaintenanceConfig struct {
+	CheckFrequency time.Duration
+	BatchLimit     int
 }
 
 type RegistrationConfig struct {
@@ -88,6 +95,13 @@ type TlsConfig struct {
 	KeyPath  string
 }
 
+type MfaConfig struct {
+	Required               bool          // If true, all users must have MFA enabled
+	SecretKey              string        `dd:"+secret"` // 32-byte base64-encoded key for AES-256-GCM encryption of TOTP secrets
+	PendingAuthExpiration  time.Duration // How long pending MFA auth tokens are valid (default 5 min)
+	ChallengeExpiration    time.Duration // How long MFA challenge tokens are valid (default 10 min)
+}
+
 type CompatibilityConfig struct {
 	LogRequests      bool
 	VersionPatterns  []string
@@ -113,6 +127,14 @@ func DefaultConfig() *Config {
 				CheckFrequency:    time.Hour,
 				BatchLimit:        500,
 			},
+			Mfa: &MfaMaintenanceConfig{
+				CheckFrequency: time.Minute * 5,
+				BatchLimit:     500,
+			},
+		},
+		Mfa: &MfaConfig{
+			PendingAuthExpiration: time.Minute * 5,
+			ChallengeExpiration:   time.Minute * 10,
 		},
 	}
 	// compile default patterns

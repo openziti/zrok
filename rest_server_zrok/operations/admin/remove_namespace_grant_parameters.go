@@ -27,7 +27,6 @@ func NewRemoveNamespaceGrantParams() RemoveNamespaceGrantParams {
 //
 // swagger:parameters removeNamespaceGrant
 type RemoveNamespaceGrantParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *RemoveNamespaceGrantParams) BindRequest(r *http.Request, route *middlew
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body RemoveNamespaceGrantBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

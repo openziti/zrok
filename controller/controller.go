@@ -51,6 +51,13 @@ func Run(inCfg *config.Config) error {
 	api.AccountChangePasswordHandler = newChangePasswordHandler(cfg)
 	api.AccountInviteHandler = newInviteHandler(cfg)
 	api.AccountLoginHandler = account.LoginHandlerFunc(loginHandler)
+	api.AccountMfaAuthenticateHandler = account.MfaAuthenticateHandlerFunc(mfaAuthenticateHandler)
+	api.AccountMfaChallengeHandler = account.MfaChallengeHandlerFunc(mfaChallengeHandler)
+	api.AccountMfaDisableHandler = account.MfaDisableHandlerFunc(mfaDisableHandler)
+	api.AccountMfaRecoveryCodesHandler = account.MfaRecoveryCodesHandlerFunc(mfaRecoveryCodesHandler)
+	api.AccountMfaSetupHandler = account.MfaSetupHandlerFunc(mfaSetupHandler)
+	api.AccountMfaStatusHandler = account.MfaStatusHandlerFunc(mfaStatusHandler)
+	api.AccountMfaVerifyHandler = account.MfaVerifyHandlerFunc(mfaVerifyHandler)
 	api.AccountRegenerateAccountTokenHandler = newRegenerateAccountTokenHandler()
 	api.AccountRegisterHandler = newRegisterHandler(cfg)
 	api.AccountResetPasswordHandler = newResetPasswordHandler(cfg)
@@ -193,6 +200,9 @@ func Run(inCfg *config.Config) error {
 		}
 		if cfg.Maintenance.ResetPassword != nil {
 			go newMaintenanceResetPasswordAgent(ctx, cfg.Maintenance.ResetPassword).run()
+		}
+		if cfg.Maintenance.Mfa != nil {
+			go newMaintenanceMfaAgent(ctx, cfg.Maintenance.Mfa).run()
 		}
 	}
 

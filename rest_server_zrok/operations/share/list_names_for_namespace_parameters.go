@@ -26,7 +26,6 @@ func NewListNamesForNamespaceParams() ListNamesForNamespaceParams {
 //
 // swagger:parameters listNamesForNamespace
 type ListNamesForNamespaceParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 

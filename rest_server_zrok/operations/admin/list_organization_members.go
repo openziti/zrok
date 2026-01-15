@@ -7,6 +7,7 @@ package admin
 
 import (
 	"context"
+	stderrors "errors"
 	"net/http"
 	"strconv"
 
@@ -71,6 +72,7 @@ func (o *ListOrganizationMembers) ServeHTTP(rw http.ResponseWriter, r *http.Requ
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -147,11 +149,15 @@ func (o *ListOrganizationMembersOKBody) validateMembers(formats strfmt.Registry)
 
 		if o.Members[i] != nil {
 			if err := o.Members[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("listOrganizationMembersOK" + "." + "members" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("listOrganizationMembersOK" + "." + "members" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -186,11 +192,15 @@ func (o *ListOrganizationMembersOKBody) contextValidateMembers(ctx context.Conte
 			}
 
 			if err := o.Members[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("listOrganizationMembersOK" + "." + "members" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("listOrganizationMembersOK" + "." + "members" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}

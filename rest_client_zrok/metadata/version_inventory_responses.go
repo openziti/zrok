@@ -7,6 +7,8 @@ package metadata
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type VersionInventoryReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *VersionInventoryReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *VersionInventoryReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewVersionInventoryOK()
@@ -79,11 +81,13 @@ func (o *VersionInventoryOK) Code() int {
 }
 
 func (o *VersionInventoryOK) Error() string {
-	return fmt.Sprintf("[GET /versions][%d] versionInventoryOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /versions][%d] versionInventoryOK %s", 200, payload)
 }
 
 func (o *VersionInventoryOK) String() string {
-	return fmt.Sprintf("[GET /versions][%d] versionInventoryOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /versions][%d] versionInventoryOK %s", 200, payload)
 }
 
 func (o *VersionInventoryOK) GetPayload() *VersionInventoryOKBody {
@@ -95,7 +99,7 @@ func (o *VersionInventoryOK) readResponse(response runtime.ClientResponse, consu
 	o.Payload = new(VersionInventoryOKBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 

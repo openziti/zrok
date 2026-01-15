@@ -27,7 +27,6 @@ func NewCreateAccountParams() CreateAccountParams {
 //
 // swagger:parameters createAccount
 type CreateAccountParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *CreateAccountParams) BindRequest(r *http.Request, route *middleware.Mat
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body CreateAccountBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

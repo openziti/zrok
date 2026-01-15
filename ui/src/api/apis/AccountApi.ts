@@ -17,7 +17,15 @@ import * as runtime from '../runtime';
 import type {
   ChangePasswordRequest,
   InviteRequest,
+  Login202Response,
   LoginRequest,
+  MfaAuthenticateRequest,
+  MfaChallenge200Response,
+  MfaDisableRequest,
+  MfaSetup200Response,
+  MfaStatus200Response,
+  MfaVerify200Response,
+  MfaVerifyRequest,
   RegenerateAccountToken200Response,
   RegenerateAccountTokenRequest,
   RegisterRequest,
@@ -30,8 +38,24 @@ import {
     ChangePasswordRequestToJSON,
     InviteRequestFromJSON,
     InviteRequestToJSON,
+    Login202ResponseFromJSON,
+    Login202ResponseToJSON,
     LoginRequestFromJSON,
     LoginRequestToJSON,
+    MfaAuthenticateRequestFromJSON,
+    MfaAuthenticateRequestToJSON,
+    MfaChallenge200ResponseFromJSON,
+    MfaChallenge200ResponseToJSON,
+    MfaDisableRequestFromJSON,
+    MfaDisableRequestToJSON,
+    MfaSetup200ResponseFromJSON,
+    MfaSetup200ResponseToJSON,
+    MfaStatus200ResponseFromJSON,
+    MfaStatus200ResponseToJSON,
+    MfaVerify200ResponseFromJSON,
+    MfaVerify200ResponseToJSON,
+    MfaVerifyRequestFromJSON,
+    MfaVerifyRequestToJSON,
     RegenerateAccountToken200ResponseFromJSON,
     RegenerateAccountToken200ResponseToJSON,
     RegenerateAccountTokenRequestFromJSON,
@@ -56,6 +80,26 @@ export interface InviteOperationRequest {
 
 export interface LoginOperationRequest {
     body?: LoginRequest;
+}
+
+export interface MfaAuthenticateOperationRequest {
+    body?: MfaAuthenticateRequest;
+}
+
+export interface MfaChallengeRequest {
+    body?: MfaVerifyRequest;
+}
+
+export interface MfaDisableOperationRequest {
+    body?: MfaDisableRequest;
+}
+
+export interface MfaRecoveryCodesRequest {
+    body?: MfaVerifyRequest;
+}
+
+export interface MfaVerifyOperationRequest {
+    body?: MfaVerifyRequest;
 }
 
 export interface RegenerateAccountTokenOperationRequest {
@@ -176,6 +220,237 @@ export class AccountApi extends runtime.BaseAPI {
      */
     async login(requestParameters: LoginOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
         const response = await this.loginRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async mfaAuthenticateRaw(requestParameters: MfaAuthenticateOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+
+        let urlPath = `/mfa/authenticate`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: MfaAuthenticateRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<string>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
+    }
+
+    /**
+     */
+    async mfaAuthenticate(requestParameters: MfaAuthenticateOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+        const response = await this.mfaAuthenticateRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async mfaChallengeRaw(requestParameters: MfaChallengeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MfaChallenge200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/mfa/challenge`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: MfaVerifyRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MfaChallenge200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async mfaChallenge(requestParameters: MfaChallengeRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MfaChallenge200Response> {
+        const response = await this.mfaChallengeRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async mfaDisableRaw(requestParameters: MfaDisableOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/mfa/disable`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: MfaDisableRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async mfaDisable(requestParameters: MfaDisableOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.mfaDisableRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async mfaRecoveryCodesRaw(requestParameters: MfaRecoveryCodesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MfaVerify200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/mfa/recoveryCodes`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: MfaVerifyRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MfaVerify200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async mfaRecoveryCodes(requestParameters: MfaRecoveryCodesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MfaVerify200Response> {
+        const response = await this.mfaRecoveryCodesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async mfaSetupRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MfaSetup200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/mfa/setup`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MfaSetup200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async mfaSetup(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MfaSetup200Response> {
+        const response = await this.mfaSetupRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async mfaStatusRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MfaStatus200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/mfa/status`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MfaStatus200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async mfaStatus(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MfaStatus200Response> {
+        const response = await this.mfaStatusRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async mfaVerifyRaw(requestParameters: MfaVerifyOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MfaVerify200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/mfa/verify`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: MfaVerifyRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MfaVerify200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async mfaVerify(requestParameters: MfaVerifyOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MfaVerify200Response> {
+        const response = await this.mfaVerifyRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

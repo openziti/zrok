@@ -9,12 +9,38 @@ import (
 	"fmt"
 
 	"github.com/go-openapi/runtime"
+	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 )
 
 // New creates a new agent API client.
 func New(transport runtime.ClientTransport, formats strfmt.Registry) ClientService {
 	return &Client{transport: transport, formats: formats}
+}
+
+// New creates a new agent API client with basic auth credentials.
+// It takes the following parameters:
+// - host: http host (github.com).
+// - basePath: any base path for the API client ("/v1", "/v3").
+// - scheme: http scheme ("http", "https").
+// - user: user for basic authentication header.
+// - password: password for basic authentication header.
+func NewClientWithBasicAuth(host, basePath, scheme, user, password string) ClientService {
+	transport := httptransport.New(host, basePath, []string{scheme})
+	transport.DefaultAuthentication = httptransport.BasicAuth(user, password)
+	return &Client{transport: transport, formats: strfmt.Default}
+}
+
+// New creates a new agent API client with a bearer token for authentication.
+// It takes the following parameters:
+// - host: http host (github.com).
+// - basePath: any base path for the API client ("/v1", "/v3").
+// - scheme: http scheme ("http", "https").
+// - bearerToken: bearer token for Bearer authentication header.
+func NewClientWithBearerToken(host, basePath, scheme, bearerToken string) ClientService {
+	transport := httptransport.New(host, basePath, []string{scheme})
+	transport.DefaultAuthentication = httptransport.BearerToken(bearerToken)
+	return &Client{transport: transport, formats: strfmt.Default}
 }
 
 /*
@@ -25,8 +51,52 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
-// ClientOption is the option for Client methods
+// ClientOption may be used to customize the behavior of Client methods.
 type ClientOption func(*runtime.ClientOperation)
+
+// This client is generated with a few options you might find useful for your swagger spec.
+//
+// Feel free to add you own set of options.
+
+// WithContentType allows the client to force the Content-Type header
+// to negotiate a specific Consumer from the server.
+//
+// You may use this option to set arbitrary extensions to your MIME media type.
+func WithContentType(mime string) ClientOption {
+	return func(r *runtime.ClientOperation) {
+		r.ConsumesMediaTypes = []string{mime}
+	}
+}
+
+// WithContentTypeApplicationJSON sets the Content-Type header to "application/json".
+func WithContentTypeApplicationJSON(r *runtime.ClientOperation) {
+	r.ConsumesMediaTypes = []string{"application/json"}
+}
+
+// WithContentTypeApplicationZrokV1JSON sets the Content-Type header to "application/zrok.v1+json".
+func WithContentTypeApplicationZrokV1JSON(r *runtime.ClientOperation) {
+	r.ConsumesMediaTypes = []string{"application/zrok.v1+json"}
+}
+
+// WithAccept allows the client to force the Accept header
+// to negotiate a specific Producer from the server.
+//
+// You may use this option to set arbitrary extensions to your MIME media type.
+func WithAccept(mime string) ClientOption {
+	return func(r *runtime.ClientOperation) {
+		r.ProducesMediaTypes = []string{mime}
+	}
+}
+
+// WithAcceptApplicationJSON sets the Accept header to "application/json".
+func WithAcceptApplicationJSON(r *runtime.ClientOperation) {
+	r.ProducesMediaTypes = []string{"application/json"}
+}
+
+// WithAcceptApplicationZrokV1JSON sets the Accept header to "application/zrok.v1+json".
+func WithAcceptApplicationZrokV1JSON(r *runtime.ClientOperation) {
+	r.ProducesMediaTypes = []string{"application/zrok.v1+json"}
+}
 
 // ClientService is the interface for Client methods
 type ClientService interface {
@@ -55,7 +125,7 @@ type ClientService interface {
 Enroll enroll API
 */
 func (a *Client) Enroll(params *EnrollParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*EnrollOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewEnrollParams()
 	}
@@ -75,17 +145,22 @@ func (a *Client) Enroll(params *EnrollParams, authInfo runtime.ClientAuthInfoWri
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*EnrollOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for enroll: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
@@ -94,7 +169,7 @@ func (a *Client) Enroll(params *EnrollParams, authInfo runtime.ClientAuthInfoWri
 Ping ping API
 */
 func (a *Client) Ping(params *PingParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PingOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewPingParams()
 	}
@@ -114,17 +189,22 @@ func (a *Client) Ping(params *PingParams, authInfo runtime.ClientAuthInfoWriter,
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*PingOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for ping: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
@@ -133,7 +213,7 @@ func (a *Client) Ping(params *PingParams, authInfo runtime.ClientAuthInfoWriter,
 RemoteAccess remote access API
 */
 func (a *Client) RemoteAccess(params *RemoteAccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteAccessOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRemoteAccessParams()
 	}
@@ -153,17 +233,22 @@ func (a *Client) RemoteAccess(params *RemoteAccessParams, authInfo runtime.Clien
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RemoteAccessOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for remoteAccess: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
@@ -172,7 +257,7 @@ func (a *Client) RemoteAccess(params *RemoteAccessParams, authInfo runtime.Clien
 RemoteShare remote share API
 */
 func (a *Client) RemoteShare(params *RemoteShareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteShareOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRemoteShareParams()
 	}
@@ -192,17 +277,22 @@ func (a *Client) RemoteShare(params *RemoteShareParams, authInfo runtime.ClientA
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RemoteShareOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for remoteShare: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
@@ -211,7 +301,7 @@ func (a *Client) RemoteShare(params *RemoteShareParams, authInfo runtime.ClientA
 RemoteStatus remote status API
 */
 func (a *Client) RemoteStatus(params *RemoteStatusParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteStatusOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRemoteStatusParams()
 	}
@@ -231,17 +321,22 @@ func (a *Client) RemoteStatus(params *RemoteStatusParams, authInfo runtime.Clien
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RemoteStatusOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for remoteStatus: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
@@ -250,7 +345,7 @@ func (a *Client) RemoteStatus(params *RemoteStatusParams, authInfo runtime.Clien
 RemoteUnaccess remote unaccess API
 */
 func (a *Client) RemoteUnaccess(params *RemoteUnaccessParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteUnaccessOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRemoteUnaccessParams()
 	}
@@ -270,17 +365,22 @@ func (a *Client) RemoteUnaccess(params *RemoteUnaccessParams, authInfo runtime.C
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RemoteUnaccessOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for remoteUnaccess: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
@@ -289,7 +389,7 @@ func (a *Client) RemoteUnaccess(params *RemoteUnaccessParams, authInfo runtime.C
 RemoteUnshare remote unshare API
 */
 func (a *Client) RemoteUnshare(params *RemoteUnshareParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoteUnshareOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRemoteUnshareParams()
 	}
@@ -309,17 +409,22 @@ func (a *Client) RemoteUnshare(params *RemoteUnshareParams, authInfo runtime.Cli
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RemoteUnshareOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for remoteUnshare: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
@@ -328,7 +433,7 @@ func (a *Client) RemoteUnshare(params *RemoteUnshareParams, authInfo runtime.Cli
 ShareHTTPHealthcheck share Http healthcheck API
 */
 func (a *Client) ShareHTTPHealthcheck(params *ShareHTTPHealthcheckParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ShareHTTPHealthcheckOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewShareHTTPHealthcheckParams()
 	}
@@ -348,17 +453,22 @@ func (a *Client) ShareHTTPHealthcheck(params *ShareHTTPHealthcheckParams, authIn
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*ShareHTTPHealthcheckOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for shareHttpHealthcheck: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
@@ -367,7 +477,7 @@ func (a *Client) ShareHTTPHealthcheck(params *ShareHTTPHealthcheckParams, authIn
 Unenroll unenroll API
 */
 func (a *Client) Unenroll(params *UnenrollParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UnenrollOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewUnenrollParams()
 	}
@@ -387,17 +497,22 @@ func (a *Client) Unenroll(params *UnenrollParams, authInfo runtime.ClientAuthInf
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*UnenrollOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for unenroll: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }

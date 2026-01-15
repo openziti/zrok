@@ -20,7 +20,7 @@ type UpdateNamespaceReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *UpdateNamespaceReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *UpdateNamespaceReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewUpdateNamespaceOK()
@@ -95,11 +95,11 @@ func (o *UpdateNamespaceOK) Code() int {
 }
 
 func (o *UpdateNamespaceOK) Error() string {
-	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceOK ", 200)
+	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceOK", 200)
 }
 
 func (o *UpdateNamespaceOK) String() string {
-	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceOK ", 200)
+	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceOK", 200)
 }
 
 func (o *UpdateNamespaceOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *UpdateNamespaceUnauthorized) Code() int {
 }
 
 func (o *UpdateNamespaceUnauthorized) Error() string {
-	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceUnauthorized ", 401)
+	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceUnauthorized", 401)
 }
 
 func (o *UpdateNamespaceUnauthorized) String() string {
-	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceUnauthorized ", 401)
+	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceUnauthorized", 401)
 }
 
 func (o *UpdateNamespaceUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *UpdateNamespaceNotFound) Code() int {
 }
 
 func (o *UpdateNamespaceNotFound) Error() string {
-	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceNotFound ", 404)
+	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceNotFound", 404)
 }
 
 func (o *UpdateNamespaceNotFound) String() string {
-	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceNotFound ", 404)
+	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceNotFound", 404)
 }
 
 func (o *UpdateNamespaceNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *UpdateNamespaceInternalServerError) Code() int {
 }
 
 func (o *UpdateNamespaceInternalServerError) Error() string {
-	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceInternalServerError ", 500)
+	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceInternalServerError", 500)
 }
 
 func (o *UpdateNamespaceInternalServerError) String() string {
-	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceInternalServerError ", 500)
+	return fmt.Sprintf("[PATCH /namespace][%d] updateNamespaceInternalServerError", 500)
 }
 
 func (o *UpdateNamespaceInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

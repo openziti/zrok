@@ -7,6 +7,8 @@ package agent
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type EnrollReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *EnrollReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *EnrollReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewEnrollOK()
@@ -97,11 +99,13 @@ func (o *EnrollOK) Code() int {
 }
 
 func (o *EnrollOK) Error() string {
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollOK %s", 200, payload)
 }
 
 func (o *EnrollOK) String() string {
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollOK %s", 200, payload)
 }
 
 func (o *EnrollOK) GetPayload() *EnrollOKBody {
@@ -113,7 +117,7 @@ func (o *EnrollOK) readResponse(response runtime.ClientResponse, consumer runtim
 	o.Payload = new(EnrollOKBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -164,11 +168,11 @@ func (o *EnrollBadRequest) Code() int {
 }
 
 func (o *EnrollBadRequest) Error() string {
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollBadRequest ", 400)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollBadRequest", 400)
 }
 
 func (o *EnrollBadRequest) String() string {
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollBadRequest ", 400)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollBadRequest", 400)
 }
 
 func (o *EnrollBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -220,11 +224,11 @@ func (o *EnrollUnauthorized) Code() int {
 }
 
 func (o *EnrollUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollUnauthorized ", 401)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollUnauthorized", 401)
 }
 
 func (o *EnrollUnauthorized) String() string {
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollUnauthorized ", 401)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollUnauthorized", 401)
 }
 
 func (o *EnrollUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -276,11 +280,11 @@ func (o *EnrollInternalServerError) Code() int {
 }
 
 func (o *EnrollInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollInternalServerError ", 500)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollInternalServerError", 500)
 }
 
 func (o *EnrollInternalServerError) String() string {
-	return fmt.Sprintf("[POST /agent/enroll][%d] enrollInternalServerError ", 500)
+	return fmt.Sprintf("[POST /agent/enroll][%d] enrollInternalServerError", 500)
 }
 
 func (o *EnrollInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

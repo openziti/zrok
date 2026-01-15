@@ -78,7 +78,7 @@ func NewGetEnvironmentDetailUnauthorized() *GetEnvironmentDetailUnauthorized {
 // WriteResponse to the client
 func (o *GetEnvironmentDetailUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -103,7 +103,7 @@ func NewGetEnvironmentDetailNotFound() *GetEnvironmentDetailNotFound {
 // WriteResponse to the client
 func (o *GetEnvironmentDetailNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -128,7 +128,7 @@ func NewGetEnvironmentDetailInternalServerError() *GetEnvironmentDetailInternalS
 // WriteResponse to the client
 func (o *GetEnvironmentDetailInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

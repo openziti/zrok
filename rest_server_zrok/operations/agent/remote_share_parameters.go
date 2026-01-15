@@ -27,7 +27,6 @@ func NewRemoteShareParams() RemoteShareParams {
 //
 // swagger:parameters remoteShare
 type RemoteShareParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *RemoteShareParams) BindRequest(r *http.Request, route *middleware.Match
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body RemoteShareBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

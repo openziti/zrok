@@ -27,7 +27,6 @@ func NewListOrganizationMembersParams() ListOrganizationMembersParams {
 //
 // swagger:parameters listOrganizationMembers
 type ListOrganizationMembersParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *ListOrganizationMembersParams) BindRequest(r *http.Request, route *midd
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body ListOrganizationMembersBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

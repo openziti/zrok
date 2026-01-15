@@ -95,6 +95,13 @@ Class | Method | HTTP request | Description
 *AccountApi* | [**change_password**](docs/AccountApi.md#change_password) | **POST** /changePassword | 
 *AccountApi* | [**invite**](docs/AccountApi.md#invite) | **POST** /invite | 
 *AccountApi* | [**login**](docs/AccountApi.md#login) | **POST** /login | 
+*AccountApi* | [**mfa_authenticate**](docs/AccountApi.md#mfa_authenticate) | **POST** /mfa/authenticate | 
+*AccountApi* | [**mfa_challenge**](docs/AccountApi.md#mfa_challenge) | **POST** /mfa/challenge | 
+*AccountApi* | [**mfa_disable**](docs/AccountApi.md#mfa_disable) | **POST** /mfa/disable | 
+*AccountApi* | [**mfa_recovery_codes**](docs/AccountApi.md#mfa_recovery_codes) | **POST** /mfa/recoveryCodes | 
+*AccountApi* | [**mfa_setup**](docs/AccountApi.md#mfa_setup) | **POST** /mfa/setup | 
+*AccountApi* | [**mfa_status**](docs/AccountApi.md#mfa_status) | **GET** /mfa/status | 
+*AccountApi* | [**mfa_verify**](docs/AccountApi.md#mfa_verify) | **POST** /mfa/verify | 
 *AccountApi* | [**regenerate_account_token**](docs/AccountApi.md#regenerate_account_token) | **POST** /regenerateAccountToken | 
 *AccountApi* | [**register**](docs/AccountApi.md#register) | **POST** /register | 
 *AccountApi* | [**reset_password**](docs/AccountApi.md#reset_password) | **POST** /resetPassword | 
@@ -219,9 +226,17 @@ Class | Method | HTTP request | Description
  - [ListOrganizations200Response](docs/ListOrganizations200Response.md)
  - [ListOrganizations200ResponseOrganizationsInner](docs/ListOrganizations200ResponseOrganizationsInner.md)
  - [ListShareNamespaces200ResponseInner](docs/ListShareNamespaces200ResponseInner.md)
+ - [Login202Response](docs/Login202Response.md)
  - [LoginRequest](docs/LoginRequest.md)
  - [Metrics](docs/Metrics.md)
  - [MetricsSample](docs/MetricsSample.md)
+ - [MfaAuthenticateRequest](docs/MfaAuthenticateRequest.md)
+ - [MfaChallenge200Response](docs/MfaChallenge200Response.md)
+ - [MfaDisableRequest](docs/MfaDisableRequest.md)
+ - [MfaSetup200Response](docs/MfaSetup200Response.md)
+ - [MfaStatus200Response](docs/MfaStatus200Response.md)
+ - [MfaVerify200Response](docs/MfaVerify200Response.md)
+ - [MfaVerifyRequest](docs/MfaVerifyRequest.md)
  - [Name](docs/Name.md)
  - [NameSelection](docs/NameSelection.md)
  - [Overview](docs/Overview.md)

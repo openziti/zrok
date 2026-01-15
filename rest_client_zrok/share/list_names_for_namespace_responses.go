@@ -6,6 +6,8 @@ package share
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type ListNamesForNamespaceReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *ListNamesForNamespaceReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *ListNamesForNamespaceReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewListNamesForNamespaceOK()
@@ -97,11 +99,13 @@ func (o *ListNamesForNamespaceOK) Code() int {
 }
 
 func (o *ListNamesForNamespaceOK) Error() string {
-	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceOK %s", 200, payload)
 }
 
 func (o *ListNamesForNamespaceOK) String() string {
-	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceOK %s", 200, payload)
 }
 
 func (o *ListNamesForNamespaceOK) GetPayload() []*rest_model_zrok.Name {
@@ -111,7 +115,7 @@ func (o *ListNamesForNamespaceOK) GetPayload() []*rest_model_zrok.Name {
 func (o *ListNamesForNamespaceOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -162,11 +166,11 @@ func (o *ListNamesForNamespaceUnauthorized) Code() int {
 }
 
 func (o *ListNamesForNamespaceUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceUnauthorized ", 401)
+	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceUnauthorized", 401)
 }
 
 func (o *ListNamesForNamespaceUnauthorized) String() string {
-	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceUnauthorized ", 401)
+	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceUnauthorized", 401)
 }
 
 func (o *ListNamesForNamespaceUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -218,11 +222,11 @@ func (o *ListNamesForNamespaceNotFound) Code() int {
 }
 
 func (o *ListNamesForNamespaceNotFound) Error() string {
-	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceNotFound ", 404)
+	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceNotFound", 404)
 }
 
 func (o *ListNamesForNamespaceNotFound) String() string {
-	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceNotFound ", 404)
+	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceNotFound", 404)
 }
 
 func (o *ListNamesForNamespaceNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -274,11 +278,11 @@ func (o *ListNamesForNamespaceInternalServerError) Code() int {
 }
 
 func (o *ListNamesForNamespaceInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceInternalServerError ", 500)
+	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceInternalServerError", 500)
 }
 
 func (o *ListNamesForNamespaceInternalServerError) String() string {
-	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceInternalServerError ", 500)
+	return fmt.Sprintf("[GET /share/names/{namespaceToken}][%d] listNamesForNamespaceInternalServerError", 500)
 }
 
 func (o *ListNamesForNamespaceInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

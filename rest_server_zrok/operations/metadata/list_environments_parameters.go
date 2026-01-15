@@ -28,7 +28,6 @@ func NewListEnvironmentsParams() ListEnvironmentsParams {
 //
 // swagger:parameters listEnvironments
 type ListEnvironmentsParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -36,58 +35,72 @@ type ListEnvironmentsParams struct {
 	  In: query
 	*/
 	AccessCount *string
+
 	/*duration for hasActivity filter (e.g., "24h", "7d", "30d"). default "24h", maximum "30d" (720h)
 	  In: query
 	*/
 	ActivityDuration *string
+
 	/*filter by address (exact match)
 	  In: query
 	*/
 	Address *string
+
 	/*filter by created date (RFC3339 datetime, inclusive)
 	  In: query
 	*/
 	CreatedAfter *string
+
 	/*filter by created date (RFC3339 datetime, inclusive)
 	  In: query
 	*/
 	CreatedBefore *string
+
 	/*filter by description (case-insensitive substring match)
 	  In: query
 	*/
 	Description *string
+
 	/*filter by whether environment has active accesses
 	  In: query
 	*/
 	HasAccesses *bool
+
 	/*filter by whether environment has metrics within activityDuration timeframe
 	  In: query
 	*/
 	HasActivity *bool
+
 	/*filter by whether environment has active shares
 	  In: query
 	*/
 	HasShares *bool
+
 	/*filter by host (case-insensitive substring match)
 	  In: query
 	*/
 	Host *string
+
 	/*filter environments WITHOUT recent activity (inverse of hasActivity)
 	  In: query
 	*/
 	Idle *bool
+
 	/*filter by whether agent is enrolled
 	  In: query
 	*/
 	RemoteAgent *bool
+
 	/*filter by share count with operator (e.g., ">0", ">=5", "=0", "<10", "<=3")
 	  In: query
 	*/
 	ShareCount *string
+
 	/*filter by updated date (RFC3339 datetime, inclusive)
 	  In: query
 	*/
 	UpdatedAfter *string
+
 	/*filter by updated date (RFC3339 datetime, inclusive)
 	  In: query
 	*/
@@ -102,7 +115,6 @@ func (o *ListEnvironmentsParams) BindRequest(r *http.Request, route *middleware.
 	var res []error
 
 	o.HTTPRequest = r
-
 	qs := runtime.Values(r.URL.Query())
 
 	qAccessCount, qhkAccessCount, _ := qs.GetOK("accessCount")

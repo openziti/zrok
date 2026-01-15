@@ -25,7 +25,6 @@ func NewOverviewParams() OverviewParams {
 //
 // swagger:parameters overview
 type OverviewParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 }

@@ -31,7 +31,7 @@ func NewAddNamespaceGrantOK() *AddNamespaceGrantOK {
 // WriteResponse to the client
 func (o *AddNamespaceGrantOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(200)
 }
@@ -56,7 +56,7 @@ func NewAddNamespaceGrantUnauthorized() *AddNamespaceGrantUnauthorized {
 // WriteResponse to the client
 func (o *AddNamespaceGrantUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -81,7 +81,7 @@ func NewAddNamespaceGrantNotFound() *AddNamespaceGrantNotFound {
 // WriteResponse to the client
 func (o *AddNamespaceGrantNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -106,7 +106,7 @@ func NewAddNamespaceGrantInternalServerError() *AddNamespaceGrantInternalServerE
 // WriteResponse to the client
 func (o *AddNamespaceGrantInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

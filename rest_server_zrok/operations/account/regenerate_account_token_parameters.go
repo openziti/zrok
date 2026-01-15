@@ -27,7 +27,6 @@ func NewRegenerateAccountTokenParams() RegenerateAccountTokenParams {
 //
 // swagger:parameters regenerateAccountToken
 type RegenerateAccountTokenParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *RegenerateAccountTokenParams) BindRequest(r *http.Request, route *middl
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body RegenerateAccountTokenBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

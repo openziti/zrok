@@ -31,7 +31,7 @@ func NewAddOrganizationMemberCreated() *AddOrganizationMemberCreated {
 // WriteResponse to the client
 func (o *AddOrganizationMemberCreated) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(201)
 }
@@ -56,7 +56,7 @@ func NewAddOrganizationMemberUnauthorized() *AddOrganizationMemberUnauthorized {
 // WriteResponse to the client
 func (o *AddOrganizationMemberUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -81,7 +81,7 @@ func NewAddOrganizationMemberNotFound() *AddOrganizationMemberNotFound {
 // WriteResponse to the client
 func (o *AddOrganizationMemberNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -106,7 +106,7 @@ func NewAddOrganizationMemberInternalServerError() *AddOrganizationMemberInterna
 // WriteResponse to the client
 func (o *AddOrganizationMemberInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

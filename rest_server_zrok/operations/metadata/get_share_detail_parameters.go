@@ -26,7 +26,6 @@ func NewGetShareDetailParams() GetShareDetailParams {
 //
 // swagger:parameters getShareDetail
 type GetShareDetailParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 

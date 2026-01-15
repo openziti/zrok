@@ -51,242 +51,593 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 		JSONProducer: runtime.JSONProducer(),
 
 		ShareAccessHandler: share.AccessHandlerFunc(func(params share.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation share.Access has not yet been implemented")
 		}),
+
 		AdminAddFrontendGrantHandler: admin.AddFrontendGrantHandlerFunc(func(params admin.AddFrontendGrantParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.AddFrontendGrant has not yet been implemented")
 		}),
+
 		AdminAddNamespaceFrontendMappingHandler: admin.AddNamespaceFrontendMappingHandlerFunc(func(params admin.AddNamespaceFrontendMappingParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.AddNamespaceFrontendMapping has not yet been implemented")
 		}),
+
 		AdminAddNamespaceGrantHandler: admin.AddNamespaceGrantHandlerFunc(func(params admin.AddNamespaceGrantParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.AddNamespaceGrant has not yet been implemented")
 		}),
+
 		AdminAddOrganizationMemberHandler: admin.AddOrganizationMemberHandlerFunc(func(params admin.AddOrganizationMemberParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.AddOrganizationMember has not yet been implemented")
 		}),
+
 		AccountChangePasswordHandler: account.ChangePasswordHandlerFunc(func(params account.ChangePasswordParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation account.ChangePassword has not yet been implemented")
 		}),
+
 		MetadataClientVersionCheckHandler: metadata.ClientVersionCheckHandlerFunc(func(params metadata.ClientVersionCheckParams) middleware.Responder {
+			_ = params
+
 			return middleware.NotImplemented("operation metadata.ClientVersionCheck has not yet been implemented")
 		}),
+
 		MetadataConfigurationHandler: metadata.ConfigurationHandlerFunc(func(params metadata.ConfigurationParams) middleware.Responder {
+			_ = params
+
 			return middleware.NotImplemented("operation metadata.Configuration has not yet been implemented")
 		}),
+
 		AdminCreateAccountHandler: admin.CreateAccountHandlerFunc(func(params admin.CreateAccountParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.CreateAccount has not yet been implemented")
 		}),
+
 		AdminCreateFrontendHandler: admin.CreateFrontendHandlerFunc(func(params admin.CreateFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.CreateFrontend has not yet been implemented")
 		}),
+
 		AdminCreateIdentityHandler: admin.CreateIdentityHandlerFunc(func(params admin.CreateIdentityParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.CreateIdentity has not yet been implemented")
 		}),
+
 		AdminCreateNamespaceHandler: admin.CreateNamespaceHandlerFunc(func(params admin.CreateNamespaceParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.CreateNamespace has not yet been implemented")
 		}),
+
 		AdminCreateOrganizationHandler: admin.CreateOrganizationHandlerFunc(func(params admin.CreateOrganizationParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.CreateOrganization has not yet been implemented")
 		}),
+
 		ShareCreateShareNameHandler: share.CreateShareNameHandlerFunc(func(params share.CreateShareNameParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation share.CreateShareName has not yet been implemented")
 		}),
+
 		AdminDeleteAccountHandler: admin.DeleteAccountHandlerFunc(func(params admin.DeleteAccountParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.DeleteAccount has not yet been implemented")
 		}),
+
 		AdminDeleteFrontendHandler: admin.DeleteFrontendHandlerFunc(func(params admin.DeleteFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.DeleteFrontend has not yet been implemented")
 		}),
+
 		AdminDeleteFrontendGrantHandler: admin.DeleteFrontendGrantHandlerFunc(func(params admin.DeleteFrontendGrantParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.DeleteFrontendGrant has not yet been implemented")
 		}),
+
 		AdminDeleteIdentityHandler: admin.DeleteIdentityHandlerFunc(func(params admin.DeleteIdentityParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.DeleteIdentity has not yet been implemented")
 		}),
+
 		AdminDeleteNamespaceHandler: admin.DeleteNamespaceHandlerFunc(func(params admin.DeleteNamespaceParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.DeleteNamespace has not yet been implemented")
 		}),
+
 		AdminDeleteOrganizationHandler: admin.DeleteOrganizationHandlerFunc(func(params admin.DeleteOrganizationParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.DeleteOrganization has not yet been implemented")
 		}),
+
 		ShareDeleteShareNameHandler: share.DeleteShareNameHandlerFunc(func(params share.DeleteShareNameParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation share.DeleteShareName has not yet been implemented")
 		}),
+
 		EnvironmentDisableHandler: environment.DisableHandlerFunc(func(params environment.DisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation environment.Disable has not yet been implemented")
 		}),
+
 		EnvironmentEnableHandler: environment.EnableHandlerFunc(func(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation environment.Enable has not yet been implemented")
 		}),
+
 		AgentEnrollHandler: agent.EnrollHandlerFunc(func(params agent.EnrollParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation agent.Enroll has not yet been implemented")
 		}),
+
 		MetadataGetAccountDetailHandler: metadata.GetAccountDetailHandlerFunc(func(params metadata.GetAccountDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.GetAccountDetail has not yet been implemented")
 		}),
+
 		MetadataGetAccountMetricsHandler: metadata.GetAccountMetricsHandlerFunc(func(params metadata.GetAccountMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.GetAccountMetrics has not yet been implemented")
 		}),
+
 		MetadataGetEnvironmentDetailHandler: metadata.GetEnvironmentDetailHandlerFunc(func(params metadata.GetEnvironmentDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.GetEnvironmentDetail has not yet been implemented")
 		}),
+
 		MetadataGetEnvironmentMetricsHandler: metadata.GetEnvironmentMetricsHandlerFunc(func(params metadata.GetEnvironmentMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.GetEnvironmentMetrics has not yet been implemented")
 		}),
+
 		MetadataGetFrontendDetailHandler: metadata.GetFrontendDetailHandlerFunc(func(params metadata.GetFrontendDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.GetFrontendDetail has not yet been implemented")
 		}),
+
 		MetadataGetShareDetailHandler: metadata.GetShareDetailHandlerFunc(func(params metadata.GetShareDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.GetShareDetail has not yet been implemented")
 		}),
+
 		MetadataGetShareMetricsHandler: metadata.GetShareMetricsHandlerFunc(func(params metadata.GetShareMetricsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.GetShareMetrics has not yet been implemented")
 		}),
+
 		MetadataGetSparklinesHandler: metadata.GetSparklinesHandlerFunc(func(params metadata.GetSparklinesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.GetSparklines has not yet been implemented")
 		}),
+
 		AdminGrantsHandler: admin.GrantsHandlerFunc(func(params admin.GrantsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.Grants has not yet been implemented")
 		}),
+
 		AccountInviteHandler: account.InviteHandlerFunc(func(params account.InviteParams) middleware.Responder {
+			_ = params
+
 			return middleware.NotImplemented("operation account.Invite has not yet been implemented")
 		}),
+
 		AdminInviteTokenGenerateHandler: admin.InviteTokenGenerateHandlerFunc(func(params admin.InviteTokenGenerateParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.InviteTokenGenerate has not yet been implemented")
 		}),
+
 		MetadataListAccessesHandler: metadata.ListAccessesHandlerFunc(func(params metadata.ListAccessesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.ListAccesses has not yet been implemented")
 		}),
+
 		ShareListAllNamesHandler: share.ListAllNamesHandlerFunc(func(params share.ListAllNamesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation share.ListAllNames has not yet been implemented")
 		}),
+
 		MetadataListEnvironmentsHandler: metadata.ListEnvironmentsHandlerFunc(func(params metadata.ListEnvironmentsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.ListEnvironments has not yet been implemented")
 		}),
+
 		AdminListFrontendNamespaceMappingsHandler: admin.ListFrontendNamespaceMappingsHandlerFunc(func(params admin.ListFrontendNamespaceMappingsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.ListFrontendNamespaceMappings has not yet been implemented")
 		}),
+
 		AdminListFrontendsHandler: admin.ListFrontendsHandlerFunc(func(params admin.ListFrontendsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.ListFrontends has not yet been implemented")
 		}),
+
 		MetadataListMembershipsHandler: metadata.ListMembershipsHandlerFunc(func(params metadata.ListMembershipsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.ListMemberships has not yet been implemented")
 		}),
+
 		ShareListNamesForNamespaceHandler: share.ListNamesForNamespaceHandlerFunc(func(params share.ListNamesForNamespaceParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation share.ListNamesForNamespace has not yet been implemented")
 		}),
+
 		AdminListNamespaceFrontendMappingsHandler: admin.ListNamespaceFrontendMappingsHandlerFunc(func(params admin.ListNamespaceFrontendMappingsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.ListNamespaceFrontendMappings has not yet been implemented")
 		}),
+
 		AdminListNamespacesHandler: admin.ListNamespacesHandlerFunc(func(params admin.ListNamespacesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.ListNamespaces has not yet been implemented")
 		}),
+
 		MetadataListOrgMembersHandler: metadata.ListOrgMembersHandlerFunc(func(params metadata.ListOrgMembersParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.ListOrgMembers has not yet been implemented")
 		}),
+
 		AdminListOrganizationMembersHandler: admin.ListOrganizationMembersHandlerFunc(func(params admin.ListOrganizationMembersParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.ListOrganizationMembers has not yet been implemented")
 		}),
+
 		AdminListOrganizationsHandler: admin.ListOrganizationsHandlerFunc(func(params admin.ListOrganizationsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.ListOrganizations has not yet been implemented")
 		}),
+
 		ShareListShareNamespacesHandler: share.ListShareNamespacesHandlerFunc(func(params share.ListShareNamespacesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation share.ListShareNamespaces has not yet been implemented")
 		}),
+
 		MetadataListSharesHandler: metadata.ListSharesHandlerFunc(func(params metadata.ListSharesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.ListShares has not yet been implemented")
 		}),
+
 		AccountLoginHandler: account.LoginHandlerFunc(func(params account.LoginParams) middleware.Responder {
+			_ = params
+
 			return middleware.NotImplemented("operation account.Login has not yet been implemented")
 		}),
+
+		AccountMfaAuthenticateHandler: account.MfaAuthenticateHandlerFunc(func(params account.MfaAuthenticateParams) middleware.Responder {
+			_ = params
+
+			return middleware.NotImplemented("operation account.MfaAuthenticate has not yet been implemented")
+		}),
+
+		AccountMfaChallengeHandler: account.MfaChallengeHandlerFunc(func(params account.MfaChallengeParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation account.MfaChallenge has not yet been implemented")
+		}),
+
+		AccountMfaDisableHandler: account.MfaDisableHandlerFunc(func(params account.MfaDisableParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation account.MfaDisable has not yet been implemented")
+		}),
+
+		AccountMfaRecoveryCodesHandler: account.MfaRecoveryCodesHandlerFunc(func(params account.MfaRecoveryCodesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation account.MfaRecoveryCodes has not yet been implemented")
+		}),
+
+		AccountMfaSetupHandler: account.MfaSetupHandlerFunc(func(params account.MfaSetupParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation account.MfaSetup has not yet been implemented")
+		}),
+
+		AccountMfaStatusHandler: account.MfaStatusHandlerFunc(func(params account.MfaStatusParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation account.MfaStatus has not yet been implemented")
+		}),
+
+		AccountMfaVerifyHandler: account.MfaVerifyHandlerFunc(func(params account.MfaVerifyParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation account.MfaVerify has not yet been implemented")
+		}),
+
 		MetadataOrgAccountOverviewHandler: metadata.OrgAccountOverviewHandlerFunc(func(params metadata.OrgAccountOverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.OrgAccountOverview has not yet been implemented")
 		}),
+
 		MetadataOverviewHandler: metadata.OverviewHandlerFunc(func(params metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation metadata.Overview has not yet been implemented")
 		}),
+
 		AgentPingHandler: agent.PingHandlerFunc(func(params agent.PingParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation agent.Ping has not yet been implemented")
 		}),
+
 		AccountRegenerateAccountTokenHandler: account.RegenerateAccountTokenHandlerFunc(func(params account.RegenerateAccountTokenParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation account.RegenerateAccountToken has not yet been implemented")
 		}),
+
 		AccountRegisterHandler: account.RegisterHandlerFunc(func(params account.RegisterParams) middleware.Responder {
+			_ = params
+
 			return middleware.NotImplemented("operation account.Register has not yet been implemented")
 		}),
+
 		AgentRemoteAccessHandler: agent.RemoteAccessHandlerFunc(func(params agent.RemoteAccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation agent.RemoteAccess has not yet been implemented")
 		}),
+
 		AgentRemoteShareHandler: agent.RemoteShareHandlerFunc(func(params agent.RemoteShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation agent.RemoteShare has not yet been implemented")
 		}),
+
 		AgentRemoteStatusHandler: agent.RemoteStatusHandlerFunc(func(params agent.RemoteStatusParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation agent.RemoteStatus has not yet been implemented")
 		}),
+
 		AgentRemoteUnaccessHandler: agent.RemoteUnaccessHandlerFunc(func(params agent.RemoteUnaccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation agent.RemoteUnaccess has not yet been implemented")
 		}),
+
 		AgentRemoteUnshareHandler: agent.RemoteUnshareHandlerFunc(func(params agent.RemoteUnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation agent.RemoteUnshare has not yet been implemented")
 		}),
+
 		AdminRemoveNamespaceFrontendMappingHandler: admin.RemoveNamespaceFrontendMappingHandlerFunc(func(params admin.RemoveNamespaceFrontendMappingParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.RemoveNamespaceFrontendMapping has not yet been implemented")
 		}),
+
 		AdminRemoveNamespaceGrantHandler: admin.RemoveNamespaceGrantHandlerFunc(func(params admin.RemoveNamespaceGrantParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.RemoveNamespaceGrant has not yet been implemented")
 		}),
+
 		AdminRemoveOrganizationMemberHandler: admin.RemoveOrganizationMemberHandlerFunc(func(params admin.RemoveOrganizationMemberParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.RemoveOrganizationMember has not yet been implemented")
 		}),
+
 		AccountResetPasswordHandler: account.ResetPasswordHandlerFunc(func(params account.ResetPasswordParams) middleware.Responder {
+			_ = params
+
 			return middleware.NotImplemented("operation account.ResetPassword has not yet been implemented")
 		}),
+
 		AccountResetPasswordRequestHandler: account.ResetPasswordRequestHandlerFunc(func(params account.ResetPasswordRequestParams) middleware.Responder {
+			_ = params
+
 			return middleware.NotImplemented("operation account.ResetPasswordRequest has not yet been implemented")
 		}),
+
 		ShareShareHandler: share.ShareHandlerFunc(func(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation share.Share has not yet been implemented")
 		}),
+
 		AgentShareHTTPHealthcheckHandler: agent.ShareHTTPHealthcheckHandlerFunc(func(params agent.ShareHTTPHealthcheckParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation agent.ShareHTTPHealthcheck has not yet been implemented")
 		}),
+
 		ShareUnaccessHandler: share.UnaccessHandlerFunc(func(params share.UnaccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation share.Unaccess has not yet been implemented")
 		}),
+
 		AgentUnenrollHandler: agent.UnenrollHandlerFunc(func(params agent.UnenrollParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation agent.Unenroll has not yet been implemented")
 		}),
+
 		ShareUnshareHandler: share.UnshareHandlerFunc(func(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation share.Unshare has not yet been implemented")
 		}),
+
 		ShareUpdateAccessHandler: share.UpdateAccessHandlerFunc(func(params share.UpdateAccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation share.UpdateAccess has not yet been implemented")
 		}),
+
 		AdminUpdateFrontendHandler: admin.UpdateFrontendHandlerFunc(func(params admin.UpdateFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.UpdateFrontend has not yet been implemented")
 		}),
+
 		AdminUpdateNamespaceHandler: admin.UpdateNamespaceHandlerFunc(func(params admin.UpdateNamespaceParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation admin.UpdateNamespace has not yet been implemented")
 		}),
+
 		ShareUpdateShareHandler: share.UpdateShareHandlerFunc(func(params share.UpdateShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation share.UpdateShare has not yet been implemented")
 		}),
+
 		ShareUpdateShareNameHandler: share.UpdateShareNameHandlerFunc(func(params share.UpdateShareNameParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
 			return middleware.NotImplemented("operation share.UpdateShareName has not yet been implemented")
 		}),
+
 		AccountVerifyHandler: account.VerifyHandlerFunc(func(params account.VerifyParams) middleware.Responder {
+			_ = params
+
 			return middleware.NotImplemented("operation account.Verify has not yet been implemented")
 		}),
+
 		MetadataVersionHandler: metadata.VersionHandlerFunc(func(params metadata.VersionParams) middleware.Responder {
+			_ = params
+
 			return middleware.NotImplemented("operation metadata.Version has not yet been implemented")
 		}),
+
 		MetadataVersionInventoryHandler: metadata.VersionInventoryHandlerFunc(func(params metadata.VersionInventoryParams) middleware.Responder {
+			_ = params
+
 			return middleware.NotImplemented("operation metadata.VersionInventory has not yet been implemented")
 		}),
 
 		// Applies when the "x-token" header is set
 		KeyAuth: func(token string) (*rest_model_zrok.Principal, error) {
+			_ = token
+
 			return nil, errors.NotImplemented("api key auth (key) x-token from header param [x-token] has not yet been implemented")
 		},
 		// default authorizer is authorized meaning no requests are blocked
@@ -434,6 +785,20 @@ type ZrokAPI struct {
 	MetadataListSharesHandler metadata.ListSharesHandler
 	// AccountLoginHandler sets the operation handler for the login operation
 	AccountLoginHandler account.LoginHandler
+	// AccountMfaAuthenticateHandler sets the operation handler for the mfa authenticate operation
+	AccountMfaAuthenticateHandler account.MfaAuthenticateHandler
+	// AccountMfaChallengeHandler sets the operation handler for the mfa challenge operation
+	AccountMfaChallengeHandler account.MfaChallengeHandler
+	// AccountMfaDisableHandler sets the operation handler for the mfa disable operation
+	AccountMfaDisableHandler account.MfaDisableHandler
+	// AccountMfaRecoveryCodesHandler sets the operation handler for the mfa recovery codes operation
+	AccountMfaRecoveryCodesHandler account.MfaRecoveryCodesHandler
+	// AccountMfaSetupHandler sets the operation handler for the mfa setup operation
+	AccountMfaSetupHandler account.MfaSetupHandler
+	// AccountMfaStatusHandler sets the operation handler for the mfa status operation
+	AccountMfaStatusHandler account.MfaStatusHandler
+	// AccountMfaVerifyHandler sets the operation handler for the mfa verify operation
+	AccountMfaVerifyHandler account.MfaVerifyHandler
 	// MetadataOrgAccountOverviewHandler sets the operation handler for the org account overview operation
 	MetadataOrgAccountOverviewHandler metadata.OrgAccountOverviewHandler
 	// MetadataOverviewHandler sets the operation handler for the overview operation
@@ -507,7 +872,7 @@ type ZrokAPI struct {
 	CommandLineOptionsGroups []swag.CommandLineOptionsGroup
 
 	// User defined logger function.
-	Logger func(string, ...interface{})
+	Logger func(string, ...any)
 }
 
 // UseRedoc for documentation at /docs
@@ -721,6 +1086,27 @@ func (o *ZrokAPI) Validate() error {
 	if o.AccountLoginHandler == nil {
 		unregistered = append(unregistered, "account.LoginHandler")
 	}
+	if o.AccountMfaAuthenticateHandler == nil {
+		unregistered = append(unregistered, "account.MfaAuthenticateHandler")
+	}
+	if o.AccountMfaChallengeHandler == nil {
+		unregistered = append(unregistered, "account.MfaChallengeHandler")
+	}
+	if o.AccountMfaDisableHandler == nil {
+		unregistered = append(unregistered, "account.MfaDisableHandler")
+	}
+	if o.AccountMfaRecoveryCodesHandler == nil {
+		unregistered = append(unregistered, "account.MfaRecoveryCodesHandler")
+	}
+	if o.AccountMfaSetupHandler == nil {
+		unregistered = append(unregistered, "account.MfaSetupHandler")
+	}
+	if o.AccountMfaStatusHandler == nil {
+		unregistered = append(unregistered, "account.MfaStatusHandler")
+	}
+	if o.AccountMfaVerifyHandler == nil {
+		unregistered = append(unregistered, "account.MfaVerifyHandler")
+	}
 	if o.MetadataOrgAccountOverviewHandler == nil {
 		unregistered = append(unregistered, "metadata.OrgAccountOverviewHandler")
 	}
@@ -822,15 +1208,14 @@ func (o *ZrokAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, *h
 func (o *ZrokAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
 	result := make(map[string]runtime.Authenticator)
 	for name := range schemes {
-		switch name {
-		case "key":
+		if name == "key" {
 			scheme := schemes[name]
-			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, func(token string) (interface{}, error) {
+			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, func(token string) (any, error) {
 				return o.KeyAuth(token)
 			})
-
 		}
 	}
+
 	return result
 }
 
@@ -840,12 +1225,12 @@ func (o *ZrokAPI) Authorizer() runtime.Authorizer {
 }
 
 // ConsumersFor gets the consumers for the specified media types.
+//
 // MIME type parameters are ignored here.
 func (o *ZrokAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer {
 	result := make(map[string]runtime.Consumer, len(mediaTypes))
 	for _, mt := range mediaTypes {
-		switch mt {
-		case "application/zrok.v1+json":
+		if mt == "application/zrok.v1+json" {
 			result["application/zrok.v1+json"] = o.JSONConsumer
 		}
 
@@ -853,16 +1238,17 @@ func (o *ZrokAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer 
 			result[mt] = c
 		}
 	}
+
 	return result
 }
 
 // ProducersFor gets the producers for the specified media types.
+//
 // MIME type parameters are ignored here.
 func (o *ZrokAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer {
 	result := make(map[string]runtime.Producer, len(mediaTypes))
 	for _, mt := range mediaTypes {
-		switch mt {
-		case "application/zrok.v1+json":
+		if mt == "application/zrok.v1+json" {
 			result["application/zrok.v1+json"] = o.JSONProducer
 		}
 
@@ -870,6 +1256,7 @@ func (o *ZrokAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer 
 			result[mt] = p
 		}
 	}
+
 	return result
 }
 
@@ -1104,6 +1491,34 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/login"] = account.NewLogin(o.context, o.AccountLoginHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/mfa/authenticate"] = account.NewMfaAuthenticate(o.context, o.AccountMfaAuthenticateHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/mfa/challenge"] = account.NewMfaChallenge(o.context, o.AccountMfaChallengeHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/mfa/disable"] = account.NewMfaDisable(o.context, o.AccountMfaDisableHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/mfa/recoveryCodes"] = account.NewMfaRecoveryCodes(o.context, o.AccountMfaRecoveryCodesHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/mfa/setup"] = account.NewMfaSetup(o.context, o.AccountMfaSetupHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/mfa/status"] = account.NewMfaStatus(o.context, o.AccountMfaStatusHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/mfa/verify"] = account.NewMfaVerify(o.context, o.AccountMfaVerifyHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

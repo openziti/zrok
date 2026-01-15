@@ -7,6 +7,8 @@ package metadata
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -23,7 +25,7 @@ type ListMembershipsReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *ListMembershipsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *ListMembershipsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewListMembershipsOK()
@@ -87,11 +89,13 @@ func (o *ListMembershipsOK) Code() int {
 }
 
 func (o *ListMembershipsOK) Error() string {
-	return fmt.Sprintf("[GET /memberships][%d] listMembershipsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /memberships][%d] listMembershipsOK %s", 200, payload)
 }
 
 func (o *ListMembershipsOK) String() string {
-	return fmt.Sprintf("[GET /memberships][%d] listMembershipsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /memberships][%d] listMembershipsOK %s", 200, payload)
 }
 
 func (o *ListMembershipsOK) GetPayload() *ListMembershipsOKBody {
@@ -103,7 +107,7 @@ func (o *ListMembershipsOK) readResponse(response runtime.ClientResponse, consum
 	o.Payload = new(ListMembershipsOKBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -154,11 +158,11 @@ func (o *ListMembershipsInternalServerError) Code() int {
 }
 
 func (o *ListMembershipsInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /memberships][%d] listMembershipsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /memberships][%d] listMembershipsInternalServerError", 500)
 }
 
 func (o *ListMembershipsInternalServerError) String() string {
-	return fmt.Sprintf("[GET /memberships][%d] listMembershipsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /memberships][%d] listMembershipsInternalServerError", 500)
 }
 
 func (o *ListMembershipsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -202,11 +206,15 @@ func (o *ListMembershipsOKBody) validateMemberships(formats strfmt.Registry) err
 
 		if o.Memberships[i] != nil {
 			if err := o.Memberships[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("listMembershipsOK" + "." + "memberships" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("listMembershipsOK" + "." + "memberships" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -241,11 +249,15 @@ func (o *ListMembershipsOKBody) contextValidateMemberships(ctx context.Context, 
 			}
 
 			if err := o.Memberships[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("listMembershipsOK" + "." + "memberships" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("listMembershipsOK" + "." + "memberships" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}

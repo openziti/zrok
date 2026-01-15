@@ -9,12 +9,38 @@ import (
 	"fmt"
 
 	"github.com/go-openapi/runtime"
+	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 )
 
 // New creates a new account API client.
 func New(transport runtime.ClientTransport, formats strfmt.Registry) ClientService {
 	return &Client{transport: transport, formats: formats}
+}
+
+// New creates a new account API client with basic auth credentials.
+// It takes the following parameters:
+// - host: http host (github.com).
+// - basePath: any base path for the API client ("/v1", "/v3").
+// - scheme: http scheme ("http", "https").
+// - user: user for basic authentication header.
+// - password: password for basic authentication header.
+func NewClientWithBasicAuth(host, basePath, scheme, user, password string) ClientService {
+	transport := httptransport.New(host, basePath, []string{scheme})
+	transport.DefaultAuthentication = httptransport.BasicAuth(user, password)
+	return &Client{transport: transport, formats: strfmt.Default}
+}
+
+// New creates a new account API client with a bearer token for authentication.
+// It takes the following parameters:
+// - host: http host (github.com).
+// - basePath: any base path for the API client ("/v1", "/v3").
+// - scheme: http scheme ("http", "https").
+// - bearerToken: bearer token for Bearer authentication header.
+func NewClientWithBearerToken(host, basePath, scheme, bearerToken string) ClientService {
+	transport := httptransport.New(host, basePath, []string{scheme})
+	transport.DefaultAuthentication = httptransport.BearerToken(bearerToken)
+	return &Client{transport: transport, formats: strfmt.Default}
 }
 
 /*
@@ -25,8 +51,52 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
-// ClientOption is the option for Client methods
+// ClientOption may be used to customize the behavior of Client methods.
 type ClientOption func(*runtime.ClientOperation)
+
+// This client is generated with a few options you might find useful for your swagger spec.
+//
+// Feel free to add you own set of options.
+
+// WithContentType allows the client to force the Content-Type header
+// to negotiate a specific Consumer from the server.
+//
+// You may use this option to set arbitrary extensions to your MIME media type.
+func WithContentType(mime string) ClientOption {
+	return func(r *runtime.ClientOperation) {
+		r.ConsumesMediaTypes = []string{mime}
+	}
+}
+
+// WithContentTypeApplicationJSON sets the Content-Type header to "application/json".
+func WithContentTypeApplicationJSON(r *runtime.ClientOperation) {
+	r.ConsumesMediaTypes = []string{"application/json"}
+}
+
+// WithContentTypeApplicationZrokV1JSON sets the Content-Type header to "application/zrok.v1+json".
+func WithContentTypeApplicationZrokV1JSON(r *runtime.ClientOperation) {
+	r.ConsumesMediaTypes = []string{"application/zrok.v1+json"}
+}
+
+// WithAccept allows the client to force the Accept header
+// to negotiate a specific Producer from the server.
+//
+// You may use this option to set arbitrary extensions to your MIME media type.
+func WithAccept(mime string) ClientOption {
+	return func(r *runtime.ClientOperation) {
+		r.ProducesMediaTypes = []string{mime}
+	}
+}
+
+// WithAcceptApplicationJSON sets the Accept header to "application/json".
+func WithAcceptApplicationJSON(r *runtime.ClientOperation) {
+	r.ProducesMediaTypes = []string{"application/json"}
+}
+
+// WithAcceptApplicationZrokV1JSON sets the Accept header to "application/zrok.v1+json".
+func WithAcceptApplicationZrokV1JSON(r *runtime.ClientOperation) {
+	r.ProducesMediaTypes = []string{"application/zrok.v1+json"}
+}
 
 // ClientService is the interface for Client methods
 type ClientService interface {
@@ -34,7 +104,21 @@ type ClientService interface {
 
 	Invite(params *InviteParams, opts ...ClientOption) (*InviteCreated, error)
 
-	Login(params *LoginParams, opts ...ClientOption) (*LoginOK, error)
+	Login(params *LoginParams, opts ...ClientOption) (*LoginOK, *LoginAccepted, error)
+
+	MfaAuthenticate(params *MfaAuthenticateParams, opts ...ClientOption) (*MfaAuthenticateOK, error)
+
+	MfaChallenge(params *MfaChallengeParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*MfaChallengeOK, error)
+
+	MfaDisable(params *MfaDisableParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*MfaDisableOK, error)
+
+	MfaRecoveryCodes(params *MfaRecoveryCodesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*MfaRecoveryCodesOK, error)
+
+	MfaSetup(params *MfaSetupParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*MfaSetupOK, error)
+
+	MfaStatus(params *MfaStatusParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*MfaStatusOK, error)
+
+	MfaVerify(params *MfaVerifyParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*MfaVerifyOK, error)
 
 	RegenerateAccountToken(params *RegenerateAccountTokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RegenerateAccountTokenOK, error)
 
@@ -53,7 +137,7 @@ type ClientService interface {
 ChangePassword change password API
 */
 func (a *Client) ChangePassword(params *ChangePasswordParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ChangePasswordOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewChangePasswordParams()
 	}
@@ -73,17 +157,22 @@ func (a *Client) ChangePassword(params *ChangePasswordParams, authInfo runtime.C
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*ChangePasswordOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for changePassword: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
@@ -92,7 +181,7 @@ func (a *Client) ChangePassword(params *ChangePasswordParams, authInfo runtime.C
 Invite invite API
 */
 func (a *Client) Invite(params *InviteParams, opts ...ClientOption) (*InviteCreated, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewInviteParams()
 	}
@@ -111,17 +200,22 @@ func (a *Client) Invite(params *InviteParams, opts ...ClientOption) (*InviteCrea
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*InviteCreated)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for invite: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
@@ -129,8 +223,8 @@ func (a *Client) Invite(params *InviteParams, opts ...ClientOption) (*InviteCrea
 /*
 Login login API
 */
-func (a *Client) Login(params *LoginParams, opts ...ClientOption) (*LoginOK, error) {
-	// TODO: Validate the params before sending
+func (a *Client) Login(params *LoginParams, opts ...ClientOption) (*LoginOK, *LoginAccepted, error) {
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewLoginParams()
 	}
@@ -149,18 +243,330 @@ func (a *Client) Login(params *LoginParams, opts ...ClientOption) (*LoginOK, err
 	for _, opt := range opts {
 		opt(op)
 	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, nil, err
+	}
 
+	// several success responses have to be checked
+	switch value := result.(type) {
+	case *LoginOK:
+		return value, nil, nil
+	case *LoginAccepted:
+		return nil, value, nil
+	}
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for account: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+MfaAuthenticate mfa authenticate API
+*/
+func (a *Client) MfaAuthenticate(params *MfaAuthenticateParams, opts ...ClientOption) (*MfaAuthenticateOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewMfaAuthenticateParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "mfaAuthenticate",
+		Method:             "POST",
+		PathPattern:        "/mfa/authenticate",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &MfaAuthenticateReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*LoginOK)
+
+	// only one success response has to be checked
+	success, ok := result.(*MfaAuthenticateOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for login: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for mfaAuthenticate: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+MfaChallenge mfa challenge API
+*/
+func (a *Client) MfaChallenge(params *MfaChallengeParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*MfaChallengeOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewMfaChallengeParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "mfaChallenge",
+		Method:             "POST",
+		PathPattern:        "/mfa/challenge",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &MfaChallengeReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*MfaChallengeOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for mfaChallenge: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+MfaDisable mfa disable API
+*/
+func (a *Client) MfaDisable(params *MfaDisableParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*MfaDisableOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewMfaDisableParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "mfaDisable",
+		Method:             "POST",
+		PathPattern:        "/mfa/disable",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &MfaDisableReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*MfaDisableOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for mfaDisable: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+MfaRecoveryCodes mfa recovery codes API
+*/
+func (a *Client) MfaRecoveryCodes(params *MfaRecoveryCodesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*MfaRecoveryCodesOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewMfaRecoveryCodesParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "mfaRecoveryCodes",
+		Method:             "POST",
+		PathPattern:        "/mfa/recoveryCodes",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &MfaRecoveryCodesReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*MfaRecoveryCodesOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for mfaRecoveryCodes: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+MfaSetup mfa setup API
+*/
+func (a *Client) MfaSetup(params *MfaSetupParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*MfaSetupOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewMfaSetupParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "mfaSetup",
+		Method:             "POST",
+		PathPattern:        "/mfa/setup",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &MfaSetupReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*MfaSetupOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for mfaSetup: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+MfaStatus mfa status API
+*/
+func (a *Client) MfaStatus(params *MfaStatusParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*MfaStatusOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewMfaStatusParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "mfaStatus",
+		Method:             "GET",
+		PathPattern:        "/mfa/status",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &MfaStatusReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*MfaStatusOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for mfaStatus: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+MfaVerify mfa verify API
+*/
+func (a *Client) MfaVerify(params *MfaVerifyParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*MfaVerifyOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewMfaVerifyParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "mfaVerify",
+		Method:             "POST",
+		PathPattern:        "/mfa/verify",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &MfaVerifyReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*MfaVerifyOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for mfaVerify: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -168,7 +574,7 @@ func (a *Client) Login(params *LoginParams, opts ...ClientOption) (*LoginOK, err
 RegenerateAccountToken regenerate account token API
 */
 func (a *Client) RegenerateAccountToken(params *RegenerateAccountTokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RegenerateAccountTokenOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRegenerateAccountTokenParams()
 	}
@@ -188,17 +594,22 @@ func (a *Client) RegenerateAccountToken(params *RegenerateAccountTokenParams, au
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RegenerateAccountTokenOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for regenerateAccountToken: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
@@ -207,7 +618,7 @@ func (a *Client) RegenerateAccountToken(params *RegenerateAccountTokenParams, au
 Register register API
 */
 func (a *Client) Register(params *RegisterParams, opts ...ClientOption) (*RegisterOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewRegisterParams()
 	}
@@ -226,17 +637,22 @@ func (a *Client) Register(params *RegisterParams, opts ...ClientOption) (*Regist
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*RegisterOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for register: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
@@ -245,7 +661,7 @@ func (a *Client) Register(params *RegisterParams, opts ...ClientOption) (*Regist
 ResetPassword reset password API
 */
 func (a *Client) ResetPassword(params *ResetPasswordParams, opts ...ClientOption) (*ResetPasswordOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewResetPasswordParams()
 	}
@@ -264,17 +680,22 @@ func (a *Client) ResetPassword(params *ResetPasswordParams, opts ...ClientOption
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*ResetPasswordOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for resetPassword: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
@@ -283,7 +704,7 @@ func (a *Client) ResetPassword(params *ResetPasswordParams, opts ...ClientOption
 ResetPasswordRequest reset password request API
 */
 func (a *Client) ResetPasswordRequest(params *ResetPasswordRequestParams, opts ...ClientOption) (*ResetPasswordRequestCreated, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewResetPasswordRequestParams()
 	}
@@ -302,17 +723,22 @@ func (a *Client) ResetPasswordRequest(params *ResetPasswordRequestParams, opts .
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*ResetPasswordRequestCreated)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for resetPasswordRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
@@ -321,7 +747,7 @@ func (a *Client) ResetPasswordRequest(params *ResetPasswordRequestParams, opts .
 Verify verify API
 */
 func (a *Client) Verify(params *VerifyParams, opts ...ClientOption) (*VerifyOK, error) {
-	// TODO: Validate the params before sending
+	// NOTE: parameters are not validated before sending
 	if params == nil {
 		params = NewVerifyParams()
 	}
@@ -340,17 +766,22 @@ func (a *Client) Verify(params *VerifyParams, opts ...ClientOption) (*VerifyOK, 
 	for _, opt := range opts {
 		opt(op)
 	}
-
 	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
+
+	// only one success response has to be checked
 	success, ok := result.(*VerifyOK)
 	if ok {
 		return success, nil
 	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for verify: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }

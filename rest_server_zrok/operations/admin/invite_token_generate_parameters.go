@@ -27,7 +27,6 @@ func NewInviteTokenGenerateParams() InviteTokenGenerateParams {
 //
 // swagger:parameters inviteTokenGenerate
 type InviteTokenGenerateParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *InviteTokenGenerateParams) BindRequest(r *http.Request, route *middlewa
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body InviteTokenGenerateBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

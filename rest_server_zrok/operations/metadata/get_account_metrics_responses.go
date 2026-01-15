@@ -78,7 +78,7 @@ func NewGetAccountMetricsBadRequest() *GetAccountMetricsBadRequest {
 // WriteResponse to the client
 func (o *GetAccountMetricsBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(400)
 }
@@ -103,7 +103,7 @@ func NewGetAccountMetricsInternalServerError() *GetAccountMetricsInternalServerE
 // WriteResponse to the client
 func (o *GetAccountMetricsInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

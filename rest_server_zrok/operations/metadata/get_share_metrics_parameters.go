@@ -27,7 +27,6 @@ func NewGetShareMetricsParams() GetShareMetricsParams {
 //
 // swagger:parameters getShareMetrics
 type GetShareMetricsParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -35,6 +34,7 @@ type GetShareMetricsParams struct {
 	  In: query
 	*/
 	Duration *string
+
 	/*
 	  Required: true
 	  In: path
@@ -50,7 +50,6 @@ func (o *GetShareMetricsParams) BindRequest(r *http.Request, route *middleware.M
 	var res []error
 
 	o.HTTPRequest = r
-
 	qs := runtime.Values(r.URL.Query())
 
 	qDuration, qhkDuration, _ := qs.GetOK("duration")

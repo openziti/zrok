@@ -31,7 +31,7 @@ func NewResetPasswordRequestCreated() *ResetPasswordRequestCreated {
 // WriteResponse to the client
 func (o *ResetPasswordRequestCreated) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(201)
 }
@@ -56,7 +56,7 @@ func NewResetPasswordRequestBadRequest() *ResetPasswordRequestBadRequest {
 // WriteResponse to the client
 func (o *ResetPasswordRequestBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(400)
 }
@@ -81,7 +81,7 @@ func NewResetPasswordRequestInternalServerError() *ResetPasswordRequestInternalS
 // WriteResponse to the client
 func (o *ResetPasswordRequestInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

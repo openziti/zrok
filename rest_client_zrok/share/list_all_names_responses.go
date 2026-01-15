@@ -6,6 +6,8 @@ package share
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type ListAllNamesReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *ListAllNamesReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *ListAllNamesReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewListAllNamesOK()
@@ -91,11 +93,13 @@ func (o *ListAllNamesOK) Code() int {
 }
 
 func (o *ListAllNamesOK) Error() string {
-	return fmt.Sprintf("[GET /share/names][%d] listAllNamesOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /share/names][%d] listAllNamesOK %s", 200, payload)
 }
 
 func (o *ListAllNamesOK) String() string {
-	return fmt.Sprintf("[GET /share/names][%d] listAllNamesOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /share/names][%d] listAllNamesOK %s", 200, payload)
 }
 
 func (o *ListAllNamesOK) GetPayload() []*rest_model_zrok.Name {
@@ -105,7 +109,7 @@ func (o *ListAllNamesOK) GetPayload() []*rest_model_zrok.Name {
 func (o *ListAllNamesOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -156,11 +160,11 @@ func (o *ListAllNamesUnauthorized) Code() int {
 }
 
 func (o *ListAllNamesUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /share/names][%d] listAllNamesUnauthorized ", 401)
+	return fmt.Sprintf("[GET /share/names][%d] listAllNamesUnauthorized", 401)
 }
 
 func (o *ListAllNamesUnauthorized) String() string {
-	return fmt.Sprintf("[GET /share/names][%d] listAllNamesUnauthorized ", 401)
+	return fmt.Sprintf("[GET /share/names][%d] listAllNamesUnauthorized", 401)
 }
 
 func (o *ListAllNamesUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -212,11 +216,11 @@ func (o *ListAllNamesInternalServerError) Code() int {
 }
 
 func (o *ListAllNamesInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /share/names][%d] listAllNamesInternalServerError ", 500)
+	return fmt.Sprintf("[GET /share/names][%d] listAllNamesInternalServerError", 500)
 }
 
 func (o *ListAllNamesInternalServerError) String() string {
-	return fmt.Sprintf("[GET /share/names][%d] listAllNamesInternalServerError ", 500)
+	return fmt.Sprintf("[GET /share/names][%d] listAllNamesInternalServerError", 500)
 }
 
 func (o *ListAllNamesInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

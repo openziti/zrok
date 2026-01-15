@@ -7,6 +7,8 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type CreateAccountReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *CreateAccountReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *CreateAccountReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 201:
 		result := NewCreateAccountCreated()
@@ -91,11 +93,13 @@ func (o *CreateAccountCreated) Code() int {
 }
 
 func (o *CreateAccountCreated) Error() string {
-	return fmt.Sprintf("[POST /account][%d] createAccountCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /account][%d] createAccountCreated %s", 201, payload)
 }
 
 func (o *CreateAccountCreated) String() string {
-	return fmt.Sprintf("[POST /account][%d] createAccountCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /account][%d] createAccountCreated %s", 201, payload)
 }
 
 func (o *CreateAccountCreated) GetPayload() *CreateAccountCreatedBody {
@@ -107,7 +111,7 @@ func (o *CreateAccountCreated) readResponse(response runtime.ClientResponse, con
 	o.Payload = new(CreateAccountCreatedBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -158,11 +162,11 @@ func (o *CreateAccountUnauthorized) Code() int {
 }
 
 func (o *CreateAccountUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /account][%d] createAccountUnauthorized ", 401)
+	return fmt.Sprintf("[POST /account][%d] createAccountUnauthorized", 401)
 }
 
 func (o *CreateAccountUnauthorized) String() string {
-	return fmt.Sprintf("[POST /account][%d] createAccountUnauthorized ", 401)
+	return fmt.Sprintf("[POST /account][%d] createAccountUnauthorized", 401)
 }
 
 func (o *CreateAccountUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -214,11 +218,11 @@ func (o *CreateAccountInternalServerError) Code() int {
 }
 
 func (o *CreateAccountInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /account][%d] createAccountInternalServerError ", 500)
+	return fmt.Sprintf("[POST /account][%d] createAccountInternalServerError", 500)
 }
 
 func (o *CreateAccountInternalServerError) String() string {
-	return fmt.Sprintf("[POST /account][%d] createAccountInternalServerError ", 500)
+	return fmt.Sprintf("[POST /account][%d] createAccountInternalServerError", 500)
 }
 
 func (o *CreateAccountInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -76,7 +76,7 @@ func NewGetSparklinesUnauthorized() *GetSparklinesUnauthorized {
 // WriteResponse to the client
 func (o *GetSparklinesUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -101,7 +101,7 @@ func NewGetSparklinesInternalServerError() *GetSparklinesInternalServerError {
 // WriteResponse to the client
 func (o *GetSparklinesInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

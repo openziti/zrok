@@ -75,8 +75,16 @@
         description: login successful
         schema:
           type: string
+      202:
+        description: mfa required
+        schema:
+          properties:
+            pendingToken:
+              type: string
       401:
         description: invalid login
+      403:
+        description: mfa enrollment required (when mfaRequired is enabled and user has no MFA)
 
 /regenerateAccountToken:
   post:
@@ -201,5 +209,192 @@
               type: string
       404:
         description: registration token not found
+      500:
+        description: internal server error
+
+/mfa/setup:
+  post:
+    tags:
+      - account
+    security:
+      - key: []
+    operationId: mfaSetup
+    responses:
+      200:
+        description: mfa setup initiated
+        schema:
+          properties:
+            secret:
+              type: string
+            qrCode:
+              type: string
+            provisioningUri:
+              type: string
+      400:
+        description: mfa already enabled
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+/mfa/verify:
+  post:
+    tags:
+      - account
+    security:
+      - key: []
+    operationId: mfaVerify
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            code:
+              type: string
+    responses:
+      200:
+        description: mfa enabled
+        schema:
+          properties:
+            recoveryCodes:
+              type: array
+              items:
+                type: string
+      400:
+        description: invalid code or no pending setup
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+/mfa/status:
+  get:
+    tags:
+      - account
+    security:
+      - key: []
+    operationId: mfaStatus
+    responses:
+      200:
+        description: mfa status
+        schema:
+          properties:
+            enabled:
+              type: boolean
+            recoveryCodesRemaining:
+              type: integer
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+/mfa/disable:
+  post:
+    tags:
+      - account
+    security:
+      - key: []
+    operationId: mfaDisable
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            password:
+              type: string
+            code:
+              type: string
+    responses:
+      200:
+        description: mfa disabled
+      400:
+        description: invalid password or code
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+/mfa/recoveryCodes:
+  post:
+    tags:
+      - account
+    security:
+      - key: []
+    operationId: mfaRecoveryCodes
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            code:
+              type: string
+    responses:
+      200:
+        description: new recovery codes generated
+        schema:
+          properties:
+            recoveryCodes:
+              type: array
+              items:
+                type: string
+      400:
+        description: invalid code or mfa not enabled
+      401:
+        description: unauthorized
+      500:
+        description: internal server error
+
+/mfa/authenticate:
+  post:
+    tags:
+      - account
+    operationId: mfaAuthenticate
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            pendingToken:
+              type: string
+            code:
+              type: string
+    responses:
+      200:
+        description: authentication successful
+        schema:
+          type: string
+      401:
+        description: invalid pending token or code
+      500:
+        description: internal server error
+
+/mfa/challenge:
+  post:
+    tags:
+      - account
+    security:
+      - key: []
+    operationId: mfaChallenge
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            code:
+              type: string
+    responses:
+      200:
+        description: challenge token issued
+        schema:
+          properties:
+            challengeToken:
+              type: string
+            expiresAt:
+              type: string
+              format: date-time
+      400:
+        description: invalid code or mfa not enabled
+      401:
+        description: unauthorized
       500:
         description: internal server error

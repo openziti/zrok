@@ -27,7 +27,6 @@ func NewGrantsParams() GrantsParams {
 //
 // swagger:parameters grants
 type GrantsParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *GrantsParams) BindRequest(r *http.Request, route *middleware.MatchedRou
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body GrantsBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

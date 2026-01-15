@@ -25,7 +25,6 @@ func NewVersionInventoryParams() VersionInventoryParams {
 //
 // swagger:parameters versionInventory
 type VersionInventoryParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 }

@@ -20,7 +20,7 @@ type DeleteShareNameReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *DeleteShareNameReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *DeleteShareNameReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewDeleteShareNameOK()
@@ -95,11 +95,11 @@ func (o *DeleteShareNameOK) Code() int {
 }
 
 func (o *DeleteShareNameOK) Error() string {
-	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameOK ", 200)
+	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameOK", 200)
 }
 
 func (o *DeleteShareNameOK) String() string {
-	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameOK ", 200)
+	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameOK", 200)
 }
 
 func (o *DeleteShareNameOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *DeleteShareNameUnauthorized) Code() int {
 }
 
 func (o *DeleteShareNameUnauthorized) Error() string {
-	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameUnauthorized ", 401)
+	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameUnauthorized", 401)
 }
 
 func (o *DeleteShareNameUnauthorized) String() string {
-	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameUnauthorized ", 401)
+	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameUnauthorized", 401)
 }
 
 func (o *DeleteShareNameUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *DeleteShareNameNotFound) Code() int {
 }
 
 func (o *DeleteShareNameNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameNotFound ", 404)
+	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameNotFound", 404)
 }
 
 func (o *DeleteShareNameNotFound) String() string {
-	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameNotFound ", 404)
+	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameNotFound", 404)
 }
 
 func (o *DeleteShareNameNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *DeleteShareNameInternalServerError) Code() int {
 }
 
 func (o *DeleteShareNameInternalServerError) Error() string {
-	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameInternalServerError ", 500)
+	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameInternalServerError", 500)
 }
 
 func (o *DeleteShareNameInternalServerError) String() string {
-	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameInternalServerError ", 500)
+	return fmt.Sprintf("[DELETE /share/name][%d] deleteShareNameInternalServerError", 500)
 }
 
 func (o *DeleteShareNameInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

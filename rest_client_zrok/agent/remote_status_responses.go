@@ -7,6 +7,8 @@ package agent
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -23,7 +25,7 @@ type RemoteStatusReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *RemoteStatusReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *RemoteStatusReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewRemoteStatusOK()
@@ -99,11 +101,13 @@ func (o *RemoteStatusOK) Code() int {
 }
 
 func (o *RemoteStatusOK) Error() string {
-	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusOK %s", 200, payload)
 }
 
 func (o *RemoteStatusOK) String() string {
-	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusOK %s", 200, payload)
 }
 
 func (o *RemoteStatusOK) GetPayload() *RemoteStatusOKBody {
@@ -115,7 +119,7 @@ func (o *RemoteStatusOK) readResponse(response runtime.ClientResponse, consumer 
 	o.Payload = new(RemoteStatusOKBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -166,11 +170,11 @@ func (o *RemoteStatusUnauthorized) Code() int {
 }
 
 func (o *RemoteStatusUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusUnauthorized ", 401)
+	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusUnauthorized", 401)
 }
 
 func (o *RemoteStatusUnauthorized) String() string {
-	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusUnauthorized ", 401)
+	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusUnauthorized", 401)
 }
 
 func (o *RemoteStatusUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -222,11 +226,11 @@ func (o *RemoteStatusInternalServerError) Code() int {
 }
 
 func (o *RemoteStatusInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusInternalServerError ", 500)
+	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusInternalServerError", 500)
 }
 
 func (o *RemoteStatusInternalServerError) String() string {
-	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusInternalServerError ", 500)
+	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusInternalServerError", 500)
 }
 
 func (o *RemoteStatusInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -278,11 +282,11 @@ func (o *RemoteStatusBadGateway) Code() int {
 }
 
 func (o *RemoteStatusBadGateway) Error() string {
-	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusBadGateway ", 502)
+	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusBadGateway", 502)
 }
 
 func (o *RemoteStatusBadGateway) String() string {
-	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusBadGateway ", 502)
+	return fmt.Sprintf("[POST /agent/status][%d] remoteStatusBadGateway", 502)
 }
 
 func (o *RemoteStatusBadGateway) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -371,11 +375,15 @@ func (o *RemoteStatusOKBody) validateAccesses(formats strfmt.Registry) error {
 
 		if o.Accesses[i] != nil {
 			if err := o.Accesses[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("remoteStatusOK" + "." + "accesses" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("remoteStatusOK" + "." + "accesses" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -397,11 +405,15 @@ func (o *RemoteStatusOKBody) validateShares(formats strfmt.Registry) error {
 
 		if o.Shares[i] != nil {
 			if err := o.Shares[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("remoteStatusOK" + "." + "shares" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("remoteStatusOK" + "." + "shares" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -440,11 +452,15 @@ func (o *RemoteStatusOKBody) contextValidateAccesses(ctx context.Context, format
 			}
 
 			if err := o.Accesses[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("remoteStatusOK" + "." + "accesses" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("remoteStatusOK" + "." + "accesses" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -465,11 +481,15 @@ func (o *RemoteStatusOKBody) contextValidateShares(ctx context.Context, formats 
 			}
 
 			if err := o.Shares[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("remoteStatusOK" + "." + "shares" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("remoteStatusOK" + "." + "shares" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -543,11 +563,15 @@ func (o *RemoteStatusOKBodyAccessesItems0) validateFailure(formats strfmt.Regist
 
 	if o.Failure != nil {
 		if err := o.Failure.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("failure")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("failure")
 			}
+
 			return err
 		}
 	}
@@ -578,11 +602,15 @@ func (o *RemoteStatusOKBodyAccessesItems0) contextValidateFailure(ctx context.Co
 		}
 
 		if err := o.Failure.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("failure")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("failure")
 			}
+
 			return err
 		}
 	}
@@ -707,11 +735,15 @@ func (o *RemoteStatusOKBodySharesItems0) validateFailure(formats strfmt.Registry
 
 	if o.Failure != nil {
 		if err := o.Failure.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("failure")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("failure")
 			}
+
 			return err
 		}
 	}
@@ -742,11 +774,15 @@ func (o *RemoteStatusOKBodySharesItems0) contextValidateFailure(ctx context.Cont
 		}
 
 		if err := o.Failure.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("failure")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("failure")
 			}
+
 			return err
 		}
 	}

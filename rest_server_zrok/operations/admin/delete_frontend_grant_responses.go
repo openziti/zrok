@@ -33,7 +33,7 @@ func NewDeleteFrontendGrantOK() *DeleteFrontendGrantOK {
 // WriteResponse to the client
 func (o *DeleteFrontendGrantOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(200)
 }
@@ -58,7 +58,7 @@ func NewDeleteFrontendGrantUnauthorized() *DeleteFrontendGrantUnauthorized {
 // WriteResponse to the client
 func (o *DeleteFrontendGrantUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -126,7 +126,7 @@ func NewDeleteFrontendGrantInternalServerError() *DeleteFrontendGrantInternalSer
 // WriteResponse to the client
 func (o *DeleteFrontendGrantInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

@@ -25,7 +25,6 @@ func NewListOrganizationsParams() ListOrganizationsParams {
 //
 // swagger:parameters listOrganizations
 type ListOrganizationsParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 }

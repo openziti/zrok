@@ -6,6 +6,8 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type OverviewReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *OverviewReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *OverviewReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewOverviewOK()
@@ -85,11 +87,13 @@ func (o *OverviewOK) Code() int {
 }
 
 func (o *OverviewOK) Error() string {
-	return fmt.Sprintf("[GET /overview][%d] overviewOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /overview][%d] overviewOK %s", 200, payload)
 }
 
 func (o *OverviewOK) String() string {
-	return fmt.Sprintf("[GET /overview][%d] overviewOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /overview][%d] overviewOK %s", 200, payload)
 }
 
 func (o *OverviewOK) GetPayload() *rest_model_zrok.Overview {
@@ -101,7 +105,7 @@ func (o *OverviewOK) readResponse(response runtime.ClientResponse, consumer runt
 	o.Payload = new(rest_model_zrok.Overview)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -153,11 +157,13 @@ func (o *OverviewInternalServerError) Code() int {
 }
 
 func (o *OverviewInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /overview][%d] overviewInternalServerError  %+v", 500, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /overview][%d] overviewInternalServerError %s", 500, payload)
 }
 
 func (o *OverviewInternalServerError) String() string {
-	return fmt.Sprintf("[GET /overview][%d] overviewInternalServerError  %+v", 500, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /overview][%d] overviewInternalServerError %s", 500, payload)
 }
 
 func (o *OverviewInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
@@ -167,7 +173,7 @@ func (o *OverviewInternalServerError) GetPayload() rest_model_zrok.ErrorMessage 
 func (o *OverviewInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 

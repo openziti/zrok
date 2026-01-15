@@ -27,7 +27,6 @@ func NewGetFrontendDetailParams() GetFrontendDetailParams {
 //
 // swagger:parameters getFrontendDetail
 type GetFrontendDetailParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 

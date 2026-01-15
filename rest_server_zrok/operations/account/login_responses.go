@@ -54,6 +54,51 @@ func (o *LoginOK) WriteResponse(rw http.ResponseWriter, producer runtime.Produce
 	}
 }
 
+// LoginAcceptedCode is the HTTP code returned for type LoginAccepted
+const LoginAcceptedCode int = 202
+
+/*
+LoginAccepted mfa required
+
+swagger:response loginAccepted
+*/
+type LoginAccepted struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *LoginAcceptedBody `json:"body,omitempty"`
+}
+
+// NewLoginAccepted creates LoginAccepted with default headers values
+func NewLoginAccepted() *LoginAccepted {
+
+	return &LoginAccepted{}
+}
+
+// WithPayload adds the payload to the login accepted response
+func (o *LoginAccepted) WithPayload(payload *LoginAcceptedBody) *LoginAccepted {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the login accepted response
+func (o *LoginAccepted) SetPayload(payload *LoginAcceptedBody) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *LoginAccepted) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(202)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
+}
+
 // LoginUnauthorizedCode is the HTTP code returned for type LoginUnauthorized
 const LoginUnauthorizedCode int = 401
 
@@ -74,7 +119,32 @@ func NewLoginUnauthorized() *LoginUnauthorized {
 // WriteResponse to the client
 func (o *LoginUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
+}
+
+// LoginForbiddenCode is the HTTP code returned for type LoginForbidden
+const LoginForbiddenCode int = 403
+
+/*
+LoginForbidden mfa enrollment required (when mfaRequired is enabled and user has no MFA)
+
+swagger:response loginForbidden
+*/
+type LoginForbidden struct {
+}
+
+// NewLoginForbidden creates LoginForbidden with default headers values
+func NewLoginForbidden() *LoginForbidden {
+
+	return &LoginForbidden{}
+}
+
+// WriteResponse to the client
+func (o *LoginForbidden) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
+
+	rw.WriteHeader(403)
 }

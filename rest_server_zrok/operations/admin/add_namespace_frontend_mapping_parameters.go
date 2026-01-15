@@ -27,7 +27,6 @@ func NewAddNamespaceFrontendMappingParams() AddNamespaceFrontendMappingParams {
 //
 // swagger:parameters addNamespaceFrontendMapping
 type AddNamespaceFrontendMappingParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *AddNamespaceFrontendMappingParams) BindRequest(r *http.Request, route *
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body AddNamespaceFrontendMappingBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

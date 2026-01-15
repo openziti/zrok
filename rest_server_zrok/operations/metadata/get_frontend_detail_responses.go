@@ -78,7 +78,7 @@ func NewGetFrontendDetailUnauthorized() *GetFrontendDetailUnauthorized {
 // WriteResponse to the client
 func (o *GetFrontendDetailUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -103,7 +103,7 @@ func NewGetFrontendDetailNotFound() *GetFrontendDetailNotFound {
 // WriteResponse to the client
 func (o *GetFrontendDetailNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -128,7 +128,7 @@ func NewGetFrontendDetailInternalServerError() *GetFrontendDetailInternalServerE
 // WriteResponse to the client
 func (o *GetFrontendDetailInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

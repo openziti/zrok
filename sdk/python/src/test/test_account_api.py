@@ -44,6 +44,48 @@ class TestAccountApi(unittest.TestCase):
         """
         pass
 
+    def test_mfa_authenticate(self) -> None:
+        """Test case for mfa_authenticate
+
+        """
+        pass
+
+    def test_mfa_challenge(self) -> None:
+        """Test case for mfa_challenge
+
+        """
+        pass
+
+    def test_mfa_disable(self) -> None:
+        """Test case for mfa_disable
+
+        """
+        pass
+
+    def test_mfa_recovery_codes(self) -> None:
+        """Test case for mfa_recovery_codes
+
+        """
+        pass
+
+    def test_mfa_setup(self) -> None:
+        """Test case for mfa_setup
+
+        """
+        pass
+
+    def test_mfa_status(self) -> None:
+        """Test case for mfa_status
+
+        """
+        pass
+
+    def test_mfa_verify(self) -> None:
+        """Test case for mfa_verify
+
+        """
+        pass
+
     def test_regenerate_account_token(self) -> None:
         """Test case for regenerate_account_token
 

@@ -6,6 +6,8 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type GetAccountDetailReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *GetAccountDetailReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *GetAccountDetailReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewGetAccountDetailOK()
@@ -85,11 +87,13 @@ func (o *GetAccountDetailOK) Code() int {
 }
 
 func (o *GetAccountDetailOK) Error() string {
-	return fmt.Sprintf("[GET /detail/account][%d] getAccountDetailOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /detail/account][%d] getAccountDetailOK %s", 200, payload)
 }
 
 func (o *GetAccountDetailOK) String() string {
-	return fmt.Sprintf("[GET /detail/account][%d] getAccountDetailOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /detail/account][%d] getAccountDetailOK %s", 200, payload)
 }
 
 func (o *GetAccountDetailOK) GetPayload() rest_model_zrok.Environments {
@@ -99,7 +103,7 @@ func (o *GetAccountDetailOK) GetPayload() rest_model_zrok.Environments {
 func (o *GetAccountDetailOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -150,11 +154,11 @@ func (o *GetAccountDetailInternalServerError) Code() int {
 }
 
 func (o *GetAccountDetailInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /detail/account][%d] getAccountDetailInternalServerError ", 500)
+	return fmt.Sprintf("[GET /detail/account][%d] getAccountDetailInternalServerError", 500)
 }
 
 func (o *GetAccountDetailInternalServerError) String() string {
-	return fmt.Sprintf("[GET /detail/account][%d] getAccountDetailInternalServerError ", 500)
+	return fmt.Sprintf("[GET /detail/account][%d] getAccountDetailInternalServerError", 500)
 }
 
 func (o *GetAccountDetailInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
