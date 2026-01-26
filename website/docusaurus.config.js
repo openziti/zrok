@@ -47,8 +47,9 @@ const config = {
 
     themes: [
         '@docusaurus/theme-mermaid',
+        '@netfoundry/docusaurus-theme',
         [
-            '@netfoundry/docusaurus-theme',
+            '@docusaurus/theme-classic',
             {
                 customCss: ZROK_CUSTOM_CSS,
             }
