@@ -1,4 +1,4 @@
-import {defaultNetFoundryFooterProps, defaultSocialProps} from "@openclint/docusaurus-shared/ui";
+import {defaultNetFoundryFooterProps, defaultSocialProps} from "@netfoundry/docusaurus-shared/ui";
 
 export const zrokFooter = {
     ...defaultNetFoundryFooterProps(),
