@@ -3,6 +3,7 @@
 const path = require('path');
 const ZROK_ROOT = path.resolve(__dirname);
 const resolvePath = (p) => path.resolve(ZROK_ROOT, p);
+const {zrokFooter} = require('./src/components/footer');
 
 // absolute paths
 const ZROK_CUSTOM_CSS = resolvePath('src/css/custom.css');
@@ -47,7 +48,7 @@ const config = {
     themes: [
         '@docusaurus/theme-mermaid',
         [
-            '@docusaurus/theme-classic',
+            '@netfoundry/docusaurus-theme',
             {
                 customCss: ZROK_CUSTOM_CSS,
             }
@@ -165,6 +166,15 @@ const config = {
     themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
+            // NetFoundry theme configuration
+            netfoundry: {
+                showStarBanner: true,
+                starBanner: {
+                    repoUrl: 'https://github.com/openziti/zrok',
+                    label: 'Star zrok on GitHub',
+                },
+                footer: zrokFooter,
+            },
             navbar: {
                 title: 'zrok',
                 logo: {
