@@ -39,21 +39,21 @@ const config = {
     favicon: 'img/zrok-favicon.png',
 
     markdown: {
+        mermaid: true,
         hooks: {
-            onBrokenMarkdownLinks: "throw",
+            onBrokenMarkdownLinks: 'throw',
         },
-        mermaid: true
     },
 
     themes: [
         '@docusaurus/theme-mermaid',
-        '@netfoundry/docusaurus-theme',
         [
             '@docusaurus/theme-classic',
             {
                 customCss: ZROK_CUSTOM_CSS,
             }
-        ]
+        ],
+        '@netfoundry/docusaurus-theme',
     ],
 
     // GitHub pages deployment config.
@@ -236,29 +236,6 @@ const config = {
                 sidebar: {
                     autoCollapseCategories: true,
                 }
-            },
-            algolia: {
-                // The application ID provided by Algolia
-                appId: 'CO73R59OLO',
-
-                // Public API key: it is safe to commit it
-                apiKey: '489572e91d0a750d34c127c2071ef962',
-
-                indexName: 'zrok',
-
-                // Optional: see doc section below
-                contextualSearch: true,
-
-                // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
-                // externalUrlRegex: 'external\\.example\\.com|thirdparty\\.example\\.com',
-
-                // Optional: Algolia search parameters
-                searchParameters: {},
-
-                // Optional: path for search page that enabled by default (`false` to disable it)
-                searchPagePath: 'search',
-
-                //... other Algolia params
             },
         }),
 };
