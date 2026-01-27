@@ -1,13 +1,17 @@
-// @ts-check
-// Note: type annotations allow type checking and IDEs autocompletion
-const path = require('path');
+import type { Config } from '@docusaurus/types';
+import type { ThemeConfig } from '@docusaurus/preset-classic';
+import path from 'path';
+import { zrokFooter } from './src/components/footer';
+
+const lightCodeTheme = require('prism-react-renderer/themes/github');
+const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+
 const ZROK_ROOT = path.resolve(__dirname);
-const resolvePath = (p) => path.resolve(ZROK_ROOT, p);
-const {zrokFooter} = require('./src/components/footer');
+const resolvePath = (p: string) => path.resolve(ZROK_ROOT, p);
 
 // absolute paths
 const ZROK_CUSTOM_CSS = resolvePath('src/css/custom.css');
-const ZROK_SIDEBARS = resolvePath('sidebars.js');
+const ZROK_SIDEBARS = resolvePath('sidebars.ts');
 const ZROK_STATIC = resolvePath('static');
 const ZROK_DOCS_IMAGES = resolvePath('docs/images');
 const ZROK_DOCKER_COMPOSE = resolvePath('../docker/compose');
@@ -22,13 +26,9 @@ console.log('ZROK_DOCS_IMAGES:', ZROK_DOCS_IMAGES);
 console.log('ZROK_DOCKER_COMPOSE:', ZROK_DOCKER_COMPOSE);
 console.log('ZROK_ETC_CADDY:', ZROK_ETC);
 
+const zrok = '/docs/zrok';
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
-const zrok = '/docs/zrok'
-
-/** @type {import('@docusaurus/types').Config} */
-const config = {
+const config: Config = {
     title: 'zrok',
     staticDirectories: [ZROK_STATIC, ZROK_DOCS_IMAGES, ZROK_DOCKER_COMPOSE, ZROK_ETC],
     tagline: 'Globally distributed reverse proxy',
@@ -38,11 +38,10 @@ const config = {
     onBrokenLinks: 'throw',
     favicon: 'img/zrok-favicon.png',
 
+    onBrokenMarkdownLinks: 'throw',
+
     markdown: {
         mermaid: true,
-        hooks: {
-            onBrokenMarkdownLinks: 'throw',
-        },
     },
 
     themes: [
@@ -57,22 +56,19 @@ const config = {
     ],
 
     // GitHub pages deployment config.
-    // If you aren't using GitHub pages, you don't need these.
-    organizationName: 'NetFoundry', // Usually your GitHub org/user name.
-    projectName: 'zrok', // Usually your repo name.
+    organizationName: 'NetFoundry',
+    projectName: 'zrok',
 
-    // Even if you don't use internalization, you can use this field to set useful
-    // metadata like html lang. For example, if your site is Chinese, you may want
-    // to replace "en" with "zh-Hans".
     i18n: {
         defaultLocale: 'en',
         locales: ['en'],
     },
+
     plugins: [
         function aliasZrokRoot() {
             return {
                 name: 'alias-zrok-root',
-                configureWebpack(config, isServer) {
+                configureWebpack() {
                     return {
                         resolve: {
                             alias: { '@zrokroot': ZROK_ROOT }
@@ -104,10 +100,10 @@ const config = {
                 ]
             }
         ],
-        function myPlugin(context, options) {
+        function yamlLoaderPlugin() {
             return {
                 name: 'custom-webpack-plugin',
-                configureWebpack(config, isServer, utils) {
+                configureWebpack() {
                     return {
                         module: {
                             rules: [
@@ -134,17 +130,16 @@ const config = {
                 versions: {
                     current: { label: '1.1' },
                 },
-
                 remarkPlugins: [
                     function forbidSite() {
-                        return (tree, file) => {
-                            const src = String(file)
+                        return (tree: unknown, file: { path: string }) => {
+                            const src = String(file);
                             if (src.includes('@site')) {
                                 throw new Error(
                                     `[FORBIDDEN] @site is not allowed in docs - use @zrokroot.\nFile: ${file.path}`
-                                )
+                                );
                             }
-                        }
+                        };
                     }
                 ]
             }
@@ -164,80 +159,85 @@ const config = {
         ],
     ],
 
-    themeConfig:
-    /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-        ({
-            // NetFoundry theme configuration
-            netfoundry: {
-                showStarBanner: true,
-                starBanner: {
-                    repoUrl: 'https://github.com/openziti/zrok',
-                    label: 'Star zrok on GitHub',
+    themeConfig: {
+        netfoundry: {
+            showStarBanner: true,
+            starBanner: {
+                repoUrl: 'https://github.com/openziti/zrok',
+                label: 'Star zrok on GitHub',
+            },
+            footer: zrokFooter,
+        },
+        navbar: {
+            title: 'zrok',
+            logo: {
+                alt: 'zrok Logo',
+                src: 'img/zrok-1.0.0-rocket-green.svg',
+                href: 'https://zrok.io',
+                target: '_self',
+            },
+            items: [
+                {
+                    type: 'docsVersionDropdown',
+                    docsPluginId: 'zrok',
                 },
-                footer: zrokFooter,
-            },
-            navbar: {
-                title: 'zrok',
-                logo: {
-                    alt: 'zrok Logo',
-                    src: 'img/zrok-1.0.0-rocket-green.svg',
-                    href: 'https://zrok.io',
-                    target: '_self',
+                {
+                    href: 'https://zrok.io/pricing/',
+                    position: 'right',
+                    label: 'pricing',
                 },
-                items: [
-                    {
-                        type: 'docsVersionDropdown',
-                        docsPluginId: 'zrok',
-                    },
-                    {
-                        href: 'https://zrok.io/pricing/',
-                        position: 'right',
-                        label: 'pricing',
-                    },
-                    {
-                        href: 'https://myzrok.io/',
-                        position: 'right',
-                        label: 'account',
-                    },
-                    {
-                        href: 'https://github.com/orgs/openziti/projects/16',
-                        label: 'roadmap',
-                        position: 'right',
-                    },
-                    {
-                        href: 'https://github.com/openziti/zrok',
-                        position: 'right',
-                        className: 'header-github-link',
-                        title: 'GitHub'
-                    },
-                    {
-                        href: 'https://openziti.discourse.group/',
-                        position: 'right',
-                        className: 'header-discourse-link',
-                        title: 'Discourse'
-                    }
-                ],
-            },
-            footer: {
-                style: 'dark',
-                links: [],
-                copyright: `Copyright © ${new Date().getFullYear()} <a href="https://netfoundry.io">NetFoundry Inc.</a>`,
-            },
-            prism: {
-                theme: lightCodeTheme,
-                darkTheme: darkCodeTheme,
-            },
-            colorMode: {
-                defaultMode: 'dark',
-                disableSwitch: false,
-                respectPrefersColorScheme: false,
-            },
-            docs: {
-                sidebar: {
-                    autoCollapseCategories: true,
+                {
+                    href: 'https://myzrok.io/',
+                    position: 'right',
+                    label: 'account',
+                },
+                {
+                    href: 'https://github.com/orgs/openziti/projects/16',
+                    label: 'roadmap',
+                    position: 'right',
+                },
+                {
+                    href: 'https://github.com/openziti/zrok',
+                    position: 'right',
+                    className: 'header-github-link',
+                    title: 'GitHub'
+                },
+                {
+                    href: 'https://openziti.discourse.group/',
+                    position: 'right',
+                    className: 'header-discourse-link',
+                    title: 'Discourse'
                 }
-            },
-        }),
+            ],
+        },
+        footer: {
+            style: 'dark',
+            links: [],
+            copyright: `Copyright © ${new Date().getFullYear()} <a href="https://netfoundry.io">NetFoundry Inc.</a>`,
+        },
+        prism: {
+            theme: lightCodeTheme,
+            darkTheme: darkCodeTheme,
+        },
+        colorMode: {
+            defaultMode: 'dark',
+            disableSwitch: false,
+            respectPrefersColorScheme: false,
+        },
+        docs: {
+            sidebar: {
+                autoCollapseCategories: true,
+            }
+        },
+        algolia: {
+            appId: 'CO73R59OLO',
+            apiKey: '489572e91d0a750d34c127c2071ef962',
+            indexName: 'zrok',
+            contextualSearch: true,
+            searchParameters: {},
+            searchPagePath: 'search',
+        },
+    } satisfies ThemeConfig,
 };
 
-module.exports = config;
+export default config;
