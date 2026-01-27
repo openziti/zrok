@@ -35,7 +35,7 @@ fi
     for UI in ./ui ./agent/agentUi
     do
         pushd ${UI}
-        npm install
+        npm ci
         npm run build
         popd
     done
