@@ -3,7 +3,7 @@ import type { PluginConfig } from '@docusaurus/types';
 
 export function zrokDocsPluginConfig(rootDir: string): PluginConfig {
     const zp = path.resolve(rootDir, 'docs');
-    const zsbp = path.resolve(rootDir, 'sidebars.js');
+    const zsbp = path.resolve(rootDir, 'sidebars.ts');
     console.log('zrokDocsPluginConfig: zp=', zp);
     console.log('zrokDocsPluginConfig: sbp=', zsbp);
     return [
