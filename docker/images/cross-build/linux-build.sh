@@ -6,7 +6,22 @@
 set -o errexit
 set -o nounset
 set -o pipefail
-set -o xtrace
+
+# Check for --verbose flag
+VERBOSE=false
+ARGS=()
+for arg in "$@"; do
+    if [[ "$arg" == "--verbose" ]]; then
+        VERBOSE=true
+    else
+        ARGS+=("$arg")
+    fi
+done
+
+# Enable xtrace only if verbose
+if [[ "$VERBOSE" == "true" ]]; then
+    set -o xtrace
+fi
 
 resolveArch() {
     case ${1} in
@@ -20,10 +35,16 @@ resolveArch() {
 }
 
 # if no architectures supplied then default to amd64
-if (( ${#} )); then
-    typeset -a JOBS=(${@})
+if (( ${#ARGS[@]} )); then
+    typeset -a JOBS=("${ARGS[@]}")
 else
     typeset -a JOBS=(amd64)
+fi
+
+# Redirect output if not verbose
+if [[ "$VERBOSE" == "false" ]]; then
+    exec 3>&1 4>&2  # Save original stdout/stderr
+    exec 1>/dev/null 2>&1  # Redirect to /dev/null
 fi
 
 (
@@ -57,10 +78,38 @@ else
     HASH="developer build"
 fi
 
+# Track built binaries for report
+typeset -a BUILT_BINARIES=()
+
 for ARCH in "${JOBS[@]}"; do
     LDFLAGS="-s -w -X 'github.com/openziti/zrok/v2/build.Version=${VERSION}' -X 'github.com/openziti/zrok/v2/build.Hash=${HASH}'"
+    BINARY_PATH="./dist/$(resolveArch "${ARCH}")/linux/zrok2"
     GOOS=linux GOARCH=$(resolveArch "${ARCH}") \
-    go build -o "./dist/$(resolveArch "${ARCH}")/linux/zrok2" \
+    go build -o "${BINARY_PATH}" \
     -ldflags "${LDFLAGS}" \
     ./cmd/zrok
+    BUILT_BINARIES+=("${BINARY_PATH}")
 done
+
+# Restore stdout/stderr and print summary if not verbose
+if [[ "$VERBOSE" == "false" ]]; then
+    exec 1>&3 2>&4  # Restore original stdout/stderr
+    exec 3>&- 4>&-  # Close saved descriptors
+    
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "✓ Build completed successfully"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    echo "Version: ${VERSION}"
+    echo "Hash:    ${HASH}"
+    echo ""
+    echo "Built binaries:"
+    for BINARY in "${BUILT_BINARIES[@]}"; do
+        echo "  • ${BINARY}"
+    done
+    echo ""
+    echo "Embedded UIs:"
+    echo "  • ./ui/dist           → /api/v1/static (main UI)"
+    echo "  • ./agent/agentUi/dist → /agent (agent UI)"
+    echo ""
+fi
