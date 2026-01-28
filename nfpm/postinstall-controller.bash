@@ -73,8 +73,8 @@ create_service_user() {
         mkdir -p "/etc/zrok"
         echo "Created config directory: /etc/zrok" >&3
     fi
-    chown "${SERVICE_USER}:${SERVICE_GROUP}" "/etc/zrok"
-    chmod 750 "/etc/zrok"
+    chown root:root "/etc/zrok"
+    chmod 755 "/etc/zrok"
 }
 
 # Function to handle clean installation
