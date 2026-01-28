@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#
+# zrok-controller-metrics-bridge.bash - Launcher script for zrok metrics bridge service
+#
+# Verifies config file exists before executing zrok controller metrics bridge
+
+set -euo pipefail
+
+CONFIG_FILE="${1:-/etc/zrok/ctrl.yml}"
+
+if [[ ! -f "$CONFIG_FILE" ]]; then
+    echo "ERROR: Configuration file not found: $CONFIG_FILE" >&2
+    echo "" >&2
+    echo "To configure the zrok metrics bridge, create the config file:" >&2
+    echo "  sudo cp /etc/zrok/ctrl.yml.example $CONFIG_FILE" >&2
+    echo "  sudo editor $CONFIG_FILE" >&2
+    echo "" >&2
+    echo "Then start the service:" >&2
+    echo "  sudo systemctl start zrok-metrics" >&2
+    exit 1
+fi
+
+exec /opt/openziti/bin/zrok controller metrics bridge "$CONFIG_FILE"

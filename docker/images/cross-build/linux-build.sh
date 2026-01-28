@@ -20,6 +20,7 @@ ARCHITECTURE:
     armel           ARM 32-bit soft-float (armv7)
 
 OPTIONS:
+    --packages      Build all nfpm packages (deb, rpm) and report file locations
     --verbose       Show full build output (npm, goreleaser, etc.)
     --debug         Enable bash xtrace for debugging (implies --verbose)
     -h, --help      Show this help message
@@ -41,6 +42,9 @@ EXAMPLES:
     # Build with debug tracing
     $(basename "$0") --debug amd64
 
+    # Build packages (deb, rpm)
+    $(basename "$0") --packages amd64
+
 OUTPUT:
     Binaries are placed in ./dist/<binary>_linux_<arch>_<variant>/zrok2
 
@@ -53,9 +57,10 @@ EOF
     exit "${1:-1}"
 }
 
-# Check for --verbose and --debug flags, or environment variables
+# Check for --verbose, --debug, and --packages flags, or environment variables
 VERBOSE=false
 DEBUG=false
+BUILD_PACKAGES=false
 
 # Check environment variables first
 if [[ "${DEBUG:-}" == "1" ]]; then
@@ -70,6 +75,9 @@ fi
 ARGS=()
 for arg in "$@"; do
     case "$arg" in
+        --packages)
+            BUILD_PACKAGES=true
+            ;;
         --debug)
             DEBUG=true
             VERBOSE=true  # --debug implies --verbose
@@ -162,8 +170,9 @@ fi
     done
 )
 
-# Track built binaries for report
+# Track built binaries and packages for report
 typeset -a BUILT_BINARIES=()
+typeset -a BUILT_PACKAGES=()
 typeset -a GORELEASER_CONFIGS=()
 
 # Track if this is the first build (for --clean flag)
@@ -188,10 +197,21 @@ for ARCH in "${JOBS[@]}"; do
         CLEAN_FLAG=""
     fi
     
-    if [[ "$VERBOSE" == "true" ]]; then
-        goreleaser build --snapshot ${CLEAN_FLAG} --config "${CONFIG_FILE}"
+    # Determine which goreleaser command to use
+    if [[ "$BUILD_PACKAGES" == "true" ]]; then
+        # Use 'release' to build packages, skip publishing steps
+        if [[ "$VERBOSE" == "true" ]]; then
+            goreleaser release --snapshot ${CLEAN_FLAG} --skip=publish,validate --config "${CONFIG_FILE}"
+        else
+            goreleaser release --snapshot ${CLEAN_FLAG} --skip=publish,validate --config "${CONFIG_FILE}" >/dev/null 2>&1
+        fi
     else
-        goreleaser build --snapshot ${CLEAN_FLAG} --config "${CONFIG_FILE}" >/dev/null 2>&1
+        # Use 'build' for binaries only
+        if [[ "$VERBOSE" == "true" ]]; then
+            goreleaser build --snapshot ${CLEAN_FLAG} --config "${CONFIG_FILE}"
+        else
+            goreleaser build --snapshot ${CLEAN_FLAG} --config "${CONFIG_FILE}" >/dev/null 2>&1
+        fi
     fi
     
     # Track the binary location (goreleaser uses dist/*_linux_<goarch>*/zrok2)
@@ -231,6 +251,17 @@ for ARCH in "${JOBS[@]}"; do
     if [[ "$FOUND" == "false" ]]; then
         echo "Warning: Could not find binary for architecture ${RESOLVED_ARCH}" >&2
     fi
+    
+    # Find packages if --packages was specified
+    if [[ "$BUILD_PACKAGES" == "true" ]]; then
+        shopt -s nullglob
+        for PKG in ./dist/*.deb ./dist/*.rpm; do
+            if [[ -f "${PKG}" ]]; then
+                BUILT_PACKAGES+=("${PKG}")
+            fi
+        done
+        shopt -u nullglob
+    fi
 done
 
 # Restore stdout and print summary if not verbose
@@ -258,6 +289,19 @@ if [[ "$VERBOSE" == "false" ]]; then
     echo "  • ./ui/dist           → /api/v1/static (main UI)"
     echo "  • ./agent/agentUi/dist → /agent (agent UI)"
     echo ""
+    
+    if [[ "$BUILD_PACKAGES" == "true" ]]; then
+        echo "Built packages:"
+        if [[ ${#BUILT_PACKAGES[@]} -eq 0 ]]; then
+            echo "  (none found - check for errors above)"
+        else
+            for PKG in "${BUILT_PACKAGES[@]}"; do
+                echo "  • ${PKG}"
+            done
+        fi
+        echo ""
+    fi
+    
     echo "Note: GoReleaser also generates archives and metadata in ./dist/"
     echo ""
 fi

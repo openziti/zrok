@@ -1,0 +1,18 @@
+# /lib/systemd/system/zrok-frontend.service
+
+[Unit]
+Description=zrok frontend service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=zrok
+Group=zrok
+UMask=0007
+ExecStart=/usr/bin/zrok-frontend.bash /etc/zrok/frontend.yml
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
