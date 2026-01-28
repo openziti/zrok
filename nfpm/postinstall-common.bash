@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 #
-# postinstall.bash - Post-installation script for zrok server packages
+# postinstall-common.bash - Shared functions for zrok package post-installation
 # 
-# This script handles both DEB and RPM package installations/upgrades
-# and manages the zrok system user and systemd service.
+# This file contains common functions used by all zrok server package postinstall scripts.
+# It should be sourced by package-specific postinstall scripts.
 #
 
-set -euo pipefail
-
-# Service configuration
-SERVICE_USER="zrok"
-SERVICE_GROUP="zrok"
-SERVICE_HOME="/var/lib/zrok"
+# Service configuration (can be overridden by sourcing script)
+: "${SERVICE_USER:=zrok}"
+: "${SERVICE_GROUP:=zrok}"
+: "${SERVICE_HOME:=/var/lib/zrok}"
+: "${SERVICE_NAME:=zrok}"
 
 # Initialize debug output
 : "${DEBUG:=0}"
@@ -63,39 +62,35 @@ create_service_user() {
 
 # Function to handle clean installation
 install() {
-    echo "Performing clean installation setup..." >&3
+    echo "Performing clean installation setup for ${SERVICE_NAME}..." >&3
     create_service_user
     
     # Reload systemd
     if command -v systemctl >/dev/null 2>&1; then
         systemctl daemon-reload
-        echo "Systemd reloaded. Enable and start services as needed:" >&3
-        echo "  systemctl enable --now zrok-controller" >&3
-        echo "  systemctl enable --now zrok-metrics" >&3
-        echo "  systemctl enable --now zrok-frontend" >&3
+        echo "Systemd reloaded. Enable and start service as needed:" >&3
+        echo "  systemctl enable --now ${SERVICE_NAME}" >&3
     fi
 }
 
 # Function to handle upgrade
 upgrade() {
-    echo "Performing upgrade setup..." >&3
+    echo "Performing upgrade setup for ${SERVICE_NAME}..." >&3
     create_service_user
     
-    # Reload systemd and restart any running services
+    # Reload systemd and restart service if running
     if command -v systemctl >/dev/null 2>&1; then
         systemctl daemon-reload
         
-        for service in zrok-controller zrok-metrics zrok-frontend; do
-            if systemctl is-active --quiet "${service}.service" 2>/dev/null; then
-                echo "Restarting ${service} service..." >&3
-                systemctl restart "${service}.service"
-            fi
-        done
+        if systemctl is-active --quiet "${SERVICE_NAME}.service" 2>/dev/null; then
+            echo "Restarting ${SERVICE_NAME} service..." >&3
+            systemctl restart "${SERVICE_NAME}.service"
+        fi
     fi
 }
 
 # Main script logic
-main() {
+run_postinstall() {
     # Determine action based on package manager parameters
     if (( $# )); then
         if [[ $1 == 1 || ($1 == configure && -z ${2:-}) ]]; then
@@ -116,14 +111,11 @@ main() {
     case "$action" in
         "install")
             install
-            printf "\033[32mCompleted clean install of zrok server packages\033[0m\n"
+            printf "\033[32mCompleted clean install of ${SERVICE_NAME}\033[0m\n"
             ;;
         "upgrade")
             upgrade
-            printf "\033[32mCompleted upgrade of zrok server packages\033[0m\n"
+            printf "\033[32mCompleted upgrade of ${SERVICE_NAME}\033[0m\n"
             ;;
     esac
 }
-
-# Run main function with all arguments
-main "$@"
