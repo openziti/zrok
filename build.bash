@@ -127,8 +127,21 @@ if [[ "${NEEDS_BUILD}" == "true" ]]; then
     fi
 fi
 
+# Ensure cache directories exist with correct ownership before docker creates them as root
+GOCACHE_DIR="${GOCACHE:-${HOME}/.cache/go-build}"
+GOMODCACHE_DIR="${GOMODCACHE:-${HOME}/.cache/go-mod}"
+
+if [[ ! -d "${GOCACHE_DIR}" ]]; then
+    mkdir -p "${GOCACHE_DIR}"
+fi
+
+if [[ ! -d "${GOMODCACHE_DIR}" ]]; then
+    mkdir -p "${GOMODCACHE_DIR}"
+fi
+
 # Run the build
 docker run --user "${UID}" --rm \
-    --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+    --volume="${GOCACHE_DIR}:/usr/share/go_cache" \
+    --volume="${GOMODCACHE_DIR}:/usr/share/go/pkg/mod" \
     --volume="${PWD}:/mnt" \
     zrok-builder "${BUILD_ARCH}"

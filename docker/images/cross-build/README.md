@@ -26,6 +26,7 @@ Run from the project root:
 ```bash
 docker run --user "${UID}" --rm \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
   zrok-builder arm64
 ```
@@ -33,10 +34,11 @@ docker run --user "${UID}" --rm \
 **What happens:**
 
 1. Mounts project root to `/mnt` in container
-2. Mounts Go build cache for faster subsequent builds
-3. Builds UI components with npm/vite
-4. Builds Go binary with goreleaser snapshot
-5. Outputs binary to `./dist/<binary>_linux_<arch>_<variant>/zrok`
+2. Mounts Go build cache (`GOCACHE`) for faster compilation
+3. Mounts Go module cache (`GOMODCACHE`) to avoid re-downloading dependencies
+4. Builds UI components with npm/vite
+5. Builds Go binary with goreleaser snapshot
+6. Outputs binary to `./dist/<binary>_linux_<arch>_<variant>/zrok`
 
 **Output (quiet mode):**
 
@@ -64,17 +66,20 @@ Note: GoReleaser also generates archives and metadata in ./dist/
 # Default: amd64 if no architecture specified
 docker run --user "${UID}" --rm \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
   zrok-builder
 
 # Build different architectures in separate runs
 docker run --user "${UID}" --rm \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
   zrok-builder arm64
 
 docker run --user "${UID}" --rm \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
   zrok-builder armhf
 ```
@@ -89,6 +94,7 @@ Show full npm, vite, and goreleaser output:
 # Using flag
 docker run --user "${UID}" --rm \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
   zrok-builder --verbose arm64
 
@@ -96,6 +102,7 @@ docker run --user "${UID}" --rm \
 docker run --user "${UID}" --rm \
   --env VERBOSE=1 \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
   zrok-builder arm64
 ```
@@ -110,6 +117,7 @@ Maximum verbosity with bash xtrace (implies `--verbose`):
 # Using flag
 docker run --user "${UID}" --rm \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
   zrok-builder --debug arm64
 
@@ -117,6 +125,7 @@ docker run --user "${UID}" --rm \
 docker run --user "${UID}" --rm \
   --env DEBUG=1 \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
   zrok-builder arm64
 ```
@@ -138,7 +147,9 @@ dist/
 
 ## Notes
 
-* **Go cache:** The `GOCACHE` mount significantly speeds up subsequent builds by reusing compiled packages
+* **Go caches:** Two cache mounts significantly speed up builds:
+  * `GOCACHE` (build cache): Reuses compiled packages
+  * `GOMODCACHE` (module cache): Avoids re-downloading Go modules
 * **Dirty builds:** Snapshot builds work with uncommitted changes (dirty working copy)
 * **User permissions:** Running with `--user "${UID}"` ensures output files have correct ownership
 * **Flag precedence:** Command line flags override environment variables

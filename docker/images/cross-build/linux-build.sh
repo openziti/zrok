@@ -7,6 +7,27 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+# Set HOME to a writable location when running as non-root user (--user flag)
+# This ensures Go cache and other tools work properly
+export HOME=/tmp/builder
+mkdir -p "${HOME}"
+
+# Ensure Go cache directories are set and writable
+# GOCACHE should already be set by Dockerfile to /usr/share/go_cache (mounted from host)
+# GOMODCACHE defaults to $GOPATH/pkg/mod which should be /usr/share/go/pkg/mod
+export GOCACHE="${GOCACHE:-/usr/share/go_cache}"
+export GOMODCACHE="${GOMODCACHE:-/usr/share/go/pkg/mod}"
+
+# Verify cache directories are writable
+if [[ ! -w "${GOCACHE}" ]]; then
+    echo "WARNING: GOCACHE directory not writable: ${GOCACHE}" >&2
+    echo "This may cause slow builds. Check volume mount permissions." >&2
+fi
+if [[ ! -w "${GOMODCACHE}" ]]; then
+    echo "WARNING: GOMODCACHE directory not writable: ${GOMODCACHE}" >&2
+    echo "This may cause slow builds. Check volume mount permissions." >&2
+fi
+
 usage() {
     cat >&2 <<EOF
 Usage: $(basename "$0") [OPTIONS] [ARCHITECTURE]
@@ -151,9 +172,6 @@ if [[ "$VERBOSE" == "false" ]]; then
 fi
 
 (
-    HOME=/tmp/builder
-    # Navigate to the "ui" directory and run npm commands
-    mkdir -p $HOME
     # pwd is probably /mnt mountpoint in the container
     npm config set cache $(pwd)/.npm
     for UI in ./ui ./agent/agentUi
