@@ -1,28 +1,144 @@
+# Cross-build Container for zrok
 
-# Cross-build Container for Building the Linux Executables for this zrok Project
+This container provides advanced build capabilities for zrok, including cross-compilation for multiple Linux architectures. It produces snapshot executables from the current checkout, even if dirty.
 
-Running this container produces one snapshot executable for zrok from the current checkout, even if dirty. Platform choices are: `amd64`, `arm64`, `arm` (the arm/v7 "armhf" ABI target), and `armel` (the arm/v7 "armel" ABI). You may specify the target architecture as a parameter to the `docker run` command.
+**Supported architectures:** `amd64`, `arm64`, `armhf` (arm/v7 hard-float), `armel` (arm/v7 soft-float)
+
+**For simple builds:** Use `./build.bash` in the project root (see [BUILD.md](../../../BUILD.md)). This README covers advanced usage.
 
 ## Build the Container Image
 
-You only need to build the container image once unless you change the Dockerfile or `./linux-build.sh`.
+The `build.bash` script handles this automatically, but you can build manually if needed:
 
 ```bash
-# build a container image named "zrok-builder"
-docker buildx build -t zrok-builder ./docker/images/cross-build --load;
+# From the project root
+docker buildx build -t zrok-builder ./docker/images/cross-build --load
 ```
 
-## Run the Container to Build Executables for the Desired Architectures
+**Note:** The image is automatically rebuilt when the Dockerfile or `linux-build.sh` changes.
 
-Executing the following `docker run` command will:
+## Usage
 
-1. Mount the top-level of this repo on the container's `/mnt`
-2. Run `linux-build.sh ${@}` inside the container
-3. Deposit built executable in `./dist/`
+### Basic Build
+
+Run from the project root:
 
 ```bash
-# cross-build for arm64/aarch64 architecture on Linux
-docker run --user "${UID}" --rm --volume=${HOME}/.cache/go-build:/usr/share/go --volume "${PWD}:/mnt" zrok-builder arm64
+docker run --user "${UID}" --rm \
+  --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${PWD}:/mnt" \
+  zrok-builder arm64
 ```
 
-You will find the built artifacts in `./dist/`.
+**What happens:**
+
+1. Mounts project root to `/mnt` in container
+2. Mounts Go build cache for faster subsequent builds
+3. Builds UI components with npm/vite
+4. Builds Go binary with goreleaser snapshot
+5. Outputs binary to `./dist/<binary>_linux_<arch>_<variant>/zrok`
+
+**Output (quiet mode):**
+
+```text
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ Build completed successfully (goreleaser snapshot)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+GoReleaser output directory: ./dist/
+
+Built binaries:
+  • ./dist/zrok-armv8_linux_arm64_v8.0/zrok
+    (config: .goreleaser-linux-arm64.yml)
+
+Embedded UIs:
+  • ./ui/dist           → /api/v1/static (main UI)
+  • ./agent/agentUi/dist → /agent (agent UI)
+
+Note: GoReleaser also generates archives and metadata in ./dist/
+```
+
+### Multiple Architectures
+
+```bash
+# Default: amd64 if no architecture specified
+docker run --user "${UID}" --rm \
+  --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${PWD}:/mnt" \
+  zrok-builder
+
+# Build different architectures in separate runs
+docker run --user "${UID}" --rm \
+  --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${PWD}:/mnt" \
+  zrok-builder arm64
+
+docker run --user "${UID}" --rm \
+  --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${PWD}:/mnt" \
+  zrok-builder armhf
+```
+
+**Note:** Each architecture must be built in a separate `docker run` command. Goreleaser cleans the `./dist/` directory at the start of each build, so multiple architectures in a single run are not supported.
+
+### Verbose Output
+
+Show full npm, vite, and goreleaser output:
+
+```bash
+# Using flag
+docker run --user "${UID}" --rm \
+  --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${PWD}:/mnt" \
+  zrok-builder --verbose arm64
+
+# Using environment variable
+docker run --user "${UID}" --rm \
+  --env VERBOSE=1 \
+  --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${PWD}:/mnt" \
+  zrok-builder arm64
+```
+
+**Shows:** npm install/build output, vite warnings, goreleaser progress, go module downloads
+
+### Debug Mode
+
+Maximum verbosity with bash xtrace (implies `--verbose`):
+
+```bash
+# Using flag
+docker run --user "${UID}" --rm \
+  --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${PWD}:/mnt" \
+  zrok-builder --debug arm64
+
+# Using environment variable
+docker run --user "${UID}" --rm \
+  --env DEBUG=1 \
+  --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${PWD}:/mnt" \
+  zrok-builder arm64
+```
+
+**Shows:** All verbose output plus bash xtrace (`set -x`) for script debugging
+
+## Output
+
+Built artifacts are placed in `./dist/`:
+
+```text
+dist/
+├── artifacts.json              # GoReleaser metadata
+├── config.yaml                 # GoReleaser config snapshot
+├── metadata.json               # Build metadata
+└── zrok-<variant>_linux_<arch>_<subarch>/
+    └── zrok                    # Executable binary
+```
+
+## Notes
+
+* **Go cache:** The `GOCACHE` mount significantly speeds up subsequent builds by reusing compiled packages
+* **Dirty builds:** Snapshot builds work with uncommitted changes (dirty working copy)
+* **User permissions:** Running with `--user "${UID}"` ensures output files have correct ownership
+* **Flag precedence:** Command line flags override environment variables
