@@ -9,6 +9,7 @@ Wants=network-online.target
 Type=simple
 User=zrok-metrics
 Group=zrok-metrics
+WorkingDirectory=/var/lib/zrok-metrics
 UMask=0007
 ExecStart=/usr/bin/zrok-metrics-bridge.bash /etc/zrok/ctrl.yml
 Restart=always

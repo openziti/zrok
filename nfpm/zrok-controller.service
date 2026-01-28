@@ -9,6 +9,7 @@ Wants=network-online.target
 Type=simple
 User=zrok-controller
 Group=zrok-controller
+WorkingDirectory=/var/lib/zrok-controller
 UMask=0007
 ExecStart=/usr/bin/zrok-controller.bash /etc/zrok/ctrl.yml
 Restart=always
