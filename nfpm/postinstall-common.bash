@@ -11,6 +11,7 @@
 : "${SERVICE_GROUP:=zrok}"
 : "${SERVICE_HOME:=/var/lib/zrok}"
 : "${SERVICE_NAME:=zrok}"
+: "${ADDITIONAL_GROUPS:=}"
 
 # Initialize debug output
 : "${DEBUG:=0}"
@@ -33,14 +34,31 @@ create_service_user() {
     
     # Create user if it doesn't exist
     if ! getent passwd "${SERVICE_USER}" >/dev/null 2>&1; then
-        useradd --system \
-                --gid "${SERVICE_GROUP}" \
-                --home-dir "${SERVICE_HOME}" \
-                --create-home \
-                --shell /usr/sbin/nologin \
-                --comment "zrok service user" \
-                "${SERVICE_USER}"
+        if [[ -n "${ADDITIONAL_GROUPS}" ]]; then
+            useradd --system \
+                    --gid "${SERVICE_GROUP}" \
+                    --groups "${ADDITIONAL_GROUPS}" \
+                    --home-dir "${SERVICE_HOME}" \
+                    --create-home \
+                    --shell /usr/sbin/nologin \
+                    --comment "zrok service user" \
+                    "${SERVICE_USER}"
+        else
+            useradd --system \
+                    --gid "${SERVICE_GROUP}" \
+                    --home-dir "${SERVICE_HOME}" \
+                    --create-home \
+                    --shell /usr/sbin/nologin \
+                    --comment "zrok service user" \
+                    "${SERVICE_USER}"
+        fi
         echo "Created user: ${SERVICE_USER}" >&3
+    else
+        # User exists, add to additional groups if specified
+        if [[ -n "${ADDITIONAL_GROUPS}" ]]; then
+            usermod --append --groups "${ADDITIONAL_GROUPS}" "${SERVICE_USER}"
+            echo "Added ${SERVICE_USER} to groups: ${ADDITIONAL_GROUPS}" >&3
+        fi
     fi
     
     # Ensure home directory exists and has correct permissions

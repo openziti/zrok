@@ -7,10 +7,12 @@ set -euo pipefail
 
 # Package-specific configuration
 SERVICE_NAME="zrok-frontend"
+SERVICE_USER="zrok-frontend"
+SERVICE_GROUP="zrok-frontend"
+SERVICE_HOME="/var/lib/zrok-frontend"
 
-# Source common functions
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "${SCRIPT_DIR}/postinstall-common.bash"
+# Source common functions from installed location
+source /usr/share/zrok/postinstall-common.bash
 
 # Run the postinstall logic
 run_postinstall "$@"

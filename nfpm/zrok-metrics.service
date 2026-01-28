@@ -7,8 +7,8 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=zrok
-Group=zrok
+User=zrok-metrics
+Group=zrok-metrics
 UMask=0007
 ExecStart=/usr/bin/zrok-metrics-bridge.bash /etc/zrok/ctrl.yml
 Restart=always
