@@ -11,7 +11,7 @@ User=zrok-frontend
 Group=zrok-frontend
 WorkingDirectory=/var/lib/zrok-frontend
 UMask=0007
-ExecStart=/usr/bin/zrok-frontend.bash /etc/zrok/frontend.yml
+ExecStart=/usr/bin/zrok-frontend.bash dynamicProxy /etc/zrok/frontend.yml
 Restart=always
 RestartSec=3
 

@@ -178,7 +178,7 @@ nfpms:
           mode: 0755
 
       - dst: /etc/zrok2/frontend.yml.example
-        src: ./etc/frontend.yml
+        src: ./etc/dynamicProxy.yml
         file_info:
           mode: 0640
           owner: zrok-frontend
