@@ -30,4 +30,4 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
     exit 1
 fi
 
-exec /opt/openziti/bin/zrok controller "$CONFIG_FILE"
+exec /usr/bin/zrok controller "$CONFIG_FILE"

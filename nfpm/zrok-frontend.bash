@@ -20,4 +20,4 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
     exit 1
 fi
 
-exec /opt/openziti/bin/zrok access public "$CONFIG_FILE"
+exec /usr/bin/zrok access public "$CONFIG_FILE"

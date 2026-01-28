@@ -32,4 +32,4 @@ EOF
     exit 1
 fi
 
-exec /opt/openziti/bin/zrok controller metrics bridge "$CONFIG_FILE"
+exec /usr/bin/zrok controller metrics bridge "$CONFIG_FILE"

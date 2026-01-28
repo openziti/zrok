@@ -83,12 +83,14 @@ For advanced use cases including cross-compilation for multiple architectures, v
 # Build for arm64
 docker run --user "${UID}" --rm \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
   zrok-builder arm64
 
 # Build for amd64 (in a separate run)
 docker run --user "${UID}" --rm \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
+  --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
   zrok-builder amd64
 ```
