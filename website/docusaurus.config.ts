@@ -2,6 +2,14 @@ import type { Config } from '@docusaurus/types';
 import type { ThemeConfig } from '@docusaurus/preset-classic';
 import path from 'path';
 import { zrokFooter } from './src/components/footer';
+import {
+    LogLevel,
+    remarkCodeSections,
+    remarkReplaceMetaUrl,
+    remarkScopedPath,
+    remarkYouTube
+} from "@netfoundry/docusaurus-theme/plugins";
+import {zrokDocsPluginConfig} from "./docusaurus-plugin-zrok-docs.ts";
 
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
@@ -11,22 +19,25 @@ const resolvePath = (p: string) => path.resolve(ZROK_ROOT, p);
 
 // absolute paths
 const ZROK_CUSTOM_CSS = resolvePath('src/css/custom.css');
-const ZROK_SIDEBARS = resolvePath('sidebars.ts');
 const ZROK_STATIC = resolvePath('static');
 const ZROK_DOCS_IMAGES = resolvePath('docs/images');
 const ZROK_DOCKER_COMPOSE = resolvePath('../docker/compose');
 const ZROK_ETC = resolvePath('../etc');
 
+const docsBase = '/';
+const REMARK_MAPPINGS = [
+    { from: '@zrokdocs', to: `${docsBase}zrok`},
+];
+
 // logs
 console.log('ZROK_ROOT:', ZROK_ROOT);
 console.log('ZROK_CUSTOM_CSS:', ZROK_CUSTOM_CSS);
-console.log('ZROK_SIDEBARS:', ZROK_SIDEBARS);
 console.log('ZROK_STATIC:', ZROK_STATIC);
 console.log('ZROK_DOCS_IMAGES:', ZROK_DOCS_IMAGES);
 console.log('ZROK_DOCKER_COMPOSE:', ZROK_DOCKER_COMPOSE);
 console.log('ZROK_ETC_CADDY:', ZROK_ETC);
 
-const zrok = '/docs/zrok';
+const zrok = '/zrok';
 
 const config: Config = {
     title: 'zrok',
@@ -38,9 +49,10 @@ const config: Config = {
     onBrokenLinks: 'throw',
     favicon: 'img/zrok-favicon.png',
 
-    onBrokenMarkdownLinks: 'throw',
-
     markdown: {
+        hooks: {
+            onBrokenMarkdownLinks: "throw"
+        },
         mermaid: true,
     },
 
@@ -117,33 +129,7 @@ const config: Config = {
                 },
             };
         },
-        [
-            '@docusaurus/plugin-content-docs',
-            {
-                id: 'zrok',
-                routeBasePath: `${zrok}`,
-                sidebarPath: ZROK_SIDEBARS,
-                editUrl: 'https://github.com/openziti/zrok/blob/main/docs',
-                path: 'docs',
-                include: ['**/*.md', '**/*.mdx'],
-                lastVersion: 'current',
-                versions: {
-                    current: { label: '1.1' },
-                },
-                remarkPlugins: [
-                    function forbidSite() {
-                        return (tree: unknown, file: { path: string }) => {
-                            const src = String(file);
-                            if (src.includes('@site')) {
-                                throw new Error(
-                                    `[FORBIDDEN] @site is not allowed in docs - use @zrokroot.\nFile: ${file.path}`
-                                );
-                            }
-                        };
-                    }
-                ]
-            }
-        ],
+        zrokDocsPluginConfig(ZROK_ROOT, [{ from: '@zrokdocs', to: `${docsBase}zrok` }]),
         [
             '@docusaurus/plugin-content-pages',
             {

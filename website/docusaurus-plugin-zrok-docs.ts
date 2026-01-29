@@ -1,7 +1,8 @@
 import * as path from 'path';
 import type { PluginConfig } from '@docusaurus/types';
+import { LogLevel, remarkScopedPath } from "@netfoundry/docusaurus-theme/plugins";
 
-export function zrokDocsPluginConfig(rootDir: string): PluginConfig {
+export function zrokDocsPluginConfig(rootDir: string, linkMappings: { from: string; to: string }[]): PluginConfig {
     const zp = path.resolve(rootDir, 'docs');
     const zsbp = path.resolve(rootDir, 'sidebars.ts');
     console.log('zrokDocsPluginConfig: zp=', zp);
@@ -29,6 +30,7 @@ export function zrokDocsPluginConfig(rootDir: string): PluginConfig {
                         }
                     };
                 },
+                [remarkScopedPath, { mappings: linkMappings, logLevel: LogLevel.Silent }],
             ],
         } as any,
     ];
