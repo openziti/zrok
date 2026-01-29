@@ -7,7 +7,6 @@ import (
 
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/endpoints/dynamicProxy"
-	"github.com/openziti/zrok/v2/environment"
 	"github.com/openziti/zrok/v2/tui"
 	"github.com/spf13/cobra"
 )
@@ -34,15 +33,6 @@ func newAccessDynamicProxyCommand() *accessDynamicProxyCommand {
 
 func (cmd *accessDynamicProxyCommand) run(_ *cobra.Command, args []string) {
 	cmd.configPath = args[0]
-
-	root, err := environment.LoadRoot()
-	if err != nil {
-		cmd.error(err)
-	}
-
-	if !root.IsEnabled() {
-		tui.Error("unable to load environment; did you 'zrok enable'?", nil)
-	}
 
 	service, err := dynamicProxy.NewService(cmd.configPath)
 	if err != nil {
