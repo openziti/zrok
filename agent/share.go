@@ -5,7 +5,7 @@ import (
 
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/agent/proctree"
-	"github.com/openziti/zrok/v2/cmd/zrok/subordinate"
+	"github.com/openziti/zrok/v2/cmd/zrok2/subordinate"
 	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
 
@@ -83,4 +83,3 @@ func (s *share) monitor() {
 	s.processExited = true
 	s.agent.rmShare <- s
 }
-

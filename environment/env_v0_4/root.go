@@ -2,14 +2,12 @@ package env_v0_4
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/environment/env_core"
-	"github.com/openziti/zrok/v2/environment/env_v0_3"
 	"github.com/pkg/errors"
 )
 
@@ -84,59 +82,7 @@ func Update(r env_core.Root) (env_core.Root, error) {
 	if r == nil || r.Metadata() == nil {
 		return nil, errors.Errorf("nil root")
 	}
-	if r.Metadata().V != env_v0_3.V {
-		return nil, errors.Errorf("expecting version '%v'", env_v0_3.V)
-	}
-
-	newR := &Root{meta: r.Metadata(), cfg: r.Config(), env: r.Environment()}
-
-	oldAccessF, err := r.ZitiIdentityNamed(r.PublicIdentityName())
-	if err != nil {
-		return nil, err
-	}
-	_, err = os.Stat(oldAccessF)
-	if err == nil {
-		newAccessF, err := newR.ZitiIdentityNamed(newR.PublicIdentityName())
-		if err != nil {
-			return nil, err
-		}
-		if err := os.Rename(oldAccessF, newAccessF); err != nil {
-			return nil, err
-		}
-		fmt.Printf("renamed '%v' -> '%v'\n", oldAccessF, newAccessF)
-	} else if !os.IsNotExist(err) {
-		return nil, err
-	}
-
-	oldShareF, err := r.ZitiIdentityNamed(r.EnvironmentIdentityName())
-	if err != nil {
-		return nil, err
-	}
-	_, err = os.Stat(oldShareF)
-	if err == nil {
-		newShareF, err := newR.ZitiIdentityNamed(newR.EnvironmentIdentityName())
-		if err != nil {
-			return nil, err
-		}
-		if err := os.Rename(oldShareF, newShareF); err != nil {
-			return nil, err
-		}
-		fmt.Printf("renamed '%v' -> '%v'\n", oldShareF, newShareF)
-	} else if !os.IsNotExist(err) {
-		return nil, err
-	}
-
-	if err := writeMetadata(); err != nil {
-		return nil, err
-	}
-
-	meta, err := loadMetadata()
-	if err != nil {
-		return nil, err
-	}
-	newR.meta = meta
-
-	return newR, nil
+	return nil, errors.Errorf("no upgrade path available from version '%v'", r.Metadata().V)
 }
 
 func rootExists() (bool, error) {

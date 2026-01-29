@@ -158,7 +158,7 @@ func (cfg *CompatibilityConfig) GetCompiledPatterns() []*regexp.Regexp {
 }
 
 func envVersionOk() bool {
-	vStr := os.Getenv("ZROK_CTRL_CONFIG_VERSION")
+	vStr := os.Getenv("ZROK2_CTRL_CONFIG_VERSION")
 	if vStr != "" {
 		envV, err := strconv.Atoi(vStr)
 		if err != nil {

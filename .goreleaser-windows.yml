@@ -1,7 +1,7 @@
 version: 2
 builds:
 - main: ./cmd/zrok
-  binary: zrok
+  binary: zrok2
   ldflags: "-s -w -X github.com/openziti/zrok/v2/build.Version={{.Tag}} -X github.com/openziti/zrok/v2/build.Hash={{.ShortCommit}}"
   env:
     - CGO_ENABLED=1

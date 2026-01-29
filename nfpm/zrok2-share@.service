@@ -1,0 +1,17 @@
+
+# /usr/lib/systemd/user/zrok2-share@.service
+
+[Unit]
+Description=zrok2 share user service unit @%i
+After=network-online.target
+
+[Service]
+Type=simple
+UMask=0007
+EnvironmentFile=%h/.zrok2/zrok2-share@%i.env
+ExecStart=/opt/openziti/bin/zrok2-share.bash @%i
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=default.target

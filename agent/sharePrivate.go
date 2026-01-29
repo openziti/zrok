@@ -8,7 +8,7 @@ import (
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/agent/agentGrpc"
 	"github.com/openziti/zrok/v2/agent/proctree"
-	"github.com/openziti/zrok/v2/cmd/zrok/subordinate"
+	"github.com/openziti/zrok/v2/cmd/zrok2/subordinate"
 	"github.com/openziti/zrok/v2/environment"
 	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
@@ -20,7 +20,7 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 	}
 
 	if !root.IsEnabled() {
-		return "", errors.New("unable to load environment; did you 'zrok enable'?")
+		return "", errors.New("unable to load environment; did you 'zrok2 enable'?")
 	}
 
 	shr := &share{

@@ -5,14 +5,14 @@ The zrok drives CLI tools allow for simple, ergonomic management and synchroniza
 
 ## Sharing a Drive
 
-Virtual drives are shared through the `zrok` CLI using the `--backend-mode drive` flag through the `zrok share` command, using either the `public` or `private` sharing modes. We'll use the `private` sharing mode for this example:
+Virtual drives are shared through the `zrok` CLI using the `--backend-mode drive` flag through the `zrok2 share` command, using either the `public` or `private` sharing modes. We'll use the `private` sharing mode for this example:
 
 ```
 $ mkdir /tmp/junk
-$ zrok share private --headless --backend-mode drive /tmp/junk
+$ zrok2 share private --headless --backend-mode drive /tmp/junk
 [   0.124]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[cf640aac-2706-49ae-9cc9-9a497d67d9c5]} new service session
 [   0.145]    INFO main.(*sharePrivateCommand).run: allow other to access your share with the following command:
-zrok access private wkcfb58vj51l
+zrok2 access private wkcfb58vj51l
 ```
 
 The command shown above creates an ephemeral, `private` drive share pointed at the local `/tmp/junk` folder.
@@ -21,20 +21,20 @@ Notice that the share token allocated by `zrok` is `wkcfb58vj51l`. We'll use tha
 
 ## Working with a Private Drive Share
 
-First, let's copy a file into our virtual drive using the `zrok copy` command:
+First, let's copy a file into our virtual drive using the `zrok2 copy` command:
 
 ```
-$ zrok copy LICENSE zrok://wkcfb58vj51l
+$ zrok2 copy LICENSE zrok://wkcfb58vj51l
 [   0.119]    INFO zrok/drives/sync.OneWay: => /LICENSE
 copy complete!
 ```
 
-We used the URL scheme `zrok://<shareToken>` to refer to the private virtual drive we allocated above using the `zrok share private` command. Use `zrok://` URLs with the drives CLI tools to refer to contents of private virtual drives.
+We used the URL scheme `zrok://<shareToken>` to refer to the private virtual drive we allocated above using the `zrok2 share private` command. Use `zrok://` URLs with the drives CLI tools to refer to contents of private virtual drives.
 
 Next, let's get a directory listing of the virtual drive:
 
 ```
-$ zrok ls zrok://wkcfb58vj51l
+$ zrok2 ls zrok://wkcfb58vj51l
 ┌──────┬─────────┬─────────┬───────────────────────────────┐
 │ TYPE │ NAME    │ SIZE    │ MODIFIED                      │
 ├──────┼─────────┼─────────┼───────────────────────────────┤
@@ -45,8 +45,8 @@ $ zrok ls zrok://wkcfb58vj51l
 We can make directories on the virtual drive:
 
 ```
-$ zrok mkdir zrok://wkcfb58vj51l/stuff
-$ zrok ls zrok://wkcfb58vj51l
+$ zrok2 mkdir zrok://wkcfb58vj51l/stuff
+$ zrok2 ls zrok://wkcfb58vj51l
 ┌──────┬─────────┬─────────┬───────────────────────────────┐
 │ TYPE │ NAME    │ SIZE    │ MODIFIED                      │
 ├──────┼─────────┼─────────┼───────────────────────────────┤
@@ -65,14 +65,14 @@ total 20
 -rw-rw-r-- 1 michael michael 609 Jul 21 13:17 proxy.go
 -rw-rw-r-- 1 michael michael 361 Jul 21 13:17 size.go
 -rw-rw-r-- 1 michael michael 423 Jan  2 11:57 uniqueName.go
-$ zrok copy util/ zrok://wkcfb58vj51l/stuff
+$ zrok2 copy util/ zrok://wkcfb58vj51l/stuff
 [   0.123]    INFO zrok/drives/sync.OneWay: => /email.go
 [   0.194]    INFO zrok/drives/sync.OneWay: => /headers.go
 [   0.267]    INFO zrok/drives/sync.OneWay: => /proxy.go
 [   0.337]    INFO zrok/drives/sync.OneWay: => /size.go
 [   0.408]    INFO zrok/drives/sync.OneWay: => /uniqueName.go
 copy complete!
-$ zrok ls zrok://wkcfb58vj51l/stuff
+$ zrok2 ls zrok://wkcfb58vj51l/stuff
 ┌──────┬───────────────┬───────┬───────────────────────────────┐
 │ TYPE │ NAME          │ SIZE  │ MODIFIED                      │
 ├──────┼───────────────┼───────┼───────────────────────────────┤
@@ -87,15 +87,15 @@ $ zrok ls zrok://wkcfb58vj51l/stuff
 And we can remove files and directories from the virtual drive:
 
 ```
-$ zrok rm zrok://wkcfb58vj51l/LICENSE
-$ zrok ls zrok://wkcfb58vj51l
+$ zrok2 rm zrok://wkcfb58vj51l/LICENSE
+$ zrok2 ls zrok://wkcfb58vj51l
 ┌──────┬───────┬──────┬──────────┐
 │ TYPE │ NAME  │ SIZE │ MODIFIED │
 ├──────┼───────┼──────┼──────────┤
 │ DIR  │ stuff │      │          │
 └──────┴───────┴──────┴──────────┘
-$ zrok rm zrok://wkcfb58vj51l/stuff
-$ zrok ls zrok://wkcfb58vj51l
+$ zrok2 rm zrok://wkcfb58vj51l/stuff
+$ zrok2 ls zrok://wkcfb58vj51l
 ┌──────┬──────┬──────┬──────────┐
 │ TYPE │ NAME │ SIZE │ MODIFIED │
 ├──────┼──────┼──────┼──────────┤
@@ -107,7 +107,7 @@ $ zrok ls zrok://wkcfb58vj51l
 Public shares work very similarly to private shares, they just use a different URL scheme:
 
 ```
-$ zrok share public --headless --backend-mode drive /tmp/junk
+$ zrok2 share public --headless --backend-mode drive /tmp/junk
 [   0.708]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[05e0f48b-242b-4fd9-8edb-259488535c47]} new service session
 [   0.878]    INFO main.(*sharePublicCommand).run: access your zrok share at the following endpoints:
  https://6kiww4bn7iok.share.zrok.io
@@ -116,15 +116,15 @@ $ zrok share public --headless --backend-mode drive /tmp/junk
 The same commands, with a different URL scheme work with the `zrok` drives CLI:
 
 ```
-$ zrok copy util/ https://6kiww4bn7iok.share.zrok.io
+$ zrok2 copy util/ https://6kiww4bn7iok.share.zrok.io
 [   0.268]    INFO zrok/drives/sync.OneWay: => /email.go
 [   0.406]    INFO zrok/drives/sync.OneWay: => /headers.go
 [   0.530]    INFO zrok/drives/sync.OneWay: => /proxy.go
 [   0.655]    INFO zrok/drives/sync.OneWay: => /size.go
 [   0.714]    INFO zrok/drives/sync.OneWay: => /uniqueName.go
 copy complete!
-michael@fourtyfour Fri Jan 19 12:42:52 ~/Repos/nf/zrok 
-$ zrok ls https://6kiww4bn7iok.share.zrok.io
+michael@fourtyfour Fri Jan 19 12:42:52 ~/Repos/nf/zrok
+$ zrok2 ls https://6kiww4bn7iok.share.zrok.io
 ┌──────┬───────────────┬───────┬───────────────────────────────┐
 │ TYPE │ NAME          │ SIZE  │ MODIFIED                      │
 ├──────┼───────────────┼───────┼───────────────────────────────┤
@@ -138,22 +138,22 @@ $ zrok ls https://6kiww4bn7iok.share.zrok.io
 
 For basic authentication provided by public shares, the `zrok` drives CLI offers the `--basic-auth` flag, which accepts a `<username>:<password>` parameter to specify the authentication for the public virtual drive (if it's required).
 
-Alternatively, the authentication can be set using the `ZROK_DRIVES_BASIC_AUTH` environment variable:
+Alternatively, the authentication can be set using the `ZROK2_DRIVES_BASIC_AUTH` environment variable:
 
 ```
-$ export ZROK_DRIVES_BASIC_AUTH=username:password
+$ export ZROK2_DRIVES_BASIC_AUTH=username:password
 ```
 
 ## One-way Synchronization
 
-The `zrok copy` command includes a `--sync` flag, which only copies files detected as _modified_. `zrok` considers a file with the same modification timestamp and size to be the same. Of course, this is not a strong guarantee that the files are equivalent. Future `zrok` drives versions will provide a cryptographically strong mechanism (a-la `rsync` and friends) to guarantee that files and trees of files are synchronized.
+The `zrok2 copy` command includes a `--sync` flag, which only copies files detected as _modified_. `zrok` considers a file with the same modification timestamp and size to be the same. Of course, this is not a strong guarantee that the files are equivalent. Future `zrok` drives versions will provide a cryptographically strong mechanism (a-la `rsync` and friends) to guarantee that files and trees of files are synchronized.
 
 For now, the `--sync` flag provides a convenience mechanism to allow resuming copies of large file trees and provide a reasonable guarantee that the trees are in sync.
 
-Let's take a look at `zrok copy --sync` in action:
+Let's take a look at `zrok2 copy --sync` in action:
 
 ```
-$ zrok copy --sync docs/ https://glmv049c62p7.share.zrok.io
+$ zrok2 copy --sync docs/ https://glmv049c62p7.share.zrok.io
 [   0.636]    INFO zrok/drives/sync.OneWay: => /_attic/
 [   0.760]    INFO zrok/drives/sync.OneWay: => /_attic/network/
 [   0.816]    INFO zrok/drives/sync.OneWay: => /_attic/network/_category_.json
@@ -180,10 +180,10 @@ $ zrok copy --sync docs/ https://glmv049c62p7.share.zrok.io
 copy complete!
 ```
 
-Because the target drive was empty, `zrok copy --sync` copied the entire contents of the local `docs/` tree into the virtual drive. However, if we run that command again, we get:
+Because the target drive was empty, `zrok2 copy --sync` copied the entire contents of the local `docs/` tree into the virtual drive. However, if we run that command again, we get:
 
 ```
-$ zrok copy --sync docs/ https://glmv049c62p7.share.zrok.io
+$ zrok2 copy --sync docs/ https://glmv049c62p7.share.zrok.io
 copy complete!
 ```
 
@@ -192,8 +192,8 @@ The virtual drive contents are already in sync with the local filesystem tree, s
 Let's alter the contents of the drive and run the `--sync` again:
 
 ```
-$ zrok rm https://glmv049c62p7.share.zrok.io/images
-$ zrok copy --sync docs/ https://glmv049c62p7.share.zrok.io
+$ zrok2 rm https://glmv049c62p7.share.zrok.io/images
+$ zrok2 copy --sync docs/ https://glmv049c62p7.share.zrok.io
 [   0.364]    INFO zrok/drives/sync.OneWay: => /images/
 [   0.456]    INFO zrok/drives/sync.OneWay: => /images/zrok.png
 [   0.795]    INFO zrok/drives/sync.OneWay: => /images/zrok_cover.png
@@ -205,16 +205,16 @@ $ zrok copy --sync docs/ https://glmv049c62p7.share.zrok.io
 copy complete!
 ```
 
-Because we removed the `images/` tree from the virtual drive, `zrok copy --sync` detected this and copied the local `images/` tree back onto the virtual drive.
+Because we removed the `images/` tree from the virtual drive, `zrok2 copy --sync` detected this and copied the local `images/` tree back onto the virtual drive.
 
 ## Drive-to-Drive Copies and Synchronization
 
-The `zrok copy` CLI can operate on pairs of virtual drives remotely, without ever having to store files locally. This allow for drive-to-drive copies and synchronization.
+The `zrok2 copy` CLI can operate on pairs of virtual drives remotely, without ever having to store files locally. This allow for drive-to-drive copies and synchronization.
 
 Here are a couple of examples:
 
 ```
-$ zrok copy --sync https://glmv049c62p7.share.zrok.io https://glmv049c62p7.share.zrok.io
+$ zrok2 copy --sync https://glmv049c62p7.share.zrok.io https://glmv049c62p7.share.zrok.io
 copy complete!
 ```
 
@@ -223,7 +223,7 @@ Specifying the same URL for both the source and the target of a `--sync` operati
 We can copy files between two virtual drives with a single command:
 
 ```
-$ zrok copy --sync https://glmv049c62p7.share.zrok.io zrok://hsml272j3xzf
+$ zrok2 copy --sync https://glmv049c62p7.share.zrok.io zrok://hsml272j3xzf
 [   1.396]    INFO zrok/drives/sync.OneWay: => /_attic/
 [   2.083]    INFO zrok/drives/sync.OneWay: => /_attic/overview.md
 [   2.704]    INFO zrok/drives/sync.OneWay: => /_attic/sharing/
@@ -233,16 +233,16 @@ $ zrok copy --sync https://glmv049c62p7.share.zrok.io zrok://hsml272j3xzf
 [ 119.589]    INFO zrok/drives/sync.OneWay: => /images/zrok_cover.png
 [ 120.214]    INFO zrok/drives/sync.OneWay: => /getting-started.mdx
 copy complete!
-$ zrok copy --sync https://glmv049c62p7.share.zrok.io zrok://hsml272j3xzf
+$ zrok2 copy --sync https://glmv049c62p7.share.zrok.io zrok://hsml272j3xzf
 copy complete!
 ```
 
 ## Copying from Drives to the Local Filesystem
 
-In the current version of the drives CLI, `zrok copy` always assumes the destination is a directory. There is currently no way to do:
+In the current version of the drives CLI, `zrok2 copy` always assumes the destination is a directory. There is currently no way to do:
 
 ```
-$ zrok copy somefile someotherfile
+$ zrok2 copy somefile someotherfile
 ```
 
 What you'll end up with on the local filesystem is:
@@ -252,18 +252,18 @@ somefile
 someotherfile/somefile
 ```
 
-It's in the backlog to support file destinations in a future release of `zrok`. So, when using `zrok copy`, always take note of the destination.
+It's in the backlog to support file destinations in a future release of `zrok`. So, when using `zrok2 copy`, always take note of the destination.
 
-`zrok copy` supports a default destination of `file://.`, so you can do single parameter `zrok copy` commands like this:
+`zrok2 copy` supports a default destination of `file://.`, so you can do single parameter `zrok2 copy` commands like this:
 
 ```
-$ zrok ls https://azc47r3cwjds.share.zrok.io
+$ zrok2 ls https://azc47r3cwjds.share.zrok.io
 ┌──────┬─────────┬─────────┬───────────────────────────────┐
 │ TYPE │ NAME    │ SIZE    │ MODIFIED                      │
 ├──────┼─────────┼─────────┼───────────────────────────────┤
 │      │ LICENSE │ 11.3 kB │ 2023-07-21 13:17:56 -0400 EDT │
 └──────┴─────────┴─────────┴───────────────────────────────┘
-$ zrok copy https://azc47r3cwjds.share.zrok.io/LICENSE
+$ zrok2 copy https://azc47r3cwjds.share.zrok.io/LICENSE
 [   0.260]    INFO zrok/drives/sync.OneWay: => /LICENSE
 copy complete!
 $ ls -l
@@ -274,7 +274,7 @@ total 12
 You can also specify a local folder as the destination for your copy:
 
 ```
-$ zrok copy https://azc47r3cwjds.share.zrok.io/LICENSE /tmp/inbox
+$ zrok2 copy https://azc47r3cwjds.share.zrok.io/LICENSE /tmp/inbox
 [   0.221]    INFO zrok/drives/sync.OneWay: => /LICENSE
 copy complete! 
 $ l /tmp/inbox
@@ -287,9 +287,9 @@ total 12
 Private reserved shares with unque names can be particularly useful with the drives CLI:
 
 ```
-$ zrok reserve private -b drive --unique-name mydrive /tmp/junk
+$ zrok2 reserve private -b drive --unique-name mydrive /tmp/junk
 [   0.315]    INFO main.(*reserveCommand).run: your reserved share token is 'mydrive'
-$ zrok share reserved --headless mydrive
+$ zrok2 share reserved --headless mydrive
 [   0.289]    INFO main.(*shareReservedCommand).run: sharing target: '/tmp/junk'
 [   0.289]    INFO main.(*shareReservedCommand).run: using existing backend target: /tmp/junk
 [   0.767]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[d519a436-9fb5-4207-afd5-7cbc28fb779a]} new service session
@@ -299,7 +299,7 @@ $ zrok share reserved --headless mydrive
 This makes working with `zrok://` URLs particularly convenient:
 
 ```
-$ zrok ls zrok://mydrive
+$ zrok2 ls zrok://mydrive
 ┌──────┬─────────┬─────────┬───────────────────────────────┐
 │ TYPE │ NAME    │ SIZE    │ MODIFIED                      │
 ├──────┼─────────┼─────────┼───────────────────────────────┤

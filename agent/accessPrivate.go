@@ -8,7 +8,7 @@ import (
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/agent/agentGrpc"
 	"github.com/openziti/zrok/v2/agent/proctree"
-	"github.com/openziti/zrok/v2/cmd/zrok/subordinate"
+	"github.com/openziti/zrok/v2/cmd/zrok2/subordinate"
 	"github.com/openziti/zrok/v2/environment"
 )
 
@@ -19,7 +19,7 @@ func (a *Agent) AccessPrivate(req *AccessPrivateRequest) (frontendToken string, 
 	}
 
 	if !root.IsEnabled() {
-		return "", errors.New("unable to load environment; did you 'zrok enable'?")
+		return "", errors.New("unable to load environment; did you 'zrok2 enable'?")
 	}
 
 	// build command using CommandBuilder
