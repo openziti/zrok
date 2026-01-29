@@ -4,7 +4,7 @@
 version: 2
 builds:
 - id: zrok-armel
-  main: ./cmd/zrok
+  main: ./cmd/zrok2
   binary: zrok2
   ldflags: 
     - "-s -w -X github.com/openziti/zrok/v2/build.Version={{.Tag}} -X github.com/openziti/zrok/v2/build.Hash={{.ShortCommit}}"

@@ -1,7 +1,7 @@
 version: 2
 builds:
   - id: zrok-amd64
-    main: ./cmd/zrok
+    main: ./cmd/zrok2
     binary: zrok2
     ldflags: "-s -w -X github.com/openziti/zrok/v2/build.Version={{.Tag}} -X github.com/openziti/zrok/v2/build.Hash={{.ShortCommit}}"
     env:
@@ -19,7 +19,7 @@ builds:
           output: true
 
   - id: zrok-arm64
-    main: ./cmd/zrok
+    main: ./cmd/zrok2
     binary: zrok2
     ldflags: "-s -w -X github.com/openziti/zrok/v2/build.Version={{.Tag}} -X github.com/openziti/zrok/v2/build.Hash={{.ShortCommit}}"
     env:
