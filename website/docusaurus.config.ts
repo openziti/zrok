@@ -94,20 +94,20 @@ const config: Config = {
             {
                 redirects: [
                     {
-                        to: `${zrok}/guides/self-hosting/linux`,
-                        from: [`${zrok}/guides/self-hosting/self_hosting_guide`],
+                        to: `$/docs/zrok/guides/self-hosting/linux`,
+                        from: [`/docs/zrok/guides/self-hosting/self_hosting_guide`],
                     },
                     {
-                        to: `${zrok}/guides/self-hosting/linux/nginx`,
-                        from: [`${zrok}/guides/self-hosting/nginx_tls_guide/`]
+                        to: `/docs/zrok/guides/self-hosting/linux/nginx`,
+                        from: [`/docs/zrok/guides/self-hosting/nginx_tls_guide/`]
                     },
                     {
-                        to: `${zrok}/guides/self-hosting/metrics-and-limits/configuring-limits`,
-                        from: [`${zrok}/guides/metrics-and-limits/configuring-limits`],
+                        to: `/docs/zrok/guides/self-hosting/metrics-and-limits/configuring-limits`,
+                        from: [`/docs/zrok/guides/metrics-and-limits/configuring-limits`],
                     },
                     {
-                        to: `${zrok}/guides/self-hosting/metrics-and-limits/configuring-metrics`,
-                        from: [`${zrok}/guides/metrics-and-limits/configuring-metrics`],
+                        to: `/docs/zrok/guides/self-hosting/metrics-and-limits/configuring-metrics`,
+                        from: [`/docs/zrok/guides/metrics-and-limits/configuring-metrics`],
                     }
                 ]
             }
@@ -129,7 +129,7 @@ const config: Config = {
                 },
             };
         },
-        zrokDocsPluginConfig(ZROK_ROOT, [{ from: '@zrokdocs', to: `${docsBase}zrok` }]),
+        zrokDocsPluginConfig(ZROK_ROOT, [{ from: '@zrokdocs', to: `/docs/zrok` }]),
         [
             '@docusaurus/plugin-content-pages',
             {

@@ -12,14 +12,15 @@ export function zrokDocsPluginConfig(rootDir: string, linkMappings: { from: stri
         {
             id: 'zrok', // do not change - affects algolia search
             path: zp,
-            routeBasePath: 'zrok',
+            routeBasePath: 'docs/zrok',
             sidebarPath: zsbp,
-            lastVersion: 'current',
+            lastVersion: '1.1',
             includeCurrentVersion: true,
             versions: {
-                current: { label: '1.1 (Current)', path: '' },
-                '1.0': { label: '1.0', path: '1.0' },
-                '0.4': { label: '0.4', path: '0.4' },
+                current: { label: '2.x (Future)', path: '2.x', banner: 'unreleased' },
+                '1.1': { label: '1.1 (Current)', path: '', banner: 'none' },
+                '1.0': { label: '1.0', path: '1.0', banner: 'unmaintained' },
+                '0.4': { label: '0.4', path: '0.4', banner: 'unmaintained' },
             },
             remarkPlugins: [
                 function forbidSite() {
