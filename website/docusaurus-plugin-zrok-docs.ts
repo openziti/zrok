@@ -2,17 +2,22 @@ import * as path from 'path';
 import type { PluginConfig } from '@docusaurus/types';
 import { LogLevel, remarkScopedPath } from "@netfoundry/docusaurus-theme/plugins";
 
-export function zrokDocsPluginConfig(rootDir: string, linkMappings: { from: string; to: string }[]): PluginConfig {
+export function zrokDocsPluginConfig(
+    rootDir: string,
+    linkMappings: { from: string; to: string }[],
+    routeBasePath: string = 'docs/zrok'  // default for standalone zrok; unified-doc passes 'zrok'
+): PluginConfig {
     const zp = path.resolve(rootDir, 'docs');
     const zsbp = path.resolve(rootDir, 'sidebars.ts');
     console.log('zrokDocsPluginConfig: zp=', zp);
     console.log('zrokDocsPluginConfig: sbp=', zsbp);
+    console.log('zrokDocsPluginConfig: routeBasePath=', routeBasePath);
     return [
         '@docusaurus/plugin-content-docs',
         {
             id: 'zrok', // do not change - affects algolia search
             path: zp,
-            routeBasePath: 'docs/zrok',
+            routeBasePath,
             sidebarPath: zsbp,
             lastVersion: '1.1',
             includeCurrentVersion: true,
