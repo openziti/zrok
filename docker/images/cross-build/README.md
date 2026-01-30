@@ -24,7 +24,7 @@ docker buildx build -t zrok-builder ./docker/images/cross-build --load
 Run from the project root:
 
 ```bash
-docker run --user "${UID}" --rm \
+docker run --user "$(id -u):$(id -g)" --rm \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
   --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
@@ -64,20 +64,20 @@ Note: GoReleaser also generates archives and metadata in ./dist/
 
 ```bash
 # Default: amd64 if no architecture specified
-docker run --user "${UID}" --rm \
+docker run --user "$(id -u):$(id -g)" --rm \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
   --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
   zrok-builder
 
 # Build different architectures in separate runs
-docker run --user "${UID}" --rm \
+docker run --user "$(id -u):$(id -g)" --rm \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
   --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
   zrok-builder arm64
 
-docker run --user "${UID}" --rm \
+docker run --user "$(id -u):$(id -g)" --rm \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
   --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
@@ -92,14 +92,14 @@ Show full npm, vite, and goreleaser output:
 
 ```bash
 # Using flag
-docker run --user "${UID}" --rm \
+docker run --user "$(id -u):$(id -g)" --rm \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
   --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
   zrok-builder --verbose arm64
 
 # Using environment variable
-docker run --user "${UID}" --rm \
+docker run --user "$(id -u):$(id -g)" --rm \
   --env VERBOSE=1 \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
   --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
@@ -115,14 +115,14 @@ Maximum verbosity with bash xtrace (implies `--verbose`):
 
 ```bash
 # Using flag
-docker run --user "${UID}" --rm \
+docker run --user "$(id -u):$(id -g)" --rm \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
   --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
   --volume="${PWD}:/mnt" \
   zrok-builder --debug arm64
 
 # Using environment variable
-docker run --user "${UID}" --rm \
+docker run --user "$(id -u):$(id -g)" --rm \
   --env DEBUG=1 \
   --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
   --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \

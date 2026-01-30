@@ -140,7 +140,7 @@ if [[ ! -d "${GOMODCACHE_DIR}" ]]; then
 fi
 
 # Run the build
-docker run --user "${UID}" --rm \
+docker run --user "$(id -u):$(id -g)" --rm \
     --volume="${GOCACHE_DIR}:/usr/share/go_cache" \
     --volume="${GOMODCACHE_DIR}:/usr/share/go/pkg/mod" \
     --volume="${PWD}:/mnt" \
