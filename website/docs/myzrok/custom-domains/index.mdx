@@ -96,15 +96,15 @@ In order to create shares that utilize your custom DNS, you will need to specify
 or update your environment configuration to use this new frontend by default.
 
 ```
-zrok share public --frontend foo-example--goPIhgtJtz
+zrok2 share public --frontend foo-example--goPIhgtJtz
 ```
 
 You can set the custom frontend as the environment default by running:
 
 ```
-zrok config set defaultFrontend foo-example--goPIhgtJtz
+zrok2 config set defaultFrontend foo-example--goPIhgtJtz
 ```
 
-To validate which frontend is being used, use the `zrok status` command, which will identify the default frontend being used:
+To validate which frontend is being used, use the `zrok2 status` command, which will identify the default frontend being used:
 
 ![zrok_status](images/zrok_status.png)

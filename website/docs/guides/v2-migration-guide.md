@@ -50,11 +50,11 @@ These commands no longer exist in v2.0:
 
 ```bash
 # no longer available
-zrok reserve public --backend-mode web /path/to/files
-zrok reserve private http://localhost:3000
-zrok share reserved <token>
-zrok release <token>
-zrok overview public-frontends
+zrok2 reserve public --backend-mode web /path/to/files
+zrok2 reserve private http://localhost:3000
+zrok2 share reserved <token>
+zrok2 release <token>
+zrok2 overview public-frontends
 ```
 
 ### New Commands
@@ -63,29 +63,29 @@ zrok overview public-frontends
 
 ```bash
 # list available namespaces
-zrok list namespaces
+zrok2 list namespaces
 
 # list all your names
-zrok list names
+zrok2 list names
 
 # create a reserved name (persistent)
-zrok create name -n <namespaceToken> <name>
+zrok2 create name -n <namespaceToken> <name>
 
 # modify a name (e.g., toggle reserved status)
-zrok modify name -n <namespaceToken> <name> -r|-r=false
+zrok2 modify name -n <namespaceToken> <name> -r|-r=false
 
 # delete a name
-zrok delete name -n <namespaceToken> <name>
+zrok2 delete name -n <namespaceToken> <name>
 ```
 
 #### Sharing with Names
 
 ```bash
 # public share with a name selection
-zrok share public <target> -n <namespaceToken>:<name>
+zrok2 share public <target> -n <namespaceToken>:<name>
 
 # private share with vanity token
-zrok share private <target> --share-token my-custom-token
+zrok2 share private <target> --share-token my-custom-token
 ```
 
 ---
@@ -113,7 +113,7 @@ $ zrok release abc123xyz
 
 ```bash
 # first, check available namespaces
-$ zrok list namespaces
+$ zrok2 list namespaces
 ╭───────────────────────┬─────────────────┬─────────────╮
 │ NAME                  │ NAMESPACE TOKEN │ DESCRIPTION │
 ├───────────────────────┼─────────────────┼─────────────┤
@@ -121,16 +121,16 @@ $ zrok list namespaces
 ╰───────────────────────┴─────────────────┴─────────────╯
 
 # create a reserved name in the 'public' namespace
-$ zrok create name -n public api
+$ zrok2 create name -n public api
 
 # start sharing using the name selection
-$ zrok share public localhost:8080 -n public:api
+$ zrok2 share public localhost:8080 -n public:api
 
 # the name persists across share restarts
-$ zrok share public localhost:8080 -n public:api
+$ zrok2 share public localhost:8080 -n public:api
 
 # when done, delete the name
-$ zrok delete name -n public api
+$ zrok2 delete name -n public api
 ```
 
 ### Scenario 2: Private Reserved Share
@@ -153,10 +153,10 @@ $ zrok access private xyz789abc
 
 ```bash
 # share privately using the name (-s specifies a share token name)
-$ zrok share private http://localhost:8080 -s myapi-prod
+$ zrok2 share private http://localhost:8080 -s myapi-prod
 
 # access from another environment
-$ zrok access private myapi-prod
+$ zrok2 access private myapi-prod
 ```
 
 ### Scenario 3: Ephemeral Shares (Unchanged)
@@ -165,7 +165,7 @@ Ephemeral shares work mostly the same, but now support optional name selections:
 
 ```bash
 # v1.x - still works in v2.0
-$ zrok share public :8080
+$ zrok2 share public :8080
 ```
 
 ---
@@ -184,19 +184,19 @@ Shares with reserved name selections automatically restart after abnormal exit o
 
 ```bash
 # create a reserved name (-n defaults to 'public')
-$ zrok create name myapp
+$ zrok2 create name myapp
 
 # when agent running, share will persist across agent restarts due to reserved name
 # selection
-$ zrok share public http://localhost:3000 -n public:myapp
+$ zrok2 share public http://localhost:3000 -n public:myapp
 
 # when agent running, private share with --share-token will persist across agent restarts
-$ zrok share private http://localhost:3000 --share-token myapp
+$ zrok2 share private http://localhost:3000 --share-token myapp
 ```
 
 ### Improved Status Command
 
-The `zrok agent status` command now shows:
+The `zrok2 agent status` command now shows:
 - Detailed error states for failed processes
 - Frontend endpoints for public shares
 - Failure information with error messages
@@ -209,11 +209,11 @@ One powerful v2.0 feature: a single share can use multiple name selections:
 
 ```bash
 # create multiple names
-$ zrok create name myapp
-$ zrok create name myapp-staging
+$ zrok2 create name myapp
+$ zrok2 create name myapp-staging
 
 # share using both names
-$ zrok share public http://localhost:3000 \
+$ zrok2 share public http://localhost:3000 \
   -n public:myapp \
   -n public:myapp-staging
 
@@ -236,7 +236,7 @@ A namespace is a logical grouping for names, similar to how a DNS zone works. Yo
 ### Listing Available Namespaces
 
 ```bash
-$ zrok list namespaces
+$ zrok2 list namespaces
 
 ╭───────────────────────┬─────────────────┬─────────────╮
 │ NAME                  │ NAMESPACE TOKEN │ DESCRIPTION │
@@ -253,7 +253,7 @@ $ zrok list namespaces
 ### View All Your Names
 
 ```bash
-$ zrok list names
+$ zrok2 list names
 
 ╭───────────────────────────────┬─────────┬───────────┬─────────────┬──────────┬─────────────────────╮
 │ URL                           │ NAME    │ NAMESPACE │ SHARE TOKEN │ RESERVED │ CREATED             │
@@ -265,11 +265,11 @@ $ zrok list names
 ### View Overview (Now Includes Names)
 
 ```bash
-$ zrok overview
+$ zrok2 overview
 # shows human-readable format with names and namespaces
 
 # for json output
-$ zrok overview --json
+$ zrok2 overview --json
 ```
 
 ---
@@ -302,9 +302,9 @@ You'll need to update your scripts to use the new command structure. The good ne
 
 If you run into issues during migration:
 
-1. Check `zrok status` to verify your environment is properly enabled
-2. Use `zrok list namespaces` to see what namespaces are available to you
-3. Use `zrok list names` to see your current names
+1. Check `zrok2 status` to verify your environment is properly enabled
+2. Use `zrok2 list namespaces` to see what namespaces are available to you
+3. Use `zrok2 list names` to see your current names
 4. Review the error messages - v2.0 has improved error reporting
 5. Consult the [self-hosting guides](/docs/category/self-hosting/) if you manage your own instance
 6. Check the [concepts documentation](/concepts/index.md) for deeper understanding

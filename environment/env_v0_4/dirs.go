@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-var rootDirName = ".zrok"
+var rootDirName = ".zrok2"
 
 func SetRootDirName(name string) {
 	rootDirName = name

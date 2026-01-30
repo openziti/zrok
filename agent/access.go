@@ -3,7 +3,7 @@ package agent
 import (
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/agent/proctree"
-	"github.com/openziti/zrok/v2/cmd/zrok/subordinate"
+	"github.com/openziti/zrok/v2/cmd/zrok2/subordinate"
 )
 
 type AccessPrivateRequest struct {

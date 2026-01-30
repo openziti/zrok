@@ -12,7 +12,7 @@ No action is necessary.
 
 If you are running version `1.0.0` or `1.0.1`, you can run the following to rebase your environment to use the new versioned API:
 ```
-  zrok rebase apiEndpoint https://api-v1.zrok.io
+  zrok2 rebase apiEndpoint https://api-v1.zrok.io
 ```
 
 Resume zrok API interactions as normal!
@@ -23,11 +23,11 @@ Resume zrok API interactions as normal!
 If you run into any issues after upgrading your environment, first verify your zrok version and review your current zrok configuration:
 
 ```
-zrok version
+zrok2 version
 ```
 Review the `apiEndpoint` configuration, if you are running version `1.0` or later, the `apiEndpoint` should be `https://api-v1.zrok.io`
 ```
-zrok status
+zrok2 status
 ```
 
 If you're still having issues, we recommend you reach out to our community support team at our [zrok discourse](https://openziti.discourse.group/c/zrok/24) forum.
@@ -35,17 +35,17 @@ If you're still having issues, we recommend you reach out to our community suppo
 If you prefer to do a hard reset of your environment, you can also run the commands below:
 
 :::warning
-Running `zrok disable` will delete any running environments or shares, and will release any reserved shares
+Running `zrok2 disable` will delete any running environments or shares, and will release any reserved shares
 :::
 ```
-zrok disable
+zrok2 disable
 ```
 
 Reset the config back to the default API endpoint for the binary version
 ```
-zrok config unset apiEndpoint
+zrok2 config unset apiEndpoint
 ```
 Create a fresh environment
 ```
-zrok enable <your account token>
+zrok2 enable <your account token>
 ```

@@ -31,10 +31,10 @@ We're going to want to enable a zrok environment for our new Agent service in th
 C:\Program Files\zrok>set USERPROFILE=c:\Windows\System32\config\systemprofile
 ```
 
-And with that environment variable set, we'll use the `zrok enable` command to enable an environment for our new Agent service:
+And with that environment variable set, we'll use the `zrok2 enable` command to enable an environment for our new Agent service:
 
 ```cmd
-C:\Program Files\zrok>zrok enable <accountToken>
+C:\Program Files\zrok>zrok2 enable <accountToken>
 ```
 
 ![Enabling the Service Environment](images/enable.png)
@@ -53,7 +53,7 @@ Windows might ask you for elevated Administrator privileges and will then show t
 
 ![nssm install](images/nssm-install.png)
 
-We'll set "Path" to `C:\Program Files\zrok\zrok.exe` (the zrok executable). We'll set the "Startup directory" to `C:\Windows\System32\config\systemprofile` (the "home" directory for the `Local System` user). The "Arguments" are the command-line parameters that will get added to the command-line when starting the service, in this case, we want the service to start with the command `zrok agent start`.
+We'll set "Path" to `C:\Program Files\zrok\zrok.exe` (the zrok executable). We'll set the "Startup directory" to `C:\Windows\System32\config\systemprofile` (the "home" directory for the `Local System` user). The "Arguments" are the command-line parameters that will get added to the command-line when starting the service, in this case, we want the service to start with the command `zrok2 agent start`.
 
 We'll set the "Service name" to `zrokAgent`.
 
@@ -61,11 +61,11 @@ Next, scroll over to the "I/O" tab in the `nssm` installer:
 
 ![I/O Tab](images/nssm-io.png)
 
-Set the "Output (stdout)" to log the standard output from the `zrok agent start` process to the file `C:\Windows\System32\config\systemprofile\.zrok\agent-stdout.log`.
+Set the "Output (stdout)" to log the standard output from the `zrok2 agent start` process to the file `C:\Windows\System32\config\systemprofile\.zrok2\agent-stdout.log`.
 
-Set the "Error (stderr)" to log the standard error to the file `C:\Windows\System32\config\systemprofile\.zrok\agent-stderr.log`.
+Set the "Error (stderr)" to log the standard error to the file `C:\Windows\System32\config\systemprofile\.zrok2\agent-stderr.log`.
 
-Setting the I/O redirection in this way will produce logs from the `zrok agent start` process that could be useful for future troubleshooting.
+Setting the I/O redirection in this way will produce logs from the `zrok2 agent start` process that could be useful for future troubleshooting.
 
 `nssm` also provides options for automatically rotating these log files:
 
@@ -83,7 +83,7 @@ If we click the start button in the toolbar, or right-click on the service and s
 
 ![Service Running](images/services-running.png)
 
-If we open a Windows Explorer in the folder `C:\Windows\System32\config\systemprofile\.zrok` we can see our logs, and the `agent.socket` which is used by the zrok command-line to interact with our Agent service:
+If we open a Windows Explorer in the folder `C:\Windows\System32\config\systemprofile\.zrok2` we can see our logs, and the `agent.socket` which is used by the zrok command-line to interact with our Agent service:
 
 ![zrokdir](images/zrokdir.png)
 
@@ -92,7 +92,7 @@ This zrok Agent service is now available for use. Whenever a Windows Command Pro
 We can access the Agent console using this command:
 
 ```cmd
-C:\Program Files\zrok>zrok agent console
+C:\Program Files\zrok>zrok2 agent console
 ```
 
 And this will open a web interface which allows the Agent to be managed:
@@ -112,10 +112,10 @@ C:\Program Files\zrok>nssm install zrokAgent "C:\Program Files\zrok\zrok.exe" ag
 C:\Program Files\zrok>nssm set zrokAgent AppDirectory C:\Windows\System32\config\systemprofile
 ```
 ```cmd
-C:\Program Files\zrok>nssm set zrokAgent AppStdout C:\Windows\System32\config\systemprofile\.zrok\agent-stdout.log
+C:\Program Files\zrok>nssm set zrokAgent AppStdout C:\Windows\System32\config\systemprofile\.zrok2\agent-stdout.log
 ```
 ```cmd
-C:\Program Files\zrok>nssm set zrokAgent AppStderr C:\Windows\System32\config\systemprofile\.zrok\agent-stderr.log
+C:\Program Files\zrok>nssm set zrokAgent AppStderr C:\Windows\System32\config\systemprofile\.zrok2\agent-stderr.log
 ```
 
 And we can start our new service using the standard Windows service control utility, `sc`:
@@ -139,6 +139,6 @@ C:\>sc delete zrokAgent
 And if you have your `USERPROFILE` environment variable properly set to `C:\Windows\System32\config\systemprofile`, you can use this command to remove the environment from your system and from the zrok service:
 
 ```cmd
-C:\Program Files\zrok>zrok disable
+C:\Program Files\zrok>zrok2 disable
 ```
 

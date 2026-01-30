@@ -72,7 +72,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-amd64
-          path: ${{ steps.solve_go_bin.outputs.go_bin }}/zrok
+          path: ${{ steps.solve_go_bin.outputs.go_bin }}/zrok2
           if-no-files-found: error
 
   windows-build:
@@ -122,7 +122,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: windows-amd64
-          path: ./dist/**/zrok.exe
+          path: ./dist/**/zrok2.exe
           if-no-files-found: error
 
   pytest:

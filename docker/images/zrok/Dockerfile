@@ -8,13 +8,13 @@ ARG TARGETOS
 # e.g. arm64
 ARG TARGETARCH
 
-### Required OpenShift Labels 
-LABEL name="openziti/zrok" \
+### Required OpenShift Labels
+LABEL name="openziti/zrok2" \
       maintainer="support@zrok.io" \
       vendor="NetFoundry" \
-      summary="Run the zrok CLI" \
-      description="Run the zrok CLI" \
-      org.opencontainers.image.description="Run the zrok CLI" \
+      summary="Run the zrok2 CLI" \
+      description="Run the zrok2 CLI" \
+      org.opencontainers.image.description="Run the zrok2 CLI" \
       org.opencontainers.image.source="https://github.com/openziti/zrok"
 
 USER root
@@ -24,10 +24,10 @@ RUN mkdir -p -m0755 /licenses
 COPY ./LICENSE /licenses/apache.txt
 
 RUN mkdir -p /usr/local/bin
-COPY --chmod=0755 ${ARTIFACTS_DIR}/${TARGETARCH}/${TARGETOS}/zrok \
-      ./nfpm/zrok-enable.bash \
-      ./nfpm/zrok-share.bash \
+COPY --chmod=0755 ${ARTIFACTS_DIR}/${TARGETARCH}/${TARGETOS}/zrok2 \
+      ./nfpm/zrok2-enable.bash \
+      ./nfpm/zrok2-share.bash \
       /usr/local/bin/
 
 USER ziggy
-ENTRYPOINT [ "zrok" ]
+ENTRYPOINT [ "zrok2" ]

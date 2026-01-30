@@ -19,23 +19,23 @@ Here's how private sharing works:
 
 ![zrok_public_share](../images/zrok_private_share.png)
 
-`private` shares are accessed using the `zrok access` command, and require the accessing user to have a `zrok enable`-d account on the same service instance where the share was created.
+`private` shares are accessed using the `zrok2 access` command, and require the accessing user to have a `zrok2 enable`-d account on the same service instance where the share was created.
 
-The `private` share is identified by a _share token_. The accessing user will use the share token, along with the `zrok access` command to create a local endpoint on their system, which lets them use the shared resource as if it were local to their system.
+The `private` share is identified by a _share token_. The accessing user will use the share token, along with the `zrok2 access` command to create a local endpoint on their system, which lets them use the shared resource as if it were local to their system.
 
-`zrok` does not require you to open any firewall ports or otherwise compromise the security of your local system; there is never an attack surface open to the public internet. As soon as you terminate the `zrok share` process, you immediately terminate any possible access to your shared resource.
+`zrok` does not require you to open any firewall ports or otherwise compromise the security of your local system; there is never an attack surface open to the public internet. As soon as you terminate the `zrok2 share` process, you immediately terminate any possible access to your shared resource.
 
 The shared resource can be a development web server to share with friends and colleagues, a webhook from a server running in the cloud which has `zrok` running and has been instructed to `access` the private resource. `zrok` can also share files, websites, and low-level TCP and UDP network connections using the `tunnel` backend.  What matters is that the access to the shared resource is not done in a public way, and can only be accessed by other `zrok` users that have access to your share token.
 
 The peer-to-peer capabilities of `zrok` are an important property of the underlying [OpenZiti](https://docs.openziti.io/docs/learn/introduction/) network that `zrok` uses to provide connectivity between users and resources.
 
-Creating `private` shares is easy and is accomplished using the `zrok share private` command. Run `zrok share private` to see the usage output and to further learn how to use the command.
+Creating `private` shares is easy and is accomplished using the `zrok2 share private` command. Run `zrok2 share private` to see the usage output and to further learn how to use the command.
 
 :::tip v2.0 persistent private shares
 In zrok v2.0, you can create persistent private shares using the `--share-token` flag:
 
 ```bash
-zrok share private localhost:8080 --share-token my-api
+zrok2 share private localhost:8080 --share-token my-api
 ```
 
 This creates a private share with a custom vanity token that persists across share restarts. When using the zrok agent, shares with `--share-token` automatically restart after abnormal exit or agent restart. See [reserved names and namespaces](./sharing-reserved.md) for more details.
@@ -46,7 +46,7 @@ This creates a private share with a custom vanity token that persists across sha
 The default backend mode is `proxy` which targets an HTTP URL that must be reachable by the backend.
 
 ```bash title="proxy example"
-zrok share private 80
+zrok2 share private 80
 ```
 
 <BackendHttp/>
