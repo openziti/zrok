@@ -98,15 +98,15 @@ zrok2 share private <target> --share-token my-custom-token
 
 ```bash
 # create a reserved share
-$ zrok2 reserve public --backend-mode web /var/www/mysite
+$ zrok reserve public --backend-mode web /var/www/mysite
 your reserved share token is 'abc123xyz'
 reserved frontend endpoint: https://abc123xyz.share.zrok.io
 
 # start sharing
-$ zrok2 share reserved abc123xyz
+$ zrok share reserved abc123xyz
 
 # later, release it
-$ zrok2 release abc123xyz
+$ zrok release abc123xyz
 ```
 
 **v2.0 workflow:**
@@ -139,14 +139,14 @@ $ zrok2 delete name -n public api
 
 ```bash
 # reserve a private share
-$ zrok2 reserve private http://localhost:8080
+$ zrok reserve private http://localhost:8080
 your reserved share token is 'xyz789abc'
 
 # share it
-$ zrok2 share reserved xyz789abc
+$ zrok share reserved xyz789abc
 
 # access from another environment
-$ zrok2 access private xyz789abc
+$ zrok access private xyz789abc
 ```
 
 **v2.0 workflow:**
