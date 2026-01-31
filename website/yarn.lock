@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@ai-sdk/gateway@2.0.29":
-  version "2.0.29"
-  resolved "https://registry.yarnpkg.com/@ai-sdk/gateway/-/gateway-2.0.29.tgz#1e441b2ddce522fc8aaa7d97d3c27f84b8a0e52f"
-  integrity sha512-1b7E9F/B5gex/1uCkhs+sGIbH0KsZOItHnNz3iY5ir+nc4ZUA6WOU5Cu2w1USlc+3UVbhf+H+iNLlxVjLe4VvQ==
+"@ai-sdk/gateway@2.0.30":
+  version "2.0.30"
+  resolved "https://registry.yarnpkg.com/@ai-sdk/gateway/-/gateway-2.0.30.tgz#0bca6a1f2f464ae5192d43878b99d1301562f0ed"
+  integrity sha512-5Nrkj8B4MzkkOfjjA+Cs5pamkbkK4lI11bx80QV7TFcen/hWA8wEC+UVzwuM5H2zpekoNMjvl6GonHnR62XIZw==
   dependencies:
     "@ai-sdk/provider" "2.0.1"
     "@ai-sdk/provider-utils" "3.0.20"
@@ -1095,9 +1095,9 @@
     "@babel/helper-validator-identifier" "^7.28.5"
 
 "@braintree/sanitize-url@^7.1.1":
-  version "7.1.1"
-  resolved "https://registry.yarnpkg.com/@braintree/sanitize-url/-/sanitize-url-7.1.1.tgz#15e19737d946559289b915e5dad3b4c28407735e"
-  integrity sha512-i1L7noDNxtFyL5DmZafWy1wRVhGehQmzZaz1HiN5e7iylJMSZR7ekOV7NsIqa5qBldlLrsKv4HbgFUVlQrz8Mw==
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/@braintree/sanitize-url/-/sanitize-url-7.1.2.tgz#ca2035b0fefe956a8676ff0c69af73e605fcd81f"
+  integrity sha512-jigsZK+sMF/cuiB7sERuo9V7N9jx+dhmHHnQyDSVdpZwVutaBu7WvNYqMDLSgFgfB30n452TP3vjDAvFC973mA==
 
 "@chevrotain/cst-dts-gen@11.0.3":
   version "11.0.3"
@@ -2363,10 +2363,10 @@
   dependencies:
     langium "3.3.1"
 
-"@netfoundry/docusaurus-theme@^0.3.6":
-  version "0.3.6"
-  resolved "https://registry.yarnpkg.com/@netfoundry/docusaurus-theme/-/docusaurus-theme-0.3.6.tgz#7331efd9ad8e42d2654dab599cc6cdc0fde14ca6"
-  integrity sha512-735Kz33XFmt0sHxDn7jJww7tJ1b1/sPmkgNPr8vgIFjXZJ7RrA41MapAHIMGTVarSFs/hcnTZe4sbFjr4uqsag==
+"@netfoundry/docusaurus-theme@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@netfoundry/docusaurus-theme/-/docusaurus-theme-0.4.0.tgz#61359c04bad77a1d0abb749299962c94af042800"
+  integrity sha512-kLIXzCB9OfuawQhQsa8HSPXYjVQ/sFnF9ke+c5zp7MSv3iZhbp/TfJwdktVBd2415M76sDa4FtSDwR7TFOXP6Q==
   dependencies:
     "@docsearch/react" "^3"
     algoliasearch "^5"
@@ -3493,11 +3493,11 @@ aggregate-error@^3.0.0:
     indent-string "^4.0.0"
 
 ai@^5.0.18:
-  version "5.0.123"
-  resolved "https://registry.yarnpkg.com/ai/-/ai-5.0.123.tgz#aa3ea828ba0308c1579f7137c49045eb28afbd5d"
-  integrity sha512-V3Imb0tg0pHCa6a/VsoW/FZpT07mwUw/4Hj6nexJC1Nvf1eyKQJyaYVkl+YTLnA8cKQSUkoarKhXWbFy4CSgjw==
+  version "5.0.124"
+  resolved "https://registry.yarnpkg.com/ai/-/ai-5.0.124.tgz#6aa6ead2a55600ab35740a12fceb3c4bb65cf6e6"
+  integrity sha512-Li6Jw9F9qsvFJXZPBfxj38ddP2iURCnMs96f9Q3OeQzrDVcl1hvtwSEAuxA/qmfh6SDV2ERqFUOFzigvr0697g==
   dependencies:
-    "@ai-sdk/gateway" "2.0.29"
+    "@ai-sdk/gateway" "2.0.30"
     "@ai-sdk/provider" "2.0.1"
     "@ai-sdk/provider-utils" "3.0.20"
     "@opentelemetry/api" "1.9.0"
@@ -3659,12 +3659,12 @@ astring@^1.8.0:
   integrity sha512-LElXdjswlqjWrPpJFg1Fx4wpkOCxj1TDHlSV4PlaRxHGWko024xICaa97ZkMfs6DRKlCguiAI+rbXv5GWwXIkg==
 
 autoprefixer@^10.4.19, autoprefixer@^10.4.23:
-  version "10.4.23"
-  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-10.4.23.tgz#c6aa6db8e7376fcd900f9fd79d143ceebad8c4e6"
-  integrity sha512-YYTXSFulfwytnjAPlw8QHncHJmlvFKtczb8InXaAx9Q0LbfDnfEYDE55omerIJKihhmU61Ft+cAOSzQVaBUmeA==
+  version "10.4.24"
+  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-10.4.24.tgz#2c29595f3abd820a79976a609d0bf40eecf212fb"
+  integrity sha512-uHZg7N9ULTVbutaIsDRoUkoS8/h3bdsmVJYZ5l3wv8Cp/6UIIoRDm90hZ+BwxUj/hGBEzLxdHNSKuFpn8WOyZw==
   dependencies:
     browserslist "^4.28.1"
-    caniuse-lite "^1.0.30001760"
+    caniuse-lite "^1.0.30001766"
     fraction.js "^5.3.4"
     picocolors "^1.1.1"
     postcss-value-parser "^4.2.0"
@@ -3927,7 +3927,7 @@ caniuse-api@^3.0.0:
     lodash.memoize "^4.1.2"
     lodash.uniq "^4.5.0"
 
-caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001759, caniuse-lite@^1.0.30001760:
+caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001759, caniuse-lite@^1.0.30001766:
   version "1.0.30001766"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001766.tgz#b6f6b55cb25a2d888d9393104d14751c6a7d6f7a"
   integrity sha512-4C0lfJ0/YPjJQHagaE9x2Elb69CIqEPZeG0anQt9SIvIoOH4a4uaRl73IavyO+0qZh6MDLH//DrXThEYKHkmYA==
@@ -5067,9 +5067,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.5.263:
-  version "1.5.282"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.282.tgz#6695816e5b170210d6aa07561546ed7d97347630"
-  integrity sha512-FCPkJtpst28UmFzd903iU7PdeVTfY0KAeJy+Lk0GLZRwgwYHn/irRcaCbQQOmr5Vytc/7rcavsYLvTM8RiHYhQ==
+  version "1.5.283"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.283.tgz#51d492c37c2d845a0dccb113fe594880c8616de8"
+  integrity sha512-3vifjt1HgrGW/h76UEeny+adYApveS9dH2h3p57JYzBSXJIKUJAvtmIytDKjcSCt9xHfrNCFJ7gts6vkhuq++w==
 
 emoji-regex@^8.0.0:
   version "8.0.0"
