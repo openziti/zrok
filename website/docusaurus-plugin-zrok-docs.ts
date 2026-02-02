@@ -22,7 +22,8 @@ export function zrokDocsPluginConfig(
             lastVersion: 'current',
             includeCurrentVersion: true,
             versions: {
-                'current': { label: '1.1 (Current)', path: '', banner: 'none' },
+                'current': { label: '2.0 (Current)', path: '', banner: 'none' },
+                '1.1': { label: '1.1', path: '1.1', banner: 'unmaintained' },
                 '1.0': { label: '1.0', path: '1.0', banner: 'unmaintained' },
             },
             remarkPlugins: [
