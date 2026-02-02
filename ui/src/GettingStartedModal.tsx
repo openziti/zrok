@@ -69,13 +69,13 @@ const GettingStartedModal = ({ close, isOpen }: GettingStartedModalProps) => {
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography>
-                        Create a zrok "environment" by using the <code>zrok enable</code> command:
+                        Create a zrok "environment" by using the <code>zrok2 enable</code> command:
                     </Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography>
                         <pre>
-                        $ zrok enable {user.token} <ClipboardText text={"zrok enable " + user.token}/>
+                        $ zrok2 enable {user.token} <ClipboardText text={"zrok enable " + user.token}/>
                         </pre>
                     </Typography>
                 </Grid2>
@@ -93,7 +93,7 @@ const GettingStartedModal = ({ close, isOpen }: GettingStartedModalProps) => {
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography>
                         <pre>
-                        $ zrok share public --backend-mode web . <ClipboardText text={"zrok share public --backend-mode web ."} />
+                        $ zrok2 share public --backend-mode web . <ClipboardText text={"zrok share public --backend-mode web ."} />
                         </pre>
                     </Typography>
                 </Grid2>
