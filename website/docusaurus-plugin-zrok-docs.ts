@@ -1,24 +1,29 @@
 import * as path from 'path';
 import type { PluginConfig } from '@docusaurus/types';
+import { LogLevel, remarkScopedPath } from "@netfoundry/docusaurus-theme/plugins";
 
-export function zrokDocsPluginConfig(rootDir: string): PluginConfig {
+export function zrokDocsPluginConfig(
+    rootDir: string,
+    linkMappings: { from: string; to: string }[],
+    routeBasePath: string = 'docs/zrok'  // default for standalone zrok; unified-doc passes 'zrok'
+): PluginConfig {
     const zp = path.resolve(rootDir, 'docs');
-    const zsbp = path.resolve(rootDir, 'sidebars.js');
+    const zsbp = path.resolve(rootDir, 'sidebars.ts');
     console.log('zrokDocsPluginConfig: zp=', zp);
     console.log('zrokDocsPluginConfig: sbp=', zsbp);
+    console.log('zrokDocsPluginConfig: routeBasePath=', routeBasePath);
     return [
         '@docusaurus/plugin-content-docs',
         {
             id: 'zrok', // do not change - affects algolia search
             path: zp,
-            routeBasePath: 'zrok',
+            routeBasePath,
             sidebarPath: zsbp,
             lastVersion: 'current',
             includeCurrentVersion: true,
             versions: {
-                current: { label: '1.1 (Current)', path: '' },
-                '1.0': { label: '1.0', path: '1.0' },
-                '0.4': { label: '0.4', path: '0.4' },
+                'current': { label: '1.1 (Current)', path: '', banner: 'none' },
+                '1.0': { label: '1.0', path: '1.0', banner: 'unmaintained' },
             },
             remarkPlugins: [
                 function forbidSite() {
@@ -29,6 +34,7 @@ export function zrokDocsPluginConfig(rootDir: string): PluginConfig {
                         }
                     };
                 },
+                [remarkScopedPath, { mappings: linkMappings, logLevel: LogLevel.Silent }],
             ],
         } as any,
     ];
