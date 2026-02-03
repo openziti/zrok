@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
 
 // ListFrontendsHandlerFunc turns a function with the right signature into a list frontends handler
@@ -81,8 +81,14 @@ type ListFrontendsOKBodyItems0 struct {
 	// created at
 	CreatedAt int64 `json:"createdAt,omitempty"`
 
+	// dynamic
+	Dynamic bool `json:"dynamic,omitempty"`
+
 	// frontend token
 	FrontendToken string `json:"frontendToken,omitempty"`
+
+	// permission mode
+	PermissionMode string `json:"permissionMode,omitempty"`
 
 	// public name
 	PublicName string `json:"publicName,omitempty"`

@@ -4,60 +4,61 @@ import (
 	"bytes"
 	cryptorand "crypto/rand"
 	"encoding/base64"
-	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/sdk-golang/ziti/edge"
-	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"io"
 	"math/rand"
 	"net/http"
 	"time"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/sdk-golang/ziti"
+	"github.com/openziti/sdk-golang/ziti/edge"
+	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
+	"github.com/pkg/errors"
 )
 
 type PublicHttpLooper struct {
-	id       uint
-	frontend string
-	opt      *LooperOptions
-	root     env_core.Root
-	shr      *sdk.Share
-	listener edge.Listener
-	abort    bool
-	done     chan struct{}
-	results  *LooperResults
+	id        uint
+	namespace string
+	opt       *LooperOptions
+	root      env_core.Root
+	shr       *sdk.Share
+	listener  edge.Listener
+	abort     bool
+	done      chan struct{}
+	results   *LooperResults
 }
 
-func NewPublicHttpLooper(id uint, frontend string, opt *LooperOptions, root env_core.Root) *PublicHttpLooper {
+func NewPublicHttpLooper(id uint, namespace string, opt *LooperOptions, root env_core.Root) *PublicHttpLooper {
 	return &PublicHttpLooper{
-		id:       id,
-		frontend: frontend,
-		opt:      opt,
-		root:     root,
-		done:     make(chan struct{}),
-		results:  &LooperResults{},
+		id:        id,
+		namespace: namespace,
+		opt:       opt,
+		root:      root,
+		done:      make(chan struct{}),
+		results:   &LooperResults{},
 	}
 }
 
 func (l *PublicHttpLooper) Run() {
 	defer close(l.done)
-	defer logrus.Infof("#%d stopping", l.id)
+	defer dl.Infof("#%d stopping", l.id)
 	defer l.shutdown()
-	logrus.Infof("#%d starting", l.id)
+	dl.Infof("#%d starting", l.id)
 
 	if err := l.startup(); err != nil {
-		logrus.Fatalf("#%d error starting: %v", l.id, err)
+		dl.Fatalf("#%d error starting: %v", l.id, err)
 	}
 
 	if err := l.bind(); err != nil {
-		logrus.Fatalf("#%d error binding: %v", l.id, err)
+		dl.Fatalf("#%d error binding: %v", l.id, err)
 	}
 
 	l.dwell()
 
 	l.iterate()
 
-	logrus.Infof("#%d completed", l.id)
+	dl.Infof("#%d completed", l.id)
 }
 
 func (l *PublicHttpLooper) Abort() {
@@ -83,7 +84,7 @@ func (l *PublicHttpLooper) startup() error {
 		ShareMode:      sdk.PublicShareMode,
 		BackendMode:    sdk.ProxyBackendMode,
 		Target:         target,
-		Frontends:      []string{l.frontend},
+		NameSelections: []sdk.NameSelection{{NamespaceToken: l.namespace}},
 		PermissionMode: sdk.ClosedPermissionMode,
 	})
 	snapshotCreateShare.Complete()
@@ -94,7 +95,7 @@ func (l *PublicHttpLooper) startup() error {
 	snapshotCreateShare.Success().Send(l.opt.SnapshotQueue)
 	l.shr = shr
 
-	logrus.Infof("#%d allocated share '%v'", l.id, l.shr.Token)
+	dl.Infof("#%d allocated share '%v'", l.id, l.shr.Token)
 
 	return nil
 }
@@ -126,7 +127,7 @@ func (l *PublicHttpLooper) bind() error {
 
 	go func() {
 		if err := http.Serve(l.listener, l); err != nil {
-			logrus.Errorf("#%d error in http listener: %v", l.id, err)
+			dl.Errorf("#%d error in http listener: %v", l.id, err)
 		}
 	}()
 
@@ -159,14 +160,14 @@ func (l *PublicHttpLooper) iterate() {
 			if batchPacingDelta > 0 {
 				batchPacingMs = (rand.Int63() % batchPacingDelta) + l.opt.MinBatchPacing.Milliseconds()
 			}
-			logrus.Debugf("sleeping %d ms for batch pacing", batchPacingMs)
+			dl.Debugf("sleeping %d ms for batch pacing", batchPacingMs)
 			time.Sleep(time.Duration(batchPacingMs) * time.Millisecond)
 		}
 
 		snapshot := NewSnapshot("public-proxy", l.id, uint64(i))
 
 		if i > 0 && i%l.opt.StatusInterval == 0 {
-			logrus.Infof("#%d: iteration %d", l.id, i)
+			dl.Infof("#%d: iteration %d", l.id, i)
 		}
 
 		payloadSize := l.opt.MaxPayload
@@ -183,29 +184,29 @@ func (l *PublicHttpLooper) iterate() {
 			client := &http.Client{Timeout: l.opt.Timeout}
 			if resp, err := client.Do(req); err == nil {
 				if resp.StatusCode != 200 {
-					logrus.Errorf("#%d: unexpected status code: %v", l.id, resp.StatusCode)
+					dl.Errorf("#%d: unexpected status code: %v", l.id, resp.StatusCode)
 					l.results.Errors++
 				}
 				inPayload := new(bytes.Buffer)
 				io.Copy(inPayload, resp.Body)
 				inBase64 := inPayload.String()
 				if inBase64 != outBase64 {
-					logrus.Errorf("#%d: payload mismatch", l.id)
+					dl.Errorf("#%d: payload mismatch", l.id)
 					l.results.Mismatches++
 
 					snapshot.Complete().Failure(err)
 				} else {
 					l.results.Bytes += uint64(len(outBase64))
-					logrus.Debugf("#%d: payload match", l.id)
+					dl.Debugf("#%d: payload match", l.id)
 
 					snapshot.Complete().Success()
 				}
 			} else {
-				logrus.Errorf("#%d: error: %v", l.id, err)
+				dl.Errorf("#%d: error: %v", l.id, err)
 				l.results.Errors++
 			}
 		} else {
-			logrus.Errorf("#%d: error creating request: %v", l.id, err)
+			dl.Errorf("#%d: error creating request: %v", l.id, err)
 			l.results.Errors++
 		}
 
@@ -225,11 +226,11 @@ func (l *PublicHttpLooper) iterate() {
 func (l *PublicHttpLooper) shutdown() {
 	if l.listener != nil {
 		if err := l.listener.Close(); err != nil {
-			logrus.Errorf("#%d error closing listener: %v", l.id, err)
+			dl.Errorf("#%d error closing listener: %v", l.id, err)
 		}
 	}
 
 	if err := sdk.DeleteShare(l.root, l.shr); err != nil {
-		logrus.Errorf("#%d error deleting share '%v': %v", l.id, l.shr.Token, err)
+		dl.Errorf("#%d error deleting share '%v': %v", l.id, l.shr.Token, err)
 	}
 }

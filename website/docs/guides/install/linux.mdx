@@ -58,18 +58,18 @@ Check out [zrok frontdoor](../../guides/frontdoor.mdx?os=Linux) for running `zro
 Download the binary distribution for your Linux distribution's architecture or run the install script below to pick the correct CPU architecture automatically. For Intel and AMD 64-bit machines use the `amd64` distribution. For Raspberry Pi use the `arm64` distribution.
 
 <Details>
-<summary>Manually install in `~/bin/zrok`</summary>
+<summary>Manually install in `~/bin/zrok2`</summary>
 
 1. Unarchive the distribution in a temporary directory.
 
     ```text
-    mkdir /tmp/zrok && tar -xf ./zrok*linux*.tar.gz -C /tmp/zrok
+    mkdir /tmp/zrok2 && tar -xf ./zrok*linux*.tar.gz -C /tmp/zrok2
     ```
 
-1. Install the `zrok` executable.
+1. Install the `zrok2` executable.
 
     ```text
-    mkdir -p ~/bin && install /tmp/zrok/zrok ~/bin/
+    mkdir -p ~/bin && install /tmp/zrok2/zrok2 ~/bin/
     ```
 
 1. Add `~/bin` to your shell's executable search path. Optionally add this to your ~/.zshenv to persist the change.
@@ -78,10 +78,10 @@ Download the binary distribution for your Linux distribution's architecture or r
     PATH=~/bin:$PATH
     ```
 
-1. With the `zrok` executable in your path, you can then execute the `zrok` command from your shell:
+1. With the `zrok2` executable in your path, you can then execute the `zrok2` command from your shell:
 
     ```text
-    zrok version
+    zrok2 version
     ```
 
     ```buttonless title="Output"
@@ -97,7 +97,7 @@ Download the binary distribution for your Linux distribution's architecture or r
 </Details>
 
 <Details>
-<summary>Script to install binary in `/usr/local/bin/zrok`</summary>
+<summary>Script to install binary in `/usr/local/bin/zrok2`</summary>
 
 This script auto-selects the correct architecture and may be helpful for Raspberry Pi users.
 
@@ -125,16 +125,16 @@ curl -sSfL \
   "https://github.com/openziti/zrok/releases/download/${ZROK_VERSION}/zrok_${ZROK_VERSION#v}_linux_${GOXARCH}.tar.gz" \
   | tar -xz -f -;
 
-sudo install -o root -g root ./zrok /usr/local/bin/;
+sudo install -o root -g root ./zrok2 /usr/local/bin/;
 
-zrok version;
+zrok2 version;
 ```
 
 </Details>
 
 ## Arch User Repository
 
-[An Arch User Repository (AUR) package](https://aur.archlinux.org/packages/zrok-bin) is maintained by the Arch community. As of April 2025, the AUR package includes the `zrok` CLI and [the `zrok-agent.service` systemd `--user` service](/guides/agent/linux-service.mdx).
+[An Arch User Repository (AUR) package](https://aur.archlinux.org/packages/zrok-bin) is maintained by the Arch community. As of April 2025, the AUR package includes the `zrok2` CLI and [the `zrok2-agent.service` systemd `--user` service](/guides/agent/linux-service.mdx).
 
 ## Homebrew Formula
 

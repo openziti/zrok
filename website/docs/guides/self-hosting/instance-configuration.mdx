@@ -9,10 +9,10 @@ This guide is relevant if you are self-hosting or using a friend's `zrok` instan
 
 The `zrok` *command* on your computer uses a `zrok` *instance* over the network.
 
-The default instance API endpoint for the `zrok` command is `api-v1.zrok.io`. Set the API endpoint to another instance's API endpoint:
+The default instance API endpoint for the `zrok` command is `api-v2.zrok.io`. Set the API endpoint to another instance's API endpoint:
 
 ```text
-zrok config set apiEndpoint https://zrok.example.com
+zrok2 config set apiEndpoint https://zrok.example.com
 ```
 
 ```buttonless title="Output"
@@ -22,13 +22,13 @@ zrok configuration updated
 ```
 
 :::note
-The `WARNING` about `environment metadata` is expected when you run `zrok config set` before `zrok enable`.
+The `WARNING` about `environment metadata` is expected when you run `zrok2 config set` before `zrok2 enable`.
 :::
 
-You can use the `zrok status` command to inspect the state of your local _environment_. `zrok` refers to each shell where you install and `enable` a copy of `zrok` as an _environment_.
+You can use the `zrok2 status` command to inspect the state of your local _environment_. `zrok` refers to each shell where you install and `enable` a copy of `zrok` as an _environment_.
 
 ```text
-zrok status
+zrok2 status
 ```
 
 ```buttonless title="Output"
@@ -39,8 +39,8 @@ Config:
 
 [WARNING]: Unable to load your local environment!
 
-To create a local environment use the zrok enable command.
+To create a local environment use the zrok2 enable command.
 ```
 
-The `zrok status` command shows the configured API service that your environment is using, as well as the `SOURCE` where the setting was retrieved. In this case, `config` means that the setting was set into the environment using the `zrok config` command.
+The `zrok2 status` command shows the configured API service that your environment is using, as well as the `SOURCE` where the setting was retrieved. In this case, `config` means that the setting was set into the environment using the `zrok2 config` command.
 

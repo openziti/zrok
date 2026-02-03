@@ -2,19 +2,29 @@ package agent
 
 import (
 	"context"
-	"github.com/openziti/zrok/agent/agentGrpc"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/agent/agentGrpc"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 func (a *Agent) ReleaseAccess(frontendToken string) error {
+	// first check active accesses
 	if acc, found := a.accesses[frontendToken]; found {
+		acc.releaseRequested = true
 		a.rmAccess <- acc
-		logrus.Infof("released access '%v'", acc.frontendToken)
-	} else {
-		return errors.Errorf("agent has no access with frontend token '%v'", frontendToken)
+		dl.Infof("released active access '%v'", acc.frontendToken)
+		return nil
 	}
-	return nil
+
+	// then check failed accesses
+	if a.retryManager.hasFailedAccess(frontendToken) {
+		dl.Infof("released failed access '%v'", frontendToken)
+		a.retryManager.rmFailedAccess(frontendToken)
+		return nil
+	}
+
+	return errors.Errorf("agent has no access with frontend token or failure id '%v'", frontendToken)
 }
 
 func (i *agentGrpcImpl) ReleaseAccess(_ context.Context, req *agentGrpc.ReleaseAccessRequest) (*agentGrpc.ReleaseAccessResponse, error) {

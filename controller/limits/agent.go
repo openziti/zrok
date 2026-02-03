@@ -1,23 +1,24 @@
 package limits
 
 import (
-	"github.com/jmoiron/sqlx"
-	"github.com/openziti/zrok/controller/emailUi"
-	"github.com/openziti/zrok/controller/metrics"
-	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
-	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/openziti/zrok/util"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"reflect"
 	"time"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/controller/automation"
+	"github.com/openziti/zrok/v2/controller/emailUi"
+	"github.com/openziti/zrok/v2/controller/metrics"
+	"github.com/openziti/zrok/v2/controller/store"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/util"
+	"github.com/pkg/errors"
 )
 
 type Agent struct {
 	cfg            *Config
 	ifx            *influxReader
-	zCfg           *zrokEdgeSdk.Config
+	zCfg           *automation.Config
 	str            *store.Store
 	queue          chan *metrics.Usage
 	warningActions []AccountAction
@@ -27,7 +28,7 @@ type Agent struct {
 	join           chan struct{}
 }
 
-func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *zrokEdgeSdk.Config, emailCfg *emailUi.Config, str *store.Store) (*Agent, error) {
+func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *automation.Config, emailCfg *emailUi.Config, str *store.Store) (*Agent, error) {
 	a := &Agent{
 		cfg:            cfg,
 		ifx:            newInfluxReader(ifxCfg),
@@ -118,34 +119,55 @@ func (a *Agent) CanCreateShare(acctId, envId int, reserved, uniqueName bool, _ s
 				return false, err
 			}
 			total := 0
-			reserveds := 0
-			uniqueNames := 0
 			for i := range envs {
 				shrs, err := a.str.FindSharesForEnvironment(envs[i].Id, trx)
 				if err != nil {
 					return false, errors.Wrapf(err, "unable to find shares for environment '%v'", envs[i].ZId)
 				}
 				total += len(shrs)
-				for _, shr := range shrs {
-					if shr.Reserved {
-						reserveds++
-					}
-					if shr.UniqueName {
-						uniqueNames++
-					}
-				}
+
 				if rc.GetShares() > store.Unlimited && total+1 > rc.GetShares() {
-					logrus.Debugf("account '#%d', environment '%d' over shares limit '%d'", acctId, envId, a.cfg.Shares)
+					dl.Debugf("account '#%d', environment '%d' over shares limit '%d'", acctId, envId, a.cfg.Shares)
 					return false, nil
 				}
-				if reserved && rc.GetReservedShares() > store.Unlimited && reserveds+1 > rc.GetReservedShares() {
-					logrus.Debugf("account '#%d', environment '%d' over reserved shares limit '%d'", acctId, envId, a.cfg.ReservedShares)
-					return false, nil
+			}
+		}
+	}
+	return true, nil
+}
+
+func (a *Agent) CanReserveName(acctId int, trx *sqlx.Tx) (bool, error) {
+	if a.cfg.Enforcing {
+		if err := a.str.LimitCheckLock(acctId, trx); err != nil {
+			return false, err
+		}
+
+		ul, err := a.getUserLimits(acctId, trx)
+		if err != nil {
+			return false, err
+		}
+
+		rc := ul.resource
+		if rc.GetUniqueNames() > store.Unlimited || rc.GetReservedShares() > store.Unlimited {
+			names, err := a.str.FindNamesForAccount(acctId, trx)
+			if err != nil {
+				return false, err
+			}
+
+			reservedNames := 0
+			for _, name := range names {
+				if name.Reserved {
+					reservedNames++
 				}
-				if reserved && uniqueName && rc.GetUniqueNames() > store.Unlimited && uniqueNames+1 > rc.GetUniqueNames() {
-					logrus.Debugf("account '#%d', environment '%d' over unique names limit '%d'", acctId, envId, a.cfg.UniqueNames)
-					return false, nil
-				}
+			}
+
+			if rc.GetUniqueNames() > store.Unlimited && reservedNames+1 > rc.GetUniqueNames() {
+				dl.Debugf("account '#%d' over unique names limit '%d'", acctId, rc.GetUniqueNames())
+				return false, nil
+			}
+			if rc.GetReservedShares() > store.Unlimited && reservedNames+1 > rc.GetReservedShares() {
+				dl.Debugf("account '#%d' over reserved shares limit '%d'", acctId, rc.GetReservedShares())
+				return false, nil
 			}
 		}
 	}
@@ -202,7 +224,7 @@ func (a *Agent) CanAccessShare(shrId int, trx *sqlx.Tx) (bool, error) {
 					return false, err
 				}
 				if len(fes)+1 > rc.GetShareFrontends() {
-					logrus.Infof("account '#%d' over frontends per share limit '%d'", *env.AccountId, rc.GetShareFrontends())
+					dl.Infof("account '#%d' over frontends per share limit '%d'", *env.AccountId, rc.GetShareFrontends())
 					return false, nil
 				}
 			}
@@ -214,14 +236,14 @@ func (a *Agent) CanAccessShare(shrId int, trx *sqlx.Tx) (bool, error) {
 }
 
 func (a *Agent) Handle(u *metrics.Usage) error {
-	logrus.Debugf("handling: %v", u)
+	dl.Debugf("handling: %v", u)
 	a.queue <- u
 	return nil
 }
 
 func (a *Agent) run() {
-	logrus.Info("started")
-	defer logrus.Info("stopped")
+	dl.Info("started")
+	defer dl.Info("stopped")
 
 	lastCycle := time.Now()
 mainLoop:
@@ -230,21 +252,21 @@ mainLoop:
 		case usage := <-a.queue:
 			if usage.ShareToken != "" {
 				if err := a.enforce(usage); err != nil {
-					logrus.Errorf("error running enforcement: %v", err)
+					dl.Errorf("error running enforcement: %v", err)
 				}
 				if time.Since(lastCycle) > a.cfg.Cycle {
 					if err := a.relax(); err != nil {
-						logrus.Errorf("error running relax cycle: %v", err)
+						dl.Errorf("error running relax cycle: %v", err)
 					}
 					lastCycle = time.Now()
 				}
 			} else {
-				logrus.Warnf("not enforcing for usage with no share token: %v", usage.String())
+				dl.Debugf("not enforcing for usage with no share token: %v", usage.String())
 			}
 
 		case <-time.After(a.cfg.Cycle):
 			if err := a.relax(); err != nil {
-				logrus.Errorf("error running relax cycle: %v", err)
+				dl.Errorf("error running relax cycle: %v", err)
 			}
 			lastCycle = time.Now()
 
@@ -327,7 +349,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 				return err
 			}
 		} else {
-			logrus.Debugf("limit '%v' already applied for '%v' (at: %v)", exceededBwc, acct.Email, latestJe.CreatedAt)
+			dl.Debugf("limit '%v' already applied for '%v' (at: %v)", exceededBwc, acct.Email, latestJe.CreatedAt)
 		}
 	}
 
@@ -335,7 +357,7 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 }
 
 func (a *Agent) relax() error {
-	logrus.Debug("relaxing")
+	dl.Debug("relaxing")
 
 	trx, err := a.str.Begin()
 	if err != nil {
@@ -397,30 +419,30 @@ func (a *Agent) relax() error {
 			used := accountPeriods[bwje.AccountId][bwc.GetPeriodMinutes()]
 			if !a.transferBytesExceeded(used.rx, used.tx, bwc) {
 				if bwc.GetLimitAction() == store.LimitLimitAction {
-					logrus.Infof("relaxing limit '%v' for '%v'", bwc.String(), accounts[bwje.AccountId].Email)
+					dl.Infof("relaxing limit '%v' for '%v'", bwc.String(), accounts[bwje.AccountId].Email)
 					for _, action := range a.relaxActions {
 						if err := action.HandleAccount(accounts[bwje.AccountId], used.rx, used.tx, bwc, uls[bwje.AccountId], trx); err != nil {
 							return errors.Wrapf(err, "%v", reflect.TypeOf(action).String())
 						}
 					}
 				} else {
-					logrus.Infof("relaxing warning '%v' for '%v'", bwc.String(), accounts[bwje.AccountId].Email)
+					dl.Infof("relaxing warning '%v' for '%v'", bwc.String(), accounts[bwje.AccountId].Email)
 				}
 				if bwc.IsGlobal() {
 					if err := a.str.DeleteBandwidthLimitJournalEntryForGlobal(bwje.AccountId, trx); err == nil {
 						commit = true
 					} else {
-						logrus.Errorf("error deleting global bandwidth limit journal entry for '%v': %v", accounts[bwje.AccountId].Email, err)
+						dl.Errorf("error deleting global bandwidth limit journal entry for '%v': %v", accounts[bwje.AccountId].Email, err)
 					}
 				} else {
 					if err := a.str.DeleteBandwidthLimitJournalEntryForLimitClass(bwje.AccountId, *bwje.LimitClassId, trx); err == nil {
 						commit = true
 					} else {
-						logrus.Errorf("error deleting bandwidth limit journal entry for '%v': %v", accounts[bwje.AccountId].Email, err)
+						dl.Errorf("error deleting bandwidth limit journal entry for '%v': %v", accounts[bwje.AccountId].Email, err)
 					}
 				}
 			} else {
-				logrus.Infof("'%v' still over limit: '%v' with rx: %v, tx: %v, total: %v", accounts[bwje.AccountId].Email, bwc, util.BytesToSize(used.rx), util.BytesToSize(used.tx), util.BytesToSize(used.rx+used.tx))
+				dl.Infof("'%v' still over limit: '%v' with rx: %v, tx: %v, total: %v", accounts[bwje.AccountId].Email, bwc, util.BytesToSize(used.rx), util.BytesToSize(used.tx), util.BytesToSize(used.rx+used.tx))
 			}
 		}
 	} else {
@@ -444,7 +466,7 @@ func (a *Agent) isBandwidthClassLimitedForAccount(acctId int, bwc store.Bandwidt
 				return nil, err
 			}
 			if je.Action == bwc.GetLimitAction() {
-				logrus.Debugf("account '#%d' over bandwidth for global bandwidth class '%v'", acctId, bwc)
+				dl.Debugf("account '#%d' over bandwidth for global bandwidth class '%v'", acctId, bwc)
 				return je, nil
 			}
 		} else if err != nil {
@@ -457,7 +479,7 @@ func (a *Agent) isBandwidthClassLimitedForAccount(acctId int, bwc store.Bandwidt
 				return nil, err
 			}
 			if je.Action == bwc.GetLimitAction() {
-				logrus.Debugf("account '#%d' over bandwidth for limit class '%v'", acctId, bwc)
+				dl.Debugf("account '#%d' over bandwidth for limit class '%v'", acctId, bwc)
 				return je, nil
 			}
 		} else if err != nil {
@@ -489,12 +511,12 @@ func (a *Agent) anyBandwidthLimitExceeded(acct *store.Account, u *metrics.Usage,
 			rxBytes = period.rx
 			txBytes = period.tx
 		} else {
-			logrus.Debugf("'%v' limit ok '%v' with rx: %v, tx: %v, total: %v", acct.Email, bwc, util.BytesToSize(period.rx), util.BytesToSize(period.tx), util.BytesToSize(period.rx+period.tx))
+			dl.Debugf("'%v' limit ok '%v' with rx: %v, tx: %v, total: %v", acct.Email, bwc, util.BytesToSize(period.rx), util.BytesToSize(period.tx), util.BytesToSize(period.rx+period.tx))
 		}
 	}
 
 	if selectedLc != nil {
-		logrus.Infof("'%v' exceeded limit '%v' with rx: %v, tx: %v, total: %v", acct.Email, selectedLc, util.BytesToSize(rxBytes), util.BytesToSize(txBytes), util.BytesToSize(rxBytes+txBytes))
+		dl.Infof("'%v' exceeded limit '%v' with rx: %v, tx: %v, total: %v", acct.Email, selectedLc, util.BytesToSize(rxBytes), util.BytesToSize(txBytes), util.BytesToSize(rxBytes+txBytes))
 	}
 
 	return selectedLc, rxBytes, txBytes, nil

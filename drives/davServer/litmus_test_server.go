@@ -21,7 +21,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/openziti/zrok/endpoints/drive/driveServer"
+	"github.com/openziti/zrok/v2/endpoints/drive/driveServer"
 	"log"
 	"net/http"
 	"net/url"

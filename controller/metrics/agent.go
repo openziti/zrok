@@ -1,9 +1,9 @@
 package metrics
 
 import (
-	"github.com/openziti/zrok/controller/store"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type Agent struct {
@@ -39,21 +39,21 @@ func (a *Agent) Start() error {
 	a.srcJoin = srcJoin
 
 	go func() {
-		logrus.Info("started")
-		defer logrus.Info("stopped")
+		dl.Info("started")
+		defer dl.Info("stopped")
 		for {
 			select {
 			case event := <-a.events:
 				if usage, err := Ingest(event.Data()); err == nil {
 					if usage.ZitiServiceId != "" {
 						if err := a.cache.addZrokDetail(usage); err != nil {
-							logrus.Errorf("unable to add zrok detail for: %v: %v", usage.String(), err)
+							dl.Debugf("unable to add zrok detail for: %v: %v", usage.String(), err)
 						}
 					}
 					shouldAck := true
 					for _, snk := range a.snks {
 						if err := snk.Handle(usage); err != nil {
-							logrus.Errorf("error handling usage: %v", err)
+							dl.Errorf("error handling usage: %v", err)
 							if shouldAck {
 								shouldAck = false
 							}
@@ -61,11 +61,11 @@ func (a *Agent) Start() error {
 					}
 					if shouldAck {
 						if err := event.Ack(); err != nil {
-							logrus.Errorf("unable to ack handled message: %v", err)
+							dl.Errorf("unable to ack handled message: %v", err)
 						}
 					}
 				} else {
-					logrus.Errorf("unable to ingest '%v': %v", event.Data(), err)
+					dl.Errorf("unable to ingest '%v': %v", event.Data(), err)
 				}
 			}
 		}

@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 	"os"
 )
 

@@ -8,82 +8,65 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/openziti/zrok/v2/endpoints"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/mitchellh/mapstructure"
-	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/proxyUi"
-	"github.com/sirupsen/logrus"
+	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/endpoints/proxyUi"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	zhttp "github.com/zitadel/oidc/v3/pkg/http"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 )
 
-type oidcConfigurer struct {
-	cfg     *OauthConfig
-	oidcCfg *oidcConfig
-	tls     bool
-}
-
-func newOidcConfigurer(cfg *OauthConfig, tls bool, v map[string]interface{}) (*oidcConfigurer, error) {
-	c := &oidcConfigurer{cfg: cfg}
-	oidcCfg, err := newOidcConfig(v)
-	if err != nil {
-		return nil, err
-	}
-	c.oidcCfg = oidcCfg
-	c.tls = tls
-	return c, nil
-}
-
 type oidcConfig struct {
-	Name         string   `mapstructure:"name"`
-	ClientId     string   `mapstructure:"client_id"`
-	ClientSecret string   `mapstructure:"client_secret"`
-	Scopes       []string `mapstructure:"scopes"`
-	Issuer       string   `mapstructure:"issuer"`
-	DiscoveryURL string   `mapstructure:"discovery_url"`
-	Pkce         bool     `mapstructure:"pkce"`
+	Name         string
+	ClientId     string
+	ClientSecret string
+	Scopes       []string
+	Issuer       string
+	DiscoveryURL string
+	Pkce         bool
 }
 
-func newOidcConfig(v map[string]interface{}) (*oidcConfig, error) {
-	cfg := &oidcConfig{}
-	if err := mapstructure.Decode(v, cfg); err != nil {
-		return nil, err
-	}
-	return cfg, nil
+func newOidcConfig(v map[string]interface{}) (dd.Dynamic, error) {
+	return dd.New[oidcConfig](v)
 }
 
-func (c *oidcConfigurer) configure() error {
+func (c *oidcConfig) Type() string                   { return "oidc" }
+func (c *oidcConfig) ToMap() (map[string]any, error) { return nil, nil }
+
+func (c *oidcConfig) configure(cfg *OauthConfig, tls bool) error {
 	scheme := "http"
-	if c.tls {
+	if tls {
 		scheme = "https"
 	}
 
-	signingKey, err := endpoints.DeriveKey(c.cfg.SigningKey, 32)
+	signingKey, err := endpoints.DeriveKey(cfg.SigningKey, 32)
 	if err != nil {
 		return err
 	}
-	encryptionKey, err := endpoints.DeriveKey(c.cfg.EncryptionKey, 32)
+	encryptionKey, err := endpoints.DeriveKey(cfg.EncryptionKey, 32)
 	if err != nil {
 		return err
 	}
-	cookieHandler := zhttp.NewCookieHandler(signingKey, encryptionKey, zhttp.WithUnsecure(), zhttp.WithDomain(c.cfg.CookieDomain))
-	redirectUrl := fmt.Sprintf("%v/%v/auth/callback", c.cfg.EndpointUrl, c.oidcCfg.Name)
+	cookieHandler := zhttp.NewCookieHandler(signingKey, encryptionKey, zhttp.WithUnsecure(), zhttp.WithDomain(cfg.CookieDomain))
+	redirectUrl := fmt.Sprintf("%v/%v/auth/callback", cfg.EndpointUrl, c.Name)
 	providerOptions := []rp.Option{
 		rp.WithCookieHandler(cookieHandler),
 		rp.WithVerifierOpts(rp.WithIssuedAtOffset(5 * time.Second)),
 	}
-	if c.oidcCfg.DiscoveryURL != "" {
-		rp.WithCustomDiscoveryUrl(c.oidcCfg.DiscoveryURL)
+	if c.DiscoveryURL != "" {
+		rp.WithCustomDiscoveryUrl(c.DiscoveryURL)
 	}
 	provider, err := rp.NewRelyingPartyOIDC(
 		context.TODO(),
-		c.oidcCfg.Issuer,
-		c.oidcCfg.ClientId,
-		c.oidcCfg.ClientSecret,
+		c.Issuer,
+		c.ClientId,
+		c.ClientSecret,
 		redirectUrl,
-		c.oidcCfg.Scopes,
+		c.Scopes,
 		providerOptions...,
 	)
 	if err != nil {
@@ -93,7 +76,7 @@ func (c *oidcConfigurer) configure() error {
 	auth := func(w http.ResponseWriter, r *http.Request) {
 		targetHost, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
 		if err != nil {
-			logrus.Errorf("unable to unescape 'targetHost': %v", err)
+			dl.Errorf("unable to unescape 'targetHost': %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to unescape targetHost")))
 			return
 		}
@@ -104,7 +87,7 @@ func (c *oidcConfigurer) configure() error {
 				TargetHost:      targetHost,
 				RefreshInterval: r.URL.Query().Get("refreshInterval"),
 				RegisteredClaims: jwt.RegisteredClaims{
-					ExpiresAt: jwt.NewNumericDate(time.Now().Add(c.cfg.IntermediateLifetime)),
+					ExpiresAt: jwt.NewNumericDate(time.Now().Add(cfg.IntermediateLifetime)),
 					IssuedAt:  jwt.NewNumericDate(time.Now()),
 					NotBefore: jwt.NewNumericDate(time.Now()),
 					Issuer:    "zrok",
@@ -114,7 +97,7 @@ func (c *oidcConfigurer) configure() error {
 			})
 			s, err := t.SignedString(signingKey)
 			if err != nil {
-				logrus.Errorf("unable to sign intermediate JWT: %v", err)
+				dl.Errorf("unable to sign intermediate JWT: %v", err)
 			}
 			return s
 		}
@@ -125,24 +108,24 @@ func (c *oidcConfigurer) configure() error {
 		}
 		rp.AuthURLHandler(state, provider, urlOptions...).ServeHTTP(w, r)
 	}
-	http.HandleFunc(fmt.Sprintf("/%v/login", c.oidcCfg.Name), auth)
+	http.HandleFunc(fmt.Sprintf("/%v/login", c.Name), auth)
 
 	refresh := func(w http.ResponseWriter, r *http.Request) {
 		scheme := "http"
-		if c.tls {
+		if tls {
 			scheme = "https"
 		}
 
 		targetHost, err := url.QueryUnescape(r.URL.Query().Get("targetHost"))
 		if err != nil {
-			logrus.Errorf("unable to unescape 'targetHost': %v", err)
+			dl.Errorf("unable to unescape 'targetHost': %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to unescape targetHost")))
 			return
 		}
 
-		cookie, err := getSessionCookie(r, c.cfg.CookieName)
+		cookie, err := getSessionCookie(r, cfg.CookieName)
 		if err != nil {
-			logrus.Errorf("unable to get auth session cookie: %v", err)
+			dl.Errorf("unable to get auth session cookie: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to get auth session cookie")))
 			return
 		}
@@ -151,38 +134,38 @@ func (c *oidcConfigurer) configure() error {
 			return signingKey, nil
 		})
 		if err != nil {
-			logrus.Errorf("unable to parse jwt: %v", err)
+			dl.Errorf("unable to parse jwt: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to parse jwt")))
 			return
 		}
 
 		claims := tkn.Claims.(*zrokClaims)
-		if claims.Provider != c.oidcCfg.Name {
-			logrus.Error("token provider mismatch")
+		if claims.Provider != c.Name {
+			dl.Error("token provider mismatch")
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("token provider mismatch")))
 			return
 		}
 
 		accessToken, err := endpoints.DecryptToken(claims.AccessToken, encryptionKey)
 		if err != nil {
-			logrus.Errorf("unable to decrypt access token: %v", err)
+			dl.Errorf("unable to decrypt access token: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to decrypt access token")))
 			return
 		}
 
 		newTokens, err := rp.RefreshTokens[*oidc.IDTokenClaims](context.Background(), provider, accessToken, "", "")
 		if err != nil {
-			logrus.Errorf("unable to refresh tokens: %v", err)
+			dl.Errorf("unable to refresh tokens: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to refresh tokens")))
 			return
 		}
 
 		setSessionCookie(w, sessionCookieRequest{
-			oauthCfg:        c.cfg,
+			oauthCfg:        cfg,
 			supportsRefresh: true,
 			email:           claims.Email,
 			accessToken:     newTokens.AccessToken,
-			provider:        c.oidcCfg.Name,
+			provider:        c.Name,
 			refreshInterval: claims.RefreshInterval,
 			signingKey:      signingKey,
 			encryptionKey:   encryptionKey,
@@ -191,14 +174,14 @@ func (c *oidcConfigurer) configure() error {
 
 		http.Redirect(w, r, fmt.Sprintf("%v://%v", scheme, targetHost), http.StatusFound)
 	}
-	http.HandleFunc(fmt.Sprintf("/%v/refresh", c.oidcCfg.Name), refresh)
+	http.HandleFunc(fmt.Sprintf("/%v/refresh", c.Name), refresh)
 
 	login := func(w http.ResponseWriter, r *http.Request, tokens *oidc.Tokens[*oidc.IDTokenClaims], state string, provider rp.RelyingParty, info *oidc.UserInfo) {
 		token, err := jwt.ParseWithClaims(state, &IntermediateJWT{}, func(t *jwt.Token) (interface{}, error) {
 			return signingKey, nil
 		})
 		if err != nil {
-			logrus.Errorf("unable to parse intermediate JWT: %v", err)
+			dl.Errorf("unable to parse intermediate JWT: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to parse intermediate jwt")))
 			return
 		}
@@ -207,17 +190,17 @@ func (c *oidcConfigurer) configure() error {
 		if v, err := time.ParseDuration(token.Claims.(*IntermediateJWT).RefreshInterval); err == nil {
 			refreshInterval = v
 		} else {
-			logrus.Errorf("unable to parse authorization check interval: %v", err)
+			dl.Errorf("unable to parse authorization check interval: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(info.Email).WithError(errors.New("unable to parse authorization check interval")))
 			return
 		}
 
 		setSessionCookie(w, sessionCookieRequest{
-			oauthCfg:        c.cfg,
+			oauthCfg:        cfg,
 			supportsRefresh: true,
 			email:           info.Email,
 			accessToken:     tokens.AccessToken,
-			provider:        c.oidcCfg.Name,
+			provider:        c.Name,
 			refreshInterval: refreshInterval,
 			signingKey:      signingKey,
 			encryptionKey:   encryptionKey,
@@ -226,58 +209,58 @@ func (c *oidcConfigurer) configure() error {
 
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).TargetHost), http.StatusFound)
 	}
-	http.Handle(fmt.Sprintf("/%v/auth/callback", c.oidcCfg.Name), rp.CodeExchangeHandler(rp.UserinfoCallback(login), provider))
+	http.Handle(fmt.Sprintf("/%v/auth/callback", c.Name), rp.CodeExchangeHandler(rp.UserinfoCallback(login), provider))
 
 	logout := func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := getSessionCookie(r, c.cfg.CookieName)
+		cookie, err := getSessionCookie(r, cfg.CookieName)
 		if err == nil {
 			tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 				return signingKey, nil
 			})
 			if err == nil {
 				claims := tkn.Claims.(*zrokClaims)
-				if claims.Provider == c.oidcCfg.Name {
+				if claims.Provider == c.Name {
 					accessToken, err := endpoints.DecryptToken(claims.AccessToken, encryptionKey)
 					if err == nil {
 						if err := rp.RevokeToken(context.Background(), provider, accessToken, "access_token"); err == nil {
-							logrus.Infof("revoked access token for '%v'", claims.Email)
+							dl.Infof("revoked access token for '%v'", claims.Email)
 						} else {
-							logrus.Errorf("access token revocation failed: %v", err)
+							dl.Errorf("access token revocation failed: %v", err)
 							proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("access token revocation failed")))
 							return
 						}
 					} else {
-						logrus.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
+						dl.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
 						proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to decrypt access token")))
 						return
 					}
 				} else {
-					logrus.Errorf("expected provider name '%v' got '%v'", c.oidcCfg.Name, claims.Provider)
+					dl.Errorf("expected provider name '%v' got '%v'", c.Name, claims.Provider)
 					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("provider mismatch")))
 					return
 				}
 			} else {
-				logrus.Errorf("invalid jwt; unable to parse: %v", err)
+				dl.Errorf("invalid jwt; unable to parse: %v", err)
 				proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid jwt; unable to parse")))
 				return
 			}
 		} else {
-			logrus.Errorf("error getting cookie '%v': %v", c.cfg.CookieName, err)
+			dl.Errorf("error getting cookie '%v': %v", cfg.CookieName, err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid cookie")))
 			return
 		}
 
-		clearSessionCookies(w, r, c.cfg.CookieName, c.cfg)
+		clearSessionCookies(w, r, cfg.CookieName, cfg)
 
 		redirectURL := r.URL.Query().Get("redirect_url")
 		if redirectURL == "" {
-			redirectURL = fmt.Sprintf("%s/%s/login", c.cfg.EndpointUrl, c.oidcCfg.Name)
+			redirectURL = fmt.Sprintf("%s/%s/login", cfg.EndpointUrl, c.Name)
 		}
 		http.Redirect(w, r, redirectURL, http.StatusFound)
 	}
-	http.HandleFunc(fmt.Sprintf("/%v/logout", c.oidcCfg.Name), logout)
+	http.HandleFunc(fmt.Sprintf("/%v/logout", c.Name), logout)
 
-	logrus.Infof("configured oidc provider at '/%v'", c.oidcCfg.Name)
+	dl.Infof("configured oidc provider at '/%v'", c.Name)
 
 	return nil
 }

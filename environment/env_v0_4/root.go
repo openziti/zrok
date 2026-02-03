@@ -2,15 +2,13 @@ package env_v0_4
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/environment/env_v0_3"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/environment/env_core"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 const V = "v0.4"
@@ -84,59 +82,7 @@ func Update(r env_core.Root) (env_core.Root, error) {
 	if r == nil || r.Metadata() == nil {
 		return nil, errors.Errorf("nil root")
 	}
-	if r.Metadata().V != env_v0_3.V {
-		return nil, errors.Errorf("expecting version '%v'", env_v0_3.V)
-	}
-
-	newR := &Root{meta: r.Metadata(), cfg: r.Config(), env: r.Environment()}
-
-	oldAccessF, err := r.ZitiIdentityNamed(r.PublicIdentityName())
-	if err != nil {
-		return nil, err
-	}
-	_, err = os.Stat(oldAccessF)
-	if err == nil {
-		newAccessF, err := newR.ZitiIdentityNamed(newR.PublicIdentityName())
-		if err != nil {
-			return nil, err
-		}
-		if err := os.Rename(oldAccessF, newAccessF); err != nil {
-			return nil, err
-		}
-		fmt.Printf("renamed '%v' -> '%v'\n", oldAccessF, newAccessF)
-	} else if !os.IsNotExist(err) {
-		return nil, err
-	}
-
-	oldShareF, err := r.ZitiIdentityNamed(r.EnvironmentIdentityName())
-	if err != nil {
-		return nil, err
-	}
-	_, err = os.Stat(oldShareF)
-	if err == nil {
-		newShareF, err := newR.ZitiIdentityNamed(newR.EnvironmentIdentityName())
-		if err != nil {
-			return nil, err
-		}
-		if err := os.Rename(oldShareF, newShareF); err != nil {
-			return nil, err
-		}
-		fmt.Printf("renamed '%v' -> '%v'\n", oldShareF, newShareF)
-	} else if !os.IsNotExist(err) {
-		return nil, err
-	}
-
-	if err := writeMetadata(); err != nil {
-		return nil, err
-	}
-
-	meta, err := loadMetadata()
-	if err != nil {
-		return nil, err
-	}
-	newR.meta = meta
-
-	return newR, nil
+	return nil, errors.Errorf("no upgrade path available from version '%v'", r.Metadata().V)
 }
 
 func rootExists() (bool, error) {
@@ -226,20 +172,20 @@ func loadConfig() (*env_core.Config, error) {
 		return nil, errors.Wrapf(err, "error unmarshaling config file '%v'", cf)
 	}
 	out := &env_core.Config{
-		ApiEndpoint:     cfg.ApiEndpoint,
-		DefaultFrontend: cfg.DefaultFrontend,
-		Headless:        cfg.Headless,
-		SuperNetwork:    cfg.SuperNetwork,
+		ApiEndpoint:      cfg.ApiEndpoint,
+		DefaultNamespace: cfg.DefaultNamespace,
+		Headless:         cfg.Headless,
+		SuperNetwork:     cfg.SuperNetwork,
 	}
 	return out, nil
 }
 
 func saveConfig(cfg *env_core.Config) error {
 	in := &config{
-		ApiEndpoint:     cfg.ApiEndpoint,
-		DefaultFrontend: cfg.DefaultFrontend,
-		Headless:        cfg.Headless,
-		SuperNetwork:    cfg.SuperNetwork,
+		ApiEndpoint:      cfg.ApiEndpoint,
+		DefaultNamespace: cfg.DefaultNamespace,
+		Headless:         cfg.Headless,
+		SuperNetwork:     cfg.SuperNetwork,
 	}
 	data, err := json.MarshalIndent(in, "", "  ")
 	if err != nil {
@@ -292,11 +238,11 @@ func loadEnvironment() (*env_core.Environment, error) {
 		ApiEndpoint:  env.ApiEndpoint,
 	}
 	if strings.HasPrefix(env.ApiEndpoint, "https://api.zrok.io") {
-		out.ApiEndpoint = "https://api-v1.zrok.io"
+		out.ApiEndpoint = "https://api-v2.zrok.io"
 		if err := saveEnvironment(out); err != nil {
 			return nil, errors.Wrap(err, "error auto-rebasing apiEndpoint")
 		}
-		logrus.Info("auto-rebased 'apiEndpoint' for v1.0.x")
+		dl.Info("auto-rebased 'apiEndpoint' for v2.0.x")
 	}
 	return out, nil
 }
@@ -341,10 +287,10 @@ type metadata struct {
 }
 
 type config struct {
-	ApiEndpoint     string `json:"api_endpoint"`
-	DefaultFrontend string `json:"default_frontend"`
-	Headless        bool   `json:"headless"`
-	SuperNetwork    bool   `json:"super_network"`
+	ApiEndpoint      string `json:"api_endpoint"`
+	DefaultNamespace string `json:"default_namespace"`
+	Headless         bool   `json:"headless"`
+	SuperNetwork     bool   `json:"super_network"`
 }
 
 type environment struct {

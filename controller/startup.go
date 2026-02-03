@@ -1,15 +1,12 @@
 package controller
 
 import (
-	"context"
 	"fmt"
-	"github.com/openziti/edge-api/rest_management_api_client"
-	"github.com/openziti/edge-api/rest_management_api_client/config"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
-	"github.com/openziti/zrok/sdk/golang/sdk"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/controller/automation"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"time"
 )
 
 var zrokProxyConfigId string
@@ -22,39 +19,36 @@ func controllerStartup() error {
 }
 
 func inspectZiti() error {
-	logrus.Infof("inspecting ziti controller configuration")
+	dl.Infof("inspecting ziti controller configuration")
 
-	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
-		return errors.Wrap(err, "error getting ziti edge client")
+		return errors.Wrap(err, "error getting automation client")
 	}
-	if err := findZrokProxyConfigType(edge); err != nil {
+	if err := findZrokProxyConfigType(ziti); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func findZrokProxyConfigType(edge *rest_management_api_client.ZitiEdgeManagement) error {
+func findZrokProxyConfigType(ziti *automation.ZitiAutomation) error {
 	filter := fmt.Sprintf("name=\"%v\"", sdk.ZrokProxyConfig)
-	limit := int64(100)
-	offset := int64(0)
-	listReq := &config.ListConfigTypesParams{
-		Filter:  &filter,
-		Limit:   &limit,
-		Offset:  &offset,
-		Context: context.Background(),
+	filterOpts := &automation.FilterOptions{
+		Filter: filter,
+		Limit:  100,
+		Offset: 0,
 	}
-	listReq.SetTimeout(30 * time.Second)
-	listResp, err := edge.Config.ListConfigTypes(listReq, nil)
+
+	configTypes, err := ziti.ConfigTypes.Find(filterOpts)
 	if err != nil {
 		return err
 	}
-	if len(listResp.Payload.Data) != 1 {
-		return errors.Errorf("expected 1 zrok proxy config type, found %d", len(listResp.Payload.Data))
+	if len(configTypes) != 1 {
+		return errors.Errorf("expected 1 zrok proxy config type, found '%d'", len(configTypes))
 	}
-	logrus.Infof("found '%v' config type with id '%v'", sdk.ZrokProxyConfig, *(listResp.Payload.Data[0].ID))
-	zrokProxyConfigId = *(listResp.Payload.Data[0].ID)
+	dl.Infof("found '%v' config type with id '%v'", sdk.ZrokProxyConfig, *configTypes[0].ID)
+	zrokProxyConfigId = *configTypes[0].ID
 
 	return nil
 }

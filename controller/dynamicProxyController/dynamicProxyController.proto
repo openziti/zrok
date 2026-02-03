@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option go_package = "github.com/openziti/zrok/v2/controller/dynamicProxyController";
+
+service DynamicProxyController {
+  rpc FrontendMappings(FrontendMappingsRequest) returns (FrontendMappingsResponse);
+}
+
+message FrontendMappingsRequest {
+  int64 id = 1;
+  string frontendToken = 2;
+  string name = 3;
+}
+
+message FrontendMappingsResponse {
+  repeated FrontendMapping frontendMappings = 1;
+}
+
+message FrontendMapping {
+  int64 id = 1;
+  string name = 2;
+  string shareToken = 3;
+}

@@ -19,15 +19,15 @@ The error page system uses Go's `text/template` package to render HTML pages wit
 
 ## Configuration Options
 
-### Private Access (`zrok access private`)
+### Private Access (`zrok2 access private`)
 
 For private access frontends, use the `--template-path` flag:
 
 ```bash
-zrok access private --template-path /path/to/custom-template.html <shareToken>
+zrok2 access private --template-path /path/to/custom-template.html <shareToken>
 ```
 
-### Public Frontend (`zrok access public`)
+### Public Frontend (`zrok2 access public`)
 
 For public frontends, add the `template_path` configuration option to your frontend configuration YAML:
 
@@ -45,7 +45,7 @@ template_path: /path/to/custom-template.html
 Then start the public frontend:
 
 ```bash
-zrok access public /path/to/frontend-config.yml
+zrok2 access public /path/to/frontend-config.yml
 ```
 
 ## Template Structure
@@ -199,7 +199,7 @@ Your template will be used for various error conditions:
 ### Share Not Found (404)
 - **Title**: `'<shareToken>' not found!`
 - **Banner**: `share <code><shareToken></code> not found!`
-- **Message**: `are you running <code>zrok share</code> for this share?`
+- **Message**: `are you running <code>zrok2 share</code> for this share?`
 
 ### Unauthorized Access (401)
 - **Title**: `unauthorized!`

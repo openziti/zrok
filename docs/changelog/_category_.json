@@ -1,0 +1,8 @@
+{
+  "label": "Changelog",
+  "position": 100,
+  "link": {
+    "type": "generated-index",
+    "description": "Detailed release notes and changelogs for zrok versions. For a quick summary of changes, see the CHANGELOG.md in the repository root."
+  }
+}

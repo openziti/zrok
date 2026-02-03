@@ -24,6 +24,12 @@ type Overview struct {
 
 	// environments
 	Environments []*EnvironmentAndResources `json:"environments"`
+
+	// names
+	Names []*OverviewNamesItems0 `json:"names"`
+
+	// namespaces
+	Namespaces []*OverviewNamespacesItems0 `json:"namespaces"`
 }
 
 // Validate validates this overview
@@ -31,6 +37,14 @@ func (m *Overview) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateEnvironments(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNames(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNamespaces(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -66,11 +80,71 @@ func (m *Overview) validateEnvironments(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Overview) validateNames(formats strfmt.Registry) error {
+	if swag.IsZero(m.Names) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Names); i++ {
+		if swag.IsZero(m.Names[i]) { // not required
+			continue
+		}
+
+		if m.Names[i] != nil {
+			if err := m.Names[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("names" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("names" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *Overview) validateNamespaces(formats strfmt.Registry) error {
+	if swag.IsZero(m.Namespaces) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Namespaces); i++ {
+		if swag.IsZero(m.Namespaces[i]) { // not required
+			continue
+		}
+
+		if m.Namespaces[i] != nil {
+			if err := m.Namespaces[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("namespaces" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("namespaces" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
 // ContextValidate validate this overview based on the context it is used
 func (m *Overview) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.contextValidateEnvironments(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateNames(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateNamespaces(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -105,6 +179,56 @@ func (m *Overview) contextValidateEnvironments(ctx context.Context, formats strf
 	return nil
 }
 
+func (m *Overview) contextValidateNames(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Names); i++ {
+
+		if m.Names[i] != nil {
+
+			if swag.IsZero(m.Names[i]) { // not required
+				return nil
+			}
+
+			if err := m.Names[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("names" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("names" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *Overview) contextValidateNamespaces(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Namespaces); i++ {
+
+		if m.Namespaces[i] != nil {
+
+			if swag.IsZero(m.Namespaces[i]) { // not required
+				return nil
+			}
+
+			if err := m.Namespaces[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("namespaces" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("namespaces" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
 // MarshalBinary interface implementation
 func (m *Overview) MarshalBinary() ([]byte, error) {
 	if m == nil {
@@ -116,6 +240,101 @@ func (m *Overview) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *Overview) UnmarshalBinary(b []byte) error {
 	var res Overview
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// OverviewNamesItems0 overview names items0
+//
+// swagger:model OverviewNamesItems0
+type OverviewNamesItems0 struct {
+
+	// created at
+	CreatedAt int64 `json:"createdAt,omitempty"`
+
+	// name
+	Name string `json:"name,omitempty"`
+
+	// namespace name
+	NamespaceName string `json:"namespaceName,omitempty"`
+
+	// namespace token
+	NamespaceToken string `json:"namespaceToken,omitempty"`
+
+	// reserved
+	Reserved bool `json:"reserved,omitempty"`
+
+	// share token
+	ShareToken string `json:"shareToken,omitempty"`
+}
+
+// Validate validates this overview names items0
+func (m *OverviewNamesItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this overview names items0 based on context it is used
+func (m *OverviewNamesItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *OverviewNamesItems0) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *OverviewNamesItems0) UnmarshalBinary(b []byte) error {
+	var res OverviewNamesItems0
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// OverviewNamespacesItems0 overview namespaces items0
+//
+// swagger:model OverviewNamespacesItems0
+type OverviewNamespacesItems0 struct {
+
+	// description
+	Description string `json:"description,omitempty"`
+
+	// name
+	Name string `json:"name,omitempty"`
+
+	// namespace token
+	NamespaceToken string `json:"namespaceToken,omitempty"`
+}
+
+// Validate validates this overview namespaces items0
+func (m *OverviewNamespacesItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this overview namespaces items0 based on context it is used
+func (m *OverviewNamespacesItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *OverviewNamespacesItems0) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *OverviewNamespacesItems0) UnmarshalBinary(b []byte) error {
+	var res OverviewNamespacesItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

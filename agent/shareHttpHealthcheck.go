@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/openziti/zrok/agent/agentGrpc"
-	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/agent/agentGrpc"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
 
 func (a *Agent) ShareHttpHealthcheck(shareToken, endpoint, httpVerb string, expectedHttpResponse, timeoutMs int) error {

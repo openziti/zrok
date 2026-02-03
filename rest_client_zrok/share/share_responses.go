@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
 
 // ShareReader is a Reader for the Share structure.
@@ -255,6 +255,7 @@ ShareConflict describes a response with status code 409, with default header val
 conflict
 */
 type ShareConflict struct {
+	Payload rest_model_zrok.ErrorMessage
 }
 
 // IsSuccess returns true when this share conflict response has a 2xx status code
@@ -288,14 +289,23 @@ func (o *ShareConflict) Code() int {
 }
 
 func (o *ShareConflict) Error() string {
-	return fmt.Sprintf("[POST /share][%d] shareConflict ", 409)
+	return fmt.Sprintf("[POST /share][%d] shareConflict  %+v", 409, o.Payload)
 }
 
 func (o *ShareConflict) String() string {
-	return fmt.Sprintf("[POST /share][%d] shareConflict ", 409)
+	return fmt.Sprintf("[POST /share][%d] shareConflict  %+v", 409, o.Payload)
+}
+
+func (o *ShareConflict) GetPayload() rest_model_zrok.ErrorMessage {
+	return o.Payload
 }
 
 func (o *ShareConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

@@ -2,9 +2,9 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/share"
-	"github.com/sirupsen/logrus"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/share"
 )
 
 type updateAccessHandler struct{}
@@ -20,20 +20,20 @@ func (h *updateAccessHandler) Handle(params share.UpdateAccessParams, principal 
 
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return share.NewUpdateAccessInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 
 	fe, err := str.FindFrontendWithToken(frontendToken, trx)
 	if err != nil {
-		logrus.Errorf("error finding frontend with token '%v': %v", frontendToken, err)
+		dl.Errorf("error finding frontend with token '%v': %v", frontendToken, err)
 		return share.NewUpdateAccessNotFound()
 	}
 
 	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("error finding environments for account '%v': %v", principal.Email, err)
+		dl.Errorf("error finding environments for account '%v': %v", principal.Email, err)
 	}
 
 	envMatched := false
@@ -44,7 +44,7 @@ func (h *updateAccessHandler) Handle(params share.UpdateAccessParams, principal 
 		}
 	}
 	if !envMatched {
-		logrus.Errorf("account '%v' does not own frontend '%v'", principal.Email, frontendToken)
+		dl.Errorf("account '%v' does not own frontend '%v'", principal.Email, frontendToken)
 		return share.NewUpdateAccessNotFound()
 	}
 
@@ -59,11 +59,11 @@ func (h *updateAccessHandler) Handle(params share.UpdateAccessParams, principal 
 		fe.BindAddress = nil
 	}
 	if err := str.UpdateFrontend(fe, trx); err != nil {
-		logrus.Errorf("error updating frontend '%v': %v", frontendToken, err)
+		dl.Errorf("error updating frontend '%v': %v", frontendToken, err)
 		return share.NewUpdateAccessInternalServerError()
 	}
 	if err := trx.Commit(); err != nil {
-		logrus.Errorf("error committing transaction for frontend '%v': %v", frontendToken, err)
+		dl.Errorf("error committing transaction for frontend '%v': %v", frontendToken, err)
 		return share.NewUpdateAccessInternalServerError()
 	}
 	return share.NewUpdateAccessOK()

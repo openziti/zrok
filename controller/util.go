@@ -8,9 +8,12 @@ import (
 
 	errors2 "github.com/go-openapi/errors"
 	"github.com/jaevor/go-nanoid"
-	"github.com/openziti/zrok/controller/config"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/sirupsen/logrus"
+	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/controller/config"
+	"github.com/openziti/zrok/v2/controller/store"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/util"
 )
 
 type zrokAuthenticator struct {
@@ -22,14 +25,14 @@ func newZrokAuthenticator(cfg *config.Config) *zrokAuthenticator {
 }
 
 func (za *zrokAuthenticator) authenticate(token string) (*rest_model_zrok.Principal, error) {
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction for '%v': %v", token, err)
+		dl.Errorf("error starting transaction for '%v': %v", token, err)
 		return nil, err
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
-	if a, err := str.FindAccountWithToken(token, tx); err == nil {
+	if a, err := str.FindAccountWithToken(token, trx); err == nil {
 		principal := &rest_model_zrok.Principal{
 			ID:        int64(a.Id),
 			Token:     a.Token,
@@ -52,7 +55,7 @@ func (za *zrokAuthenticator) authenticate(token string) (*rest_model_zrok.Princi
 		}
 
 		// no match
-		logrus.Warnf("invalid api key '%v'", token)
+		dl.Warnf("invalid api key '%v'", token)
 		return nil, errors2.New(401, "invalid api key")
 	}
 }
@@ -87,10 +90,6 @@ func realRemoteAddress(req *http.Request) string {
 	return ip
 }
 
-func proxyUrl(shrToken, template string) string {
-	return strings.Replace(template, "{token}", shrToken, -1)
-}
-
 func validatePassword(cfg *config.Config, password string) error {
 	if len(password) < 8 {
 		return fmt.Errorf("password length: expected (8), got (%d)", len(password))
@@ -123,4 +122,55 @@ func hasNumeric(check string) bool {
 		}
 	}
 	return false
+}
+
+// buildFrontendEndpointsForShare retrieves names for a share and builds frontend endpoints
+// from those names. Falls back to the deprecated FrontendEndpoint field if no names are
+// mapped (for backwards compatibility).
+func buildFrontendEndpointsForShare(shareId int, shareToken string, deprecatedEndpoint *string, trx *sqlx.Tx) []string {
+	// retrieve names for this share using the new mapping table
+	shareNames, err := str.FindNamesForShare(shareId, trx)
+	if err != nil {
+		dl.Errorf("error finding names for share '%v': %v", shareToken, err)
+		// continue without failing the entire request
+		shareNames = []*store.NameWithNamespace{}
+	}
+
+	// build frontend endpoints from the names
+	var frontendEndpoints []string
+	for _, sn := range shareNames {
+		endpoint := util.NameInNamespace(sn.Name.Name, sn.NamespaceName)
+		frontendEndpoints = append(frontendEndpoints, endpoint)
+	}
+
+	// fallback to deprecated field if no names are mapped (for backwards compatibility)
+	if len(frontendEndpoints) == 0 && deprecatedEndpoint != nil {
+		frontendEndpoints = []string{*deprecatedEndpoint}
+	}
+
+	return frontendEndpoints
+}
+
+// isAccountLimited checks if an account has an active bandwidth limit restriction.
+// returns true if the account is currently limited, false otherwise.
+func isAccountLimited(accountId int, trx *sqlx.Tx) (bool, error) {
+	// check if journal is empty first to avoid unnecessary queries
+	jEmpty, err := str.IsBandwidthLimitJournalEmpty(accountId, trx)
+	if err != nil {
+		return false, err
+	}
+
+	// if journal is empty, account is not limited
+	if jEmpty {
+		return false, nil
+	}
+
+	// retrieve the latest journal entry
+	je, err := str.FindLatestBandwidthLimitJournal(accountId, trx)
+	if err != nil {
+		return false, err
+	}
+
+	// account is limited if latest entry exists and action is "limit"
+	return je != nil && je.Action == store.LimitLimitAction, nil
 }

@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/openziti/zrok/agent/agentGrpc"
-	"github.com/openziti/zrok/agent/proctree"
-	"github.com/openziti/zrok/cmd/zrok/subordinate"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/sirupsen/logrus"
-	"os"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/agent/agentGrpc"
+	"github.com/openziti/zrok/v2/agent/proctree"
+	"github.com/openziti/zrok/v2/cmd/zrok2/subordinate"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
 
 func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err error) {
@@ -20,10 +20,9 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 	}
 
 	if !root.IsEnabled() {
-		return "", errors.New("unable to load environment; did you 'zrok enable'?")
+		return "", errors.New("unable to load environment; did you 'zrok2 enable'?")
 	}
 
-	shrCmd := []string{os.Args[0], "share", "private", "--subordinate", "-b", req.BackendMode}
 	shr := &share{
 		shareMode:   sdk.PrivateShareMode,
 		backendMode: sdk.BackendMode(req.BackendMode),
@@ -32,35 +31,30 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 		agent:       a,
 	}
 	shr.sub.MessageHandler = func(msg subordinate.Message) {
-		logrus.Info(msg)
+		dl.Info(msg)
 	}
 	var bootErr error
-	shr.sub.BootHandler = func(msgType string, msg subordinate.Message) {
-		bootErr = shr.bootHandler(msgType, msg)
-	}
-	shr.sub.MalformedHandler = func(msg subordinate.Message) {
-		logrus.Error(msg)
-	}
+	bootHandler := NewShareBootHandler(shr, &bootErr)
+	shr.sub.BootHandler = bootHandler.HandleBoot
+	shr.sub.MalformedHandler = bootHandler.HandleMalformed
 
-	if req.Insecure {
-		shrCmd = append(shrCmd, "--insecure")
-	}
+	// build command using CommandBuilder
+	shrCmd := NewSharePrivateCommand().
+		BackendMode(req.BackendMode).
+		ShareToken(req.PrivateShareToken).
+		Insecure(req.Insecure).
+		Open(!req.Closed).
+		AccessGrants(req.AccessGrants).
+		Target(req.Target).
+		Build()
+
+	// set share properties
 	shr.insecure = req.Insecure
-
-	if !req.Closed {
-		shrCmd = append(shrCmd, "--open")
-	}
 	shr.closed = req.Closed
-
-	for _, grant := range req.AccessGrants {
-		shrCmd = append(shrCmd, "--access-grant", grant)
-	}
 	shr.accessGrants = req.AccessGrants
-
-	shrCmd = append(shrCmd, req.Target)
 	shr.target = req.Target
 
-	logrus.Infof("executing '%v'", shrCmd)
+	dl.Infof("executing '%v'", shrCmd)
 
 	shr.process, err = proctree.StartChild(shr.sub.Tail, shrCmd...)
 	if err != nil {
@@ -76,7 +70,7 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 
 	} else {
 		if err := proctree.WaitChild(shr.process); err != nil {
-			logrus.Errorf("error joining: %v", err)
+			dl.Errorf("error joining: %v", err)
 		}
 		return "", fmt.Errorf("unable to start share: %v", bootErr)
 	}
@@ -84,11 +78,12 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 
 func (i *agentGrpcImpl) SharePrivate(_ context.Context, req *agentGrpc.SharePrivateRequest) (*agentGrpc.SharePrivateResponse, error) {
 	if shareToken, err := i.agent.SharePrivate(&SharePrivateRequest{
-		Target:       req.Target,
-		BackendMode:  req.BackendMode,
-		Insecure:     req.Insecure,
-		Closed:       req.Closed,
-		AccessGrants: req.AccessGrants,
+		Target:            req.Target,
+		PrivateShareToken: req.PrivateShareToken,
+		BackendMode:       req.BackendMode,
+		Insecure:          req.Insecure,
+		Closed:            req.Closed,
+		AccessGrants:      req.AccessGrants,
 	}); err == nil {
 		return &agentGrpc.SharePrivateResponse{Token: shareToken}, nil
 	} else {

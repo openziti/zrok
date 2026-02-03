@@ -4,13 +4,14 @@ apis/index.ts
 index.ts
 models/AccessDetail.ts
 models/AccessPrivateResponse.ts
+models/Failure.ts
+models/GooglerpcStatus.ts
+models/NameSelection.ts
 models/ProtobufAny.ts
-models/RpcStatus.ts
 models/ShareDetail.ts
 models/ShareHttpHealthcheckResponse.ts
 models/SharePrivateResponse.ts
 models/SharePublicResponse.ts
-models/ShareReservedResponse.ts
 models/StatusResponse.ts
 models/VersionResponse.ts
 models/index.ts

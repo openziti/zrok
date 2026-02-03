@@ -10,15 +10,15 @@ func TestPublicFrontend(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, str)
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	assert.Nil(t, err)
-	assert.NotNil(t, tx)
+	assert.NotNil(t, trx)
 
 	acctId, err := str.CreateAccount(&Account{
 		Email:    "test@test.com",
 		Password: "password",
 		Token:    "token",
-	}, tx)
+	}, trx)
 	assert.Nil(t, err)
 
 	envId, err := str.CreateEnvironment(acctId, &Environment{
@@ -26,7 +26,7 @@ func TestPublicFrontend(t *testing.T) {
 		Host:        "host",
 		Address:     "address",
 		ZId:         "zId0",
-	}, tx)
+	}, trx)
 	assert.Nil(t, err)
 
 	feName := "public"
@@ -34,29 +34,29 @@ func TestPublicFrontend(t *testing.T) {
 		Token:      "token",
 		ZId:        "zId0",
 		PublicName: &feName,
-	}, tx)
+	}, trx)
 	assert.Nil(t, err)
 
-	fe, err := str.GetFrontend(feId, tx)
+	fe, err := str.GetFrontend(feId, trx)
 	assert.Nil(t, err)
 	assert.NotNil(t, fe)
 	assert.Equal(t, envId, *fe.EnvironmentId)
 	assert.Equal(t, feName, *fe.PublicName)
 	assert.False(t, fe.Deleted)
 
-	fe0, err := str.FindFrontendPubliclyNamed(feName, tx)
+	fe0, err := str.FindFrontendPubliclyNamed(feName, trx)
 	assert.Nil(t, err)
 	assert.NotNil(t, fe0)
 	assert.EqualValues(t, fe, fe0)
 
-	err = str.DeleteFrontend(fe.Id, tx)
+	err = str.DeleteFrontend(fe.Id, trx)
 	assert.Nil(t, err)
 
-	fe0, err = str.FindFrontendWithToken(feName, tx)
+	fe0, err = str.FindFrontendWithToken(feName, trx)
 	assert.NotNil(t, err)
 	assert.Nil(t, fe0)
 
-	fe0, err = str.GetFrontend(fe.Id, tx)
+	fe0, err = str.GetFrontend(fe.Id, trx)
 	assert.Nil(t, err)
 	assert.NotNil(t, fe0)
 	assert.True(t, fe0.Deleted)

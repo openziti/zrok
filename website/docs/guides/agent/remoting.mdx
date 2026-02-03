@@ -11,7 +11,7 @@ As of `v1.0.5` the zrok Agent and controller support secure, opt-in remote contr
 Create an identity for your zrok controller to use for interacting with remote agents:
 
 ```
-$ zrok admin create identity agentremoting
+$ zrok2 admin create identity agentremoting
 zrok identity 'agentremoting' created with ziti id 'WEfGMIx-e4'
 ```
 :::note
@@ -23,23 +23,23 @@ Next, you'll need to configure remoting in your controller config like this:
 ```yaml
 agent_controller:
   z_id:             WEfGMIx-e4
-  identity_path:    /home/michael/.zrok/identities/agentremoting.json
+  identity_path:    /home/michael/.zrok2/identities/agentremoting.json
 ```
 
 Restart your controller with this configuration and the agent remoting endpoints will become available.
 
 ## Enrolling an Agent
 
-Enrolling an Agent in remoting requires an enabled environment. You can use the `zrok agent enroll` command from an enabled environment to enroll your agent:
+Enrolling an Agent in remoting requires an enabled environment. You can use the `zrok2 agent enroll` command from an enabled environment to enroll your agent:
 
 ```
-$ zrok agent enroll
+$ zrok2 agent enroll
 
 warning! proceeding will allow remote control of your zrok agent!
 
 your agent will accept remote commands from:
 
-https://api-v1.zrok.io
+https://api-v2.zrok.io
 
 you should only proceed if you understand the implications of this action!
 
@@ -72,7 +72,7 @@ The `apiEndpoint` `http://localhost:18080` is a zrok controller in a local devel
 You can call the `/agent/share` endpoint to create a share on a remote Agent through the API:
 
 ```
-$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4", "shareMode": "public", "backendMode": "web", "target": "/home/michael/Repos/nf/zrok"}' http://localhost:18080/api/v1/agent/share | jq
+$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4", "shareMode": "public", "backendMode": "web", "target": "/home/michael/Repos/nf/zrok"}' http://localhost:18080/api/v2/agent/share | jq
 {
   "frontendEndpoints": [
     "http://51bnatug7ua3.zrok.quigley.com:8080"
@@ -84,7 +84,7 @@ $ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+j
 ### Query the Status of the Remote Agent
 
 ```
-$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4"}' http://localhost:18080/api/v1/agent/status | jq
+$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4"}' http://localhost:18080/api/v2/agent/status | jq
 {
   "accesses": null,
   "shares": [
@@ -104,9 +104,9 @@ $ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+j
 ### Remove the Remote Share
 
 ```
-$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4", "token": "51bnatug7ua3"}' http://localhost:18080/api/v1/agent/unshare
+$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4", "token": "51bnatug7ua3"}' http://localhost:18080/api/v2/agent/unshare
 
-$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4"}' http://localhost:18080/api/v1/agent/status | jq
+$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4"}' http://localhost:18080/api/v2/agent/status | jq
 {
   "accesses": null,
   "shares": null
@@ -119,11 +119,11 @@ The `/agent/access` and `/agent/unaccess` endpoints also exist and allow for cre
 
 ## Unenrolling an Agent
 
-The `zrok agent unenroll` command will remove all remote control access from an Agent in an environment:
+The `zrok2 agent unenroll` command will remove all remote control access from an Agent in an environment:
 
 ```
-$ zrok agent unenroll
-SUCCESS: unenrolled agent from 'https://api-v1.zrok.io'
+$ zrok2 agent unenroll
+SUCCESS: unenrolled agent from 'https://api-v2.zrok.io'
 SUCCESS: removed agent-enrollment.json
 ```
 

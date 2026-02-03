@@ -29,7 +29,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -101,7 +101,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -157,7 +157,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -187,7 +187,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -217,13 +217,19 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
         "parameters": [
           {
             "name": "target",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "privateShareToken",
             "in": "query",
             "required": false,
             "type": "string"
@@ -275,7 +281,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -288,16 +294,6 @@
           },
           {
             "name": "basicAuth",
-            "in": "query",
-            "required": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "collectionFormat": "multi"
-          },
-          {
-            "name": "frontendSelection",
             "in": "query",
             "required": false,
             "type": "array",
@@ -325,7 +321,7 @@
             "type": "string"
           },
           {
-            "name": "oauthEmailAddressPatterns",
+            "name": "oauthEmailDomains",
             "in": "query",
             "required": false,
             "type": "array",
@@ -335,7 +331,7 @@
             "collectionFormat": "multi"
           },
           {
-            "name": "oauthCheckInterval",
+            "name": "oauthRefreshInterval",
             "in": "query",
             "required": false,
             "type": "string"
@@ -375,7 +371,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -397,7 +393,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -425,6 +421,12 @@
           "items": {
             "type": "string"
           }
+        },
+        "status": {
+          "type": "string"
+        },
+        "failure": {
+          "$ref": "#/definitions/Failure"
         }
       }
     },
@@ -432,6 +434,36 @@
       "type": "object",
       "properties": {
         "frontendToken": {
+          "type": "string"
+        }
+      }
+    },
+    "Failure": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "lastError": {
+          "type": "string"
+        },
+        "nextRetry": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "NameSelection": {
+      "type": "object",
+      "properties": {
+        "namespaceToken": {
+          "type": "string"
+        },
+        "name": {
           "type": "string"
         }
       }
@@ -454,9 +486,6 @@
         "backendMode": {
           "type": "string"
         },
-        "reserved": {
-          "type": "boolean"
-        },
         "frontendEndpoint": {
           "type": "array",
           "items": {
@@ -471,6 +500,9 @@
         },
         "status": {
           "type": "string"
+        },
+        "failure": {
+          "$ref": "#/definitions/Failure"
         }
       }
     },
@@ -507,29 +539,6 @@
         }
       }
     },
-    "ShareReservedResponse": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "string"
-        },
-        "backendMode": {
-          "type": "string"
-        },
-        "shareMode": {
-          "type": "string"
-        },
-        "frontendEndpoints": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "target": {
-          "type": "string"
-        }
-      }
-    },
     "StatusResponse": {
       "type": "object",
       "properties": {
@@ -560,16 +569,7 @@
         }
       }
     },
-    "protobufAny": {
-      "type": "object",
-      "properties": {
-        "@type": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": {}
-    },
-    "rpcStatus": {
+    "googlerpcStatus": {
       "type": "object",
       "properties": {
         "code": {
@@ -587,6 +587,15 @@
           }
         }
       }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
     }
   }
 }

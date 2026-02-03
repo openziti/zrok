@@ -47,7 +47,7 @@ class Root:
         apiEndpoint = self.ApiEndpoint()
 
         cfg = Configuration()
-        cfg.host = apiEndpoint[0] + "/api/v1"
+        cfg.host = apiEndpoint[0] + "/api/v2"
 
         # Update: Configure authentication token
         # The token needs to be set with 'key' instead of 'x-token'
@@ -61,7 +61,7 @@ class Root:
         return auth_client
 
     def ApiEndpoint(self) -> ApiEndpoint:
-        apiEndpoint = "https://api-v1.zrok.io"
+        apiEndpoint = "https://api-v2.zrok.io"
         frm = "binary"
 
         if self.cfg.ApiEndpoint != "":

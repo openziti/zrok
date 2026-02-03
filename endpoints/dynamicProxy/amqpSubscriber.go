@@ -1,0 +1,255 @@
+package dynamicProxy
+
+import (
+	"context"
+	"encoding/json"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/michaelquigley/df/da"
+	"github.com/michaelquigley/df/dd"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/controller/dynamicProxyController"
+	"github.com/pkg/errors"
+	amqp "github.com/rabbitmq/amqp091-go"
+)
+
+type amqpSubscriberConfig struct {
+	Url          string `dd:"+required"`
+	ExchangeName string `dd:"+required"`
+	QueueDepth   int
+}
+
+type amqpSubscriber struct {
+	cfg        *config
+	conn       *amqp.Connection
+	ch         *amqp.Channel
+	queue      amqp.Queue
+	ctx        context.Context
+	cancel     context.CancelFunc
+	done       chan struct{}
+	instanceId string
+	updates    chan *dynamicProxyController.Mapping
+}
+
+func buildAmqpSubscriber(app *da.Application[*config]) error {
+	subscriber, err := newAmqpSubscriber(app.Cfg)
+	if err != nil {
+		return err
+	}
+	da.Set(app.C, subscriber)
+	return nil
+}
+
+func newAmqpSubscriber(cfg *config) (*amqpSubscriber, error) {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	s := &amqpSubscriber{
+		cfg:        cfg,
+		ctx:        ctx,
+		cancel:     cancel,
+		done:       make(chan struct{}),
+		instanceId: uuid.New().String(),
+		updates:    make(chan *dynamicProxyController.Mapping, cfg.AmqpSubscriber.QueueDepth),
+	}
+
+	return s, nil
+}
+
+func (s *amqpSubscriber) Start() error {
+	go s.run()
+	return nil
+}
+
+func (s *amqpSubscriber) Stop() error {
+	s.cancel()
+	<-s.done
+	return nil
+}
+
+func (s *amqpSubscriber) run() {
+	dl.Infof("amqp subscriber started for frontend token '%s'", s.cfg.FrontendToken)
+	defer dl.Infof("amqp subscriber stopped for frontend token '%s'", s.cfg.FrontendToken)
+	defer close(s.done)
+
+mainLoop:
+	for {
+		select {
+		case <-s.ctx.Done():
+			break mainLoop
+		default:
+			dl.Infof("connecting to amqp broker at '%s'", s.cfg.AmqpSubscriber.Url)
+			if err := s.connect(); err != nil {
+				dl.Errorf("failed to connect to amqp broker: %v", err)
+				select {
+				case <-time.After(10 * time.Second):
+					continue mainLoop
+				case <-s.ctx.Done():
+					break mainLoop
+				}
+			}
+			dl.Infof("connected to amqp broker, consuming messages for frontend '%s'", s.cfg.FrontendToken)
+
+			if err := s.consume(); err != nil {
+				dl.Errorf("consume error: %v", err)
+				s.disconnect()
+			}
+		}
+	}
+
+	s.disconnect()
+}
+
+func (s *amqpSubscriber) connect() error {
+	conn, err := amqp.Dial(s.cfg.AmqpSubscriber.Url)
+	if err != nil {
+		return errors.Wrapf(err, "failed to dial amqp broker at '%s'", s.cfg.AmqpSubscriber.Url)
+	}
+
+	ch, err := conn.Channel()
+	if err != nil {
+		conn.Close()
+		return errors.Wrap(err, "failed to create amqp channel")
+	}
+
+	// declare exchange (should already exist from publisher side)
+	err = ch.ExchangeDeclare(
+		s.cfg.AmqpSubscriber.ExchangeName, // name
+		"topic",                           // type
+		true,                              // durable
+		false,                             // auto-deleted
+		false,                             // internal
+		false,                             // no-wait
+		nil,                               // arguments
+	)
+	if err != nil {
+		ch.Close()
+		conn.Close()
+		return errors.Wrapf(err, "failed to declare exchange '%s'", s.cfg.AmqpSubscriber.ExchangeName)
+	}
+
+	// create ephemeral queue for this process instance
+	queueName := s.generateQueueName()
+	queue, err := ch.QueueDeclare(
+		queueName, // name with instance ID for uniqueness
+		false,     // durable: false (ephemeral)
+		true,      // delete when unused: true (auto-cleanup)
+		true,      // exclusive: true (only this connection)
+		false,     // no-wait
+		nil,       // arguments
+	)
+	if err != nil {
+		ch.Close()
+		conn.Close()
+		return errors.Wrapf(err, "failed to declare queue '%s'", queueName)
+	}
+
+	// bind queue to exchange with frontend token as routing key
+	err = ch.QueueBind(
+		queue.Name,                        // queue name
+		s.cfg.FrontendToken,               // routing key (frontend token)
+		s.cfg.AmqpSubscriber.ExchangeName, // exchange
+		false,                             // no-wait
+		nil,                               // arguments
+	)
+	if err != nil {
+		ch.Close()
+		conn.Close()
+		return errors.Wrapf(err, "failed to bind queue '%s' to exchange '%s' with routing key '%s'",
+			queue.Name, s.cfg.AmqpSubscriber.ExchangeName, s.cfg.FrontendToken)
+	}
+
+	s.conn = conn
+	s.ch = ch
+	s.queue = queue
+
+	dl.Debugf("created ephemeral queue '%s' bound to frontend token '%s'", queue.Name, s.cfg.FrontendToken)
+	return nil
+}
+
+func (s *amqpSubscriber) consume() error {
+	msgs, err := s.ch.Consume(
+		s.queue.Name, // queue
+		"",           // consumer tag (auto-generated)
+		false,        // auto-ack: false (manual ack for reliability)
+		false,        // exclusive
+		false,        // no-local
+		false,        // no-wait
+		nil,          // args
+	)
+	if err != nil {
+		return errors.Wrap(err, "failed to start consuming messages")
+	}
+
+	for {
+		select {
+		case <-s.ctx.Done():
+			return nil
+		case msg, ok := <-msgs:
+			if !ok {
+				return errors.New("message channel closed")
+			}
+
+			if err := s.handleMessage(msg); err != nil {
+				dl.Errorf("failed to handle message: %v", err)
+				// negative acknowledgment - message will be requeued
+				msg.Nack(false, true)
+			} else {
+				// positive acknowledgment
+				msg.Ack(false)
+			}
+		}
+	}
+}
+
+func (s *amqpSubscriber) handleMessage(delivery amqp.Delivery) error {
+	var data map[string]any
+	if err := json.Unmarshal(delivery.Body, &data); err != nil {
+		return errors.Wrap(err, "failed to unmarshal mapping data")
+	}
+	update, err := dd.New[dynamicProxyController.Mapping](data)
+	if err != nil {
+		return err
+	}
+
+	switch update.Operation {
+	case dynamicProxyController.OperationBind:
+		dl.Debugf("adding mapping for '%v' -> '%v'", update.Name, update.ShareToken)
+
+	case dynamicProxyController.OperationUnbind:
+		dl.Debugf("removing mapping for '%v'", update.Name)
+
+	default:
+		dl.Errorf("unknown operation '%v'", update.Operation)
+	}
+
+	select {
+	case s.updates <- update:
+		dl.Debugf("published mapping update to channel")
+	case <-s.ctx.Done():
+		return errors.New("context cancelled while publishing update")
+	default:
+		dl.Warnf("updates channel full, dropping mapping update")
+	}
+
+	return nil
+}
+
+func (s *amqpSubscriber) disconnect() {
+	if s.ch != nil {
+		s.ch.Close()
+		s.ch = nil
+	}
+	if s.conn != nil {
+		s.conn.Close()
+		s.conn = nil
+	}
+}
+
+func (s *amqpSubscriber) Updates() <-chan *dynamicProxyController.Mapping {
+	return s.updates
+}
+
+func (s *amqpSubscriber) generateQueueName() string {
+	return "frontend-" + s.cfg.FrontendToken + "-" + s.instanceId
+}

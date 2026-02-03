@@ -10,14 +10,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/proxyUi"
-	"github.com/openziti/zrok/environment"
-	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/endpoints"
+	"github.com/openziti/zrok/v2/endpoints/proxyUi"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type FrontendConfig struct {
@@ -124,13 +124,13 @@ func newServiceProxy(cfg *FrontendConfig, ctx ziti.Context) (*httputil.ReversePr
 			if len(tokens) == 2 {
 				resp.Header.Set(strings.TrimSpace(tokens[0]), strings.TrimSpace(tokens[1]))
 			} else {
-				logrus.Errorf("invalid response header '%v' (expecting header:value", responseHeader)
+				dl.Errorf("invalid response header '%v' (expecting header:value", responseHeader)
 			}
 		}
 		return nil
 	}
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
-		logrus.Errorf("error proxying: %v", err)
+		dl.Errorf("error proxying: %v", err)
 		proxyUi.WriteBadGateway(
 			w, proxyUi.RequiredData(
 				"bad gateway!",
@@ -146,12 +146,12 @@ func serviceTargetProxy(cfg *FrontendConfig, ctx ziti.Context) *httputil.Reverse
 		targetShrToken := cfg.ShrToken
 		if svc, found := endpoints.GetRefreshedService(targetShrToken, ctx); found {
 			if cfg, found := svc.Config[sdk.ZrokProxyConfig]; found {
-				logrus.Debugf("auth model: %v", cfg)
+				dl.Debugf("auth model: %v", cfg)
 			} else {
-				logrus.Warn("no config!")
+				dl.Warn("no config!")
 			}
 			if target, err := url.Parse(fmt.Sprintf("http://%v", targetShrToken)); err == nil {
-				logrus.Debugf("[%v] -> %v", targetShrToken, req.URL)
+				dl.Debugf("[%v] -> %v", targetShrToken, req.URL)
 
 				targetQuery := target.RawQuery
 				req.URL.Scheme = target.Scheme
@@ -167,7 +167,7 @@ func serviceTargetProxy(cfg *FrontendConfig, ctx ziti.Context) *httputil.Reverse
 					req.Header.Set("User-Agent", "")
 				}
 			} else {
-				logrus.Errorf("error proxying: %v", err)
+				dl.Errorf("error proxying: %v", err)
 			}
 		}
 	}
@@ -181,12 +181,12 @@ func authHandler(shrToken string, handler http.Handler, realm string, cfg *Front
 				if scheme, found := proxyCfg["auth_scheme"]; found {
 					switch scheme {
 					case string(sdk.None):
-						logrus.Debugf("auth scheme none '%v'", shrToken)
+						dl.Debugf("auth scheme none '%v'", shrToken)
 						handler.ServeHTTP(w, r)
 						return
 
 					case string(sdk.Basic):
-						logrus.Debugf("auth scheme basic '%v", shrToken)
+						dl.Debugf("auth scheme basic '%v", shrToken)
 						inUser, inPass, ok := r.BasicAuth()
 						if !ok {
 							writeUnauthorizedResponse(w, realm)
@@ -230,20 +230,20 @@ func authHandler(shrToken string, handler http.Handler, realm string, cfg *Front
 						handler.ServeHTTP(w, r)
 
 					default:
-						logrus.Infof("invalid auth scheme '%v'", scheme)
+						dl.Infof("invalid auth scheme '%v'", scheme)
 						writeUnauthorizedResponse(w, realm)
 						return
 					}
 				} else {
-					logrus.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, shrToken)
+					dl.Warnf("%v -> no auth scheme for '%v'", r.RemoteAddr, shrToken)
 					proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken).WithError(errors.New("'auth_scheme' missing from service config")))
 				}
 			} else {
-				logrus.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, shrToken)
+				dl.Warnf("%v -> no proxy config for '%v'", r.RemoteAddr, shrToken)
 				proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken).WithError(errors.New("'zrok.proxy.v1' config missing from service")))
 			}
 		} else {
-			logrus.Warnf("%v -> service '%v' not found", r.RemoteAddr, shrToken)
+			dl.Warnf("%v -> service '%v' not found", r.RemoteAddr, shrToken)
 			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(shrToken).WithError(fmt.Errorf("share '%v' not found in overlay network", shrToken)))
 		}
 	}

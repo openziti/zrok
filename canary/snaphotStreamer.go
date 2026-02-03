@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
-	"github.com/sirupsen/logrus"
+	"github.com/michaelquigley/df/dl"
 )
 
 type SnapshotStreamer struct {
@@ -37,8 +38,8 @@ func NewSnapshotStreamer(ctx context.Context, cfg *Config) (*SnapshotStreamer, e
 func (ss *SnapshotStreamer) Run() {
 	defer close(ss.Closed)
 	defer ss.ifxClient.Close()
-	defer logrus.Info("stoping")
-	logrus.Info("starting")
+	defer dl.Info("stoping")
+	dl.Info("starting")
 
 	for {
 		select {
@@ -47,7 +48,7 @@ func (ss *SnapshotStreamer) Run() {
 
 		case snapshot := <-ss.InputQueue:
 			if err := ss.store(snapshot); err != nil {
-				logrus.Errorf("error storing snapshot: %v", err)
+				dl.Errorf("error storing snapshot: %v", err)
 			}
 		}
 	}

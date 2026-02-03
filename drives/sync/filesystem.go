@@ -3,7 +3,7 @@ package sync
 import (
 	"context"
 	"fmt"
-	"github.com/openziti/zrok/drives/davServer"
+	"github.com/openziti/zrok/v2/drives/davServer"
 	"io"
 	"io/fs"
 	"os"

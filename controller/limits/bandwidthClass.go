@@ -2,9 +2,9 @@ package limits
 
 import (
 	"fmt"
-	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/sdk/golang/sdk"
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/controller/store"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/util"
 )
 
 type configBandwidthClass struct {
@@ -38,10 +38,6 @@ func (bc *configBandwidthClass) IsScoped() bool {
 
 func (bc *configBandwidthClass) GetLimitClassId() int {
 	return -1
-}
-
-func (bc *configBandwidthClass) GetShareMode() sdk.ShareMode {
-	return ""
 }
 
 func (bc *configBandwidthClass) GetBackendMode() sdk.BackendMode {

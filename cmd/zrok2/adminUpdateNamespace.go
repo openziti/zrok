@@ -1,0 +1,69 @@
+package main
+
+import (
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/rest_client_zrok/admin"
+	"github.com/spf13/cobra"
+)
+
+func init() {
+	adminUpdateCmd.AddCommand(newAdminUpdateNamespaceCommand().cmd)
+}
+
+type adminUpdateNamespaceCommand struct {
+	cmd         *cobra.Command
+	name        string
+	description string
+	open        bool
+	closed      bool
+}
+
+func newAdminUpdateNamespaceCommand() *adminUpdateNamespaceCommand {
+	cmd := &cobra.Command{
+		Use:   "namespace <token>",
+		Short: "Update a namespace",
+		Args:  cobra.ExactArgs(1),
+	}
+	command := &adminUpdateNamespaceCommand{cmd: cmd}
+	cmd.Flags().StringVarP(&command.name, "name", "n", "", "namespace name")
+	cmd.Flags().StringVarP(&command.description, "description", "d", "", "namespace description")
+	cmd.Flags().BoolVar(&command.open, "open", false, "set namespace as open")
+	cmd.Flags().BoolVar(&command.closed, "closed", false, "set namespace as closed")
+	cmd.Run = command.run
+	return command
+}
+
+func (cmd *adminUpdateNamespaceCommand) run(_ *cobra.Command, args []string) {
+	env, err := environment.LoadRoot()
+	if err != nil {
+		panic(err)
+	}
+
+	zrok, err := env.Client()
+	if err != nil {
+		panic(err)
+	}
+
+	req := admin.NewUpdateNamespaceParams()
+	req.Body = admin.UpdateNamespaceBody{
+		NamespaceToken: args[0],
+		Name:           cmd.name,
+		Description:    cmd.description,
+	}
+
+	if cmd.cmd.Flags().Changed("open") {
+		req.Body.Open = true
+		req.Body.OpenSet = true
+	} else if cmd.cmd.Flags().Changed("closed") {
+		req.Body.Open = false
+		req.Body.OpenSet = true
+	}
+
+	_, err = zrok.Admin.UpdateNamespace(req, mustGetAdminAuth())
+	if err != nil {
+		panic(err)
+	}
+
+	dl.Infof("updated namespace '%v'", args[0])
+}

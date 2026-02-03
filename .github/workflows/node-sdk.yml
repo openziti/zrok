@@ -38,7 +38,7 @@ jobs:
       matrix:
         config:
           - { os: ubuntu-24.04, target: "linux", arch: "x64" }
-        node_ver: [ 20 ]
+        node_ver: [ 22 ]
       fail-fast: false
 
     steps:

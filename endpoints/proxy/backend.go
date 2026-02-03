@@ -8,12 +8,12 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
-	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/endpoints"
+	"github.com/openziti/zrok/v2/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type BackendConfig struct {
@@ -103,7 +103,7 @@ func newReverseProxy(cfg *BackendConfig) (*httputil.ReverseProxy, error) {
 		req.Header.Set("X-Proxy", "zrok")
 	}
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
-		logrus.Errorf("error proxying: %v", err)
+		dl.Errorf("error proxying: %v", err)
 		w.WriteHeader(http.StatusBadGateway)
 	}
 

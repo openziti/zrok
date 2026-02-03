@@ -2,7 +2,7 @@ package sync
 
 import (
 	"context"
-	"github.com/openziti/zrok/drives/davClient"
+	"github.com/openziti/zrok/v2/drives/davClient"
 	"github.com/pkg/errors"
 	"io"
 	"net/http"

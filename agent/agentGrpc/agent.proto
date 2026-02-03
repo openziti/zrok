@@ -1,8 +1,9 @@
 syntax = "proto3";
 
-option go_package = "github.com/openziti/zrok/agent/agentGrpc";
+option go_package = "github.com/openziti/zrok/v2/agent/agentGrpc";
 
 import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
 
 service Agent {
 	rpc AccessPrivate(AccessPrivateRequest) returns (AccessPrivateResponse) {
@@ -25,7 +26,6 @@ service Agent {
 			post: "/v1/agent/httpShareHealthcheck"
 		};
 	}
-	rpc ShareReserved(ShareReservedRequest) returns (ShareReservedResponse) {}
 	rpc SharePrivate(SharePrivateRequest) returns (SharePrivateResponse) {
 		option(google.api.http) = {
 			post: "/v1/agent/sharePrivate"
@@ -53,6 +53,8 @@ message AccessDetail {
 	string token = 2;
 	string bindAddress = 3;
 	repeated string responseHeaders = 4;
+	string status = 5;
+  Failure failure = 6;
 }
 
 message AccessPrivateResponse{
@@ -67,6 +69,18 @@ message AccessPrivateRequest{
 	uint32 autoStartPort = 5;
 	uint32 autoEndPort = 6;
 	repeated string responseHeaders = 7;
+}
+
+message Failure {
+  string id = 1;
+  int32 count = 2;
+  string lastError = 3;
+  google.protobuf.Timestamp nextRetry = 4;
+}
+
+message NameSelection {
+  string namespaceToken = 1;
+  string name = 2;
 }
 
 message ReleaseAccessRequest {
@@ -87,11 +101,11 @@ message ShareDetail {
 	string token = 1;
 	string shareMode = 2;
 	string backendMode = 3;
-	bool reserved = 4;
-	repeated string frontendEndpoint = 5;
-	string backendEndpoint = 6;
-	bool closed = 7;
-	string status = 8;
+	repeated string frontendEndpoint = 4;
+	string backendEndpoint = 5;
+	bool closed = 6;
+	string status = 7;
+  Failure failure = 8;
 }
 
 message ShareHttpHealthcheckRequest{
@@ -109,10 +123,11 @@ message ShareHttpHealthcheckResponse{
 
 message SharePrivateRequest {
 	string target = 1;
-	string backendMode = 2;
-	bool insecure = 3;
-	bool closed = 4;
-	repeated string accessGrants = 5;
+  string privateShareToken = 2;
+	string backendMode = 3;
+	bool insecure = 4;
+	bool closed = 5;
+	repeated string accessGrants = 6;
 }
 
 message SharePrivateResponse {
@@ -122,12 +137,12 @@ message SharePrivateResponse {
 message SharePublicRequest {
 	string target = 1;
 	repeated string basicAuth = 2;
-	repeated string frontendSelection = 3;
+	repeated NameSelection nameSelections = 3;
 	string backendMode = 4;
 	bool insecure = 5;
 	string oauthProvider = 6;
-	repeated string oauthEmailAddressPatterns = 7;
-	string oauthCheckInterval = 8;
+	repeated string oauthEmailDomains = 7;
+	string oauthRefreshInterval = 8;
 	bool closed = 9;
 	repeated string accessGrants = 10;
 }
@@ -135,20 +150,6 @@ message SharePublicRequest {
 message SharePublicResponse {
 	string token = 1;
 	repeated string frontendEndpoints = 2;
-}
-
-message ShareReservedRequest {
-	string token = 1;
-	string overrideEndpoint = 2;
-	bool insecure = 3;
-}
-
-message ShareReservedResponse {
-	string token = 1;
-	string backendMode = 2;
-	string shareMode = 3;
-	repeated string frontendEndpoints = 4;
-	string target = 5;
 }
 
 message StatusRequest {

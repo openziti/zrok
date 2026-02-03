@@ -16,12 +16,13 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
-	"github.com/openziti/zrok/endpoints"
-	"github.com/sirupsen/logrus"
 	"io"
 	"net"
 	"strconv"
 	"time"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/endpoints"
 )
 
 // Authentication METHODs described in RFC 1928, section 3.
@@ -114,7 +115,7 @@ func (s *Server) Serve(l net.Listener) error {
 			conn := &Conn{clientConn: c, srv: s}
 			err := conn.Run()
 			if err != nil {
-				logrus.Infof("client connection failed: %v", err)
+				dl.Infof("client connection failed: %v", err)
 			}
 		}()
 	}

@@ -1,7 +1,7 @@
 package metrics
 
 import (
-	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/v2/controller/store"
 )
 
 type cache struct {
@@ -13,18 +13,18 @@ func newShareCache(str *store.Store) *cache {
 }
 
 func (c *cache) addZrokDetail(u *Usage) error {
-	tx, err := c.str.Begin()
+	trx, err := c.str.Begin()
 	if err != nil {
 		return err
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
-	shr, err := c.str.FindShareWithZIdAndDeleted(u.ZitiServiceId, tx)
+	shr, err := c.str.FindShareWithZIdAndDeleted(u.ZitiServiceId, trx)
 	if err != nil {
 		return err
 	}
 	u.ShareToken = shr.Token
-	env, err := c.str.GetEnvironment(shr.EnvironmentId, tx)
+	env, err := c.str.GetEnvironment(shr.EnvironmentId, trx)
 	if err != nil {
 		return err
 	}

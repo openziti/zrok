@@ -7,6 +7,8 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **account_limited** | **bool** |  | [optional] 
 **environments** | [**List[EnvironmentAndResources]**](EnvironmentAndResources.md) |  | [optional] 
+**namespaces** | [**List[ListShareNamespaces200ResponseInner]**](ListShareNamespaces200ResponseInner.md) |  | [optional] 
+**names** | [**List[OverviewNamesInner]**](OverviewNamesInner.md) |  | [optional] 
 
 ## Example
 

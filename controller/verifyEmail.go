@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"html/template"
 
-	"github.com/openziti/zrok/build"
-	"github.com/openziti/zrok/controller/emailUi"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/build"
+	"github.com/openziti/zrok/v2/controller/emailUi"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/wneessen/go-mail"
 )
 
@@ -63,7 +63,7 @@ func sendVerificationEmail(emailAddress, regToken string) error {
 		return errors.Wrap(err, "error sending verification email")
 	}
 
-	logrus.Infof("verification email sent to '%v'", emailAddress)
+	dl.Infof("verification email sent to '%v'", emailAddress)
 	return nil
 }
 

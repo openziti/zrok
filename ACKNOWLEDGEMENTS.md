@@ -1,6 +1,6 @@
 # ACKNOWLEDGEMENTS
 
-## github.com/openziti/zrok/endpoints/socks
+## github.com/openziti/zrok/v2/endpoints/socks
 
 Portions of the `socks` package is based on code from `https://github.com/tailscale/tailscale/blob/v1.58.2/net/socks5/socks5.go`, which included the following license:
 
@@ -33,7 +33,7 @@ Portions of the `socks` package is based on code from `https://github.com/tailsc
 > OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 > OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-## github.com/openziti/zrok/drives/davServer
+## github.com/openziti/zrok/v2/drives/davServer
 
 The `davServer` package is based on code from `https://cs.opensource.google/go/go/`, which included the following license:
 
@@ -65,7 +65,7 @@ The `davServer` package is based on code from `https://cs.opensource.google/go/g
 > (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 > OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
-## github.com/openziti/zrok/drives/davClient
+## github.com/openziti/zrok/v2/drives/davClient
 
 The `davClient` package is based on code from `github.com/emersion/go-webdav`, which included the following license:
 
