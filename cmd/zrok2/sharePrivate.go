@@ -60,7 +60,7 @@ func newSharePrivateCommand() *sharePrivateCommand {
 		headless, _ = root.Headless()
 	}
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, tcpTunnel, udpTunnel, caddy, drive, socks}")
-	cmd.Flags().StringVarP(&command.shareToken, "share-token", "s", "", "Request a specific share token name")
+	cmd.Flags().StringVarP(&command.shareToken, "share-token", "s", "", "Use an existing share instead of creating new")
 	cmd.Flags().BoolVar(&command.headless, "headless", headless, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
 	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
@@ -74,7 +74,7 @@ func newSharePrivateCommand() *sharePrivateCommand {
 	return command
 }
 
-func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
+func (cmd *sharePrivateCommand) run(cobraCmd *cobra.Command, args []string) {
 	if cmd.subordinate {
 		logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
 		dlOpts := dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo)
@@ -94,14 +94,43 @@ func (cmd *sharePrivateCommand) run(_ *cobra.Command, args []string) {
 	detectAndRouteToAgent(
 		cmd.subordinate, cmd.forceLocal, cmd.forceAgent,
 		root,
-		func() { cmd.shareLocal(args, root) },
-		func() { cmd.shareAgent(args, root) },
+		func() { cmd.shareLocal(cobraCmd, args, root) },
+		func() { cmd.shareAgent(cobraCmd, args, root) },
 	)
 }
 
-func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
+func (cmd *sharePrivateCommand) shareLocal(cobraCmd *cobra.Command, args []string, root env_core.Root) {
+	var shr *sdk.Share
+	var skipDelete bool
+	var backendMode string
+
+	if cmd.shareToken != "" {
+		// using existing share - verify it exists and get its backend mode
+		if cobraCmd.Flags().Changed("backend-mode") {
+			cmd.error("unable to create share", errors.New("--backend-mode cannot be specified when using --share-token"))
+		}
+
+		shareDetail, err := sdk.GetShareDetail(root, cmd.shareToken)
+		if err != nil {
+			cmd.error("share not found", err)
+		}
+		if shareDetail.ShareMode != "private" {
+			cmd.error("share is not private", errors.New("invalid share mode"))
+		}
+
+		backendMode = shareDetail.BackendMode
+		shr = &sdk.Share{
+			Token:             shareDetail.ShareToken,
+			FrontendEndpoints: shareDetail.FrontendEndpoints,
+		}
+		skipDelete = true
+	} else {
+		backendMode = cmd.backendMode
+		skipDelete = false
+	}
+
 	// validate and process backend mode (nil = allow all modes for private shares)
-	target, forceHeadless, err := validateBackendMode(cmd.backendMode, args, nil)
+	target, forceHeadless, err := validateBackendMode(backendMode, args, nil)
 	if err != nil {
 		cmd.error("unable to create share", err)
 	}
@@ -116,25 +145,27 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 		cmd.error("unable to load ziti identity configuration", err)
 	}
 
-	req := &sdk.ShareRequest{
-		BackendMode:       sdk.BackendMode(cmd.backendMode),
-		ShareMode:         sdk.PrivateShareMode,
-		PrivateShareToken: cmd.shareToken,
-		Target:            target,
-		PermissionMode:    sdk.ClosedPermissionMode,
-		AccessGrants:      cmd.accessGrants,
-	}
-	if cmd.open {
-		req.PermissionMode = sdk.OpenPermissionMode
-	}
+	if shr == nil {
+		// create ephemeral share (existing behavior)
+		req := &sdk.ShareRequest{
+			BackendMode:    sdk.BackendMode(backendMode),
+			ShareMode:      sdk.PrivateShareMode,
+			Target:         target,
+			PermissionMode: sdk.ClosedPermissionMode,
+			AccessGrants:   cmd.accessGrants,
+		}
+		if cmd.open {
+			req.PermissionMode = sdk.OpenPermissionMode
+		}
 
-	shr, err := sdk.CreateShare(root, req)
-	if err != nil {
-		cmd.error("unable to create share", err)
+		shr, err = sdk.CreateShare(root, req)
+		if err != nil {
+			cmd.error("unable to create share", err)
+		}
 	}
 
 	shareDescription := fmt.Sprintf("access your share with: %v", tui.Code.Render(fmt.Sprintf("zrok2 access private %v", shr.Token)))
-	mdl := newShareModel(shr.Token, []string{shareDescription}, sdk.PrivateShareMode, sdk.BackendMode(cmd.backendMode))
+	mdl := newShareModel(shr.Token, []string{shareDescription}, sdk.PrivateShareMode, sdk.BackendMode(backendMode))
 	if !cmd.headless && !cmd.subordinate {
 		proxy.SetCaddyLoggingWriter(mdl)
 	}
@@ -143,13 +174,13 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.shutdown(root, shr)
+		cmd.shutdown(root, shr, skipDelete)
 		os.Exit(0)
 	}()
 
 	requests := make(chan *endpoints.Request, 1024)
 
-	switch cmd.backendMode {
+	switch backendMode {
 	case "proxy":
 		cfg := &proxy.BackendConfig{
 			IdentityPath:    zif,
@@ -239,7 +270,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 
 		be, err := proxy.NewCaddyfileBackend(cfg)
 		if err != nil {
-			cmd.shutdown(root, shr)
+			cmd.shutdown(root, shr, skipDelete)
 			cmd.error("unable to create 'caddy' backend", err)
 		}
 
@@ -353,7 +384,7 @@ func (cmd *sharePrivateCommand) shareLocal(args []string, root env_core.Root) {
 		}
 
 		close(requests)
-		cmd.shutdown(root, shr)
+		cmd.shutdown(root, shr, skipDelete)
 	}
 }
 
@@ -367,18 +398,40 @@ func (cmd *sharePrivateCommand) error(msg string, err error) {
 	panic(errors.Wrap(err, msg))
 }
 
-func (cmd *sharePrivateCommand) shutdown(root env_core.Root, shr *sdk.Share) {
+func (cmd *sharePrivateCommand) shutdown(root env_core.Root, shr *sdk.Share, skipDelete bool) {
 	dl.Debugf("shutting down '%v'", shr.Token)
-	if err := sdk.DeleteShare(root, shr); err != nil {
-		dl.Errorf("error shutting down '%v': %v", shr.Token, err)
+	if !skipDelete {
+		if err := sdk.DeleteShare(root, shr); err != nil {
+			dl.Errorf("error shutting down '%v': %v", shr.Token, err)
+		}
 	}
 	dl.Debugf("shutdown complete")
 }
 
-func (cmd *sharePrivateCommand) shareAgent(args []string, root env_core.Root) {
+func (cmd *sharePrivateCommand) shareAgent(cobraCmd *cobra.Command, args []string, root env_core.Root) {
 	var target string
+	var backendMode string
 
-	switch cmd.backendMode {
+	if cmd.shareToken != "" {
+		// using existing share - verify it exists and get its backend mode
+		if cobraCmd.Flags().Changed("backend-mode") {
+			tui.Error("--backend-mode cannot be specified when using --share-token", nil)
+		}
+
+		shareDetail, err := sdk.GetShareDetail(root, cmd.shareToken)
+		if err != nil {
+			tui.Error("share not found", err)
+		}
+		if shareDetail.ShareMode != "private" {
+			tui.Error("share is not private", nil)
+		}
+
+		backendMode = shareDetail.BackendMode
+	} else {
+		backendMode = cmd.backendMode
+	}
+
+	switch backendMode {
 	case "proxy":
 		if len(args) != 1 {
 			tui.Error("the 'proxy' backend mode expects a <target>", nil)
@@ -450,7 +503,7 @@ func (cmd *sharePrivateCommand) shareAgent(args []string, root env_core.Root) {
 		target = "socks"
 
 	default:
-		tui.Error(fmt.Sprintf("invalid backend mode '%v'", cmd.backendMode), nil)
+		tui.Error(fmt.Sprintf("invalid backend mode '%v'", backendMode), nil)
 	}
 
 	client, conn, err := agentClient.NewClient(root)
@@ -462,7 +515,7 @@ func (cmd *sharePrivateCommand) shareAgent(args []string, root env_core.Root) {
 	shr, err := client.SharePrivate(context.Background(), &agentGrpc.SharePrivateRequest{
 		Target:            target,
 		PrivateShareToken: cmd.shareToken,
-		BackendMode:       cmd.backendMode,
+		BackendMode:       backendMode,
 		Insecure:          cmd.insecure,
 		Closed:            !cmd.open,
 		AccessGrants:      cmd.accessGrants,

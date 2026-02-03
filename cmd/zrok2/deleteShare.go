@@ -7,27 +7,27 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(newUnshareCommand().cmd)
+	deleteCmd.AddCommand(newDeleteShareCommand().cmd)
 }
 
-type unshareCommand struct {
+type deleteShareCommand struct {
 	cmd    *cobra.Command
 	envZId string
 }
 
-func newUnshareCommand() *unshareCommand {
+func newDeleteShareCommand() *deleteShareCommand {
 	cmd := &cobra.Command{
-		Use:   "unshare",
-		Short: "Remove a share",
+		Use:   "share <shareToken>",
+		Short: "Delete a share",
 		Args:  cobra.ExactArgs(1),
 	}
-	command := &unshareCommand{cmd: cmd}
+	command := &deleteShareCommand{cmd: cmd}
 	cmd.Flags().StringVar(&command.envZId, "envzid", "", "Override environment ziti identifier")
 	cmd.Run = command.run
 	return command
 }
 
-func (cmd *unshareCommand) run(_ *cobra.Command, args []string) {
+func (cmd *deleteShareCommand) run(_ *cobra.Command, args []string) {
 	env, auth := mustGetEnvironmentAuth()
 	zrok, err := env.Client()
 	if err != nil {
@@ -46,5 +46,5 @@ func (cmd *unshareCommand) run(_ *cobra.Command, args []string) {
 		dl.Fatal(err)
 	}
 
-	dl.Infof("removed share '%v' from environment '%v'", req.Body.ShareToken, req.Body.EnvZID)
+	dl.Infof("deleted share '%v' from environment '%v'", req.Body.ShareToken, req.Body.EnvZID)
 }
