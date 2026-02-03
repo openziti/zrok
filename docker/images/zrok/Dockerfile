@@ -1,5 +1,5 @@
-# this builds docker.io/openziti/zrok
-FROM docker.io/openziti/ziti-cli:1.6.8
+# this builds docker.io/openziti/zrok2
+FROM docker.io/openziti/ziti-cli:1.6.12
 
 ARG ARTIFACTS_DIR=./dist
 ARG DOCKER_BUILD_DIR=.
@@ -25,9 +25,9 @@ COPY ./LICENSE /licenses/apache.txt
 
 RUN mkdir -p /usr/local/bin
 COPY --chmod=0755 ${ARTIFACTS_DIR}/${TARGETARCH}/${TARGETOS}/zrok2 \
-      ./nfpm/zrok2-enable.bash \
-      ./nfpm/zrok2-share.bash \
       /usr/local/bin/
+COPY --chmod=0755 ./nfpm/zrok2-enable.bash \
+      /usr/local/bin/zrok2-enable
 
 USER ziggy
 ENTRYPOINT [ "zrok2" ]
