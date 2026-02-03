@@ -13,11 +13,11 @@ Give the `nssm` documentation a quick review, here:
 
 [https://nssm.cc/usage](https://nssm.cc/usage)
 
-You'll want to install both the `zrok.exe` and `nssm.exe` in a convenient, protected location. In this example, we'll put them in `C:\Program Files\zrok`, as `C:\Program Files\zrok\zrok.exe` and `C:\Program Files\zrok\nssm.exe`.
+You'll want to install both the `zrok2.exe` and `nssm.exe` in a convenient, protected location. In this example, we'll put them in `C:\Program Files\zrok2`, as `C:\Program Files\zrok2\zrok2.exe` and `C:\Program Files\zrok2\nssm.exe`.
 
-![C:\\Program Files\\zrok](images/program-files.png)
+![C:\\Program Files\\zrok2](images/program-files.png)
 
-We're going to use a command prompt to install and configure our Agent service. Open a new command prompt and `cd "\Program Files\zrok"`:
+We're going to use a command prompt to install and configure our Agent service. Open a new command prompt and `cd "\Program Files\zrok2"`:
 
 ![Empty Command Prompt](images/empty-command-prompt.png)
 
@@ -28,13 +28,13 @@ On Windows, the `USERPROFILE` environment variable controls the "home" where zro
 We're going to want to enable a zrok environment for our new Agent service in this directory. First, we'll run:
 
 ```cmd
-C:\Program Files\zrok>set USERPROFILE=c:\Windows\System32\config\systemprofile
+C:\Program Files\zrok2>set USERPROFILE=c:\Windows\System32\config\systemprofile
 ```
 
 And with that environment variable set, we'll use the `zrok2 enable` command to enable an environment for our new Agent service:
 
 ```cmd
-C:\Program Files\zrok>zrok2 enable <accountToken>
+C:\Program Files\zrok2>zrok2 enable <accountToken>
 ```
 
 ![Enabling the Service Environment](images/enable.png)
@@ -43,17 +43,17 @@ Now we've got a new, enabled environment to use with our Agent running as a Wind
 
 ## Installing the Service
 
-In the `C:\Program Files\zrok` directory, execute this command to invoke `nssm` to create the new Windows service for our zrok Agent:
+In the `C:\Program Files\zrok2` directory, execute this command to invoke `nssm` to create the new Windows service for our zrok Agent:
 
 ```cmd
-C:\Program Files\zrok>nssm install zrokAgent
+C:\Program Files\zrok2>nssm install zrokAgent
 ```
 
 Windows might ask you for elevated Administrator privileges and will then show the main `nssm` installation dialog, which we'll use to configure the new Windows service:
 
 ![nssm install](images/nssm-install.png)
 
-We'll set "Path" to `C:\Program Files\zrok\zrok.exe` (the zrok executable). We'll set the "Startup directory" to `C:\Windows\System32\config\systemprofile` (the "home" directory for the `Local System` user). The "Arguments" are the command-line parameters that will get added to the command-line when starting the service, in this case, we want the service to start with the command `zrok2 agent start`.
+We'll set "Path" to `C:\Program Files\zrok2\zrok2.exe` (the zrok executable). We'll set the "Startup directory" to `C:\Windows\System32\config\systemprofile` (the "home" directory for the `Local System` user). The "Arguments" are the command-line parameters that will get added to the command-line when starting the service, in this case, we want the service to start with the command `zrok2 agent start`.
 
 We'll set the "Service name" to `zrokAgent`.
 
@@ -92,7 +92,7 @@ This zrok Agent service is now available for use. Whenever a Windows Command Pro
 We can access the Agent console using this command:
 
 ```cmd
-C:\Program Files\zrok>zrok2 agent console
+C:\Program Files\zrok2>zrok2 agent console
 ```
 
 And this will open a web interface which allows the Agent to be managed:
@@ -106,21 +106,21 @@ The Agent console can be used to directly create shares and accesses, and the zr
 `nssm` provides a command-line that can do this configuration without interacting with the `nssm` GUI. We would create our service like this:
 
 ```cmd
-C:\Program Files\zrok>nssm install zrokAgent "C:\Program Files\zrok\zrok.exe" agent start
+C:\Program Files\zrok2>nssm install zrokAgent "C:\Program Files\zrok2\zrok2.exe" agent start
 ```
 ```cmd
-C:\Program Files\zrok>nssm set zrokAgent AppDirectory C:\Windows\System32\config\systemprofile
+C:\Program Files\zrok2>nssm set zrokAgent AppDirectory C:\Windows\System32\config\systemprofile
 ```
 ```cmd
-C:\Program Files\zrok>nssm set zrokAgent AppStdout C:\Windows\System32\config\systemprofile\.zrok2\agent-stdout.log
+C:\Program Files\zrok2>nssm set zrokAgent AppStdout C:\Windows\System32\config\systemprofile\.zrok2\agent-stdout.log
 ```
 ```cmd
-C:\Program Files\zrok>nssm set zrokAgent AppStderr C:\Windows\System32\config\systemprofile\.zrok2\agent-stderr.log
+C:\Program Files\zrok2>nssm set zrokAgent AppStderr C:\Windows\System32\config\systemprofile\.zrok2\agent-stderr.log
 ```
 
 And we can start our new service using the standard Windows service control utility, `sc`:
 ```cmd
-C:\Program Files\zrok>sc start zrokAgent
+C:\Program Files\zrok2>sc start zrokAgent
 ```
 
 ![nssm CLI installation](images/nssm-cli-installation.png)
@@ -139,6 +139,6 @@ C:\>sc delete zrokAgent
 And if you have your `USERPROFILE` environment variable properly set to `C:\Windows\System32\config\systemprofile`, you can use this command to remove the environment from your system and from the zrok service:
 
 ```cmd
-C:\Program Files\zrok>zrok2 disable
+C:\Program Files\zrok2>zrok2 disable
 ```
 
