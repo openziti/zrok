@@ -48,23 +48,12 @@
   --selection-color: #0f023b;
 }
 
-@media (min-width: 1416px) {
-  .main-wrapper {
-    align-self: center;
-    max-width: 1400px;
-    width: 1400px;
-  }
-}
 
 .navbar .navbar__inner {
   margin: 0 auto;
   max-width: 1360px;
 }
 
-.main-wrapper {
-  display: flex;
-  flex-direction: column;
-}
 
 .footer--dark {
   --ifm-footer-background-color: #0d0235;
