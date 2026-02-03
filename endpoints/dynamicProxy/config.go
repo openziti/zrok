@@ -73,8 +73,5 @@ func defaults() *config {
 		Controller: &controllerClientConfig{
 			Timeout: 30 * time.Second,
 		},
-		Oauth: &oauthConfig{
-			MaxCookieSize: 3072,
-		},
 	}
 }

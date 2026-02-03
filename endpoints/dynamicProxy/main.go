@@ -21,6 +21,9 @@ func NewService(cfgPath string) (*Service, error) {
 	if err := svc.app.InitializeWithOptions(opts, cfgPath); err != nil {
 		return nil, err
 	}
+	if svc.app.Cfg.Oauth != nil && svc.app.Cfg.Oauth.MaxCookieSize == 0 {
+		svc.app.Cfg.Oauth.MaxCookieSize = 3072
+	}
 	dl.Info(dd.MustInspect(svc.app.Cfg))
 	return svc, nil
 }
