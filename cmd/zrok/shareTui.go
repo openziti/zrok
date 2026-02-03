@@ -63,10 +63,10 @@ func (m *shareModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
-		shareHeaderStyle.Width(m.width - 30)
-		shareConfigStyle.Width(26)
-		shareRequestsStyle.Width(m.width - 2)
-		shareLogStyle.Width(m.width - 2)
+		shareHeaderStyle = shareHeaderStyle.Width(m.width - 30)
+		shareConfigStyle = shareConfigStyle.Width(26)
+		shareRequestsStyle = shareRequestsStyle.Width(m.width - 2)
+		shareLogStyle = shareLogStyle.Width(m.width - 2)
 
 		m.height = msg.Height
 		m.headerHeight = len(m.frontendDescriptions) + 4
@@ -106,11 +106,11 @@ func (m *shareModel) View() string {
 
 func (m *shareModel) adjustPaneHeights() {
 	if !m.showLog {
-		shareRequestsStyle.Height(m.height - m.headerHeight)
+		shareRequestsStyle = shareRequestsStyle.Height(m.height - m.headerHeight)
 	} else {
 		splitHeight := m.height - m.headerHeight
-		shareRequestsStyle.Height(splitHeight/2 - 1)
-		shareLogStyle.Height(splitHeight/2 - 1)
+		shareRequestsStyle = shareRequestsStyle.Height(splitHeight/2 - 1)
+		shareLogStyle = shareLogStyle.Height(splitHeight/2 - 1)
 	}
 }
 
