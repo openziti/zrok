@@ -53,9 +53,9 @@ func (m *accessModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
-		accessHeaderStyle.Width(m.width - 2)
-		accessRequestsStyle.Width(m.width - 2)
-		accessLogStyle.Width(m.width - 2)
+		accessHeaderStyle = accessHeaderStyle.Width(m.width - 2)
+		accessRequestsStyle = accessRequestsStyle.Width(m.width - 2)
+		accessLogStyle = accessLogStyle.Width(m.width - 2)
 
 		m.height = msg.Height
 		m.adjustPaneHeights()
@@ -95,11 +95,11 @@ func (m *accessModel) View() string {
 
 func (m *accessModel) adjustPaneHeights() {
 	if !m.showLog {
-		accessRequestsStyle.Height(m.height - 5)
+		accessRequestsStyle = accessRequestsStyle.Height(m.height - 5)
 	} else {
 		splitHeight := m.height - 5
-		accessRequestsStyle.Height(splitHeight/2 - 1)
-		accessLogStyle.Height(splitHeight/2 - 1)
+		accessRequestsStyle = accessRequestsStyle.Height(splitHeight/2 - 1)
+		accessLogStyle = accessLogStyle.Height(splitHeight/2 - 1)
 	}
 }
 

@@ -56,6 +56,10 @@ CHANGE: Updated `github.com/greenpau/caddy-security` to `v1.1.31`. Updated `gith
 
 FIX: the `zrok-share.bash` wrapper script for Docker and Linux services was updated to use the new spelling of the `--oauth-email-address-pattern` option (it was `--oauth-email-domains` until v0.4.26 when it changed to `--oauth-email-address-patterns`)
 
+## v1.1.10
+
+Re-release of the mis-tagged `v1.1.9`.
+
 ## v1.1.9
 
 CHANGE: The `publicProxy` now supports "striped session cookies" to support larger authentication payloads when working with OIDC providers that use larger tokens/payloads. (https://github.com/openziti/zrok/issues/1101)
