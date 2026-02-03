@@ -5,7 +5,7 @@ sidebar_position: 10
 ---
 
 import { AssetsProvider } from '@zrokroot/src/components/assets-context';
-import DownloadCard from '@zrokroot/src/components/download-card';
+import DownloadCard from '@zrokroot/src/components/download-card.jsx';
 import DownloadCardStyles from '@zrokroot/src/css/download-card.module.css';
 import InstallCards from '@zrokroot/docs/guides/install/_install_cards.mdx';
 import useBaseUrl from '@docusaurus/useBaseUrl';
@@ -54,7 +54,7 @@ Here's a quick overview of what's involved in getting started with `zrok`:
                 Run a zrok instance on Linux, Docker, or Kubernetes.
             </CardBody>
             <CardFooter>
-                <a href={"@zrokdocs/category/self-hosting/"}>
+                <a href={useBaseUrl("/docs/zrok/category/self-hosting/")}>
                     <button className='button button--secondary button--block'>Guides</button>
                 </a>
             </CardFooter>
@@ -99,7 +99,7 @@ When we left off you had downloaded, extracted, and configured your `zrok` softw
 
 Log into the API console at:
 
-[https://api-v2.zrok.io/](https://api-v2.zrok.io/)
+[https://api-v1.zrok.io/](https://api-v1.zrok.io/)
 
 When you first log into your account on the API console, your interface will look like this:
 
@@ -133,8 +133,8 @@ $ zrok status
 Config:
 
  CONFIG           VALUE                   SOURCE 
- apiEndpoint      https://api-v2.zrok.io  env
- defaultNamespace public                  binary
+ apiEndpoint      https://api-v1.zrok.io  env    
+ defaultFrontend  public                  binary 
  headless         false                   binary 
 
 Environment:
@@ -207,7 +207,7 @@ If we try to reload the frontend endpoint in our web browser, we'll see:
 
 ![Not Found](images/zrok-not-found.png)
 
-[More about public shares](/concepts/sharing-public.mdx)
+[More about public shares](./concepts/sharing-public.mdx)
 
 ### Private Shares
 
@@ -298,7 +298,7 @@ Here's a quick review of the `zrok` mental model and the vocabulary.
 
 You create an _account_ with a `zrok` _instance_. Your account is identified by a username and a password, which you use to log into the _web console_. Your account also has a _secret token_, which you will use to authenticate from the `zrok` command-line to interact with the _instance_.
 
-You create a new _account_ with NetFoundry's `zrok` _instance_ by subscribing in [myzrok.io](https://myzrok.io) or in a self-hosted `zrok` _instance_ by running [the `zrok invite` command](/guides/self-hosting/self-service-invite.mdx) or the `zrok admin create account` command.
+You create a new _account_ with NetFoundry's `zrok` _instance_ by subscribing in [myzrok.io](https://myzrok.io) or in a self-hosted `zrok` _instance_ by running [the `zrok invite` command](./guides/self-hosting/self-service-invite.mdx) or the `zrok admin create account` command.
 
 ### Environment
 
@@ -322,7 +322,7 @@ You use the `zrok reserve` command to create _reserved shares_. Reserved shares 
 
 ## Self-Hosting an Instance
 
-Interested in self-hosting your own `zrok` instance? See the [self-hosting guides](@zrokdocs/category/self-hosting/)!
+Interested in self-hosting your own `zrok` instance? See the [self-hosting guides](/docs/zrok/category/self-hosting/)!
 
 ## Resources
 

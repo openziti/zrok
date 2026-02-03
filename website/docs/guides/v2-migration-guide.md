@@ -306,7 +306,7 @@ If you run into issues during migration:
 2. Use `zrok2 list namespaces` to see what namespaces are available to you
 3. Use `zrok2 list names` to see your current names
 4. Review the error messages - v2.0 has improved error reporting
-5. Consult the [self-hosting guides](/docs/category/self-hosting/) if you manage your own instance
+5. Consult the [self-hosting guides](@zrokdocs/category/self-hosting/) if you manage your own instance
 6. Check the [concepts documentation](/concepts/index.md) for deeper understanding
 7. Reach out on the [OpenZiti Discourse](https://openziti.discourse.group) for help
 

@@ -1,0 +1,8 @@
+{
+  "label": "The zrok Agent",
+  "position": 15,
+  "link": {
+    "type": "doc",
+    "id": "guides/agent/index"
+  }
+}
