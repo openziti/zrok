@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 #
-# postinstall-metrics.bash - Post-installation script for zrok-metrics package
+# postinstall-metrics.bash - Post-installation script for zrok2-metrics package
 #
 
 set -euo pipefail
 
 # Package-specific configuration
-SERVICE_NAME="zrok-metrics"
-SERVICE_USER="zrok-metrics"
-SERVICE_GROUP="zrok-metrics"
-SERVICE_HOME="/var/lib/zrok-metrics"
-ADDITIONAL_GROUPS="zrok-controller"
+SERVICE_NAME="zrok2-metrics"
+SERVICE_USER="zrok2-metrics"
+SERVICE_GROUP="zrok2-metrics"
+SERVICE_HOME="/var/lib/zrok2-metrics"
+ADDITIONAL_GROUPS="zrok2-controller"
 
 # Initialize debug output
 : "${DEBUG:=0}"
@@ -40,7 +40,7 @@ create_service_user() {
                     --home-dir "${SERVICE_HOME}" \
                     --create-home \
                     --shell /usr/sbin/nologin \
-                    --comment "zrok service user" \
+                    --comment "zrok2 service user" \
                     "${SERVICE_USER}"
         else
             useradd --system \
@@ -48,7 +48,7 @@ create_service_user() {
                     --home-dir "${SERVICE_HOME}" \
                     --create-home \
                     --shell /usr/sbin/nologin \
-                    --comment "zrok service user" \
+                    --comment "zrok2 service user" \
                     "${SERVICE_USER}"
         fi
         echo "Created user: ${SERVICE_USER}" >&3

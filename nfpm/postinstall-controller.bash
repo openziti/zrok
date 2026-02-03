@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 #
-# postinstall-controller.bash - Post-installation script for zrok-controller package
+# postinstall-controller.bash - Post-installation script for zrok2-controller package
 #
 
 set -euo pipefail
 
 # Package-specific configuration
-SERVICE_NAME="zrok-controller"
-SERVICE_USER="zrok-controller"
-SERVICE_GROUP="zrok-controller"
-SERVICE_HOME="/var/lib/zrok-controller"
+SERVICE_NAME="zrok2-controller"
+SERVICE_USER="zrok2-controller"
+SERVICE_GROUP="zrok2-controller"
+SERVICE_HOME="/var/lib/zrok2-controller"
 ADDITIONAL_GROUPS=""
 
 # Initialize debug output
@@ -40,7 +40,7 @@ create_service_user() {
                     --home-dir "${SERVICE_HOME}" \
                     --create-home \
                     --shell /usr/sbin/nologin \
-                    --comment "zrok service user" \
+                    --comment "zrok2 service user" \
                     "${SERVICE_USER}"
         else
             useradd --system \
@@ -48,7 +48,7 @@ create_service_user() {
                     --home-dir "${SERVICE_HOME}" \
                     --create-home \
                     --shell /usr/sbin/nologin \
-                    --comment "zrok service user" \
+                    --comment "zrok2 service user" \
                     "${SERVICE_USER}"
         fi
         echo "Created user: ${SERVICE_USER}" >&3
@@ -69,12 +69,12 @@ create_service_user() {
     chmod 750 "${SERVICE_HOME}"
     
     # Ensure config directory exists and has correct permissions
-    if [[ ! -d "/etc/zrok" ]]; then
-        mkdir -p "/etc/zrok"
-        echo "Created config directory: /etc/zrok" >&3
+    if [[ ! -d "/etc/zrok2" ]]; then
+        mkdir -p "/etc/zrok2"
+        echo "Created config directory: /etc/zrok2" >&3
     fi
-    chown root:root "/etc/zrok"
-    chmod 755 "/etc/zrok"
+    chown root:root "/etc/zrok2"
+    chmod 755 "/etc/zrok2"
 }
 
 # Function to handle clean installation
