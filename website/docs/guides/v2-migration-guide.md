@@ -36,9 +36,9 @@ The `defaultFrontend` configuration option has been replaced with `defaultNamesp
 | v1.x concept | v2.0 equivalent | description |
 |--------------|----------------|-------------|
 | reserved share | reserved name in a namespace | A persistent external name for your share |
-| `zrok reserve` | `zrok create name` | Create a reserved name |
-| `zrok share reserved <token>` | `zrok share public/private -n <namespaceToken>:<name>` | Share using a name (`-n` selects a name in a namespace) |
-| `zrok release <token>` | `zrok delete name <name>` | Remove a reserved name |
+| `zrok reserve` | `zrok2 create name` | Create a reserved name |
+| `zrok share reserved <token>` | `zrok2 share public/private -n <namespaceToken>:<name>` | Share using a name (`-n` selects a name in a namespace) |
+| `zrok release <token>` | `zrok2 delete name <name>` | Remove a reserved name |
 
 ---
 
