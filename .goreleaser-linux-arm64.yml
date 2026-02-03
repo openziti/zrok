@@ -51,93 +51,10 @@ nfpms:
     priority: optional
 
     # GoReleaser will automatically add the binaries here
-    bindir: /opt/openziti/bin
+    bindir: /usr/bin
 
     # Contents to add to the package.
-    contents:
-      - src: /opt/openziti/bin/zrok2
-        dst: /usr/bin/zrok2
-        type: "symlink"
-
-  - package_name: zrok2-share
-    id: zrok-share
-    vendor: NetFoundry
-    homepage: https://zrok.io/
-    maintainer: support@zrok.io
-    description: |-
-      This package provides zrok2-share.service. To enable, edit the "/opt/openziti/etc/zrok2/zrok2-share.env" file with the
-      desired target for sharing, and run "systemctl enable --now zrok2-share.service".
-    license: Apache 2.0
-
-    # do not bundle the built binaries, only supporting files
-    meta: true
-
-    # Formats to be generated.
-    formats:
-      - deb
-      - rpm
-
-    # {{ .ConventionalFileName }} satisfies the RPM name convention.
-    file_name_template: "{{ .ConventionalFileName }}"
-
-    # Umask to be used on files without explicit mode set. (overridable)
-    umask: 0o002
-
-    # Package version within this release version.
-    release: 1
-
-    # Section.
-    section: default
-
-    # Priority.
-    priority: optional
-
-    # GoReleaser will automatically add the binaries here
-    dependencies:
-      - zrok2
-
-    # this allows users to satisfy the requirement for jq another way, not with the package manager, e.g.
-    # apt install --no-recommends zrok2-share
-    recommends:
-      - jq
-
-    overrides:
-      # yum and dnf do not automatically install "weak deps" aka "recommends", so we need to add them as a dependency
-      rpm:
-        dependencies:
-          - zrok2
-          - jq
-
-    # Contents to add to the package.
-    contents:
-      - dst: /lib/systemd/system/
-        src: ./nfpm/zrok2-share.service
-
-      - dst: /usr/lib/systemd/user/
-        src: ./nfpm/zrok2-share@.service
-
-      - dst: /opt/openziti/etc/zrok2
-        type: dir
-        file_info:
-          mode: 0755
-
-      - dst: /opt/openziti/bin/
-        src: ./nfpm/zrok2-share.bash
-        file_info:
-          mode: 0755
-
-      - dst: /opt/openziti/bin/
-        src: ./nfpm/zrok2-enable.bash
-        file_info:
-          mode: 0755
-
-      - dst: /opt/openziti/etc/zrok2/
-        src: ./nfpm/zrok2-share.env
-        type: config|noreplace
-
-      - dst: /opt/openziti/etc/zrok2/
-        src: ./etc/caddy/multiple_upstream.Caddyfile
-        type: config|noreplace
+    contents: []
 
   - package_name: zrok2-agent
     id: zrok-agent
@@ -178,7 +95,7 @@ nfpms:
       - zrok2
 
     # this allows users to satisfy the requirement for jq another way, not with the package manager, e.g.
-    # apt install --no-recommends zrok2-share
+    # apt install --no-recommends zrok2-agent
     recommends: []
 
     overrides:
@@ -191,3 +108,12 @@ nfpms:
     contents:
       - dst: /usr/lib/systemd/user/
         src: ./nfpm/zrok2-agent.service
+
+      - dst: /usr/bin/zrok2-enable
+        src: ./nfpm/zrok2-enable.bash
+        file_info:
+          mode: 0755
+
+      - dst: /etc/zrok2/
+        src: ./etc/caddy/multiple_upstream.Caddyfile
+        type: config|noreplace
