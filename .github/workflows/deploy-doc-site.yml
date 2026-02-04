@@ -22,8 +22,8 @@ jobs:
         with:
           node-version: 22
           check-latest: true
-          cache: "npm"
-          cache-dependency-path: website/package-lock.json
+          cache: "yarn"
+          cache-dependency-path: website/yarn.lock
 
       - name: Run a multi-line script
         run: |
