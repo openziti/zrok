@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkwebsite=globalThis.webpackChunkwebsite||[]).push([[2598],{3806(t,e,s){s.r(e),s.d(e,{default:()=>i});s(96540);var r=s(56347),a=s(74848);function i(){return(0,a.jsx)(r.rd,{to:"/docs/zrok/getting-started"})}}}]);
