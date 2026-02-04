@@ -4,8 +4,8 @@ import versioneer
 from pathlib import Path
 import re
 
-NAME = os.getenv('ZROK_PY_NAME', "zrok")
-VERSION = "1.0.0"
+NAME = os.getenv('ZROK_PY_NAME', "zrok2")
+VERSION = "2.0.0"
 
 OVERRIDES = {
     # Override specific packages with version constraints different from the generated requirements.txt
@@ -47,10 +47,10 @@ setup(
     name=NAME,
     cmdclass=versioneer.get_cmdclass(dict()),
     version=versioneer.get_version(),
-    description="zrok",
+    description="zrok2",
     author_email="",
     url="",
-    keywords=["zrok"],
+    keywords=["zrok", "zrok2"],
     install_requires=REQUIRES,
     python_requires='>3.10.0',
     packages=find_packages(),

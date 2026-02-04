@@ -8,7 +8,7 @@ After=network-online.target
 Type=simple
 UMask=0007
 ExecStartPre=/usr/bin/env rm --force %h/.zrok2/agent.socket
-ExecStart=/opt/openziti/bin/zrok2 agent start
+ExecStart=/usr/bin/zrok2 agent start
 Restart=always
 RestartSec=3
 

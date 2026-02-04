@@ -62,7 +62,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: zrok_sdk_distributions
+          name: zrok2_sdk_distributions
           path: sdk/python/src/dist/*
 
   publish_testpypi:
@@ -77,7 +77,7 @@ jobs:
         with:
           path: sdk/python/src/dist
           merge-multiple: true
-          pattern: zrok_sdk_distributions
+          pattern: zrok2_sdk_distributions
 
       - name: Publish Distributions to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -99,7 +99,7 @@ jobs:
         with:
           path: sdk/python/src/dist
           merge-multiple: true
-          pattern: zrok_sdk_distributions
+          pattern: zrok2_sdk_distributions
 
       - name: Publish Distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

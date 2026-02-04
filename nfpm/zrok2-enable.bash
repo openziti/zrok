@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# this script uses a zrok enable token to enable a zrok environment in $HOME/.zrok2
+# this script uses a zrok2 account token to enable a zrok2 environment in $HOME/.zrok2
 #
 
 set -o errexit
@@ -8,7 +8,7 @@ set -o nounset
 set -o pipefail
 
 BASENAME=$(basename "$0")
-DEFAULT_ZROK2_ENVIRONMENT_NAME="zrok2-share service on $(hostname -s 2>/dev/null || echo localhost)"
+DEFAULT_ZROK2_ENVIRONMENT_NAME="zrok2-agent on $(hostname -s 2>/dev/null || echo localhost)"
 
 if (( $# )); then
   case $1 in
@@ -21,16 +21,10 @@ if (( $# )); then
   esac
 fi
 
-# set HOME to the first colon-sep dir in STATE_DIRECTORY inherited from systemd, e.g. /var/lib/zrok2-share
-if [[ -n "${STATE_DIRECTORY:-}" ]]; then
-  export HOME="${STATE_DIRECTORY%:*}"
-else
-  echo "WARNING: STATE_DIRECTORY is undefined. Using HOME=${HOME}" >&2
-fi
-echo "DEBUG: zrok state directory is ${HOME}/.zrok2"
+echo "DEBUG: zrok2 state directory is ${HOME}/.zrok2"
 
 if [[ -s ~/.zrok2/environment.json ]]; then
-  echo "INFO: zrok environment is already enabled. Delete '$(realpath ~/.zrok2/environment.json)' if you want to create a"\
+  echo "INFO: zrok2 environment is already enabled. Delete '$(realpath ~/.zrok2/environment.json)' if you want to create a"\
     "new environment."
   exit 0
 fi

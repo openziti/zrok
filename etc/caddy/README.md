@@ -15,4 +15,4 @@ http:// {
 
 ## Notes
 
-multiple_upstream.Caddyfile is bundled in the zrok2-share package for Linux as an example Caddyfile.
+multiple_upstream.Caddyfile is bundled in the zrok2-agent package for Linux as an example Caddyfile.
