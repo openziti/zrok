@@ -2,11 +2,9 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/jmoiron/sqlx"
-	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
-	"github.com/sirupsen/logrus"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/metadata"
 )
 
 type overviewHandler struct{}
@@ -18,27 +16,27 @@ func newOverviewHandler() *overviewHandler {
 func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return metadata.NewOverviewInternalServerError()
 	}
 	defer func() { _ = trx.Rollback() }()
 
 	envs, err := str.FindEnvironmentsForAccount(int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("error finding environments for '%v': %v", principal.Email, err)
+		dl.Errorf("error finding environments for '%v': %v", principal.Email, err)
 		return metadata.NewOverviewInternalServerError()
 	}
 
-	accountLimited, err := h.isAccountLimited(principal, trx)
+	accountLimited, err := isAccountLimited(int(principal.ID), trx)
 	if err != nil {
-		logrus.Errorf("error checking account limited for '%v': %v", principal.Email, err)
+		dl.Errorf("error checking account limited for '%v': %v", principal.Email, err)
 	}
 
 	ovr := &rest_model_zrok.Overview{AccountLimited: accountLimited}
 	for _, env := range envs {
 		remoteAgent, err := str.IsAgentEnrolledForEnvironment(env.Id, trx)
 		if err != nil {
-			logrus.Errorf("error checking agent enrollment for environment '%v' (%v): %v", env.ZId, principal.Email, err)
+			dl.Errorf("error checking agent enrollment for environment '%v' (%v): %v", env.ZId, principal.Email, err)
 			return metadata.NewOverviewInternalServerError()
 		}
 
@@ -57,41 +55,32 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 
 		shrs, err := str.FindSharesForEnvironment(env.Id, trx)
 		if err != nil {
-			logrus.Errorf("error finding shares for environment '%v': %v", env.ZId, err)
+			dl.Errorf("error finding shares for environment '%v': %v", env.ZId, err)
 			return metadata.NewOverviewInternalServerError()
 		}
 		for _, shr := range shrs {
-			feEndpoint := ""
-			if shr.FrontendEndpoint != nil {
-				feEndpoint = *shr.FrontendEndpoint
-			}
-			feSelection := ""
-			if shr.FrontendSelection != nil {
-				feSelection = *shr.FrontendSelection
-			}
-			beProxyEndpoint := ""
+			frontendEndpoints := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, trx)
+			target := ""
 			if shr.BackendProxyEndpoint != nil {
-				beProxyEndpoint = *shr.BackendProxyEndpoint
+				target = *shr.BackendProxyEndpoint
 			}
 			envShr := &rest_model_zrok.Share{
-				ShareToken:           shr.Token,
-				ZID:                  shr.ZId,
-				EnvZID:               env.ZId,
-				ShareMode:            shr.ShareMode,
-				BackendMode:          shr.BackendMode,
-				FrontendSelection:    feSelection,
-				FrontendEndpoint:     feEndpoint,
-				BackendProxyEndpoint: beProxyEndpoint,
-				Reserved:             shr.Reserved,
-				Limited:              accountLimited,
-				CreatedAt:            shr.CreatedAt.UnixMilli(),
-				UpdatedAt:            shr.UpdatedAt.UnixMilli(),
+				ShareToken:        shr.Token,
+				ZID:               shr.ZId,
+				EnvZID:            env.ZId,
+				ShareMode:         shr.ShareMode,
+				BackendMode:       shr.BackendMode,
+				FrontendEndpoints: frontendEndpoints,
+				Target:            target,
+				Limited:           accountLimited,
+				CreatedAt:         shr.CreatedAt.UnixMilli(),
+				UpdatedAt:         shr.UpdatedAt.UnixMilli(),
 			}
 			ear.Shares = append(ear.Shares, envShr)
 		}
 		fes, err := str.FindFrontendsForEnvironment(env.Id, trx)
 		if err != nil {
-			logrus.Errorf("error finding frontends for environment '%v': %v", env.ZId, err)
+			dl.Errorf("error finding frontends for environment '%v': %v", env.ZId, err)
 			return metadata.NewOverviewInternalServerError()
 		}
 		for _, fe := range fes {
@@ -111,7 +100,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 			if fe.PrivateShareId != nil {
 				feShr, err := str.GetShare(*fe.PrivateShareId, trx)
 				if err != nil {
-					logrus.Errorf("error getting share for frontend '%v': %v", fe.ZId, err)
+					dl.Errorf("error getting share for frontend '%v': %v", fe.ZId, err)
 					return metadata.NewOverviewInternalServerError()
 				}
 				envFe.ShareToken = feShr.Token
@@ -123,20 +112,44 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 		ovr.Environments = append(ovr.Environments, ear)
 	}
 
-	return metadata.NewOverviewOK().WithPayload(ovr)
-}
-
-func (h *overviewHandler) isAccountLimited(principal *rest_model_zrok.Principal, trx *sqlx.Tx) (bool, error) {
-	var je *store.BandwidthLimitJournalEntry
-	jEmpty, err := str.IsBandwidthLimitJournalEmpty(int(principal.ID), trx)
+	// find all namespaces the user has access to
+	namespaces, err := str.FindNamespacesForAccount(int(principal.ID), trx)
 	if err != nil {
-		return false, err
+		dl.Errorf("error finding namespaces for account '%v': %v", principal.Email, err)
+		return metadata.NewOverviewInternalServerError()
 	}
-	if !jEmpty {
-		je, err = str.FindLatestBandwidthLimitJournal(int(principal.ID), trx)
+
+	// build namespace objects for overview
+	for _, namespace := range namespaces {
+		ovr.Namespaces = append(ovr.Namespaces, &rest_model_zrok.OverviewNamespacesItems0{
+			NamespaceToken: namespace.Token,
+			Name:           namespace.Name,
+			Description:    namespace.Description,
+		})
+	}
+
+	// collect allocated names from all accessible namespaces
+	for _, ns := range namespaces {
+		names, err := str.FindNamesWithShareTokensForAccountAndNamespace(int(principal.ID), ns.Id, trx)
 		if err != nil {
-			return false, err
+			dl.Errorf("error finding allocated names for namespace '%v': %v", ns.Token, err)
+			return metadata.NewOverviewInternalServerError()
+		}
+
+		for _, an := range names {
+			nameObj := &rest_model_zrok.OverviewNamesItems0{
+				NamespaceToken: ns.Token,
+				NamespaceName:  ns.Name,
+				Name:           an.Name.Name,
+				Reserved:       an.Name.Reserved,
+				CreatedAt:      an.Name.CreatedAt.Unix(),
+			}
+			if an.ShareToken != nil {
+				nameObj.ShareToken = *an.ShareToken
+			}
+			ovr.Names = append(ovr.Names, nameObj)
 		}
 	}
-	return je != nil && je.Action == store.LimitLimitAction, nil
+
+	return metadata.NewOverviewOK().WithPayload(ovr)
 }

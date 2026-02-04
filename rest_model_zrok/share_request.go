@@ -27,24 +27,18 @@ type ShareRequest struct {
 	// auth scheme
 	AuthScheme string `json:"authScheme,omitempty"`
 
-	// auth users
-	AuthUsers []*AuthUser `json:"authUsers"`
-
 	// backend mode
 	// Enum: [proxy web tcpTunnel udpTunnel caddy drive socks]
 	BackendMode string `json:"backendMode,omitempty"`
 
-	// backend proxy endpoint
-	BackendProxyEndpoint string `json:"backendProxyEndpoint,omitempty"`
+	// basic auth users
+	BasicAuthUsers []*AuthUser `json:"basicAuthUsers"`
 
 	// env z Id
 	EnvZID string `json:"envZId,omitempty"`
 
-	// frontend selection
-	FrontendSelection []string `json:"frontendSelection"`
-
-	// oauth authorization check interval
-	OauthAuthorizationCheckInterval string `json:"oauthAuthorizationCheckInterval,omitempty"`
+	// name selections
+	NameSelections []*NameSelection `json:"nameSelections"`
 
 	// oauth email domains
 	OauthEmailDomains []string `json:"oauthEmailDomains"`
@@ -52,30 +46,37 @@ type ShareRequest struct {
 	// oauth provider
 	OauthProvider string `json:"oauthProvider,omitempty"`
 
+	// oauth refresh interval
+	OauthRefreshInterval string `json:"oauthRefreshInterval,omitempty"`
+
 	// permission mode
 	// Enum: [open closed]
 	PermissionMode string `json:"permissionMode,omitempty"`
 
-	// reserved
-	Reserved bool `json:"reserved,omitempty"`
+	// private share token
+	PrivateShareToken string `json:"privateShareToken,omitempty"`
 
 	// share mode
 	// Enum: [public private]
 	ShareMode string `json:"shareMode,omitempty"`
 
-	// unique name
-	UniqueName string `json:"uniqueName,omitempty"`
+	// target
+	Target string `json:"target,omitempty"`
 }
 
 // Validate validates this share request
 func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAuthUsers(formats); err != nil {
+	if err := m.validateBackendMode(formats); err != nil {
 		res = append(res, err)
 	}
 
-	if err := m.validateBackendMode(formats); err != nil {
+	if err := m.validateBasicAuthUsers(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNameSelections(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -90,32 +91,6 @@ func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (m *ShareRequest) validateAuthUsers(formats strfmt.Registry) error {
-	if swag.IsZero(m.AuthUsers) { // not required
-		return nil
-	}
-
-	for i := 0; i < len(m.AuthUsers); i++ {
-		if swag.IsZero(m.AuthUsers[i]) { // not required
-			continue
-		}
-
-		if m.AuthUsers[i] != nil {
-			if err := m.AuthUsers[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("authUsers" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("authUsers" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
 	return nil
 }
 
@@ -171,6 +146,58 @@ func (m *ShareRequest) validateBackendMode(formats strfmt.Registry) error {
 	// value enum
 	if err := m.validateBackendModeEnum("backendMode", "body", m.BackendMode); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (m *ShareRequest) validateBasicAuthUsers(formats strfmt.Registry) error {
+	if swag.IsZero(m.BasicAuthUsers) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.BasicAuthUsers); i++ {
+		if swag.IsZero(m.BasicAuthUsers[i]) { // not required
+			continue
+		}
+
+		if m.BasicAuthUsers[i] != nil {
+			if err := m.BasicAuthUsers[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("basicAuthUsers" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("basicAuthUsers" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *ShareRequest) validateNameSelections(formats strfmt.Registry) error {
+	if swag.IsZero(m.NameSelections) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.NameSelections); i++ {
+		if swag.IsZero(m.NameSelections[i]) { // not required
+			continue
+		}
+
+		if m.NameSelections[i] != nil {
+			if err := m.NameSelections[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("nameSelections" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("nameSelections" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -264,7 +291,11 @@ func (m *ShareRequest) validateShareMode(formats strfmt.Registry) error {
 func (m *ShareRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.contextValidateAuthUsers(ctx, formats); err != nil {
+	if err := m.contextValidateBasicAuthUsers(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateNameSelections(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -274,21 +305,46 @@ func (m *ShareRequest) ContextValidate(ctx context.Context, formats strfmt.Regis
 	return nil
 }
 
-func (m *ShareRequest) contextValidateAuthUsers(ctx context.Context, formats strfmt.Registry) error {
+func (m *ShareRequest) contextValidateBasicAuthUsers(ctx context.Context, formats strfmt.Registry) error {
 
-	for i := 0; i < len(m.AuthUsers); i++ {
+	for i := 0; i < len(m.BasicAuthUsers); i++ {
 
-		if m.AuthUsers[i] != nil {
+		if m.BasicAuthUsers[i] != nil {
 
-			if swag.IsZero(m.AuthUsers[i]) { // not required
+			if swag.IsZero(m.BasicAuthUsers[i]) { // not required
 				return nil
 			}
 
-			if err := m.AuthUsers[i].ContextValidate(ctx, formats); err != nil {
+			if err := m.BasicAuthUsers[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("authUsers" + "." + strconv.Itoa(i))
+					return ve.ValidateName("basicAuthUsers" + "." + strconv.Itoa(i))
 				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("authUsers" + "." + strconv.Itoa(i))
+					return ce.ValidateName("basicAuthUsers" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *ShareRequest) contextValidateNameSelections(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.NameSelections); i++ {
+
+		if m.NameSelections[i] != nil {
+
+			if swag.IsZero(m.NameSelections[i]) { // not required
+				return nil
+			}
+
+			if err := m.NameSelections[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("nameSelections" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("nameSelections" + "." + strconv.Itoa(i))
 				}
 				return err
 			}

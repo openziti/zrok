@@ -4,13 +4,14 @@ package rest_server_zrok
 
 import (
 	"crypto/tls"
-	"github.com/openziti/zrok/ui"
-	"github.com/sirupsen/logrus"
 	"net/http"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/ui"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
-	"github.com/openziti/zrok/rest_server_zrok/operations"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations"
 )
 
 var HealthCheck func(w http.ResponseWriter, r *http.Request)
@@ -23,7 +24,7 @@ func configureFlags(api *operations.ZrokAPI) {
 
 func configureAPI(api *operations.ZrokAPI) http.Handler {
 	api.ServeError = errors.ServeError
-	api.Logger = logrus.Printf
+	api.Logger = func(m string, args ...interface{}) { dl.Infof(m, args...) }
 	api.UseSwaggerUI()
 	api.JSONConsumer = runtime.JSONConsumer()
 	api.JSONProducer = runtime.JSONProducer()

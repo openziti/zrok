@@ -1,9 +1,8 @@
 package environment
 
 import (
-	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/environment/env_v0_3"
-	"github.com/openziti/zrok/environment/env_v0_4"
+	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/environment/env_v0_4"
 	"github.com/pkg/errors"
 )
 
@@ -16,11 +15,8 @@ func SetRootDirName(name string) {
 func LoadRoot() (env_core.Root, error) {
 	if assert, err := env_v0_4.Assert(); assert && err == nil {
 		return env_v0_4.Load()
-	} else if assert, err := env_v0_3.Assert(); assert && err == nil {
-		return env_v0_3.Load()
-	} else {
-		return env_v0_4.Default()
 	}
+	return env_v0_4.Default()
 }
 
 func IsLatest(r env_core.Root) bool {

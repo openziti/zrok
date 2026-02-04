@@ -4,12 +4,12 @@ import (
 	"net"
 	"time"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/sdk-golang/ziti/edge"
-	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/endpoints"
+	"github.com/openziti/zrok/v2/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type BackendConfig struct {
@@ -53,8 +53,8 @@ func NewBackend(cfg *BackendConfig) (*Backend, error) {
 }
 
 func (b *Backend) Run() error {
-	logrus.Info("started")
-	defer logrus.Info("exited")
+	dl.Info("started")
+	defer dl.Info("exited")
 
 	for {
 		if conn, err := b.listener.Accept(); err == nil {
@@ -66,7 +66,7 @@ func (b *Backend) Run() error {
 }
 
 func (b *Backend) handle(conn net.Conn) {
-	logrus.Debugf("handling '%v'", conn.RemoteAddr())
+	dl.Debugf("handling '%v'", conn.RemoteAddr())
 	if rAddr, err := net.ResolveUDPAddr("udp", b.cfg.EndpointAddress); err == nil {
 		if rConn, err := net.DialUDP("udp", nil, rAddr); err == nil {
 			go endpoints.TXer(conn, rConn)
@@ -80,11 +80,11 @@ func (b *Backend) handle(conn net.Conn) {
 				}
 			}
 		} else {
-			logrus.Errorf("error dialing '%v': %v", b.cfg.EndpointAddress, err)
+			dl.Errorf("error dialing '%v': %v", b.cfg.EndpointAddress, err)
 			_ = conn.Close()
 			return
 		}
 	} else {
-		logrus.Errorf("error resolving '%v': %v", b.cfg.EndpointAddress, err)
+		dl.Errorf("error resolving '%v': %v", b.cfg.EndpointAddress, err)
 	}
 }

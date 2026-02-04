@@ -2,9 +2,9 @@ package agentClient
 
 import (
 	"context"
-	"github.com/openziti/zrok/agent/agentGrpc"
-	"github.com/openziti/zrok/build"
-	"github.com/openziti/zrok/environment/env_core"
+	"github.com/openziti/zrok/v2/agent/agentGrpc"
+	"github.com/openziti/zrok/v2/build"
+	"github.com/openziti/zrok/v2/environment/env_core"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

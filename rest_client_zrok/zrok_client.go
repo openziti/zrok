@@ -10,12 +10,12 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/openziti/zrok/rest_client_zrok/account"
-	"github.com/openziti/zrok/rest_client_zrok/admin"
-	"github.com/openziti/zrok/rest_client_zrok/agent"
-	"github.com/openziti/zrok/rest_client_zrok/environment"
-	"github.com/openziti/zrok/rest_client_zrok/metadata"
-	"github.com/openziti/zrok/rest_client_zrok/share"
+	"github.com/openziti/zrok/v2/rest_client_zrok/account"
+	"github.com/openziti/zrok/v2/rest_client_zrok/admin"
+	"github.com/openziti/zrok/v2/rest_client_zrok/agent"
+	"github.com/openziti/zrok/v2/rest_client_zrok/environment"
+	"github.com/openziti/zrok/v2/rest_client_zrok/metadata"
+	"github.com/openziti/zrok/v2/rest_client_zrok/share"
 )
 
 // Default zrok HTTP client.
@@ -27,7 +27,7 @@ const (
 	DefaultHost string = "localhost"
 	// DefaultBasePath is the default BasePath
 	// found in Meta (info) section of spec file
-	DefaultBasePath string = "/api/v1"
+	DefaultBasePath string = "/api/v2"
 )
 
 // DefaultSchemes are the default schemes found in Meta (info) section of spec file

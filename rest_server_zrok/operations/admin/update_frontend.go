@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
 
 // UpdateFrontendHandlerFunc turns a function with the right signature into a update frontend handler
@@ -77,6 +77,12 @@ func (o *UpdateFrontend) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 //
 // swagger:model UpdateFrontendBody
 type UpdateFrontendBody struct {
+
+	// dynamic
+	Dynamic bool `json:"dynamic,omitempty"`
+
+	// dynamic set
+	DynamicSet bool `json:"dynamicSet,omitempty"`
 
 	// frontend token
 	FrontendToken string `json:"frontendToken,omitempty"`

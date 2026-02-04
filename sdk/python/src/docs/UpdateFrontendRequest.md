@@ -8,6 +8,8 @@ Name | Type | Description | Notes
 **frontend_token** | **str** |  | [optional] 
 **public_name** | **str** |  | [optional] 
 **url_template** | **str** |  | [optional] 
+**dynamic** | **bool** |  | [optional] 
+**dynamic_set** | **bool** |  | [optional] 
 
 ## Example
 

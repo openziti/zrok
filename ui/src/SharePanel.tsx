@@ -38,16 +38,6 @@ const SharePanel = ({ share }: SharePanelProps) => {
     const customProperties = {
         createdAt: row => new Date(row.value).toLocaleString(),
         updatedAt: row => new Date(row.value).toLocaleString(),
-        frontendEndpoint: row => <>
-            <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
-                <Grid2 display="flex" justifyContent="left">
-                    <a href={row.value} target="_">{row.value}</a>
-                </Grid2>
-                <Grid2 display="flex" justifyContent="right" sx={{ flexGrow: 1 }}>
-                    <ClipboardText text={row.value} />
-                </Grid2>
-            </Grid2>
-        </>,
         reserved: row => row.value ? "reserved" : "ephemeral",
         shareToken: row => <>
             <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
@@ -58,13 +48,30 @@ const SharePanel = ({ share }: SharePanelProps) => {
                     <ClipboardText text={row.value} />
                 </Grid2>
             </Grid2>
-        </>
+        </>,
+        frontendEndpoints: row => {
+            if (!row.value || row.value.length === 0) {
+                return <span>None</span>;
+            }
+            return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    {row.value.map((endpoint, index) => (
+                        <Grid2 key={index} container sx={{ flexGrow: 1 }} alignItems="center">
+                            <Grid2 display="flex" justifyContent="left">
+                                <span>{endpoint}</span>
+                            </Grid2>
+                            <Grid2 display="flex" justifyContent="right" sx={{ flexGrow: 1 }}>
+                                <ClipboardText text={endpoint} />
+                            </Grid2>
+                        </Grid2>
+                    ))}
+                </div>
+            );
+        }
     }
 
     const labels = {
-        backendProxyEndpoint: "Target",
         createdAt: "Created",
-        reserved: "Reservation",
         token: "Share Token",
         updatedAt: "Updated"
     }
@@ -76,8 +83,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
                 delete d.limited;
                 delete d.zId;
                 if(d.shareMode === "private") {
-                    delete d.frontendEndpoint;
-                    delete d.frontendSelection;
+                    delete d.frontendEndpoints;
                 }
                 setDetail(d);
             })

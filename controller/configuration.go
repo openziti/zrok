@@ -2,10 +2,10 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti/zrok/build"
-	"github.com/openziti/zrok/controller/config"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
+	"github.com/openziti/zrok/v2/build"
+	"github.com/openziti/zrok/v2/controller/config"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/metadata"
 )
 
 type configurationHandler struct {

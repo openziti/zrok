@@ -3,11 +3,12 @@ package metrics
 import (
 	"context"
 	"fmt"
+
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
-	"github.com/openziti/zrok/util"
-	"github.com/sirupsen/logrus"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/util"
 )
 
 type influxWriter struct {
@@ -53,7 +54,7 @@ func (w *influxWriter) Handle(u *Usage) error {
 		}
 
 		if err := w.writeApi.WritePoint(context.Background(), pts...); err == nil {
-			logrus.Info(out)
+			dl.Info(out)
 		} else {
 			return err
 		}

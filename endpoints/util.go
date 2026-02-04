@@ -1,11 +1,12 @@
 package endpoints
 
 import (
-	"github.com/openziti/edge-api/rest_model"
-	"github.com/openziti/sdk-golang/ziti"
-	"github.com/sirupsen/logrus"
 	"net/url"
 	"strings"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/edge-api/rest_model"
+	"github.com/openziti/sdk-golang/ziti"
 )
 
 func GetRefreshedService(svcName string, ctx ziti.Context) (*rest_model.ServiceDetail, bool) {
@@ -13,11 +14,11 @@ func GetRefreshedService(svcName string, ctx ziti.Context) (*rest_model.ServiceD
 	if !found {
 		svc, err := ctx.RefreshService(svcName)
 		if err != nil {
-			logrus.Errorf("error refreshing service '%v': %v", svcName, err)
+			dl.Errorf("error refreshing service '%v': %v", svcName, err)
 			return nil, false
 		}
 		if svc == nil {
-			logrus.Errorf("service '%v' not found", svcName)
+			dl.Errorf("service '%v' not found", svcName)
 			return nil, false
 		}
 		return svc, true

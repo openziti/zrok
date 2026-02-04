@@ -1,7 +1,6 @@
 package env_v0_4
 
 import (
-	"fmt"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -10,10 +9,10 @@ import (
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-	"github.com/openziti/zrok/build"
-	"github.com/openziti/zrok/environment/env_core"
-	"github.com/openziti/zrok/rest_client_zrok"
-	metadata2 "github.com/openziti/zrok/rest_client_zrok/metadata"
+	"github.com/openziti/zrok/v2/build"
+	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/rest_client_zrok"
+	metadata2 "github.com/openziti/zrok/v2/rest_client_zrok/metadata"
 	"github.com/pkg/errors"
 )
 
@@ -46,14 +45,14 @@ func (r *Root) Client() (*rest_client_zrok.Zrok, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "error parsing api endpoint '%v'", r)
 	}
-	transport := httptransport.New(apiUrl.Host, "/api/v1", []string{apiUrl.Scheme})
+	transport := httptransport.New(apiUrl.Host, "/api/v2", []string{apiUrl.Scheme})
 	transport.Producers["application/zrok.v1+json"] = runtime.JSONProducer()
 	transport.Consumers["application/zrok.v1+json"] = runtime.JSONConsumer()
 
 	zrok := rest_client_zrok.New(transport, strfmt.Default)
 	_, err = zrok.Metadata.ClientVersionCheck(&metadata2.ClientVersionCheckParams{
 		Body: metadata2.ClientVersionCheckBody{
-			ClientVersion: fmt.Sprintf("v1.0-%s", build.String()), // TODO: go back to build.String()
+			ClientVersion: build.String(),
 		},
 	})
 	if err != nil {
@@ -63,7 +62,7 @@ func (r *Root) Client() (*rest_client_zrok.Zrok, error) {
 }
 
 func (r *Root) ApiEndpoint() (string, string) {
-	apiEndpoint := "https://api-v1.zrok.io"
+	apiEndpoint := "https://api-v2.zrok.io"
 	from := "binary"
 
 	if r.Config() != nil && r.Config().ApiEndpoint != "" {
@@ -71,10 +70,10 @@ func (r *Root) ApiEndpoint() (string, string) {
 		from = "config"
 	}
 
-	env := os.Getenv("ZROK_API_ENDPOINT")
+	env := os.Getenv("ZROK2_API_ENDPOINT")
 	if env != "" {
 		apiEndpoint = env
-		from = "ZROK_API_ENDPOINT"
+		from = "ZROK2_API_ENDPOINT"
 	}
 
 	if r.IsEnabled() {
@@ -85,22 +84,22 @@ func (r *Root) ApiEndpoint() (string, string) {
 	return apiEndpoint, from
 }
 
-func (r *Root) DefaultFrontend() (string, string) {
-	defaultFrontend := "public"
+func (r *Root) DefaultNamespace() (string, string) {
+	defaultNamespace := "public"
 	from := "binary"
 
-	if r.Config() != nil && r.Config().DefaultFrontend != "" {
-		defaultFrontend = r.Config().DefaultFrontend
+	if r.Config() != nil && r.Config().DefaultNamespace != "" {
+		defaultNamespace = r.Config().DefaultNamespace
 		from = "config"
 	}
 
-	env := os.Getenv("ZROK_DEFAULT_FRONTEND")
+	env := os.Getenv("ZROK2_DEFAULT_NAMESPACE")
 	if env != "" {
-		defaultFrontend = env
-		from = "ZROK_DEFAULT_FRONTEND"
+		defaultNamespace = env
+		from = "ZROK2_DEFAULT_NAMESPACE"
 	}
 
-	return defaultFrontend, from
+	return defaultNamespace, from
 }
 
 func (r *Root) Headless() (bool, string) {
@@ -112,11 +111,11 @@ func (r *Root) Headless() (bool, string) {
 		from = "config"
 	}
 
-	env := os.Getenv("ZROK_HEADLESS")
+	env := os.Getenv("ZROK2_HEADLESS")
 	if env != "" {
 		if v, err := strconv.ParseBool(env); err == nil {
 			headless = v
-			from = "ZROK_HEADLESS"
+			from = "ZROK2_HEADLESS"
 		}
 	}
 
@@ -132,11 +131,11 @@ func (r *Root) SuperNetwork() (bool, string) {
 		from = "config"
 	}
 
-	env := os.Getenv("ZROK_SUPER_NETWORK")
+	env := os.Getenv("ZROK2_SUPER_NETWORK")
 	if env != "" {
 		if v, err := strconv.ParseBool(env); err == nil {
 			superNetwork = v
-			from = "ZROK_SUPER_NETWORK"
+			from = "ZROK2_SUPER_NETWORK"
 		}
 	}
 

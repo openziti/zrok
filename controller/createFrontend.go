@@ -2,14 +2,15 @@ package controller
 
 import (
 	"errors"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/lib/pq"
 	"github.com/mattn/go-sqlite3"
-	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
-	"github.com/sirupsen/logrus"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/controller/automation"
+	"github.com/openziti/zrok/v2/controller/store"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/admin"
 )
 
 type createFrontendHandler struct{}
@@ -20,38 +21,37 @@ func newCreateFrontendHandler() *createFrontendHandler {
 
 func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, principal *rest_model_zrok.Principal) middleware.Responder {
 	if !principal.Admin {
-		logrus.Errorf("invalid admin principal")
+		dl.Errorf("invalid admin principal")
 		return admin.NewCreateFrontendUnauthorized()
 	}
 
-	client, err := zrokEdgeSdk.Client(cfg.Ziti)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
-		logrus.Errorf("error getting edge client: %v", err)
+		dl.Errorf("error getting automation client: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
 	}
 
 	zId := params.Body.ZID
-	detail, err := zrokEdgeSdk.GetIdentityByZId(zId, client)
+	identity, err := ziti.Identities.GetByID(zId)
 	if err != nil {
-		logrus.Errorf("error getting identity details for '%v': %v", zId, err)
+		dl.Errorf("error getting identity details for '%v': %v", zId, err)
+		if ziti.IsNotFound(err) {
+			return admin.NewCreateFrontendNotFound()
+		}
 		return admin.NewCreateFrontendInternalServerError()
 	}
-	if len(detail.Payload.Data) != 1 {
-		logrus.Errorf("expected a single identity to be returned for '%v'", zId)
-		return admin.NewCreateFrontendNotFound()
-	}
-	logrus.Infof("found frontend identity '%v'", *detail.Payload.Data[0].Name)
+	dl.Infof("found frontend identity '%v'", *identity.Name)
 
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction: %v", err)
+		dl.Errorf("error starting transaction: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
 	feToken, err := CreateToken()
 	if err != nil {
-		logrus.Errorf("error creating frontend token: %v", err)
+		dl.Errorf("error creating frontend token: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
 	}
 
@@ -62,31 +62,34 @@ func (h *createFrontendHandler) Handle(params admin.CreateFrontendParams, princi
 		UrlTemplate:    &params.Body.URLTemplate,
 		Reserved:       true,
 		PermissionMode: store.PermissionMode(params.Body.PermissionMode),
+		Dynamic:        params.Body.Dynamic,
 	}
-	if _, err := str.CreateGlobalFrontend(fe, tx); err != nil {
+	if _, err := str.CreateGlobalFrontend(fe, trx); err != nil {
 		perr := &pq.Error{}
 		sqliteErr := &sqlite3.Error{}
 		switch {
 		case errors.As(err, &perr):
 			if perr.Code == pq.ErrorCode("23505") {
+				dl.Errorf("error creating frontend record: %v", err)
 				return admin.NewCreateFrontendBadRequest()
 			}
 		case errors.As(err, sqliteErr):
 			if errors.Is(sqliteErr.Code, sqlite3.ErrConstraint) {
+				dl.Errorf("error creating frontend record: %v", err)
 				return admin.NewCreateFrontendBadRequest()
 			}
 		}
 
-		logrus.Errorf("error creating frontend record: %v", err)
+		dl.Errorf("error creating frontend record: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
 	}
 
-	if err := tx.Commit(); err != nil {
-		logrus.Errorf("error committing frontend record: %v", err)
+	if err := trx.Commit(); err != nil {
+		dl.Errorf("error committing frontend record: %v", err)
 		return admin.NewCreateFrontendInternalServerError()
 	}
 
-	logrus.Infof("created global frontend '%v' with public name '%v'", fe.Token, *fe.PublicName)
+	dl.Infof("created global frontend '%v' with public name '%v'", fe.Token, *fe.PublicName)
 
 	return admin.NewCreateFrontendCreated().WithPayload(&admin.CreateFrontendCreatedBody{FrontendToken: feToken})
 }

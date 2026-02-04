@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
 
 // UnshareReader is a Reader for the Unshare structure.
@@ -296,9 +296,6 @@ type UnshareBody struct {
 
 	// env z Id
 	EnvZID string `json:"envZId,omitempty"`
-
-	// reserved
-	Reserved bool `json:"reserved,omitempty"`
 
 	// share token
 	ShareToken string `json:"shareToken,omitempty"`

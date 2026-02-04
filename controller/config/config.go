@@ -6,40 +6,42 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/michaelquigley/cf"
-	"github.com/openziti/zrok/controller/agentController"
-	"github.com/openziti/zrok/controller/emailUi"
-	"github.com/openziti/zrok/controller/env"
-	"github.com/openziti/zrok/controller/limits"
-	"github.com/openziti/zrok/controller/metrics"
-	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
+	"github.com/michaelquigley/df/dd"
+	"github.com/openziti/zrok/v2/controller/agentController"
+	"github.com/openziti/zrok/v2/controller/automation"
+	"github.com/openziti/zrok/v2/controller/dynamicProxyController"
+	"github.com/openziti/zrok/v2/controller/emailUi"
+	"github.com/openziti/zrok/v2/controller/env"
+	"github.com/openziti/zrok/v2/controller/limits"
+	"github.com/openziti/zrok/v2/controller/metrics"
+	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/pkg/errors"
 )
 
 const ConfigVersion = 4
 
 type Config struct {
-	V               int
-	Admin           *AdminConfig
-	AgentController *agentController.Config
-	Bridge          *metrics.BridgeConfig
-	Compatibility   *CompatibilityConfig
-	Endpoint        *EndpointConfig
-	Email           *emailUi.Config
-	Invites         *InvitesConfig
-	Limits          *limits.Config
-	Maintenance     *MaintenanceConfig
-	Metrics         *metrics.Config
-	Registration    *RegistrationConfig
-	ResetPassword   *ResetPasswordConfig
-	Store           *store.Config
-	Ziti            *zrokEdgeSdk.Config
-	Tls             *TlsConfig
+	V                      int
+	Admin                  *AdminConfig
+	AgentController        *agentController.Config
+	Bridge                 *metrics.BridgeConfig
+	Compatibility          *CompatibilityConfig
+	DynamicProxyController *dynamicProxyController.Config
+	Endpoint               *EndpointConfig
+	Email                  *emailUi.Config
+	Invites                *InvitesConfig
+	Limits                 *limits.Config
+	Maintenance            *MaintenanceConfig
+	Metrics                *metrics.Config
+	Registration           *RegistrationConfig
+	ResetPassword          *ResetPasswordConfig
+	Store                  *store.Config
+	Ziti                   *automation.Config
+	Tls                    *TlsConfig
 }
 
 type AdminConfig struct {
-	Secrets         []string `cf:"+secret"`
+	Secrets         []string `dd:"+secret"`
 	TouLink         string
 	NewAccountLink  string
 	ProfileEndpoint string
@@ -96,8 +98,7 @@ func DefaultConfig() *Config {
 	cfg := &Config{
 		Compatibility: &CompatibilityConfig{
 			VersionPatterns: []string{
-				`^(refs/(heads|tags)/)?v1\.1`,
-				`^v1\.0`,
+				`^(refs/(heads|tags)/)?v2\.0`,
 			},
 		},
 		Limits: limits.DefaultConfig(),
@@ -123,7 +124,7 @@ func DefaultConfig() *Config {
 
 func LoadConfig(path string) (*Config, error) {
 	cfg := DefaultConfig()
-	if err := cf.BindYaml(cfg, path, env.GetCfOptions()); err != nil {
+	if err := dd.MergeFromYAML(cfg, path, env.GetDdOptions()); err != nil {
 		return nil, errors.Wrapf(err, "error loading controller config '%v'", path)
 	}
 	if !envVersionOk() && cfg.V != ConfigVersion {
@@ -157,7 +158,7 @@ func (cfg *CompatibilityConfig) GetCompiledPatterns() []*regexp.Regexp {
 }
 
 func envVersionOk() bool {
-	vStr := os.Getenv("ZROK_CTRL_CONFIG_VERSION")
+	vStr := os.Getenv("ZROK2_CTRL_CONFIG_VERSION")
 	if vStr != "" {
 		envV, err := strconv.Atoi(vStr)
 		if err != nil {

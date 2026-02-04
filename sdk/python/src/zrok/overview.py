@@ -23,7 +23,7 @@ class Overview:
         try:
             response = http.request(
                 'GET',
-                apiEndpoint + "/api/v1/overview",
+                apiEndpoint + "/api/v2/overview",
                 headers={
                     "X-TOKEN": root.env.Token
                 })

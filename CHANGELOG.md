@@ -1,5 +1,53 @@
 # CHANGELOG
 
+## v2.0.0
+
+FEATURE: Major changes to how "unique names" and "reserved sharing" work. See the [zrok v2 Migration Guide](https://docs.zrok.io) for details. Reserved sharing, including the `zrok reserve`, `zrok release` and `zrok share reserved` commands have been removed. Namespaces and reserved names replace these concepts in a much more powerful, flexible way which can accomplish what reserved sharing did in a much better way. (https://github.com/openziti/zrok/issues/726)
+
+CHANGE: **Binary renamed from `zrok` to `zrok2`**. This allows zrok v1 and v2 to coexist on the same system without conflicts. All command invocations now use `zrok2` (e.g., `zrok2 enable`, `zrok2 share public`). (https://github.com/openziti/zrok/issues/1124)
+
+CHANGE: **Environment directory changed from `~/.zrok` to `~/.zrok2`**. This provides complete isolation between v1 and v2 environments. Users running `zrok2 enable` will create a new environment in `~/.zrok2`; existing `~/.zrok` environments are not affected. (https://github.com/openziti/zrok/issues/1124)
+
+CHANGE: **Environment variables renamed from `ZROK_*` to `ZROK2_*`**. All environment variables now use the `ZROK2_` prefix (e.g., `ZROK2_API_ENDPOINT`, `ZROK2_ADMIN_TOKEN`, `ZROK2_ENABLE_TOKEN`). This ensures v1 and v2 environment configurations do not interfere with each other. (https://github.com/openziti/zrok/issues/1124)
+
+CHANGE: **Linux packages renamed to `zrok2`, `zrok2-agent`**. The agent's systemd user service file is renamed to `zrok2-agent.service`. Configuration directory changed to `/etc/zrok2`. (https://github.com/openziti/zrok/issues/1124)
+
+CHANGE: **Removed `env_v0_3` compatibility layer**. Since zrok2 uses `~/.zrok2` exclusively and will never touch `~/.zrok`, the v0.3 environment migration code has been removed. The update infrastructure remains for future version upgrades.
+
+FEATURE: `zrok2 share private` now includes a `--share-token` flag, which allows a user to create a vanity token for private shares. Now that reserved sharing has been replaced with namespaces, the `--share-token` flag allows private sharing to retain custom, persistent share token names. (https://github.com/openziti/zrok/issues/1070)
+
+FEATURE: `zrok2 modify name` command available to "upgrade" an ephemeral share name to a reserved share name. If you share something ephemerally and later decide that you want to persist that name for future use you can just `zrok2 modify name -r` that name and retain it indefinitely (or conversely `zrok2 modify name -r=false` to schedule a reserved name to be released when an associated share is terminated). (https://github.com/openziti/zrok/issues/1066)
+
+FEATURE: New `zrok2 list names`, `zrok2 list namespaces`, `zrok2 list environments`, `zrok2 list shares`, and `zrok2 list accesses` commands available to query the environments, shares, and accesses contained in the user's account; supports filtering on activity, accesses, shares, descriptions, host, ip address, and other relevant search criteria. By default outputs human-readable tabular output, but has a `--json` option to emit the values as JSON. (https://github.com/openziti/zrok/issues/1107)
+
+FEATURE: New `zrok2 delete environment` command that allows for deleting environments other than the current enabled environment. Use `zrok2 list environments --idle` to find idle environments and remove them using `zrok2 delete environment`. (https://github.com/openziti/zrok/issues/1107)
+
+FEATURE: New `zrok2 access dynamicProxy` which is designed to work with the new namespaces/names functionality. Rather than parsing the `Host` header and trying to extract a share token, the new `dynamicProxy` receives mapping updates from the zrok controller, allowing it to support any kind of mapped name. See the [zrok dynamicProxy Guide](https://docs.zrok.io) for details on setting up the new frontend. `zrok2 access public` remains available for legacy-style setups. (https://github.com/openziti/zrok/issues/1041)
+
+FEATURE: The zrok Agent now includes significantly improved handling for subordinate processes in error states. Errors encountered during agent reloading and also during active runtime are retried using an exponential falloff approach. Errored accesses or shares are given transient `err_XXXX` tokens, which can be used to manage (release) these processes. (https://github.com/openziti/zrok/issues/1000)
+
+FEATURE: The zrok Agent has been updated for v2 name selections. Now that "reserved shares" have been replaced with reserved names, the zrok Agent will automatically restart any share which contains a name selection with a reserved name. The Agent continues to automatically manage `zrok2 access private` processes as always.
+
+FEATURE: `zrok2 overview` now includes a human-readable default output, that formats the details of your zrok account in an easy-to-understand format. The classic JSON output is still available using the `--json` flag. (https://github.com/openziti/zrok/issues/1064)
+
+FEATURE: `zrok2 admin migrate` now supports a `--down <n>` flag, which allows for reverse-migration by a specified number of migrations
+
+CHANGE: The root package path was migrated from `github.com/openziti/zrok` to `github.com/openziti/zrok/v2` to accomodate golang v2+ package naming semantics.
+
+CHANGE: `zrok2 status` now shows `EnvZId` instead of `Ziti Identity` in output. (https://github.com/openziti/zrok/issues/1107)
+
+CHANGE: `defaultFrontend` configuration replaced with new `defaultNamespace`, which provides the logical equivalent of the old name-handling configuration (https://github.com/openziti/zrok/issues/1065)
+
+CHANGE: `zrok2 admin create frontend`, `zrok2 admin update frontend` now include a new `--dynamic` flag which allows setting/changing the value of the `dynamic` property in the frontend. Setting `dynamic` is required when configuring a `dynamicProxy` frontend. `zrok2 admin list frontends` now displays the `dynamic` value of the frontends in the system. `zrok2 admin list frontends` includes a new `--extra` flag to display the additional/v1 properties maintained for frontends. (https://github.com/openziti/zrok/issues/1096)
+
+CHANGE: Completely overhauled the core ziti automation logic. The legacy `controller/zrokEdgeSdk` package has been replaced with a much more streamlined, clearer package `controller/automation`. This makes comprehending the controller code a lot simpler. (https://github.com/openziti/zrok/issues/1054)
+
+CHANGE: Updated `github.com/openziti/sdk-golang` to `v1.2.4`.
+
+CHANGE: All logging migrated from `githhub.com/michaelquigley/pfxlog` and `github.com/sirupsen/logrus` to `github.com/michaelquigley/df/dl` and `log/slog`. Use environment variable `DL_USE_JSON=true` to force JSON output. Use `DL_USE_COLOR` to force colorized output. (https://github.com/openziti/zrok/issues/1078)
+
+FIX: Updated the unique constraint on the `accounts.email` column to only be unique when `is not deleted`. This only fixes PostgreSQL databases; fixing SQLite databases effectively requires rebuilding the entire database, see the comment in the issue for details. (https://github.com/openziti/zrok/issues/1109)
+
 ## v1.1.11
 
 CHANGE: The `vpn` backend mode has been removed from zrok due to dependency management issues. The underlying TUN device libraries created conflicts that prevented updates to critical dependencies. See the [VPN removal guide](https://docs.zrok.io/docs/guides/vpn/) for migration alternatives and future plans.

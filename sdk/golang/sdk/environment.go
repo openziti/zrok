@@ -2,8 +2,8 @@ package sdk
 
 import (
 	httptransport "github.com/go-openapi/runtime/client"
-	"github.com/openziti/zrok/environment/env_core"
-	restEnvironment "github.com/openziti/zrok/rest_client_zrok/environment"
+	"github.com/openziti/zrok/v2/environment/env_core"
+	restEnvironment "github.com/openziti/zrok/v2/rest_client_zrok/environment"
 	"github.com/pkg/errors"
 )
 

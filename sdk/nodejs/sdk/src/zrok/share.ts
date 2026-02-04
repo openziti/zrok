@@ -26,17 +26,26 @@ export type PermissionMode = string;
 export const OPEN_PERMISSION_MODE = "open";
 export const CLOSED_PERMISSION_MODE = "closed";
 
+export class NameSelection {
+    namespaceToken: string;
+    name: string | undefined;
+
+    constructor(namespaceToken: string) {
+        this.namespaceToken = namespaceToken;
+    }
+}
+
 export class ShareRequest {
     reserved: boolean;
     uniqueName: string | undefined;
     backendMode: BackendMode;
     shareMode: ShareMode;
     target: string;
-    frontends: string[] | undefined;
+    nameSelections: NameSelection[] | undefined;
     basicAuth: string[] | undefined;
     oauthProvider: string | undefined;
-    oauthEmailAddressPatterns: string[] | undefined;
-    oauthAuthorizationCheckInterval: string | undefined;
+    oauthEmailDomains: string[] | undefined;
+    oauthRefreshInterval: string | undefined;
     permissionMode: PermissionMode;
     accessGrants: string[] | undefined;
 
@@ -46,11 +55,11 @@ export class ShareRequest {
         this.backendMode = backendMode;
         this.shareMode = shareMode;
         this.target = target;
-        this.frontends = shareMode === PUBLIC_SHARE_MODE ? ["public"] : undefined;
+        this.nameSelections = shareMode === PUBLIC_SHARE_MODE ? [{namespaceToken: "public"} as NameSelection] : undefined;
         this.basicAuth = undefined;
         this.oauthProvider = undefined;
-        this.oauthEmailAddressPatterns = undefined;
-        this.oauthAuthorizationCheckInterval = undefined;
+        this.oauthEmailDomains = undefined;
+        this.oauthRefreshInterval = undefined;
         this.permissionMode = CLOSED_PERMISSION_MODE;
         this.accessGrants = undefined;
     }
@@ -110,7 +119,7 @@ const toPrivateApiShareRequest = (root: Root, request: ShareRequest): ApiShareRe
         envZId: root.environment?.zId,
         shareMode: ShareRequestShareModeEnum.Private,
         backendMode: toApiBackendMode(request.backendMode),
-        backendProxyEndpoint: request.target,
+        target: request.target,
         authScheme: AUTH_SCHEME_NONE,
         permissionMode: CLOSED_PERMISSION_MODE,
     };
@@ -120,27 +129,33 @@ const toPublicApiShareRequest = (root: Root, request: ShareRequest): ApiShareReq
     let out: ApiShareRequest = {
         envZId: root.environment?.zId,
         shareMode: ShareRequestShareModeEnum.Public,
-        frontendSelection: request.frontends,
         backendMode: toApiBackendMode(request.backendMode),
-        backendProxyEndpoint: request.target,
+        target: request.target,
         authScheme: AUTH_SCHEME_NONE,
     };
+    if (request.nameSelections) {
+        let nss = new Array<NameSelection>();
+        request.nameSelections.forEach(n => {
+            nss.push({namespaceToken: n.namespaceToken, name: n.name})
+        })
+        out.nameSelections = nss;
+    }
 
     if(request.oauthProvider !== undefined) {
         out.authScheme = AUTH_SCHEME_OAUTH;
         out.oauthProvider = request.oauthProvider;
-        out.oauthEmailDomains = request.oauthEmailAddressPatterns;
-        out.oauthAuthorizationCheckInterval = request.oauthAuthorizationCheckInterval;
+        out.oauthEmailDomains = request.oauthEmailDomains;
+        out.oauthRefreshInterval = request.oauthRefreshInterval;
 
     } else if(request.basicAuth?.length! > 0) {
         out.authScheme = AUTH_SCHEME_BASIC;
         for(let pair in request.basicAuth) {
             let tokens = pair.split(":");
             if(tokens.length === 2) {
-                if(out.authUsers === undefined) {
-                    out.authUsers = new Array<AuthUser>();
+                if(out.basicAuthUsers === undefined) {
+                    out.basicAuthUsers = new Array<AuthUser>();
                 }
-                out.authUsers.push({username: tokens[0].trim(), password: tokens[1].trim()})
+                out.basicAuthUsers.push({username: tokens[0].trim(), password: tokens[1].trim()})
             }
         }
     }

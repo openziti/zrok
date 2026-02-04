@@ -1,0 +1,53 @@
+/enable:
+  post:
+    tags:
+      - environment
+    security:
+      - key: []
+    operationId: enable
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            description:
+              type: string
+            host:
+              type: string
+    responses:
+      201:
+        description: environment enabled
+        schema:
+          properties:
+            identity:
+              type: string
+            cfg:
+              type: string
+      401:
+        description: unauthorized
+      404:
+        description: account not found
+      500:
+        description: internal server error
+
+/disable:
+  post:
+    tags:
+      - environment
+    security:
+      - key: []
+    operationId: disable
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            identity:
+              type: string
+    responses:
+      200:
+        description: environment disabled
+      401:
+        description: invalid environment
+      500:
+        description: internal server error

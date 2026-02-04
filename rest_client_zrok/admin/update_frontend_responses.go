@@ -281,6 +281,12 @@ swagger:model UpdateFrontendBody
 */
 type UpdateFrontendBody struct {
 
+	// dynamic
+	Dynamic bool `json:"dynamic,omitempty"`
+
+	// dynamic set
+	DynamicSet bool `json:"dynamicSet,omitempty"`
+
 	// frontend token
 	FrontendToken string `json:"frontendToken,omitempty"`
 

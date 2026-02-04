@@ -42,7 +42,7 @@ fi
 )
 
 # Get version information
-VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.x")
+VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v2.0.x")
 STEPS=$(git rev-list --count ${VERSION}..HEAD 2>/dev/null || echo "0")
 if [ "$STEPS" -gt "0" ]; then
     VERSION="${VERSION}-${STEPS}"
@@ -58,9 +58,9 @@ else
 fi
 
 for ARCH in "${JOBS[@]}"; do
-    LDFLAGS="-s -w -X 'github.com/openziti/zrok/build.Version=${VERSION}' -X 'github.com/openziti/zrok/build.Hash=${HASH}'"
+    LDFLAGS="-s -w -X 'github.com/openziti/zrok/v2/build.Version=${VERSION}' -X 'github.com/openziti/zrok/v2/build.Hash=${HASH}'"
     GOOS=linux GOARCH=$(resolveArch "${ARCH}") \
-    go build -o "./dist/$(resolveArch "${ARCH}")/linux/zrok" \
+    go build -o "./dist/$(resolveArch "${ARCH}")/linux/zrok2" \
     -ldflags "${LDFLAGS}" \
     ./cmd/zrok
 done

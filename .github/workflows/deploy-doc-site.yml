@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   build:
+    if: github.repository_owner == 'openziti'
     runs-on: ubuntu-latest
     
     steps:
@@ -19,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v4
         name: setup npm
         with:
-          node-version: 18
+          node-version: 22
           check-latest: true
           cache: "npm"
           cache-dependency-path: website/package-lock.json

@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/openziti/zrok/endpoints"
-	"github.com/openziti/zrok/endpoints/proxyUi"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/endpoints"
+	"github.com/openziti/zrok/v2/endpoints/proxyUi"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type sessionCookieRequest struct {
@@ -33,7 +33,7 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 	targetHost := strings.TrimSpace(req.targetHost)
 	if targetHost == "" {
 		err := errors.New("targetHost claim must not be empty")
-		logrus.Error(err)
+		dl.Error(err)
 		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(err))
 		return
 	}
@@ -41,7 +41,7 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 
 	encryptedAccessToken, err := endpoints.EncryptToken(req.accessToken, req.encryptionKey)
 	if err != nil {
-		logrus.Errorf("failed to encrypt access token: %v", err)
+		dl.Errorf("failed to encrypt access token: %v", err)
 		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("failed to encrypt access token")))
 		return
 	}
@@ -60,14 +60,14 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 	})
 	sTkn, err := tkn.SignedString(req.signingKey)
 	if err != nil {
-		logrus.Errorf("error signing jwt: %v", err)
+		dl.Errorf("error signing jwt: %v", err)
 		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(req.email).WithError(errors.New("error signing jwt")))
 		return
 	}
 
 	// use the shared endpoints package to set the cookie with compression and striping
 	if err := endpoints.SetSessionCookie(w, req.oauthCfg.CookieName, sTkn, req.oauthCfg); err != nil {
-		logrus.Errorf("failed to set session cookie: %v", err)
+		dl.Errorf("failed to set session cookie: %v", err)
 		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(req.email).WithError(errors.New("failed to set session cookie")))
 		return
 	}
@@ -87,10 +87,6 @@ func filterSessionCookies(w http.ResponseWriter, r *http.Request, cfg *Config) {
 		// use the shared endpoints package to filter session cookies
 		filtered := endpoints.FilterSessionCookies(cookies, cfg.Oauth.CookieName)
 		for _, cookie := range filtered {
-			// also filter out pkce cookie
-			if cookie.Name == "pkce" {
-				continue
-			}
 			r.AddCookie(cookie)
 		}
 	} else {

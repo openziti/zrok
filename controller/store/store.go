@@ -2,16 +2,17 @@ package store
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/iancoleman/strcase"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
-	postgresql_schema "github.com/openziti/zrok/controller/store/sql/postgresql"
-	sqlite3_schema "github.com/openziti/zrok/controller/store/sql/sqlite3"
+	"github.com/michaelquigley/df/dl"
+	postgresql_schema "github.com/openziti/zrok/v2/controller/store/sql/postgresql"
+	sqlite3_schema "github.com/openziti/zrok/v2/controller/store/sql/sqlite3"
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
-	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type Model struct {
@@ -22,7 +23,7 @@ type Model struct {
 }
 
 type Config struct {
-	Path                 string `cf:"+secret"`
+	Path                 string `dd:"+secret"`
 	Type                 string
 	EnableLocking        bool
 	DisableAutoMigration bool
@@ -54,7 +55,7 @@ func Open(cfg *Config) (*Store, error) {
 	default:
 		return nil, errors.Errorf("unknown database type '%v' (supported: sqlite3, postgres)", cfg.Type)
 	}
-	logrus.Info("database connected")
+	dl.Info("database connected")
 	dbx.MapperFunc(strcase.ToSnake)
 
 	store := &Store{cfg: cfg, db: dbx}
@@ -75,6 +76,14 @@ func (str *Store) Close() error {
 }
 
 func (str *Store) migrate(cfg *Config) error {
+	return str.migrateWithDirection(cfg, migrate.Up, 0)
+}
+
+func (str *Store) MigrateDown(cfg *Config, max int) error {
+	return str.migrateWithDirection(cfg, migrate.Down, max)
+}
+
+func (str *Store) migrateWithDirection(cfg *Config, direction migrate.MigrationDirection, max int) error {
 	switch cfg.Type {
 	case "sqlite3":
 		migrations := &migrate.EmbedFileSystemMigrationSource{
@@ -82,11 +91,11 @@ func (str *Store) migrate(cfg *Config) error {
 			Root:       "/",
 		}
 		migrate.SetTable("migrations")
-		n, err := migrate.Exec(str.db.DB, "sqlite3", migrations, migrate.Up)
+		n, err := migrate.ExecMax(str.db.DB, "sqlite3", migrations, direction, max)
 		if err != nil {
 			return errors.Wrap(err, "error running migrations")
 		}
-		logrus.Infof("applied %d migrations", n)
+		dl.Infof("applied %d migrations", n)
 
 	case "postgres":
 		migrations := &migrate.EmbedFileSystemMigrationSource{
@@ -94,11 +103,11 @@ func (str *Store) migrate(cfg *Config) error {
 			Root:       "/",
 		}
 		migrate.SetTable("migrations")
-		n, err := migrate.Exec(str.db.DB, "postgres", migrations, migrate.Up)
+		n, err := migrate.ExecMax(str.db.DB, "postgres", migrations, direction, max)
 		if err != nil {
 			return errors.Wrap(err, "error running migrations")
 		}
-		logrus.Infof("applied %d migrations", n)
+		dl.Infof("applied %d migrations", n)
 	}
 	return nil
 }

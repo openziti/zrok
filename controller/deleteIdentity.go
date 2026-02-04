@@ -1,15 +1,13 @@
 package controller
 
 import (
-	"context"
-	"time"
+	"fmt"
 
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti/edge-api/rest_management_api_client/identity"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/admin"
-	"github.com/sirupsen/logrus"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/controller/automation"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/admin"
 )
 
 type deleteIdentityHandler struct{}
@@ -22,28 +20,26 @@ func (h *deleteIdentityHandler) Handle(params admin.DeleteIdentityParams, princi
 	identityZId := params.Body.ZID
 
 	if !principal.Admin {
-		logrus.Errorf("invalid admin principal")
+		dl.Errorf("invalid admin principal")
 		return admin.NewDeleteIdentityUnauthorized()
 	}
 
-	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
-		logrus.Errorf("error getting edge client: %v", err)
+		dl.Errorf("error getting automation client: %v", err)
 		return admin.NewDeleteIdentityInternalServerError()
 	}
 
-	if err := zrokEdgeSdk.DeleteEdgeRouterPolicy(identityZId, edge); err != nil {
-		logrus.Errorf("error deleting edge router policy: %v", err)
+	// delete edge router policy for the identity
+	erpFilter := fmt.Sprintf("name=\"%v\"", identityZId)
+	if err := ziti.EdgeRouterPolicies.DeleteWithFilter(erpFilter); err != nil {
+		dl.Errorf("error deleting edge router policy: %v", err)
 		return admin.NewDeleteIdentityInternalServerError()
 	}
 
-	req := &identity.DeleteIdentityParams{
-		ID:      identityZId,
-		Context: context.Background(),
-	}
-	req.SetTimeout(30 * time.Second)
-	if _, err := edge.Identity.DeleteIdentity(req, nil); err != nil {
-		logrus.Errorf("error deleting identity '%v': %v", identityZId, err)
+	// delete the identity
+	if err := ziti.Identities.Delete(identityZId); err != nil {
+		dl.Errorf("error deleting identity '%v': %v", identityZId, err)
 		return admin.NewDeleteIdentityInternalServerError()
 	}
 

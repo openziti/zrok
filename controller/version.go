@@ -5,11 +5,11 @@ import (
 	"regexp"
 
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti/zrok/build"
-	"github.com/openziti/zrok/controller/config"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
-	"github.com/sirupsen/logrus"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/build"
+	"github.com/openziti/zrok/v2/controller/config"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/metadata"
 )
 
 func versionHandler(_ metadata.VersionParams) middleware.Responder {
@@ -28,13 +28,13 @@ func newClientVersionCheckHandler(cfg *config.Config) *clientVersionCheckHandler
 
 func (h *clientVersionCheckHandler) Handle(params metadata.ClientVersionCheckParams) middleware.Responder {
 	if h.cfg.Compatibility != nil && h.cfg.Compatibility.LogRequests {
-		logrus.Infof("client at '%v' sent version '%v'", params.HTTPRequest.RemoteAddr, params.Body.ClientVersion)
+		dl.Infof("client at '%v' sent version '%v'", params.HTTPRequest.RemoteAddr, params.Body.ClientVersion)
 	}
 
 	patterns := h.getCompiledPatterns()
 	for i, re := range patterns {
 		if re.MatchString(params.Body.ClientVersion) {
-			logrus.Debugf("client version matched pattern %d", i)
+			dl.Debugf("client version matched pattern %d", i)
 			return metadata.NewClientVersionCheckOK()
 		}
 	}
@@ -48,7 +48,7 @@ func (h *clientVersionCheckHandler) getCompiledPatterns() []*regexp.Regexp {
 	}
 
 	// fallback to built-in patterns (this should not happen in normal operation)
-	logrus.Errorf("missing compatibility patterns; defaulting to last-resort patterns")
+	dl.Errorf("missing compatibility patterns; defaulting to last-resort patterns")
 	defaultPatterns := []*regexp.Regexp{
 		regexp.MustCompile(`^(refs/(heads|tags)/)?` + build.Series),
 	}

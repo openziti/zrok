@@ -506,11 +506,17 @@ type RemoteStatusOKBodyAccessesItems0 struct {
 	// bind address
 	BindAddress string `json:"bindAddress,omitempty"`
 
+	// failure
+	Failure *RemoteStatusOKBodyAccessesItems0Failure `json:"failure,omitempty"`
+
 	// frontend token
 	FrontendToken string `json:"frontendToken,omitempty"`
 
 	// response headers
 	ResponseHeaders []string `json:"responseHeaders"`
+
+	// status
+	Status string `json:"status,omitempty"`
 
 	// token
 	Token string `json:"token,omitempty"`
@@ -518,11 +524,69 @@ type RemoteStatusOKBodyAccessesItems0 struct {
 
 // Validate validates this remote status o k body accesses items0
 func (o *RemoteStatusOKBodyAccessesItems0) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateFailure(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this remote status o k body accesses items0 based on context it is used
+func (o *RemoteStatusOKBodyAccessesItems0) validateFailure(formats strfmt.Registry) error {
+	if swag.IsZero(o.Failure) { // not required
+		return nil
+	}
+
+	if o.Failure != nil {
+		if err := o.Failure.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("failure")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("failure")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this remote status o k body accesses items0 based on the context it is used
 func (o *RemoteStatusOKBodyAccessesItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateFailure(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *RemoteStatusOKBodyAccessesItems0) contextValidateFailure(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.Failure != nil {
+
+		if swag.IsZero(o.Failure) { // not required
+			return nil
+		}
+
+		if err := o.Failure.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("failure")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("failure")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -545,6 +609,53 @@ func (o *RemoteStatusOKBodyAccessesItems0) UnmarshalBinary(b []byte) error {
 }
 
 /*
+RemoteStatusOKBodyAccessesItems0Failure remote status o k body accesses items0 failure
+swagger:model RemoteStatusOKBodyAccessesItems0Failure
+*/
+type RemoteStatusOKBodyAccessesItems0Failure struct {
+
+	// count
+	Count int64 `json:"count,omitempty"`
+
+	// id
+	ID string `json:"id,omitempty"`
+
+	// last error
+	LastError string `json:"lastError,omitempty"`
+
+	// next retry
+	NextRetry string `json:"nextRetry,omitempty"`
+}
+
+// Validate validates this remote status o k body accesses items0 failure
+func (o *RemoteStatusOKBodyAccessesItems0Failure) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this remote status o k body accesses items0 failure based on context it is used
+func (o *RemoteStatusOKBodyAccessesItems0Failure) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *RemoteStatusOKBodyAccessesItems0Failure) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *RemoteStatusOKBodyAccessesItems0Failure) UnmarshalBinary(b []byte) error {
+	var res RemoteStatusOKBodyAccessesItems0Failure
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
 RemoteStatusOKBodySharesItems0 remote status o k body shares items0
 swagger:model RemoteStatusOKBodySharesItems0
 */
@@ -556,14 +667,14 @@ type RemoteStatusOKBodySharesItems0 struct {
 	// backend mode
 	BackendMode string `json:"backendMode,omitempty"`
 
+	// failure
+	Failure *RemoteStatusOKBodySharesItems0Failure `json:"failure,omitempty"`
+
 	// frontend endpoints
 	FrontendEndpoints []string `json:"frontendEndpoints"`
 
 	// open
 	Open bool `json:"open,omitempty"`
-
-	// reserved
-	Reserved bool `json:"reserved,omitempty"`
 
 	// share mode
 	ShareMode string `json:"shareMode,omitempty"`
@@ -577,11 +688,69 @@ type RemoteStatusOKBodySharesItems0 struct {
 
 // Validate validates this remote status o k body shares items0
 func (o *RemoteStatusOKBodySharesItems0) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateFailure(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this remote status o k body shares items0 based on context it is used
+func (o *RemoteStatusOKBodySharesItems0) validateFailure(formats strfmt.Registry) error {
+	if swag.IsZero(o.Failure) { // not required
+		return nil
+	}
+
+	if o.Failure != nil {
+		if err := o.Failure.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("failure")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("failure")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this remote status o k body shares items0 based on the context it is used
 func (o *RemoteStatusOKBodySharesItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateFailure(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *RemoteStatusOKBodySharesItems0) contextValidateFailure(ctx context.Context, formats strfmt.Registry) error {
+
+	if o.Failure != nil {
+
+		if swag.IsZero(o.Failure) { // not required
+			return nil
+		}
+
+		if err := o.Failure.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("failure")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("failure")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -596,6 +765,53 @@ func (o *RemoteStatusOKBodySharesItems0) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (o *RemoteStatusOKBodySharesItems0) UnmarshalBinary(b []byte) error {
 	var res RemoteStatusOKBodySharesItems0
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+/*
+RemoteStatusOKBodySharesItems0Failure remote status o k body shares items0 failure
+swagger:model RemoteStatusOKBodySharesItems0Failure
+*/
+type RemoteStatusOKBodySharesItems0Failure struct {
+
+	// count
+	Count int64 `json:"count,omitempty"`
+
+	// id
+	ID string `json:"id,omitempty"`
+
+	// last error
+	LastError string `json:"lastError,omitempty"`
+
+	// next retry
+	NextRetry string `json:"nextRetry,omitempty"`
+}
+
+// Validate validates this remote status o k body shares items0 failure
+func (o *RemoteStatusOKBodySharesItems0Failure) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this remote status o k body shares items0 failure based on context it is used
+func (o *RemoteStatusOKBodySharesItems0Failure) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *RemoteStatusOKBodySharesItems0Failure) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *RemoteStatusOKBodySharesItems0Failure) UnmarshalBinary(b []byte) error {
+	var res RemoteStatusOKBodySharesItems0Failure
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

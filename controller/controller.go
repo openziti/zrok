@@ -9,17 +9,18 @@ import (
 	"github.com/go-openapi/loads"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/jessevdk/go-flags"
-	"github.com/openziti/zrok/controller/agentController"
-	"github.com/openziti/zrok/controller/config"
-	"github.com/openziti/zrok/controller/limits"
-	"github.com/openziti/zrok/controller/metrics"
-	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/rest_server_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations"
-	"github.com/openziti/zrok/rest_server_zrok/operations/account"
-	"github.com/openziti/zrok/rest_server_zrok/operations/metadata"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/controller/agentController"
+	"github.com/openziti/zrok/v2/controller/config"
+	"github.com/openziti/zrok/v2/controller/dynamicProxyController"
+	"github.com/openziti/zrok/v2/controller/limits"
+	"github.com/openziti/zrok/v2/controller/metrics"
+	"github.com/openziti/zrok/v2/controller/store"
+	"github.com/openziti/zrok/v2/rest_server_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/account"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/metadata"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -28,6 +29,7 @@ var (
 	idb         influxdb2.Client
 	limitsAgent *limits.Agent
 	agentCtrl   *agentController.Controller
+	dPCtrl      *dynamicProxyController.Controller
 )
 
 func Run(inCfg *config.Config) error {
@@ -55,27 +57,37 @@ func Run(inCfg *config.Config) error {
 	api.AccountResetPasswordRequestHandler = newResetPasswordRequestHandler()
 	api.AccountVerifyHandler = newVerifyHandler()
 	api.AdminAddFrontendGrantHandler = newAddFrontendGrantHandler()
+	api.AdminAddNamespaceFrontendMappingHandler = newAddNamespaceFrontendMappingHandler()
+	api.AdminAddNamespaceGrantHandler = newAddNamespaceGrantHandler()
 	api.AdminAddOrganizationMemberHandler = newAddOrganizationMemberHandler()
 	api.AdminCreateAccountHandler = newCreateAccountHandler()
 	api.AdminCreateFrontendHandler = newCreateFrontendHandler()
 	api.AdminCreateIdentityHandler = newCreateIdentityHandler()
+	api.AdminCreateNamespaceHandler = newCreateNamespaceHandler()
 	api.AdminCreateOrganizationHandler = newCreateOrganizationHandler()
 	api.AdminDeleteAccountHandler = newDeleteAccountHandler()
 	api.AdminDeleteFrontendGrantHandler = newDeleteFrontendGrantHandler()
 	api.AdminDeleteFrontendHandler = newDeleteFrontendHandler()
 	api.AdminDeleteIdentityHandler = newDeleteIdentityHandler()
+	api.AdminDeleteNamespaceHandler = newDeleteNamespaceHandler()
 	api.AdminDeleteOrganizationHandler = newDeleteOrganizationHandler()
 	api.AdminGrantsHandler = newGrantsHandler()
 	api.AdminInviteTokenGenerateHandler = newInviteTokenGenerateHandler()
 	api.AdminListFrontendsHandler = newListFrontendsHandler()
+	api.AdminListFrontendNamespaceMappingsHandler = newListFrontendNamespaceMappingsHandler()
+	api.AdminListNamespaceFrontendMappingsHandler = newListNamespaceFrontendMappingsHandler()
+	api.AdminListNamespacesHandler = newListNamespacesHandler()
 	api.AdminListOrganizationMembersHandler = newListOrganizationMembersHandler()
 	api.AdminListOrganizationsHandler = newListOrganizationsHandler()
+	api.AdminRemoveNamespaceFrontendMappingHandler = newRemoveNamespaceFrontendMappingHandler()
+	api.AdminRemoveNamespaceGrantHandler = newRemoveNamespaceGrantHandler()
 	api.AdminRemoveOrganizationMemberHandler = newRemoveOrganizationMemberHandler()
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
+	api.AdminUpdateNamespaceHandler = newUpdateNamespaceHandler()
 	if cfg.AgentController != nil {
 		if i, err := agentController.NewAgentController(cfg.AgentController); err == nil {
 			agentCtrl = i
-			logrus.Infof("created new agent controller")
+			dl.Infof("created new agent controller")
 		} else {
 			return errors.Wrap(err, "error creating agent controller")
 		}
@@ -101,16 +113,24 @@ func Run(inCfg *config.Config) error {
 		api.MetadataGetShareMetricsHandler = newGetShareMetricsHandler(cfg.Metrics.Influx)
 	}
 	api.MetadataGetEnvironmentDetailHandler = newEnvironmentDetailHandler()
+	api.MetadataListEnvironmentsHandler = newListEnvironmentsHandler()
 	api.MetadataGetFrontendDetailHandler = newGetFrontendDetailHandler()
 	api.MetadataGetShareDetailHandler = newShareDetailHandler()
+	api.MetadataListSharesHandler = newListSharesHandler()
+	api.MetadataListAccessesHandler = newListAccessesHandler()
 	api.MetadataListMembershipsHandler = newListMembershipsHandler()
 	api.MetadataListOrgMembersHandler = newListOrgMembersHandler()
-	api.MetadataListPublicFrontendsForAccountHandler = newListPublicFrontendsForAccountHandler()
 	api.MetadataOrgAccountOverviewHandler = newOrgAccountOverviewHandler()
 	api.MetadataOverviewHandler = newOverviewHandler()
 	api.MetadataVersionHandler = metadata.VersionHandlerFunc(versionHandler)
 	api.MetadataVersionInventoryHandler = metadata.VersionInventoryHandlerFunc(versionInventoryHandler)
 	api.ShareAccessHandler = newAccessHandler()
+	api.ShareCreateShareNameHandler = newCreateShareNameHandler()
+	api.ShareDeleteShareNameHandler = newDeleteShareNameHandler()
+	api.ShareUpdateShareNameHandler = newUpdateShareNameHandler()
+	api.ShareListAllNamesHandler = newListAllNamesHandler()
+	api.ShareListNamesForNamespaceHandler = newListNamesForNamespaceHandler()
+	api.ShareListShareNamespacesHandler = newListShareNamespacesHandler()
 	api.ShareShareHandler = newShareHandler()
 	api.ShareUnaccessHandler = newUnaccessHandler()
 	api.ShareUnshareHandler = newUnshareHandler()
@@ -127,10 +147,18 @@ func Run(inCfg *config.Config) error {
 		return errors.Wrap(err, "error opening store")
 	}
 
+	if cfg.DynamicProxyController != nil {
+		dPCtrl, err = dynamicProxyController.NewController(cfg.DynamicProxyController, str)
+		if err != nil {
+			return err
+		}
+		dl.Infof("started dynamic proxy controller")
+	}
+
 	if cfg.Metrics != nil && cfg.Metrics.Influx != nil {
 		idb = influxdb2.NewClient(cfg.Metrics.Influx.Url, cfg.Metrics.Influx.Token)
 	} else {
-		logrus.Warn("skipping influx client; no configuration")
+		dl.Warn("skipping influx client; no configuration")
 	}
 
 	if cfg.Metrics != nil && cfg.Metrics.Agent != nil && cfg.Metrics.Influx != nil {

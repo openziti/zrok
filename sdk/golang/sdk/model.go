@@ -1,6 +1,11 @@
 package sdk
 
-import "time"
+import (
+	"strings"
+	"time"
+
+	"github.com/pkg/errors"
+)
 
 type EnableRequest struct {
 	Host        string
@@ -40,19 +45,41 @@ const (
 	ClosedPermissionMode PermissionMode = "closed"
 )
 
+type NameSelection struct {
+	NamespaceToken string
+	Name           string
+}
+
+// ParseNameSelection converts a string in the format "<namespaceToken>[:<name>]"
+// into a NameSelection struct. if no name is provided, the Name field will be empty.
+func ParseNameSelection(input string) (NameSelection, error) {
+	parts := strings.SplitN(input, ":", 2)
+	if len(parts) > 2 {
+		return NameSelection{}, errors.New("invalid namespace selection")
+	}
+	selection := NameSelection{
+		NamespaceToken: parts[0],
+	}
+	if len(parts) == 2 {
+		selection.Name = parts[1]
+	}
+	return selection, nil
+}
+
 type ShareRequest struct {
-	Reserved                        bool
-	UniqueName                      string
-	BackendMode                     BackendMode
-	ShareMode                       ShareMode
-	Target                          string
-	Frontends                       []string
-	BasicAuth                       []string
-	OauthProvider                   string
-	OauthEmailAddressPatterns       []string
-	OauthAuthorizationCheckInterval time.Duration
-	PermissionMode                  PermissionMode
-	AccessGrants                    []string
+	Reserved                  bool
+	UniqueName                string
+	BackendMode               BackendMode
+	ShareMode                 ShareMode
+	Target                    string
+	NameSelections            []NameSelection
+	PrivateShareToken         string
+	BasicAuth                 []string
+	OauthProvider             string
+	OauthEmailAddressPatterns []string
+	OauthRefreshInterval      time.Duration
+	PermissionMode            PermissionMode
+	AccessGrants              []string
 }
 
 type Share struct {

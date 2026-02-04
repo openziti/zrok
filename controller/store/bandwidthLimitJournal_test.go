@@ -1,7 +1,7 @@
 package store
 
 import (
-	"github.com/openziti/zrok/sdk/golang/sdk"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

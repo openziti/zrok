@@ -1,9 +1,10 @@
 package canary
 
 import (
-	"github.com/openziti/zrok/util"
-	"github.com/sirupsen/logrus"
 	"time"
+
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/util"
 )
 
 type LooperOptions struct {
@@ -47,7 +48,7 @@ func ReportLooperResults(results []*LooperResults) {
 		totalErrors += result.Errors
 		totalMismatches += result.Mismatches
 		totalLoops += result.Loops
-		logrus.Infof("looper #%d: %d loops, %v, %d errors, %d mismatches, %s/sec", i, result.Loops, util.BytesToSize(int64(result.Bytes)), result.Errors, result.Mismatches, util.BytesToSize(int64(xferRate)))
+		dl.Infof("looper #%d: %d loops, %v, %d errors, %d mismatches, %s/sec", i, result.Loops, util.BytesToSize(int64(result.Bytes)), result.Errors, result.Mismatches, util.BytesToSize(int64(xferRate)))
 	}
-	logrus.Infof("total: %d loops, %v, %d errors, %d mismatches, %s/sec", totalLoops, util.BytesToSize(int64(totalBytes)), totalErrors, totalMismatches, util.BytesToSize(int64(totalXferRate)))
+	dl.Infof("total: %d loops, %v, %d errors, %d mismatches, %s/sec", totalLoops, util.BytesToSize(int64(totalBytes)), totalErrors, totalMismatches, util.BytesToSize(int64(totalXferRate)))
 }

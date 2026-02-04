@@ -16,7 +16,7 @@ import (
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
 
 // CreateFrontendHandlerFunc turns a function with the right signature into a create frontend handler
@@ -80,6 +80,9 @@ func (o *CreateFrontend) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 //
 // swagger:model CreateFrontendBody
 type CreateFrontendBody struct {
+
+	// dynamic
+	Dynamic bool `json:"dynamic,omitempty"`
 
 	// permission mode
 	// Enum: [open closed]

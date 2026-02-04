@@ -1,0 +1,12 @@
+info:
+  description: zrok client access
+  title: zrok
+  version: 2.0.0
+
+basePath: /api/v2
+
+securityDefinitions:
+  key:
+    type: apiKey
+    in: header
+    name: x-token

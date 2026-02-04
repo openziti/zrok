@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/openziti/zrok/util"
+	"github.com/openziti/zrok/v2/util"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 

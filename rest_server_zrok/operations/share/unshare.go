@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
 
 // UnshareHandlerFunc turns a function with the right signature into a unshare handler
@@ -80,9 +80,6 @@ type UnshareBody struct {
 
 	// env z Id
 	EnvZID string `json:"envZId,omitempty"`
-
-	// reserved
-	Reserved bool `json:"reserved,omitempty"`
 
 	// share token
 	ShareToken string `json:"shareToken,omitempty"`

@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/openziti/zrok/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
 
 // UpdateShareHandlerFunc turns a function with the right signature into a update share handler
@@ -80,9 +80,6 @@ type UpdateShareBody struct {
 
 	// add access grants
 	AddAccessGrants []string `json:"addAccessGrants"`
-
-	// backend proxy endpoint
-	BackendProxyEndpoint string `json:"backendProxyEndpoint,omitempty"`
 
 	// remove access grants
 	RemoveAccessGrants []string `json:"removeAccessGrants"`

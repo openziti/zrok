@@ -7,7 +7,6 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **env_zid** | **str** |  | [optional] 
 **share_token** | **str** |  | [optional] 
-**reserved** | **bool** |  | [optional] 
 
 ## Example
 

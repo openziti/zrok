@@ -1,18 +1,15 @@
 package controller
 
 import (
-	"context"
-	"fmt"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/openziti/edge-api/rest_management_api_client"
-	edge_service "github.com/openziti/edge-api/rest_management_api_client/service"
-	"github.com/openziti/zrok/controller/store"
-	"github.com/openziti/zrok/controller/zrokEdgeSdk"
-	"github.com/openziti/zrok/rest_model_zrok"
-	"github.com/openziti/zrok/rest_server_zrok/operations/share"
+	"github.com/jmoiron/sqlx"
+	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/controller/automation"
+	"github.com/openziti/zrok/v2/controller/store"
+	"github.com/openziti/zrok/v2/rest_model_zrok"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/share"
+	"github.com/openziti/zrok/v2/util"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type unshareHandler struct{}
@@ -22,118 +19,187 @@ func newUnshareHandler() *unshareHandler {
 }
 
 func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
-	tx, err := str.Begin()
+	trx, err := str.Begin()
 	if err != nil {
-		logrus.Errorf("error starting transaction for '%v': %v", principal.Email, err)
+		dl.Errorf("error starting transaction for '%v': %v", principal.Email, err)
 		return share.NewUnshareInternalServerError()
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer func() { _ = trx.Rollback() }()
 
-	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
-	if err != nil {
-		logrus.Errorf("error getting edge client for '%v': %v", principal.Email, err)
-		return share.NewUnshareInternalServerError()
-	}
 	shrToken := params.Body.ShareToken
-	shrZId, err := h.findShareZId(shrToken, edge)
+	envZId := params.Body.EnvZID
+
+	// validate environment
+	env, err := h.validateEnvironment(envZId, principal, trx)
 	if err != nil {
-		logrus.Errorf("error finding share identity for '%v' (%v): %v", shrToken, principal.Email, err)
-		return share.NewUnshareNotFound()
-	}
-	var senv *store.Environment
-	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
-		for _, env := range envs {
-			if env.ZId == params.Body.EnvZID {
-				senv = env
-				break
-			}
-		}
-		if senv == nil {
-			logrus.Errorf("environment with id '%v' not found for '%v", params.Body.EnvZID, principal.Email)
-			return share.NewUnshareNotFound()
-		}
-	} else {
-		logrus.Errorf("error finding environments for account '%v': %v", principal.Email, err)
+		dl.Errorf("environment validation failed for '%v': %v", principal.Email, err)
 		return share.NewUnshareNotFound()
 	}
 
-	var sshr *store.Share
-	if shrs, err := str.FindSharesForEnvironment(senv.Id, tx); err == nil {
-		for _, shr := range shrs {
-			if shr.ZId == shrZId {
-				sshr = shr
-				break
-			}
-		}
-		if sshr == nil {
-			logrus.Errorf("share with id '%v' not found for '%v'", shrZId, principal.Email)
-			return share.NewUnshareNotFound()
-		}
-	} else {
-		logrus.Errorf("error finding shares for account '%v': %v", principal.Email, err)
+	// find and validate share
+	shr, err := h.findAndValidateShare(shrToken, env, trx)
+	if err != nil {
+		dl.Errorf("share validation failed for '%v': %v", principal.Email, err)
+		return share.NewUnshareNotFound()
+	}
+
+	// deallocate ziti resources using automation framework
+	if err := h.deallocateResources(shrToken); err != nil {
+		dl.Warnf("error deallocating ziti resources for share '%v': %v", shrToken, err)
+	}
+
+	// send unbind mapping updates before cleaning up share name mappings
+	if err := h.processDynamicMappings(shr.Id, trx); err != nil {
+		dl.Errorf("error sending unbind mapping updates for '%v': %v", shrToken, err)
+	}
+
+	// clean up share name mappings
+	if err := h.cleanupShareNameMappings(shr.Id, trx); err != nil {
+		dl.Errorf("error cleaning up share name mappings for '%v': %v", shrToken, err)
 		return share.NewUnshareInternalServerError()
 	}
 
-	if sshr.Reserved == params.Body.Reserved {
-		// single tag-based share deallocator; should work regardless of sharing mode
-		h.deallocateResources(senv, shrToken, shrZId, edge)
-		logrus.Debugf("deallocated share '%v'", shrToken)
-
-		if err := str.DeleteAccessGrantsForShare(sshr.Id, tx); err != nil {
-			logrus.Errorf("error deleting access grants for share '%v': %v", shrToken, err)
-			return share.NewUnshareInternalServerError()
-		}
-		if err := str.DeleteShare(sshr.Id, tx); err != nil {
-			logrus.Errorf("error deleting share '%v': %v", shrToken, err)
-			return share.NewUnshareInternalServerError()
-		}
-		if err := tx.Commit(); err != nil {
-			logrus.Errorf("error committing transaction for '%v': %v", shrZId, err)
-			return share.NewUnshareInternalServerError()
-		}
-
-	} else {
-		logrus.Infof("share '%v' is reserved, skipping deallocation", shrToken)
+	// clean up access grants
+	if err := str.DeleteAccessGrantsForShare(shr.Id, trx); err != nil {
+		dl.Errorf("error deleting access grants for share '%v': %v", shrToken, err)
+		return share.NewUnshareInternalServerError()
 	}
 
+	// delete the share record
+	if err := str.DeleteShare(shr.Id, trx); err != nil {
+		dl.Errorf("error deleting share '%v': %v", shrToken, err)
+		return share.NewUnshareInternalServerError()
+	}
+
+	// commit transaction
+	if err := trx.Commit(); err != nil {
+		dl.Errorf("error committing transaction for '%v': %v", shrToken, err)
+		return share.NewUnshareInternalServerError()
+	}
+
+	dl.Infof("successfully unshared '%v' for '%v'", shrToken, principal.Email)
 	return share.NewUnshareOK()
 }
 
-func (h *unshareHandler) findShareZId(shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
-	filter := fmt.Sprintf("name=\"%v\"", shrToken)
-	limit := int64(1)
-	offset := int64(0)
-	listReq := &edge_service.ListServicesParams{
-		Filter:  &filter,
-		Limit:   &limit,
-		Offset:  &offset,
-		Context: context.Background(),
-	}
-	listReq.SetTimeout(30 * time.Second)
-	listResp, err := edge.Service.ListServices(listReq, nil)
+func (h *unshareHandler) validateEnvironment(envZId string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) (*store.Environment, error) {
+	env, err := str.FindEnvironmentForAccount(envZId, int(principal.ID), trx)
 	if err != nil {
-		return "", err
+		return nil, errors.Wrapf(err, "error finding environment '%v' for account '%v'", envZId, principal.Email)
 	}
-	if len(listResp.Payload.Data) == 1 {
-		return *(listResp.Payload.Data[0].ID), nil
-	}
-	return "", errors.Errorf("share '%v' not found", shrToken)
+	return env, nil
 }
 
-func (h *unshareHandler) deallocateResources(senv *store.Environment, shrToken, shrZId string, edge *rest_management_api_client.ZitiEdgeManagement) {
-	if err := zrokEdgeSdk.DeleteServiceEdgeRouterPolicyForShare(senv.ZId, shrToken, edge); err != nil {
-		logrus.Warnf("error deleting service edge router policies for share '%v' in environment '%v': %v", shrToken, senv.ZId, err)
+func (h *unshareHandler) findAndValidateShare(shrToken string, env *store.Environment, trx *sqlx.Tx) (*store.Share, error) {
+	shares, err := str.FindSharesForEnvironment(env.Id, trx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error finding shares for environment '%v'", env.ZId)
 	}
-	if err := zrokEdgeSdk.DeleteServicePoliciesDialForShare(senv.ZId, shrToken, edge); err != nil {
-		logrus.Warnf("error deleting dial service policies for share '%v' in environment '%v': %v", shrToken, senv.ZId, err)
+
+	for _, share := range shares {
+		if share.Token == shrToken {
+			return share, nil
+		}
 	}
-	if err := zrokEdgeSdk.DeleteServicePoliciesBindForShare(senv.ZId, shrToken, edge); err != nil {
-		logrus.Warnf("error deleting bind service policies for share '%v' in environment '%v': %v", shrToken, senv.ZId, err)
+
+	return nil, errors.Errorf("share '%v' not found in environment '%v'", shrToken, env.ZId)
+}
+
+func (h *unshareHandler) deallocateResources(shrToken string) error {
+	// get shared automation client
+	za, err := automation.NewZitiAutomation(cfg.Ziti)
+	if err != nil {
+		return errors.Wrap(err, "error getting ziti automation client")
 	}
-	if err := zrokEdgeSdk.DeleteConfig(senv.ZId, shrToken, edge); err != nil {
-		logrus.Warnf("error deleting config for share '%v' in environment '%v': %v", shrToken, senv.ZId, err)
+
+	// use fluent workflow API for tag-based cleanup
+	err = za.CleanupByTag("zrokShareToken", shrToken)
+	if err != nil {
+		return errors.Wrapf(err, "error cleaning up ziti resources for share '%v'", shrToken)
 	}
-	if err := zrokEdgeSdk.DeleteService(senv.ZId, shrZId, edge); err != nil {
-		logrus.Warnf("error deleting service '%v' for share '%v' in environment '%v': %v", shrZId, shrToken, senv.ZId, err)
+
+	dl.Infof("deallocated ziti resources for share '%v'", shrToken)
+	return nil
+}
+
+func (h *unshareHandler) cleanupShareNameMappings(shareId int, trx *sqlx.Tx) error {
+	// find all share name mappings for this share
+	mappings, err := str.FindShareNameMappingsByShareId(shareId, trx)
+	if err != nil {
+		return errors.Wrapf(err, "error finding share name mappings for share '%v'", shareId)
 	}
+
+	// delete each name that was dynamically allocated (not reserved)
+	for _, mapping := range mappings {
+		name, err := str.GetName(mapping.NameId, trx)
+		if err != nil {
+			dl.Warnf("error getting name '%v' for cleanup: %v", mapping.NameId, err)
+			continue
+		}
+
+		// only delete names that are not reserved (dynamically allocated by share12)
+		if !name.Reserved {
+			if err := str.DeleteName(name.Id, trx); err != nil {
+				dl.Warnf("error deleting name '%v': %v", name.Name, err)
+			} else {
+				dl.Debugf("deleted dynamically allocated name '%v'", name.Name)
+			}
+		}
+
+		// delete the share name mapping
+		if err := str.DeleteShareNameMapping(mapping.Id, trx); err != nil {
+			dl.Warnf("error deleting share name mapping '%v': %v", mapping.Id, err)
+		}
+	}
+
+	return nil
+}
+
+func (h *unshareHandler) processDynamicMappings(shareId int, trx *sqlx.Tx) error {
+	// only send updates if dynamic proxy controller is enabled
+	if dPCtrl == nil {
+		return nil
+	}
+
+	// find all share name mappings for this share
+	mappings, err := str.FindShareNameMappingsByShareId(shareId, trx)
+	if err != nil {
+		return errors.Wrapf(err, "error finding share name mappings for share '%v'", shareId)
+	}
+
+	for _, mapping := range mappings {
+		// find name record to get the name and namespace
+		name, err := str.GetName(mapping.NameId, trx)
+		if err != nil {
+			dl.Warnf("error finding name with id '%v' for unbind update: %v", mapping.NameId, err)
+			continue
+		}
+
+		// find namespace
+		ns, err := str.GetNamespace(name.NamespaceId, trx)
+		if err != nil {
+			dl.Warnf("error finding namespace with id '%v' for unbind update: %v", name.NamespaceId, err)
+			continue
+		}
+
+		// find dynamic frontends for this namespace
+		frontends, err := str.FindDynamicFrontendsForNamespace(ns.Id, trx)
+		if err != nil {
+			dl.Warnf("error finding dynamic frontends for namespace '%v': %v", ns.Token, err)
+			continue
+		}
+
+		// send unbind mapping updates to each dynamic frontend
+		for _, frontend := range frontends {
+			frontendName := util.NameInNamespace(name.Name, ns.Name)
+
+			if err := dPCtrl.UnbindFrontendMapping(frontend.Token, frontendName, trx); err != nil {
+				dl.Errorf("error unbinding frontend mapping from frontend '%v': %v", frontend.Token, err)
+				// continue with other frontends rather than failing completely
+			} else {
+				dl.Debugf("unbound frontend mapping '%v' from dynamic frontend '%v'", frontendName, frontend.Token)
+			}
+		}
+	}
+
+	return nil
 }

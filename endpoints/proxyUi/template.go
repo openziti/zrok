@@ -7,8 +7,8 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 var tmpl *template.Template
@@ -69,7 +69,7 @@ func NotFoundData(shareToken string) VariableData {
 	return RequiredData(
 		fmt.Sprintf("'%v' not found!", shareToken),
 		fmt.Sprintf("share <code>%v</code> not found!", shareToken),
-	).WithMessage(fmt.Sprintf("are you running <code>zrok share</code> for this share?"))
+	).WithMessage(fmt.Sprintf("are you running <code>zrok2 share</code> for this share?"))
 }
 
 func WriteNotFound(w http.ResponseWriter, variableData VariableData) {
@@ -97,7 +97,7 @@ func WriteUnauthorized(w http.ResponseWriter, variableData VariableData) {
 func WriteTemplate(w http.ResponseWriter, statusCode int, variableData VariableData) {
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, variableData); err != nil {
-		logrus.Errorf("failed to execute template: %v", err)
+		dl.Errorf("failed to execute template: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -107,11 +107,11 @@ func WriteTemplate(w http.ResponseWriter, statusCode int, variableData VariableD
 
 	n, err := w.Write(buf.Bytes())
 	if n != buf.Len() {
-		logrus.Errorf("short write: wrote %d bytes, expected %d", n, buf.Len())
+		dl.Errorf("short write: wrote %d bytes, expected %d", n, buf.Len())
 		return
 	}
 	if err != nil {
-		logrus.Errorf("failed to write response: %v", err)
+		dl.Errorf("failed to write response: %v", err)
 		return
 	}
 }

@@ -1,6 +1,6 @@
 package env_core
 
-import "github.com/openziti/zrok/rest_client_zrok"
+import "github.com/openziti/zrok/v2/rest_client_zrok"
 
 // Root is the primary interface encapsulating the on-disk environment data.
 type Root interface {
@@ -13,7 +13,7 @@ type Root interface {
 
 	Client() (*rest_client_zrok.Zrok, error)
 	ApiEndpoint() (string, string)
-	DefaultFrontend() (string, string)
+	DefaultNamespace() (string, string)
 	Headless() (bool, string)
 	SuperNetwork() (bool, string)
 
@@ -41,10 +41,10 @@ type Environment struct {
 }
 
 type Config struct {
-	ApiEndpoint     string
-	DefaultFrontend string
-	Headless        bool
-	SuperNetwork    bool
+	ApiEndpoint      string
+	DefaultNamespace string
+	Headless         bool
+	SuperNetwork     bool
 }
 
 type Metadata struct {
