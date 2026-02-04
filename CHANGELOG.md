@@ -10,7 +10,7 @@ CHANGE: **Environment directory changed from `~/.zrok` to `~/.zrok2`**. This pro
 
 CHANGE: **Environment variables renamed from `ZROK_*` to `ZROK2_*`**. All environment variables now use the `ZROK2_` prefix (e.g., `ZROK2_API_ENDPOINT`, `ZROK2_ADMIN_TOKEN`, `ZROK2_ENABLE_TOKEN`). This ensures v1 and v2 environment configurations do not interfere with each other. (https://github.com/openziti/zrok/issues/1124)
 
-CHANGE: **Linux packages renamed to `zrok2`, `zrok2-share`, `zrok2-agent`**. Systemd service files renamed to `zrok2-agent.service`, `zrok2-share.service`, `zrok2-share@.service`. Configuration directory changed to `/opt/openziti/etc/zrok2`. (https://github.com/openziti/zrok/issues/1124)
+CHANGE: **Linux packages renamed to `zrok2`, `zrok2-agent`**. The agent's systemd user service file is renamed to `zrok2-agent.service`. Configuration directory changed to `/etc/zrok2`. (https://github.com/openziti/zrok/issues/1124)
 
 CHANGE: **Removed `env_v0_3` compatibility layer**. Since zrok2 uses `~/.zrok2` exclusively and will never touch `~/.zrok`, the v0.3 environment migration code has been removed. The update infrastructure remains for future version upgrades.
 

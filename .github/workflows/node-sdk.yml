@@ -10,7 +10,7 @@ jobs:
 
   enforce_stable_semver:
     name: Require Stable Release Semver
-    if: github.event.action == 'released'
+    if: github.event.action == 'released' && vars.ZROK_SKIP_NODEJS != 'true'
     runs-on: ubuntu-24.04
     steps:
       - name: Parse Release Version
