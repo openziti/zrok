@@ -1,0 +1,19 @@
+# /lib/systemd/system/zrok2-controller.service
+
+[Unit]
+Description=zrok2 controller service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=zrok2-controller
+Group=zrok2-controller
+WorkingDirectory=/var/lib/zrok2-controller
+UMask=0007
+ExecStart=/usr/bin/zrok2-controller.bash /etc/zrok2/ctrl.yml
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

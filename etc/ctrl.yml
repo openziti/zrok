@@ -33,6 +33,15 @@ admin:
   #
   #profile_endpoint:               localhost:6060
 
+# dynamic proxy controller is required to access public shares with memorable, meaningful, pronounceable names,
+# otherwise you must use random share tokens in URLs
+#dynamic_proxy_controller:
+#  identity_path: /home/zrok/.zrok/identities/dynamicProxyController.json
+#  service_name: dynamicProxyController
+#  amqp_publisher:
+#    url: amqp://guest:guest@localhost:5672
+#    exchange_name: dynamicProxy
+
 # The `bridge` section configures the `zrok controller metrics bridge`, specifying the source and sink where OpenZiti
 # `fabric.usage` events are consumed and then sent into `zrok`. For production environments, we recommend that you use
 # the `fileSource`, tailing the events from a JSON file written to by the OpenZiti controller. The `amqpSink` will then

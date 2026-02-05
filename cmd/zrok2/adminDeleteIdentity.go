@@ -17,8 +17,8 @@ type adminDeleteIdentityCommand struct {
 
 func newAdminDeleteIdentityCommand() *adminDeleteIdentityCommand {
 	cmd := &cobra.Command{
-		Use:   "identity <zId>",
-		Short: "Delete an identity",
+		Use:   "identity <name|zId>",
+		Short: "Delete an identity by name or Ziti ID",
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &adminDeleteIdentityCommand{cmd: cmd}

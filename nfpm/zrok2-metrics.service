@@ -1,0 +1,19 @@
+# /lib/systemd/system/zrok2-metrics.service
+
+[Unit]
+Description=zrok2 controller metrics bridge service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=zrok2-metrics
+Group=zrok2-metrics
+WorkingDirectory=/var/lib/zrok2-metrics
+UMask=0007
+ExecStart=/usr/bin/zrok2-metrics-bridge.bash /etc/zrok2/ctrl.yml
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
