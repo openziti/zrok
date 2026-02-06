@@ -5,6 +5,7 @@ import (
 
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/v2/rest_client_zrok/share"
 	"github.com/openziti/zrok/v2/rest_model_zrok"
 	"github.com/pkg/errors"
@@ -12,7 +13,7 @@ import (
 
 func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 	if !root.IsEnabled() {
-		return nil, errors.New("environment is not enabled; enable with 'zrok enable' first!")
+		return nil, errors.New("environment is not enabled; enable with 'zrok2 enable' first!")
 	}
 
 	var err error
@@ -115,4 +116,26 @@ func DeleteShare(root env_core.Root, shr *Share) error {
 	}
 
 	return nil
+}
+
+func GetShareDetail(root env_core.Root, shareToken string) (*rest_model_zrok.Share, error) {
+	if !root.IsEnabled() {
+		return nil, errors.New("environment is not enabled")
+	}
+
+	zrok, err := root.Client()
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting zrok client")
+	}
+	auth := httptransport.APIKeyAuth("X-TOKEN", "header", root.Environment().AccountToken)
+
+	params := metadata.NewGetShareDetailParams()
+	params.ShareToken = shareToken
+
+	resp, err := zrok.Metadata.GetShareDetail(params, auth)
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting share detail")
+	}
+
+	return resp.Payload, nil
 }

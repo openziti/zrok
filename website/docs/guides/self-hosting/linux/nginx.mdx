@@ -90,10 +90,10 @@ If you followed the non-TLS quickstart then you may have opened 8080,18080/tcp i
 
 ## Update the zrok Frontend
 
-List available frontends to obtain the token identifier of the frontend named "public". You may need to set `ZROK_ADMIN_TOKEN` or `ZROK_API_ENDPOINT` before running `zrok admin`.
+List available frontends to obtain the token identifier of the frontend named "public". You may need to set `ZROK2_ADMIN_TOKEN` or `ZROK2_API_ENDPOINT` before running `zrok2 admin`.
 
 ```bash
-$ zrok admin list frontends
+$ zrok2 admin list frontends
 
  TOKEN         ZID        PUBLIC NAME  URL TEMPLATE                              CREATED AT                         UPDATED AT                    
  2NiDTRYUww18  7DsLh9DXG  public       http://{token}.zrok.quigley.com:8080  2023-01-19 05:29:20.793 +0000 UTC  2023-01-19 06:17:25 +0000 UTC 
@@ -102,6 +102,6 @@ $ zrok admin list frontends
 Update the URL template to use NGINX.
 
 ```bash
-$ zrok admin update frontend 2NiDTRYUww18 --url-template https://{token}.zrok.quigley.com:443
+$ zrok2 admin update frontend 2NiDTRYUww18 --url-template https://{token}.zrok.quigley.com:443
 [   0.028]    INFO main.(*adminUpdateFrontendCommand).run: updated global frontend '2NiDTRYUww18'
 ```

@@ -10,7 +10,7 @@ import (
 
 func CreateAccess(root env_core.Root, request *AccessRequest) (*Access, error) {
 	if !root.IsEnabled() {
-		return nil, errors.New("environment is not enabled; enable with 'zrok enable' first!")
+		return nil, errors.New("environment is not enabled; enable with 'zrok2 enable' first!")
 	}
 
 	out := share.NewAccessParams()

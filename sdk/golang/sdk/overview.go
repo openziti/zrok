@@ -10,7 +10,7 @@ import (
 
 func Overview(root env_core.Root) (string, error) {
 	if !root.IsEnabled() {
-		return "", errors.New("environment is not enabled; enable with 'zrok enable' first!")
+		return "", errors.New("environment is not enabled; enable with 'zrok2 enable' first!")
 	}
 
 	client := &http.Client{}

@@ -99,7 +99,7 @@ ziti:
 
 ```
 
-The `admin` section defines privileged administrative credentials and must be set in the `ZROK_ADMIN_TOKEN` environment variable in shells where you want to run `zrok admin`.
+The `admin` section defines privileged administrative credentials and must be set in the `ZROK2_ADMIN_TOKEN` environment variable in shells where you want to run `zrok2 admin`.
 
 The `endpoint` section defines where your `zrok` controller will listen.
 
@@ -119,12 +119,12 @@ See the separate guides on [configuring metrics](../../../guides/self-hosting/me
 
 The `zrok` binaries are configured to work with the global `zrok.io` service, and default to using `api-v1.zrok.io` as the endpoint for communicating with the service.
 
-To work with a self-hosted `zrok` deployment, you'll need to set the `ZROK_API_ENDPOINT` environment variable to point to the address where your `zrok` controller will be listening, according to `endpoint` in the configuration file above.
+To work with a self-hosted `zrok` deployment, you'll need to set the `ZROK2_API_ENDPOINT` environment variable to point to the address where your `zrok` controller will be listening, according to `endpoint` in the configuration file above.
 
 In my case, I've set:
 
 ```bash
-export ZROK_API_ENDPOINT=http://127.0.0.1:18080
+export ZROK2_API_ENDPOINT=http://127.0.0.1:18080
 ```
 
 [Read more about configuring your self-hosted `zrok` instance](../../../guides/self-hosting/instance-configuration.mdx).
@@ -133,10 +133,10 @@ export ZROK_API_ENDPOINT=http://127.0.0.1:18080
 
 With your OpenZiti network running and your configuration saved to a local file (I refer to mine as `etc/ctrl.yml` in these examples), you're ready to bootstrap the Ziti network.
 
-Use the `zrok admin bootstrap` command to bootstrap like this:
+Use the `zrok2 admin bootstrap` command to bootstrap like this:
 
 ```bash
-$ zrok admin bootstrap etc/ctrl.yml
+$ zrok2 admin bootstrap etc/ctrl.yml
 [   0.002]    INFO main.(*adminBootstrap).run: {
 	...
 }
@@ -164,24 +164,24 @@ $ zrok admin bootstrap etc/ctrl.yml
 [   0.140]    INFO main.(*adminBootstrap).run: bootstrap complete!
 ```
 
-The `zrok admin bootstrap` command configures the `zrok` database, the necessary OpenZiti identities, and all of the OpenZiti policies required to run a `zrok` service.
+The `zrok2 admin bootstrap` command configures the `zrok` database, the necessary OpenZiti identities, and all of the OpenZiti policies required to run a `zrok` service.
 
 Notice this warning:
 
 ```
-[   0.120] WARNING zrok/controller.Bootstrap: missing public frontend for ziti id 'sqJRAINSiB'; please use 'zrok admin create frontend sqJRAINSiB public https://{token}.your.dns.name' to create a frontend instance
+[   0.120] WARNING zrok/controller.Bootstrap: missing public frontend for ziti id 'sqJRAINSiB'; please use 'zrok2 admin create frontend sqJRAINSiB public https://{token}.your.dns.name' to create a frontend instance
 ```
 
-If you find it necessary to re-run the `zrok admin bootstrap` command, you may need to add the `--skip-frontend` flag to avoid re-creating the default `public` frontend's Ziti identity and router policy.
+If you find it necessary to re-run the `zrok2 admin bootstrap` command, you may need to add the `--skip-frontend` flag to avoid re-creating the default `public` frontend's Ziti identity and router policy.
 
 ## Run zrok Controller
 
 The `zrok` bootstrap process wants us to create a "public frontend" for our service. `zrok` uses public frontends to allow users to specify where they would like public traffic to ingress from.
 
-The `zrok admin create frontend` command requires a running `zrok` controller, so let's start that up first:
+The `zrok2 admin create frontend` command requires a running `zrok` controller, so let's start that up first:
 
 ```bash
-$ zrok controller etc/ctrl.yml 
+$ zrok2 controller etc/ctrl.yml 
 [   0.003]    INFO main.(*controllerCommand).run: {
 	...
 }
@@ -198,10 +198,10 @@ $ zrok controller etc/ctrl.yml
 
 ## Create zrok Frontend
 
-With our `ZROK_ADMIN_TOKEN` and `ZROK_API_ENDPOINT` environment variables set, we can create our public frontend like this:
+With our `ZROK2_ADMIN_TOKEN` and `ZROK2_API_ENDPOINT` environment variables set, we can create our public frontend like this:
 
 ```bash
-$ zrok admin create frontend sqJRAINSiB public http://{token}.zrok.quigley.com:8080
+$ zrok2 admin create frontend sqJRAINSiB public http://{token}.zrok.quigley.com:8080
 [   0.037]    INFO main.(*adminCreateFrontendCommand).run: created global public frontend 'WEirJNHVlcW9'
 ```
 
@@ -240,7 +240,7 @@ You can also specify an `oauth` configuration in this file, full details of are 
 In another terminal window, run:
 
 ```bash
-$ zrok access public etc/http-frontend.yml
+$ zrok2 access public etc/http-frontend.yml
 [   0.002]    INFO main.(*accessPublicCommand).run: {
 	...
 }
@@ -251,10 +251,10 @@ The `zrok` frontend uses the `public` identity created during the bootstrap proc
 
 ## Create a User Account
 
-With our `ZROK_ADMIN_TOKEN` and `ZROK_API_ENDPOINT` environment variables set, we can create our first user account.
+With our `ZROK2_ADMIN_TOKEN` and `ZROK2_API_ENDPOINT` environment variables set, we can create our first user account.
 
 ```bash
-zrok admin create account <email> <password>
+zrok2 admin create account <email> <password>
 ```
 
 The output is the account token you will use to enable each device's zrok environment.
@@ -268,7 +268,7 @@ SuGzRPjVDIcF
 Offer this onboarding method to your users if you have configured an email-sending service in your `zrok` controller configuration.
 
 ```bash
-$ zrok invite
+$ zrok2 invite
 New Email: user@domain.com
 Confirm Email: user@domain.com
 invitation sent to 'user@domain.com'!
@@ -301,13 +301,13 @@ Keep track of the token listed above (`SuGzRPjVDIcF`). We'll use this to enable 
 On another device that can reach your Linux server by FQDN, configure the API endpoint and enable the environment with the account token you received when you created the first user account.
 
 ```bash
-export ZROK_API_ENDPOINT=https://zrok.quigley.com
+export ZROK2_API_ENDPOINT=https://zrok.quigley.com
 # or
-zrok config set apiEndpoint https://zrok.quigley.com
+zrok2 config set apiEndpoint https://zrok.quigley.com
 ```
 
 ```bash
-zrok enable SuGzRPjVDIcF
+zrok2 enable SuGzRPjVDIcF
 ```
 
 ```buttonless title="Example output"
@@ -315,7 +315,7 @@ zrok environment '2AS1WZ3Sz' enabled for 'SuGzRPjVDIcF'
 ```
 
 ```bash
-zrok status --secrets
+zrok2 status --secrets
 ```
 
 ```buttonless title="Example output"

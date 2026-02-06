@@ -11,22 +11,22 @@ Run the zrok agent as a `systemd --user` service under your Linux user account.
 
 ## Install the Package
 
-The package provides the `zrok` executable and the `zrok-agent.service` unit.
+The package provides the `zrok` executable and the `zrok2-agent.service` unit.
 
 <LinuxAgentInstall />
 
 ## Enable your Account
 
-This creates a `~/.zrok` directory enabled for your zrok account.
+This creates a `~/.zrok2` directory enabled for your zrok account.
 
 ```bash
-zrok enable <your_account_token>
+zrok2 enable <your_account_token>
 ```
 
 ## Start the Service
 
 ```bash
-systemctl --user enable --now zrok-agent.service
+systemctl --user enable --now zrok2-agent.service
 ```
 
 ## Use the agent
@@ -38,5 +38,5 @@ Learn more about using the zrok agent in the [agent guide](../../guides/agent/in
 ### Check the User Service Log
 
 ```bash
-journalctl --user -lfu zrok-agent.service
+journalctl --user -lfu zrok2-agent.service
 ```

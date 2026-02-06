@@ -38,7 +38,7 @@ type Agent struct {
 
 func NewAgent(cfg *AgentConfig, root env_core.Root) (*Agent, error) {
 	if !root.IsEnabled() {
-		return nil, errors.Errorf("unable to load environment; did you 'zrok enable'?")
+		return nil, errors.Errorf("unable to load environment; did you 'zrok2 enable'?")
 	}
 	a := &Agent{
 		cfg:       cfg,
