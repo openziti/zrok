@@ -1,0 +1,30 @@
+{
+  "name": "@example/zrok-demo-extension",
+  "version": "1.0.0",
+  "description": "Example extension for the zrok web UI demonstrating extension capabilities",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "@mui/material": "^6.0.0",
+    "@mui/icons-material": "^6.0.0",
+    "@xyflow/react": "^12.0.0",
+    "react-router": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12 || ^19.0.0",
+    "typescript": "~5.6.2"
+  },
+  "keywords": [
+    "zrok",
+    "extension",
+    "demo"
+  ],
+  "license": "Apache-2.0",
+  "private": true,
+  "readme": "This extension is designed to be used via path imports from the zrok UI. Do not run npm install here directly. Instead, import from the parent zrok/ui project."
+}
