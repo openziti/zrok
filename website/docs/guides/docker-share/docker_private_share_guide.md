@@ -24,9 +24,9 @@ The Docker Compose project uses your zrok account token to reserve a private sha
 
 When the project runs it will:
 
-1. enable a zrok environment unless `/mnt/.zrok/environment.json` exists in the `zrok_env` volume
-1. reserve a private share token for the service unless `/mnt/.zrok/reserved.json` exists
-1. start sharing the target specified in the `ZROK_TARGET` environment variable
+1. enable a zrok environment unless `/mnt/.zrok2/environment.json` exists in the `zrok_env` volume
+1. reserve a private share token for the service unless `/mnt/.zrok2/reserved.json` exists
+1. start sharing the target specified in the `ZROK2_TARGET` environment variable
 
 ## Before You Begin
 
@@ -45,14 +45,14 @@ First, let's create the private share.
 
     ```bash
     # file name ".env"
-    ZROK_ENABLE_TOKEN="8UL9-48rN0ua"
+    ZROK2_ENABLE_TOKEN="8UL9-48rN0ua"
     ```
 
 1. If you are self-hosting zrok then it's important to set your API endpoint URL too. If you're using the hosted zrok service then you can skip this step.
 
     ```bash
     # file name ".env"
-    ZROK_API_ENDPOINT="https://zrok.example.com"
+    ZROK2_API_ENDPOINT="https://zrok.example.com"
     ```
 
 1. Run your Compose project to start sharing the built-in demo web server:
@@ -80,15 +80,15 @@ Now that we have a private share we can access it with the zrok command or by ru
 
     ```bash
     # file name ".env"
-    ZROK_ENABLE_TOKEN="8UL9-48rN0ua"
+    ZROK2_ENABLE_TOKEN="8UL9-48rN0ua"
     ```
 
 1. Now copy the zrok private access token from the zrok private share project's output to your clipboard and paste it in the same file named `.env` here in your private share project folder like this:
 
     ```bash
     # file name ".env"
-    ZROK_ENABLE_TOKEN="8UL9-48rN0ua"
-    ZROK_ACCESS_TOKEN="wr3hpf2z5fiy"
+    ZROK2_ENABLE_TOKEN="8UL9-48rN0ua"
+    ZROK2_ACCESS_TOKEN="wr3hpf2z5fiy"
     ```
 
 1. Run your Compose project to start accessing the private share:
@@ -108,19 +108,19 @@ You must set the permission mode before you reserve the share.
 Only your own account can access the private share.
 
 ```bash
-ZROK_PERMISSION_MODE="closed"
+ZROK2_PERMISSION_MODE="closed"
 ```
 
 Grant access to additional zrok accounts.
 
 ```bash
-ZROK_ACCESS_GRANTS="bob@example.com alice@example.org"
+ZROK2_ACCESS_GRANTS="bob@example.com alice@example.org"
 ```
 
 You can adjust the access grants by running the CLI inside the `zrok-share` container.
 
 ```bash
-docker compose exec zrok-share zrok modify ${ZROK_UNIQUE_NAME} --remove-access-grant bob@example.com
+docker compose exec zrok-share zrok2 modify ${ZROK2_UNIQUE_NAME} --remove-access-grant bob@example.com
 ```
 
 ## Going Further with Private Access

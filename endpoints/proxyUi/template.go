@@ -69,7 +69,7 @@ func NotFoundData(shareToken string) VariableData {
 	return RequiredData(
 		fmt.Sprintf("'%v' not found!", shareToken),
 		fmt.Sprintf("share <code>%v</code> not found!", shareToken),
-	).WithMessage(fmt.Sprintf("are you running <code>zrok share</code> for this share?"))
+	).WithMessage(fmt.Sprintf("are you running <code>zrok2 share</code> for this share?"))
 }
 
 func WriteNotFound(w http.ResponseWriter, variableData VariableData) {

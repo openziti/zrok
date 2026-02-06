@@ -132,12 +132,12 @@ This section covers setting up dynamicProxy from scratch on a new zrok instance.
 First, create a Ziti identity for the dynamicProxyController service:
 
 ```bash
-zrok admin create identity dynamicProxyController
+zrok2 admin create identity dynamicProxyController
 ```
 
 This command outputs the identity details. Save the identity's Ziti ID (starts with a letter, like `aBc123`), as you'll need it for the next steps.
 
-The identity configuration file is saved to `~/.zrok/identities/dynamicProxyController.json` by default.
+The identity configuration file is saved to `~/.zrok2/identities/dynamicProxyController.json` by default.
 
 ### Step 2: Create Ziti Service and Policies
 
@@ -179,7 +179,7 @@ Add the dynamicProxyController configuration to your zrok controller configurati
 ```yaml
 # Add to your existing controller configuration
 dynamic_proxy_controller:
-  identity_path: /home/zrok/.zrok/identities/dynamicProxyController.json
+  identity_path: /home/zrok/.zrok2/identities/dynamicProxyController.json
   service_name: dynamicProxyController
 
   amqp_publisher:
@@ -202,7 +202,7 @@ sudo systemctl restart zrok-controller
 
 # If running manually
 # Stop the controller (Ctrl+C) and restart it
-zrok controller etc/ctrl.yml
+zrok2 controller etc/ctrl.yml
 ```
 
 ### Step 4: Create a Namespace
@@ -211,10 +211,10 @@ Namespaces provide logical grouping for names. Create your first namespace:
 
 ```bash
 # Create an open namespace (anyone can create names in it)
-zrok admin create namespace --token public --open zrok.example.com
+zrok2 admin create namespace --token public --open zrok.example.com
 
 # Or create a closed namespace (requires grants)
-zrok admin create namespace --token private private.example.com
+zrok2 admin create namespace --token private private.example.com
 ```
 
 The command outputs a namespace token (e.g., `abc123xyz`). Save this token as you'll need it for frontend mapping and when creating names.
@@ -229,7 +229,7 @@ Parameters:
 Create a frontend with the dynamic flag enabled:
 
 ```bash
-zrok admin create frontend --dynamic public "http://{token}.zrok.example.com:8080"
+zrok2 admin create frontend --dynamic public "http://{token}.zrok.example.com:8080"
 ```
 
 This creates a dynamic frontend and outputs a frontend token (e.g., `KMmfE0VXO7Pp`).
@@ -248,7 +248,7 @@ Command breakdown:
 Link the namespace to the frontend so shares in the namespace are served by this frontend:
 
 ```bash
-zrok admin create namespace-frontend <namespaceToken> <frontendToken>
+zrok2 admin create namespace-frontend <namespaceToken> <frontendToken>
 ```
 
 You can map multiple frontends to a single namespace for load balancing and high availability. All mapped frontends will receive the same mapping updates via AMQP.
@@ -259,10 +259,10 @@ To view existing mappings:
 
 ```bash
 # List frontends for a namespace
-zrok admin list namespaceFrontendMappings <namespaceToken>
+zrok2 admin list namespaceFrontendMappings <namespaceToken>
 
 # List namespaces for a frontend
-zrok admin list frontendNamespaceMappings <frontendToken>
+zrok2 admin list frontendNamespaceMappings <frontendToken>
 ```
 
 ### Step 7: Configure dynamicProxy Frontend
@@ -282,7 +282,7 @@ amqp_subscriber:
   exchange_name: dynamicProxy
 
 controller:
-  identity_path: /home/zrok/.zrok/identities/public.json
+  identity_path: /home/zrok/.zrok2/identities/public.json
   service_name: dynamicProxyController
 ```
 
@@ -340,7 +340,7 @@ tls:
 Run the dynamicProxy frontend using your configuration:
 
 ```bash
-zrok access dynamicProxy etc/dynamicProxy.yml
+zrok2 access dynamicProxy etc/dynamicProxy.yml
 ```
 
 The frontend will:
@@ -362,7 +362,7 @@ Type=simple
 User=zrok
 Group=zrok
 WorkingDirectory=/home/zrok
-ExecStart=/usr/local/bin/zrok access dynamicProxy /home/zrok/etc/dynamicProxy.yml
+ExecStart=/usr/local/bin/zrok2 access dynamicProxy /home/zrok/etc/dynamicProxy.yml
 Restart=always
 RestartSec=10
 
@@ -384,16 +384,16 @@ Create a test share to verify the setup:
 
 ```bash
 # First, enable a zrok environment if you haven't already
-zrok enable <accountToken>
+zrok2 enable <accountToken>
 
 # Set the default namespace for convenience
-zrok config set defaultNamespace <namespaceToken>
+zrok2 config set defaultNamespace <namespaceToken>
 
 # Create a reserved name in the namespace
-zrok create name -n <namespaceToken> my-test-share
+zrok2 create name -n <namespaceToken> my-test-share
 
 # Share a resource using the reserved name
-zrok share public --backend-mode web -n <namespaceToken>:my-test-share ~/public
+zrok2 share public --backend-mode web -n <namespaceToken>:my-test-share ~/public
 ```
 
 Access your share at `http://my-test-share.zrok.example.com:8080` (adjust domain/port based on your configuration).
@@ -422,13 +422,13 @@ This approach allows both publicProxy and dynamicProxy to run simultaneously, en
 Users need to:
 
 1. Upgrade to zrok v2.0+
-2. Set the default namespace: `zrok config set defaultNamespace <namespaceToken>`
+2. Set the default namespace: `zrok2 config set defaultNamespace <namespaceToken>`
 3. Recreate their shares using names:
    ```bash
-   # Instead of: zrok reserve public 8080
+   # Instead of: zrok2 reserve public 8080
    # They use:
-   zrok create name my-app
-   zrok share public localhost:8080 -n <namespaceToken>:my-app
+   zrok2 create name my-app
+   zrok2 share public localhost:8080 -n <namespaceToken>:my-app
    ```
 
 #### Deprecation Timeline
@@ -464,7 +464,7 @@ This approach requires downtime but provides a clean migration in a single maint
 All users must:
 
 1. Upgrade to zrok v2.0+
-2. Set default namespace: `zrok config set defaultNamespace <namespaceToken>`
+2. Set default namespace: `zrok2 config set defaultNamespace <namespaceToken>`
 3. Recreate shares as shown in Option 1
 
 :::warning
@@ -509,7 +509,7 @@ amqp_subscriber:
 
 # Controller client for gRPC queries
 controller:
-  identity_path: /home/zrok/.zrok/identities/public.json
+  identity_path: /home/zrok/.zrok2/identities/public.json
   service_name: dynamicProxyController
   timeout: 30s  # Optional: gRPC request timeout (default: 30s)
 
@@ -573,10 +573,10 @@ Namespaces can be **open** (anyone can create names) or **closed** (requires gra
 
 ```bash
 # Open namespace - users can freely create names
-zrok admin create namespace public "Public Shares" -o
+zrok2 admin create namespace public "Public Shares" -o
 
 # Closed namespace - requires explicit grants
-zrok admin create namespace private "Private Shares"
+zrok2 admin create namespace private "Private Shares"
 ```
 
 ### Granting Namespace Access
@@ -584,13 +584,13 @@ zrok admin create namespace private "Private Shares"
 For closed namespaces, grant users access by email:
 
 ```bash
-zrok admin add namespaceGrant <namespaceToken> user@example.com
+zrok2 admin add namespaceGrant <namespaceToken> user@example.com
 ```
 
 Remove grants with:
 
 ```bash
-zrok admin remove namespaceGrant <namespaceToken> user@example.com
+zrok2 admin remove namespaceGrant <namespaceToken> user@example.com
 ```
 
 ### Setting Default Namespace
@@ -598,13 +598,13 @@ zrok admin remove namespaceGrant <namespaceToken> user@example.com
 Users can set their default namespace to avoid specifying it on every command:
 
 ```bash
-zrok config set defaultNamespace <namespaceToken>
+zrok2 config set defaultNamespace <namespaceToken>
 ```
 
 Or via environment variable:
 
 ```bash
-export ZROK_DEFAULT_NAMESPACE=<namespaceToken>
+export ZROK2_DEFAULT_NAMESPACE=<namespaceToken>
 ```
 
 ### Listing Namespaces
@@ -612,13 +612,13 @@ export ZROK_DEFAULT_NAMESPACE=<namespaceToken>
 Users can see available namespaces (based on grants and open namespaces):
 
 ```bash
-zrok list namespaces
+zrok2 list namespaces
 ```
 
 Administrators can list all namespaces:
 
 ```bash
-zrok admin list namespaces
+zrok2 admin list namespaces
 ```
 
 ## Troubleshooting
@@ -695,17 +695,17 @@ zrok admin list namespaces
 
 1. Verify namespace-to-frontend mapping exists:
    ```bash
-   zrok admin list namespace-frontend <namespaceToken>
+   zrok2 admin list namespace-frontend <namespaceToken>
    ```
 
 2. Check if the name exists:
    ```bash
-   zrok list names
+   zrok2 list names
    ```
 
 3. Verify the share is active:
    ```bash
-   zrok list shares
+   zrok2 list shares
    ```
 
 4. Check frontend logs for mapping presence:
@@ -780,8 +780,8 @@ For high availability and load balancing, run multiple dynamicProxy instances:
 1. Create separate configuration files for each instance (with unique bind addresses if on the same host)
 2. Map the same namespace to multiple frontends:
    ```bash
-   zrok admin create namespace-frontend <namespaceToken> <frontendToken1>
-   zrok admin create namesapce-frontend <namespaceToken> <frontendToken2>
+   zrok2 admin create namespace-frontend <namespaceToken> <frontendToken1>
+   zrok2 admin create namesapce-frontend <namespaceToken> <frontendToken2>
    ```
 3. Use a load balancer (nginx, HAProxy, etc.) in front of the instances
 4. Each instance will receive mapping updates via AMQP independently

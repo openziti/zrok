@@ -2,8 +2,8 @@
 version: 2
 builds:
 - id: zrok-armhf
-  main: ./cmd/zrok
-  binary: zrok
+  main: ./cmd/zrok2
+  binary: zrok2
   ldflags: 
     - "-s -w -X github.com/openziti/zrok/v2/build.Version={{.Tag}} -X github.com/openziti/zrok/v2/build.Hash={{.ShortCommit}}"
   env:
@@ -18,7 +18,7 @@ builds:
     - 7
 
 nfpms:
-  - package_name: zrok
+  - package_name: zrok2
     id: zrok-cli
     vendor: NetFoundry
     homepage: https://zrok.io/
@@ -53,103 +53,20 @@ nfpms:
     priority: optional
 
     # GoReleaser will automatically add the binaries here
-    bindir: /opt/openziti/bin
+    bindir: /usr/bin
 
     # Contents to add to the package.
-    contents:
-      - src: /opt/openziti/bin/zrok
-        dst: /usr/bin/zrok
-        type: "symlink"
+    contents: []
 
-  - package_name: zrok-share
-    id: zrok-share
-    vendor: NetFoundry
-    homepage: https://zrok.io/
-    maintainer: support@zrok.io
-    description: |-
-      This package provides zrok-share.service. To enable, edit the "/opt/openziti/etc/zrok/zrok-share.env" file with the
-      desired target for sharing, and run "systemctl enable --now zrok-share.service".
-    license: Apache 2.0
-
-    # do not bundle the built binaries, only supporting files
-    meta: true
-
-    # Formats to be generated.
-    formats:
-      - deb
-      - rpm
-
-    # {{ .ConventionalFileName }} satisfies the RPM name convention.
-    file_name_template: "{{ .ConventionalFileName }}"
-
-    # Umask to be used on files without explicit mode set. (overridable)
-    umask: 0o002
-
-    # Package version within this release version.
-    release: 1
-
-    # Section.
-    section: default
-
-    # Priority.
-    priority: optional
-
-    # GoReleaser will automatically add the binaries here
-    dependencies:
-      - zrok
-
-    # this allows users to satisfy the requirement for jq another way, not with the package manager, e.g.
-    # apt install --no-recommends zrok-share
-    recommends:
-      - jq
-
-    overrides:
-      # yum and dnf do not automatically install "weak deps" aka "recommends", so we need to add them as a dependency
-      rpm:
-        dependencies:
-          - zrok
-          - jq
-
-    # Contents to add to the package.
-    contents:
-      - dst: /lib/systemd/system/
-        src: ./nfpm/zrok-share.service
-
-      - dst: /usr/lib/systemd/user/
-        src: ./nfpm/zrok-share@.service
-
-      - dst: /opt/openziti/etc/zrok
-        type: dir
-        file_info:
-          mode: 0755
-
-      - dst: /opt/openziti/bin/
-        src: ./nfpm/zrok-share.bash
-        file_info:
-          mode: 0755
-
-      - dst: /opt/openziti/bin/
-        src: ./nfpm/zrok-enable.bash
-        file_info:
-          mode: 0755
-
-      - dst: /opt/openziti/etc/zrok/
-        src: ./nfpm/zrok-share.env
-        type: config|noreplace
-
-      - dst: /opt/openziti/etc/zrok/
-        src: ./etc/caddy/multiple_upstream.Caddyfile
-        type: config|noreplace
-
-  - package_name: zrok-agent
+  - package_name: zrok2-agent
     id: zrok-agent
     vendor: NetFoundry
     homepage: https://zrok.io/
     maintainer: support@zrok.io
     description: |
-      This package provides zrok-agent.service. Enable your zrok account on this device with "zrok enable". Run 
-      "systemctl enable --user --now zrok-agent.service" to enable the service for the current user and visit the agent 
-      UI by running "zrok agent console".
+      This package provides zrok2-agent.service. Enable your zrok account on this device with "zrok2 enable". Run
+      "systemctl enable --user --now zrok2-agent.service" to enable the service for the current user and visit the agent
+      UI by running "zrok2 agent console".
     license: Apache 2.0
 
     # do not bundle the built binaries, only supporting files
@@ -177,19 +94,28 @@ nfpms:
 
     # GoReleaser will automatically add the binaries here
     dependencies:
-      - zrok
+      - zrok2
 
     # this allows users to satisfy the requirement for jq another way, not with the package manager, e.g.
-    # apt install --no-recommends zrok-share
+    # apt install --no-recommends zrok2-agent
     recommends: []
 
     overrides:
       # yum and dnf do not automatically install "weak deps" aka "recommends", so we need to add them as a dependency
       rpm:
         dependencies:
-          - zrok
+          - zrok2
 
     # Contents to add to the package.
     contents:
       - dst: /usr/lib/systemd/user/
-        src: ./nfpm/zrok-agent.service
+        src: ./nfpm/zrok2-agent.service
+
+      - dst: /usr/bin/zrok2-enable
+        src: ./nfpm/zrok2-enable.bash
+        file_info:
+          mode: 0755
+
+      - dst: /etc/zrok2/
+        src: ./etc/caddy/multiple_upstream.Caddyfile
+        type: config|noreplace

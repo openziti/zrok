@@ -44,7 +44,7 @@ the detected OS of the visitor's browser */}
 
   <TabItem value="Linux">
 
-On Linux, zrok frontdoor is implemented natively as a system service provided by the `zrok-share` DEB or RPM package.
+On Linux, zrok frontdoor is implemented natively as a system service provided by the `zrok2-share` DEB or RPM package.
 
 ## Goal
 
@@ -52,7 +52,7 @@ Proxy a reserved public subdomain to a backend target with an always-on Linux sy
 
 ## How it Works
 
-The `zrok-share` package creates a `zrok-share.service` unit in systemd. The administrator edits the service's configuration file to specify the:
+The `zrok2-share` package creates a `zrok2-share.service` unit in systemd. The administrator edits the service's configuration file to specify the:
 
 1. zrok account token
 1. target URL or files to be shared and backend mode, e.g. `proxy`
@@ -60,9 +60,9 @@ The `zrok-share` package creates a `zrok-share.service` unit in systemd. The adm
 
 When the service starts it will:
 
-1. enable the zrok environment unless `/var/lib/zrok-share/.zrok/environment.json` exists
-1. reserve a public subdomain for the service unless `/var/lib/zrok-share/.zrok/reserved.json` exists
-1. start sharing the target specified as `ZROK_TARGET` in the environment file
+1. enable the zrok environment unless `/var/lib/zrok2-share/.zrok2/environment.json` exists
+1. reserve a public subdomain for the service unless `/var/lib/zrok2-share/.zrok2/reserved.json` exists
+1. start sharing the target specified as `ZROK2_TARGET` in the environment file
 
   <LinuxService/>
 

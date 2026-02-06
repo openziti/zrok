@@ -38,7 +38,7 @@ The `tcpTunnel` backend mode allows you to tunnel specific TCP ports between hos
 On the machine you want to access (the "sharing" side):
 
 ```bash
-zrok share private --backend-mode tcpTunnel localhost:22
+zrok2 share private --backend-mode tcpTunnel localhost:22
 ```
 
 This creates a private share and outputs a share token (e.g., `abc123`).
@@ -46,7 +46,7 @@ This creates a private share and outputs a share token (e.g., `abc123`).
 On your local machine (the "accessing" side):
 
 ```bash
-zrok access private --bind 127.0.0.1:2222 abc123
+zrok2 access private --bind 127.0.0.1:2222 abc123
 ```
 
 Now you can SSH to the remote machine through the tunnel:
@@ -60,13 +60,13 @@ ssh -p 2222 user@127.0.0.1
 Share a PostgreSQL database:
 
 ```bash
-zrok share private --backend-mode tcpTunnel localhost:5432
+zrok2 share private --backend-mode tcpTunnel localhost:5432
 ```
 
 Access it locally:
 
 ```bash
-zrok access private --bind 127.0.0.1:5432 <share-token>
+zrok2 access private --bind 127.0.0.1:5432 <share-token>
 ```
 
 Connect with your database client:
@@ -84,13 +84,13 @@ The `socks` backend mode creates a SOCKS5 proxy, enabling dynamic port forwardin
 On the remote machine (the "sharing" side):
 
 ```bash
-zrok share private --backend-mode socks
+zrok2 share private --backend-mode socks
 ```
 
 On your local machine (the "accessing" side):
 
 ```bash
-zrok access private --bind 127.0.0.1:1080 <share-token>
+zrok2 access private --bind 127.0.0.1:1080 <share-token>
 ```
 
 Now configure your applications to use the SOCKS5 proxy at `127.0.0.1:1080`. For example:

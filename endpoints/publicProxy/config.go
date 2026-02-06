@@ -65,9 +65,6 @@ func DefaultConfig() *Config {
 	return &Config{
 		Identity: "public",
 		Address:  "0.0.0.0:8080",
-		Oauth: &OauthConfig{
-			MaxCookieSize: 3072,
-		},
 	}
 }
 
@@ -84,6 +81,9 @@ func (c *Config) Load(path string) error {
 	}
 	if c.V != V {
 		return errors.Errorf("invalid configuration version '%d'; expected '%d'", c.V, V)
+	}
+	if c.Oauth != nil && c.Oauth.MaxCookieSize == 0 {
+		c.Oauth.MaxCookieSize = 3072
 	}
 	return nil
 }

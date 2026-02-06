@@ -25,9 +25,9 @@ target.
 
 When the project runs it will:
 
-1. enable a zrok environment unless `/mnt/.zrok/environment.json` exists in the `zrok_env` volume
-1. reserve a public subdomain for the service unless `/mnt/.zrok/reserved.json` exists
-1. start sharing the target specified in the `ZROK_TARGET` environment variable
+1. enable a zrok environment unless `/mnt/.zrok2/environment.json` exists in the `zrok_env` volume
+1. reserve a public subdomain for the service unless `/mnt/.zrok2/reserved.json` exists
+1. start sharing the target specified in the `ZROK2_TARGET` environment variable
 
 ## Create the Docker Project
 
@@ -36,7 +36,7 @@ When the project runs it will:
 1. Copy your zrok account's enable token from the zrok web console to your clipboard and paste it in a file named `.env` in the same folder like this:
 
     ```bash title=".env"
-    ZROK_ENABLE_TOKEN="8UL9-48rN0ua"
+    ZROK2_ENABLE_TOKEN="8UL9-48rN0ua"
     ```
 
 1. Name the Share
@@ -44,7 +44,7 @@ When the project runs it will:
     This unique name becomes part of the domain name of the share, e.g. `https://toaster.share.zrok.io`. A random name is generated if you don't specify one.
 
     ```bash title=".env"
-    ZROK_UNIQUE_NAME="toaster"
+    ZROK2_UNIQUE_NAME="toaster"
     ```
 
 1. Run the Compose project to start sharing the built-in demo web server. Be sure to `--detach` so the project runs in the background if you want it to auto-restart when your computer reboots.
@@ -67,10 +67,10 @@ This concludes the minimum steps to begin sharing the demo web server. Read on t
 
 ## Proxy Any Web Server
 
-The simplest way to share your existing HTTP server is to set `ZROK_TARGET` (e.g. `https://example.com`) in the environment of the `docker compose up` command. When you restart the share will auto-configure for that URL.
+The simplest way to share your existing HTTP server is to set `ZROK2_TARGET` (e.g. `https://example.com`) in the environment of the `docker compose up` command. When you restart the share will auto-configure for that URL.
 
 ```bash title=".env"
-ZROK_TARGET="http://example.com:8080"
+ZROK2_TARGET="http://example.com:8080"
 ```
 
 ```bash
@@ -83,18 +83,18 @@ You can require a password or an OAuth login with certain email addresses.
 
 ### OAuth Email
 
-You can allow specific email addresse patterns by setting `ZROK_OAUTH_PROVIDER` to `github` or `google` and
-`ZROK_OAUTH_EMAILS`. Read more about the OAuth features in [this blog
+You can allow specific email addresse patterns by setting `ZROK2_OAUTH_PROVIDER` to `github` or `google` and
+`ZROK2_OAUTH_EMAILS`. Read more about the OAuth features in [this blog
 post](https://blog.openziti.io/the-zrok-oauth-public-frontend).
 
 ```bash title=".env"
-ZROK_OAUTH_PROVIDER="github"
-ZROK_OAUTH_EMAILS="alice@example.com *@acme.example.com"
+ZROK2_OAUTH_PROVIDER="github"
+ZROK2_OAUTH_EMAILS="alice@example.com *@acme.example.com"
 ```
 
 ## Caddy is Powerful
 
-The reserved public share project uses zrok's default backend mode, `proxy`. Another backend mode, `caddy`, accepts a path to [a Caddyfile](https://caddyserver.com/docs/caddyfile) as the value of `ZROK_TARGET` ([zrok Caddyfile examples](https://github.com/openziti/zrok/tree/main/etc/caddy)). 
+The reserved public share project uses zrok's default backend mode, `proxy`. Another backend mode, `caddy`, accepts a path to [a Caddyfile](https://caddyserver.com/docs/caddyfile) as the value of `ZROK2_TARGET` ([zrok Caddyfile examples](https://github.com/openziti/zrok/tree/main/etc/caddy)). 
 
 Caddy is the most powerful and flexible backend mode in zrok. You must reserve a new public subdomain whenever you switch the backend mode, so using `caddy` reduces the risk that you'll have to share a new frontend URL with your users. 
 
@@ -125,7 +125,7 @@ With Caddy, you can balance the workload for websites or web services or share s
         expose: 8080
       zrok-share:
         volumes:
-          - ./Caddyfile:/mnt/.zrok/Caddyfile
+          - ./Caddyfile:/mnt/.zrok2/Caddyfile
     ```
 
 1. Start a new Docker Compose project or delete the existing state volume. 
@@ -134,7 +134,7 @@ With Caddy, you can balance the workload for websites or web services or share s
     docker compose down --volumes
     ```
 
-  If you prefer to keep using the same zrok environment with the new share then delete `/mnt/.zrok/reserved.json` instead of the entire volume.
+  If you prefer to keep using the same zrok environment with the new share then delete `/mnt/.zrok2/reserved.json` instead of the entire volume.
 
 1. Run the project to load the new configuration.
 

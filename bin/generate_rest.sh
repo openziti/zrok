@@ -45,11 +45,6 @@ command -v swagger &>/dev/null || {
   exit 1
 }
 
-command -v swagger-codegen &>/dev/null || {
-  echo >&2 "command 'swagger-codegen' not installed. see: https://github.com/swagger-api/swagger-codegen for installation"
-  exit 1
-}
-
 command -v openapi-generator-cli &>/dev/null || {
   echo >&2 "command 'openapi-generator-cli' not installed. see: https://www.npmjs.com/package/@openapitools/openapi-generator-cli for installation"
   exit 1

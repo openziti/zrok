@@ -70,10 +70,10 @@ func (r *Root) ApiEndpoint() (string, string) {
 		from = "config"
 	}
 
-	env := os.Getenv("ZROK_API_ENDPOINT")
+	env := os.Getenv("ZROK2_API_ENDPOINT")
 	if env != "" {
 		apiEndpoint = env
-		from = "ZROK_API_ENDPOINT"
+		from = "ZROK2_API_ENDPOINT"
 	}
 
 	if r.IsEnabled() {
@@ -93,10 +93,10 @@ func (r *Root) DefaultNamespace() (string, string) {
 		from = "config"
 	}
 
-	env := os.Getenv("ZROK_DEFAULT_NAMESPACE")
+	env := os.Getenv("ZROK2_DEFAULT_NAMESPACE")
 	if env != "" {
 		defaultNamespace = env
-		from = "ZROK_DEFAULT_NAMESPACE"
+		from = "ZROK2_DEFAULT_NAMESPACE"
 	}
 
 	return defaultNamespace, from
@@ -111,11 +111,11 @@ func (r *Root) Headless() (bool, string) {
 		from = "config"
 	}
 
-	env := os.Getenv("ZROK_HEADLESS")
+	env := os.Getenv("ZROK2_HEADLESS")
 	if env != "" {
 		if v, err := strconv.ParseBool(env); err == nil {
 			headless = v
-			from = "ZROK_HEADLESS"
+			from = "ZROK2_HEADLESS"
 		}
 	}
 
@@ -131,11 +131,11 @@ func (r *Root) SuperNetwork() (bool, string) {
 		from = "config"
 	}
 
-	env := os.Getenv("ZROK_SUPER_NETWORK")
+	env := os.Getenv("ZROK2_SUPER_NETWORK")
 	if env != "" {
 		if v, err := strconv.ParseBool(env); err == nil {
 			superNetwork = v
-			from = "ZROK_SUPER_NETWORK"
+			from = "ZROK2_SUPER_NETWORK"
 		}
 	}
 
