@@ -102,7 +102,7 @@ func (c *oidcConfig) configure(cfg *OauthConfig, tls bool) error {
 			return s
 		}
 		urlOptions := []rp.URLParamOpt{
-			rp.WithPromptURLParam("login"),
+			rp.WithPromptURLParam("none"),
 			rp.WithResponseModeURLParam("query"),
 			rp.WithURLParam("access_type", "offline"),
 		}
