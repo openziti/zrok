@@ -150,6 +150,13 @@ metrics:
     org:            zrok
     token:          "<INFLUX TOKEN>"
 
+# Names configuration. Controls profanity screening for share tokens and namespace names. By default, profanity
+# screening is enabled for both. Set these to `true` to disable screening for the respective name type.
+#
+#names:
+#  disable_share_token_profanity_check:    false
+#  disable_namespace_name_profanity_check: false
+
 # Configure the generated URL for the registration email. The registration token will be appended to this URL.
 #
 registration:
