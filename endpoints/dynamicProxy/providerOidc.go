@@ -33,6 +33,7 @@ type oidcConfig struct {
 	Issuer       string
 	DiscoveryURL string
 	Pkce         bool
+	Prompt       string
 }
 
 func newOidcConfig(v map[string]interface{}) (dd.Dynamic, error) {
@@ -119,8 +120,12 @@ func (p *oidcProvider) authHandler() http.HandlerFunc {
 			return s
 		}
 
+		prompt := p.config.Prompt
+		if prompt == "" {
+			prompt = "login"
+		}
 		urlOptions := []rp.URLParamOpt{
-			rp.WithPromptURLParam("login"),
+			rp.WithPromptURLParam(prompt),
 			rp.WithResponseModeURLParam("query"),
 			rp.WithURLParam("access_type", "offline"),
 		}

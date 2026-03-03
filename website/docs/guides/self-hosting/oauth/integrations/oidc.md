@@ -33,6 +33,7 @@ oauth:
       client_secret: "<your-oidc-client-secret>"
       scopes: ["openid", "email", "profile"]
       issuer: "https://your-oidc-provider.com"
+      prompt: "login"
       supports_pkce: true  # recommended for security
 ```
 
@@ -45,6 +46,7 @@ oauth:
 - **`issuer`**: The OIDC issuer URL (used for auto-discovery)
 - **`discovery_url`**: Optional explicit discovery endpoint URL (if not using issuer auto-discovery)
 - **`supports_pkce`**: Whether the provider supports PKCE (recommended: `true`)
+- **`prompt`**: Optional prompt parameter for OIDC authentication (e.g., "login", "consent"), defaults to "login"
 
 ## Common OIDC Providers
 
