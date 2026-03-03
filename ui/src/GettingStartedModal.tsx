@@ -86,7 +86,7 @@ const GettingStartedModal = ({ close, isOpen }: GettingStartedModalProps) => {
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography>
-                        Use the <code>zrok share</code> command to share network connectivity and files (see the
+                        Use the <code>zrok2 share</code> command to share network connectivity and files (see the
                         <code> --help</code> in the CLI for details: <code>zrok2 share --help</code>):
                     </Typography>
                 </Grid2>
