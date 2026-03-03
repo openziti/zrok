@@ -75,7 +75,7 @@ const GettingStartedModal = ({ close, isOpen }: GettingStartedModalProps) => {
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography>
                         <pre>
-                        $ zrok2 enable {user.token} <ClipboardText text={"zrok enable " + user.token}/>
+                        $ zrok2 enable {user.token} <ClipboardText text={"zrok2 enable " + user.token}/>
                         </pre>
                     </Typography>
                 </Grid2>
@@ -87,13 +87,13 @@ const GettingStartedModal = ({ close, isOpen }: GettingStartedModalProps) => {
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography>
                         Use the <code>zrok share</code> command to share network connectivity and files (see the
-                        <code> --help</code> in the CLI for details: <code>zrok share --help</code>):
+                        <code> --help</code> in the CLI for details: <code>zrok2 share --help</code>):
                     </Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography>
                         <pre>
-                        $ zrok2 share public --backend-mode web . <ClipboardText text={"zrok share public --backend-mode web ."} />
+                        $ zrok2 share public --backend-mode web . <ClipboardText text={"zrok2 share public --backend-mode web ."} />
                         </pre>
                     </Typography>
                 </Grid2>
