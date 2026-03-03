@@ -88,21 +88,33 @@ jobs:
       - name: Copy RPM from test repo to stable repo with jFrog CLI
         if: matrix.packager == 'rpm'
         shell: bash
-        run: >
-          jf rt copy
-          --recursive=false
-          --flat=true
-          --fail-no-op=true
-          ${{ env.ZITI_RPM_TEST_REPO }}/redhat/${{ matrix.arch.rpm }}/${{ matrix.package_name }}-${{ needs.enforce_stable_semver.outputs.version }}-1.${{ matrix.arch.rpm }}.rpm
-          ${{ env.ZITI_RPM_PROD_REPO }}/redhat/${{ matrix.arch.rpm }}/
+        run: |
+          # meta packages like zrok2-agent produce noarch RPMs; arch-specific packages use the target arch
+          if [[ "${{ matrix.package_name }}" == "zrok2-agent" ]]; then
+            _rpm_arch="noarch"
+          else
+            _rpm_arch="${{ matrix.arch.rpm }}"
+          fi
+          jf rt copy \
+            --recursive=false \
+            --flat=true \
+            --fail-no-op=true \
+            "${{ env.ZITI_RPM_TEST_REPO }}/redhat/${{ matrix.arch.rpm }}/${{ matrix.package_name }}-${{ needs.enforce_stable_semver.outputs.version }}-1.${_rpm_arch}.rpm" \
+            "${{ env.ZITI_RPM_PROD_REPO }}/redhat/${{ matrix.arch.rpm }}/"
 
       - name: Copy DEB from test repo to stable repo with jFrog CLI
         if: matrix.packager == 'deb'
         shell: bash
-        run: >
-          jf rt copy
-          --recursive=false
-          --flat=true
-          --fail-no-op=true
-          ${{ env.ZITI_DEB_TEST_REPO }}/pool/${{ matrix.package_name }}/${{ matrix.arch.deb }}/${{ matrix.package_name }}_${{ needs.enforce_stable_semver.outputs.version }}-1_${{ matrix.arch.deb }}.deb
-          ${{ env.ZITI_DEB_PROD_REPO }}/pool/${{ matrix.package_name }}/${{ matrix.arch.deb }}/
+        run: |
+          # meta packages like zrok2-agent produce arch-independent (all) DEBs; arch-specific packages use the target arch
+          if [[ "${{ matrix.package_name }}" == "zrok2-agent" ]]; then
+            _deb_arch="all"
+          else
+            _deb_arch="${{ matrix.arch.deb }}"
+          fi
+          jf rt copy \
+            --recursive=false \
+            --flat=true \
+            --fail-no-op=true \
+            "${{ env.ZITI_DEB_TEST_REPO }}/pool/${{ matrix.package_name }}/${{ matrix.arch.deb }}/${{ matrix.package_name }}_${{ needs.enforce_stable_semver.outputs.version }}-1_${_deb_arch}.deb" \
+            "${{ env.ZITI_DEB_PROD_REPO }}/pool/${{ matrix.package_name }}/${{ matrix.arch.deb }}/"
