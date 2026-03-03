@@ -65,7 +65,7 @@ func (h *createShareNameHandler) Handle(params share.CreateShareNameParams, prin
 	}
 
 	// screen for profanity and DNS-appropriateness
-	if !util.IsValidNameInNamespace(params.Body.Name) {
+	if !util.IsValidNameInNamespace(params.Body.Name, cfg.Names != nil && cfg.Names.DisableNamespaceNameProfanityCheck) {
 		dl.Errorf("'%v' is not a valid unique name for '%v'", params.Body.Name, principal.Email)
 		return share.NewCreateShareNameConflict().WithPayload(rest_model_zrok.ErrorMessage(fmt.Sprintf("'%v' is not a valid share name; failed profanity or DNS check", params.Body.Name)))
 	}

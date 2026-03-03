@@ -33,6 +33,7 @@ type Config struct {
 	Limits                 *limits.Config
 	Maintenance            *MaintenanceConfig
 	Metrics                *metrics.Config
+	Names                  *NamesConfig
 	Registration           *RegistrationConfig
 	ResetPassword          *ResetPasswordConfig
 	Store                  *store.Config
@@ -81,6 +82,11 @@ type ResetPasswordMaintenanceConfig struct {
 	ExpirationTimeout time.Duration
 	CheckFrequency    time.Duration
 	BatchLimit        int
+}
+
+type NamesConfig struct {
+	DisableShareTokenProfanityCheck   bool
+	DisableNamespaceNameProfanityCheck bool
 }
 
 type TlsConfig struct {
