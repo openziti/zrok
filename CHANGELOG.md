@@ -48,6 +48,8 @@ CHANGE: All logging migrated from `githhub.com/michaelquigley/pfxlog` and `githu
 
 FIX: Updated the unique constraint on the `accounts.email` column to only be unique when `is not deleted`. This only fixes PostgreSQL databases; fixing SQLite databases effectively requires rebuilding the entire database, see the comment in the issue for details. (https://github.com/openziti/zrok/issues/1109)
 
+FEATURE: Added configuration option for OIDC authentication prompts.
+
 ## v1.1.11
 
 CHANGE: The `vpn` backend mode has been removed from zrok due to dependency management issues. The underlying TUN device libraries created conflicts that prevented updates to critical dependencies. See the [VPN removal guide](https://docs.zrok.io/docs/guides/vpn/) for migration alternatives and future plans.
