@@ -89,8 +89,9 @@ jobs:
         if: matrix.packager == 'rpm'
         shell: bash
         run: |
-          # meta packages like zrok2-agent produce noarch RPMs; arch-specific packages use the target arch
-          if [[ "${{ matrix.package_name }}" == "zrok2-agent" ]]; then
+          # meta packages produce noarch RPMs; binary packages use the target arch
+          META_PACKAGES=(zrok2-agent)
+          if [[ " ${META_PACKAGES[*]} " == *" ${{ matrix.package_name }} "* ]]; then
             _rpm_arch="noarch"
           else
             _rpm_arch="${{ matrix.arch.rpm }}"
@@ -106,8 +107,9 @@ jobs:
         if: matrix.packager == 'deb'
         shell: bash
         run: |
-          # meta packages like zrok2-agent produce arch-independent (all) DEBs; arch-specific packages use the target arch
-          if [[ "${{ matrix.package_name }}" == "zrok2-agent" ]]; then
+          # meta packages produce arch-independent (all) DEBs; binary packages use the target arch
+          META_PACKAGES=(zrok2-agent)
+          if [[ " ${META_PACKAGES[*]} " == *" ${{ matrix.package_name }} "* ]]; then
             _deb_arch="all"
           else
             _deb_arch="${{ matrix.arch.deb }}"
