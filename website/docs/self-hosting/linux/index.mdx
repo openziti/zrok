@@ -1,14 +1,14 @@
 ---
 sidebar_position: 40
-title: Self-Hosting Guide for Linux
+title: Self-hosting guide for Linux
 sidebar_label: Linux
 ---
 
-## Walkthrough Video
+## Walkthrough video
 
 <iframe width="100%" height="315" src="https://www.youtube.com/embed/870A5dke_u4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-## Before you Begin
+## Before you begin
 
 This will get you up and running with a self-hosted instance of `zrok`. I'll assume you have the following:
 
@@ -57,7 +57,7 @@ sudo apt install zrok
 
 Follow [the Linux installation guide](../../how-tos/install/linux.mdx) to install the `zrok` package from the repository or manually install the binary for your platform.
 
-## Configure the Controller
+## Configure the controller
 
 Create a `zrok` controller configuration file in `etc/ctrl.yml`. The controller can terminate TLS or you may front the server with a reverse proxy that continually renews the necessary wildcard certificate (e.g., Caddy w/ a DNS provider plugin). This example will expose the non-TLS listener for the controller.
 
@@ -115,7 +115,7 @@ See the separate guides on [configuring metrics](../metrics-and-limits/configuri
 
 :::
 
-## Environment Variables
+## Environment variables
 
 The `zrok` binaries are configured to work with the global `zrok.io` service, and default to using `api-v1.zrok.io` as the endpoint for communicating with the service.
 
@@ -174,7 +174,7 @@ Notice this warning:
 
 If you find it necessary to re-run the `zrok2 admin bootstrap` command, you may need to add the `--skip-frontend` flag to avoid re-creating the default `public` frontend's Ziti identity and router policy.
 
-## Run zrok Controller
+## Run zrok controller
 
 The `zrok` bootstrap process wants us to create a "public frontend" for our service. `zrok` uses public frontends to allow users to specify where they would like public traffic to ingress from.
 
@@ -196,7 +196,7 @@ $ zrok2 controller etc/ctrl.yml
 [   0.085]    INFO zrok/controller.(*metricsAgent).listen: started
 ```
 
-## Create zrok Frontend
+## Create zrok frontend
 
 With our `ZROK2_ADMIN_TOKEN` and `ZROK2_API_ENDPOINT` environment variables set, we can create our public frontend like this:
 
@@ -219,7 +219,7 @@ The id is shown for the frontend identity named "public."
 
 Nice work! The `zrok` controller is fully configured now that you have created the `zrok` frontend.
 
-## Configure the Public Frontend
+## Configure the public frontend
 
 Create an http frontend configuration file in `etc/http-frontend.yml`.
 
@@ -235,7 +235,7 @@ The frontend does not provide server TLS, but you may front the server with a re
 
 You can also specify an `oauth` configuration in this file, full details of are found in [OAuth Public Frontend Configuration](../oauth/configuring-oauth.md#configuring-your-public-frontend).
 
-## Start Public Frontend
+## Start public frontend
 
 In another terminal window, run:
 
@@ -249,7 +249,7 @@ $ zrok2 access public etc/http-frontend.yml
 
 The `zrok` frontend uses the `public` identity created during the bootstrap process to securely access zrok backends. to provide public access for the `zrok` deployment. It is expected that the configured listener for this frontend corresponds to the DNS template specified when creating the public frontend record above.
 
-## Create a User Account
+## Create a user account
 
 With our `ZROK2_ADMIN_TOKEN` and `ZROK2_API_ENDPOINT` environment variables set, we can create our first user account.
 
@@ -263,7 +263,7 @@ The output is the account token you will use to enable each device's zrok enviro
 SuGzRPjVDIcF
 ```
 
-## Invite Additional Users
+## Invite additional users
 
 Offer this onboarding method to your users if you have configured an email-sending service in your `zrok` controller configuration.
 
@@ -296,7 +296,7 @@ After doing that, I see the following output in my controller console:
 
 Keep track of the token listed above (`SuGzRPjVDIcF`). We'll use this to enable our shell for this `zrok` deployment.
 
-## Enable Your Environment
+## Enable your environment
 
 On another device that can reach your Linux server by FQDN, configure the API endpoint and enable the environment with the account token you received when you created the first user account.
 

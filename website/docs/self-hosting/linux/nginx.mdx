@@ -1,23 +1,23 @@
 ---
 sidebar_position: 50
-sidebar_label: NGINX TLS
+sidebar_label: NGINX reverse proxy for zrok
 ---
 
-# NGINX Reverse Proxy for zrok
+# NGINX reverse proxy for zrok
 
-## Walkthrough Video
+## Walkthrough video
 
 <iframe width="100%" height="315" src="https://www.youtube.com/embed/870A5dke_u4?start=1080" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-## Before You Begin
+## Before you begin
 
 I'll assume you have a running `zrok` controller and frontend and wish to front both with NGINX providing server TLS. Go back to [Self-Hosting Guide](./index.mdx) if you still need to spin those up.
 
-## Choose a Reverse Proxy Address
+## Choose a reverse proxy address
 
 I'll use `https://api.zrok.quigley.com:443` in this example, and assume you already set up wildcard DNS like `*.zrok.quigley.com`. This lets us elect `api.zrok.quigley.com` as the controller DNS name, and forward any other incoming requests to the zrok public frontend.
 
-## Obtain a Wildcard Server Certificate
+## Obtain a wildcard server certificate
 
 You must complete a DNS challenge to obtain a wildcard certificate from Let's Encrypt. I'll assume you know how to create the necessary TXT record in the DNS zone you're using with zrok.
 
@@ -84,11 +84,11 @@ Load the new configuration by restarting NGINX. Check the logs to make sure it's
 
 > Started A high performance web server and a reverse proxy server.
 
-## Check the Firewall
+## Check the firewall
 
 If you followed the non-TLS quickstart then you may have opened 8080,18080/tcp in your firewall. You can go ahead and replace those exceptions with 443/tcp because only NGINX needs to be reachable for zrok to function.
 
-## Update the zrok Frontend
+## Update the zrok frontend
 
 List available frontends to obtain the token identifier of the frontend named "public". You may need to set `ZROK2_ADMIN_TOKEN` or `ZROK2_API_ENDPOINT` before running `zrok2 admin`.
 

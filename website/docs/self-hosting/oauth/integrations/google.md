@@ -2,11 +2,11 @@
 sidebar_position: 10
 ---
 
-# Google OAuth Setup
+# Google OAuth setup
 
 This guide covers setting up Google OAuth for your zrok public frontend.
 
-## OAuth Consent Screen
+## OAuth consent screen
 
 Before configuring an OAuth Client ID, you must configure the "OAuth consent screen" in the Google Cloud Console.
 
@@ -28,7 +28,7 @@ Add the `../auth/userinfo.email` scope (required for zrok to receive user email 
 
 ![](images/google_oauth_content_screen_6.png)
 
-## Create OAuth 2.0 Client ID
+## Create OAuth 2.0 client ID
 
 Navigate to: **APIs & Services > Credentials > + Create Credentials**
 
@@ -48,7 +48,7 @@ Configure the **Authorized redirect URIs** to match your OAuth frontend address 
 
 Save the client ID and client secret for your frontend configuration.
 
-## Frontend Configuration
+## Frontend configuration
 
 Add the Google provider to your `frontend.yml`:
 
@@ -61,7 +61,7 @@ oauth:
       client_secret: "<your-google-client-secret>"
 ```
 
-## Redirect URL Format
+## Redirect URL format
 
 For Google OAuth with the provider name `"google"`, the redirect URL should be:
 ```

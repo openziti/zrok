@@ -2,7 +2,7 @@
 sidebar_position: 20
 ---
 
-# Configuring Metrics
+# Configuring metrics
 
 A fully configured, production-scale `zrok` service instance looks like this:
 
@@ -14,7 +14,7 @@ A fully configured, production-scale `zrok` service instance looks like this:
 
 Environments that horizontally scale the `zrok` control plane with multiple controllers should use an AMQP-based queue to "fan out" the metrics workload across the entire control plane. Simpler installations that use a single `zrok` controller can collect `fabric.usage` events from the OpenZiti controller by "tailing" the events log file, or collecting them from the OpenZiti controller's websocket implementation.
 
-## Configuring the OpenZiti Controller
+## Configuring the OpenZiti controller
 
 > This requires a version of OpenZiti with a `fabric` dependency of `v0.22.52` or newer, which is satisfed by the `v0.27.6` release of OpenZiti Controller.
 
@@ -52,7 +52,7 @@ metrics:
 
 Be sure to restart all of the components of your OpenZiti network after making these configuration changes.
 
-## Configuring the zrok Metrics Bridge
+## Configuring the zrok metrics bridge
 
 `zrok` currently uses a "metrics bridge" component (running as a separate process) to consume the `fabric.usage` events from the OpenZiti controller, and publish them onto an AMQP queue. Add a stanza like the following to your `zrok` controller configuration:
 
@@ -83,7 +83,7 @@ Once RabbitMQ is running, you can start the `zrok` metrics bridge by pointing it
 $ zrok ctrl metrics bridge <path/to/zrok-controller.yaml>
 ```
 
-## Configuring zrok Metrics
+## Configuring zrok metrics
 
 Configure the `metrics` section of your `zrok` controller. Here is an example:
 
@@ -103,7 +103,7 @@ metrics:
 
 This configures the `zrok` controller to consume usage events from the AMQP queue, and configures the InfluxDB metrics store. The InfluxDB organization and bucket must be created in advance. The `zrok` controller will not create these for you.
 
-## Testing Metrics
+## Testing metrics
 
 With all of the components configured and running, either use `zrok test loop` or manually create share(s) to generate traffic on the `zrok` instance. If everything is working correctly, you should see log messages from the controller like the following, which indicate that that the controller is processing OpenZiti usage events, and generating `zrok` metrics:
 

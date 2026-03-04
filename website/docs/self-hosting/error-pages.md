@@ -1,10 +1,10 @@
 ---
-title: Error Pages
-sidebar_label: Error Pages
+title: Custom error pages
+sidebar_label: Custom error pages
 sidebar_position: 17
 ---
 
-# Custom Error Pages
+# Custom error pages
 
 zrok includes a built-in error page template that displays user-friendly messages for various error conditions like "share not found", "unauthorized access", and "bad gateway" errors. This template can be replaced with your own custom HTML file to match your organization's branding or provide custom error handling.
 
@@ -17,9 +17,9 @@ The error page system uses Go's `text/template` package to render HTML pages wit
 - `Message`: Optional explanatory message
 - `Error`: Optional error details
 
-## Configuration Options
+## Configuration options
 
-### Private Access (`zrok2 access private`)
+### Private access (`zrok2 access private`)
 
 For private access frontends, use the `--template-path` flag:
 
@@ -27,7 +27,7 @@ For private access frontends, use the `--template-path` flag:
 zrok2 access private --template-path /path/to/custom-template.html <shareToken>
 ```
 
-### Public Frontend (`zrok2 access public`)
+### Public frontend (`zrok2 access public`)
 
 For public frontends, add the `template_path` configuration option to your frontend configuration YAML:
 
@@ -48,7 +48,7 @@ Then start the public frontend:
 zrok2 access public /path/to/frontend-config.yml
 ```
 
-## Template Structure
+## Template structure
 
 The template uses Go's template syntax with the following available variables:
 
@@ -57,7 +57,7 @@ The template uses Go's template syntax with the following available variables:
 - `{{.Message}}`: Optional message (may contain HTML)
 - `{{.Error}}`: Optional error object
 
-### Conditional Content
+### Conditional content
 
 Use Go template conditionals to show content only when data is available:
 
@@ -73,7 +73,7 @@ Use Go template conditionals to show content only when data is available:
 {{end}}
 ```
 
-## Custom Template Example
+## Custom template example
 
 Here's a simplified version of the default template that you can customize:
 
@@ -192,29 +192,29 @@ Here's a simplified version of the default template that you can customize:
 </html>
 ```
 
-## Error Types
+## Error types
 
 Your template will be used for various error conditions:
 
-### Share Not Found (404)
+### Share not found (404)
 - **Title**: `'<shareToken>' not found!`
 - **Banner**: `share <code><shareToken></code> not found!`
 - **Message**: `are you running <code>zrok2 share</code> for this share?`
 
-### Unauthorized Access (401)
+### Unauthorized access (401)
 - **Title**: `unauthorized!`
 - **Banner**: `user not authorized!` or `<code><username></code> not authorized!`
 
-### Bad Gateway (502)
+### Bad gateway (502)
 - **Title**: Custom title based on the error
 - **Banner**: Custom banner based on the error
 - **Error**: Detailed error information
 
-### Health Check (200)
+### Health check (200)
 - **Title**: `healthy`
 - **Banner**: `healthy`
 
-## Best Practices
+## Best practices
 
 1. **Keep it simple**: Error pages should load quickly and not depend on external resources that might also be failing.
 

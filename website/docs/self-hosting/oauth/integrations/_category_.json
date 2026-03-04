@@ -1,7 +1,8 @@
 {
-  "label": "OAuth Integrations",
+  "label": "OAuth integrations",
   "position": 20,
   "link": {
-    "type": "generated-index"
+    "type": "generated-index",
+    "description": "Step-by-step setup guides for configuring Google, GitHub, and generic OIDC providers with your zrok public frontend."
   }
 }

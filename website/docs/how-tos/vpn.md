@@ -1,12 +1,13 @@
 ---
-sidebar_label: VPN (Deprecated)
+title: VPN backend mode (deprecated)
+sidebar_label: VPN (deprecated)
 ---
 
-# The VPN Backend Mode Has Been Deprecated
+# VPN backend mode (deprecated)
 
 The `vpn` backend mode has been removed from zrok as of `v1.1.11`.
 
-## Why Was the VPN Mode Removed?
+## Why the VPN mode was removed
 
 The VPN backend mode was removed from the core zrok distribution due to dependency management issues. The underlying libraries required for VPN functionality (specifically the TUN device management libraries) created conflicts that prevented updates to critical dependencies in the zrok codebase.
 
@@ -23,13 +24,13 @@ This approach would allow:
 - Users who need VPN features to opt-in to the additional tool
 - The VPN implementation could support a different subset of platforms than core zrok
 
-## Migrating Away from VPN
+## Migrate away from VPN
 
 If you were using the VPN backend mode, consider these alternatives:
 
-### For Host-to-Host Connectivity
+### For host-to-host connectivity
 
-#### TCP Tunnel Mode
+#### TCP tunnel mode
 
 The `tcpTunnel` backend mode allows you to tunnel specific TCP ports between hosts. This is ideal when you need to access a specific service on a remote machine.
 
@@ -75,7 +76,7 @@ Connect with your database client:
 psql -h 127.0.0.1 -p 5432 -U myuser mydatabase
 ```
 
-#### SOCKS Proxy Mode
+#### SOCKS proxy mode
 
 The `socks` backend mode creates a SOCKS5 proxy, enabling dynamic port forwarding to multiple destinations through a single share. This is useful when you need to access multiple services on a remote network.
 
@@ -107,7 +108,7 @@ ssh -o ProxyCommand='nc -x 127.0.0.1:1080 %h %p' user@internal-host
 
 **Browser:** Configure your browser's proxy settings to use SOCKS5 proxy `127.0.0.1:1080` to browse internal web applications.
 
-#### When to Use Each Mode
+#### When to use each mode
 
 | Use Case | Recommended Mode |
 |----------|------------------|
@@ -116,7 +117,7 @@ ssh -o ProxyCommand='nc -x 127.0.0.1:1080 %h %p' user@internal-host
 | Web browsing through a remote network | `socks` |
 | Persistent service tunneling | `tcpTunnel` with reserved name |
 
-### For Network-Level Access
+### For network-level access
 
 - Consider deploying an OpenZiti network directly for full network-level zero-trust connectivity
 

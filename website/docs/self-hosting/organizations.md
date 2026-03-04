@@ -9,11 +9,11 @@ zrok (starting with `v0.4.45`) includes support for "organizations". Organizatio
 
 Future zrok releases will include additional organization features, including `--closed` permission sharing functions.
 
-## Configuring an Organization
+## Configuring an organization
 
 The API endpoints used to manage organizations and their members require a site-level `ZROK2_ADMIN_TOKEN` to access. See the [self-hosting guide](linux/index.mdx#configure-the-controller) for details on configuring admin tokens.
 
-### Create an Organization
+### Create an organization
 
 The `zrok2 admin create organization` command is used to create organizations:
 
@@ -45,7 +45,7 @@ $ zrok2 admin create organization -d "documentation"
 [   0.006]    INFO main.(*adminCreateOrganizationCommand).run: created new organization with token 'gK1XRvthq7ci'
 ```
 
-### List Organizations
+### List organizations
 
 We use the `zrok2 admin list organizations` command to list our organizations:
 
@@ -56,7 +56,7 @@ $ zrok2 admin list organizations
  gK1XRvthq7ci        documentation 
 ```
 
-### Add a Member to an Organization
+### Add a member to an organization
 
 We use the `zrok2 admin create org-member` command to add members to organizations:
 
@@ -87,7 +87,7 @@ $ zrok2 admin create org-member gK1XRvthq7ci michael.quigley@netfoundry.io
 
 The `--admin` flag can be added to the `zrok2 admin create org-member` command to mark the member as an administrator of the organization.
 
-### List Members of an Organization
+### List members of an organization
 
 ```
 $ zrok2 admin list org-members gK1XRvthq7ci
@@ -96,11 +96,11 @@ $ zrok2 admin list org-members gK1XRvthq7ci
  michael.quigley@netfoundry.io  false 
 ```
 
-### Removing Organizations and Members
+### Removing organizations and members
 
 The `zrok2 admin delete org-member` and `zrok2 admin delete organization` commands are available to clean up organizations and their membership lists.
 
-## End-user Organization Administrator Commands
+## End-user organization administrator commands
 
 When a zrok account is added to an organization as an administrator it allows them to use the `zrok2 organization admin` commands, which include:
 
@@ -129,7 +129,7 @@ The `zrok2 organization admin list` command is used to list the members of an or
 
 The `zrok2 organization admin overview` command is used to retrieve an overview of an organization member account. This is functionally equivalent to what the `zrok2 overview` command does, but it allows an organization admin to retrieve the overview for another zrok account.
 
-## End-user Organization Commands
+## End-user organization commands
 
 All zrok accounts can use the `zrok2 organization memberships` command to list the organizations they're a member of:
 

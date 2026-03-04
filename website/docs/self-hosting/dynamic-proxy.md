@@ -2,13 +2,13 @@
 sidebar_position: 20
 ---
 
-# Dynamic Proxy Frontend Migration Guide
+# Dynamic proxy frontend migration guide
 
 This guide helps self-hosting system administrators migrate from the legacy `zrok access public` (`publicProxy`) to the new v2.0 `zrok access dynamicProxy` (`dynamicProxy`) architecture. The dynamicProxy system provides enhanced scalability, namespace-based naming mapping, and full support for OAuth integration.
 
 ## Overview
 
-### What's Changing
+### What's changing
 
 In zrok v2.0, the public sharing model has been redesigned around **namespaces** and **names**:
 
@@ -22,7 +22,7 @@ The new `dynamicProxy` frontend replaces `publicProxy` with several key improvem
 - **Enhanced scalability**: multiple dynamicProxy instances can serve the same namespace
 - **gRPC communication**: efficient controller-to-frontend communication for mapping queries
 
-### Architecture Components
+### Architecture components
 
 The dynamicProxy system consists of three main components:
 
@@ -94,7 +94,7 @@ Before setting up `dynamicProxy`, ensure you have:
 
 RabbitMQ is available through most package managers. Here are installation options:
 
-#### Docker (Recommended for Testing)
+#### Docker (recommended for testing)
 
 ```bash
 docker run -d --name rabbitmq \
@@ -123,11 +123,11 @@ sudo systemctl start rabbitmq-server
 
 For production deployments, consult the [RabbitMQ documentation](https://www.rabbitmq.com/download.html) for best practices on clustering, persistence, and monitoring.
 
-## Fresh Installation
+## Fresh installation
 
 This section covers setting up dynamicProxy from scratch on a new zrok instance.
 
-### Step 1: Create dynamicProxyController Identity
+### Step 1: Create dynamicProxyController identity
 
 First, create a Ziti identity for the dynamicProxyController service:
 
@@ -139,7 +139,7 @@ This command outputs the identity details. Save the identity's Ziti ID (starts w
 
 The identity configuration file is saved to `~/.zrok2/identities/dynamicProxyController.json` by default.
 
-### Step 2: Create Ziti Service and Policies
+### Step 2: Create Ziti service and policies
 
 Using the Ziti CLI, create a service for the dynamicProxyController and the necessary policies:
 
@@ -172,7 +172,7 @@ ziti edge create sp "${SERVICE_NAME}-dial" Dial \
 The `public` identity referenced in the dial policy should be the identity used by your dynamicProxy frontends. If you use a different identity name, adjust the command accordingly. You can create multiple dial policies for different frontend identities if needed.
 :::
 
-### Step 3: Configure zrok Controller
+### Step 3: Configure zrok controller
 
 Add the dynamicProxyController configuration to your zrok controller configuration file (typically `etc/dev.yml` or your production config):
 
@@ -205,7 +205,7 @@ sudo systemctl restart zrok-controller
 zrok2 controller etc/ctrl.yml
 ```
 
-### Step 4: Create a Namespace
+### Step 4: Create a namespace
 
 Namespaces provide logical grouping for names. Create your first namespace:
 
@@ -224,7 +224,7 @@ Parameters:
 - `--open`: open mode (users can create names without grants); without `--open` is "closed mode" where users need explicit grants to create names in the namespace (use `zrok admin create namespace-grant`)
 - And the name (`zrok.example.com`) is the DNS name for the namespace; names will end up being `myshare.zrok.example.com`
 
-### Step 5: Create a Dynamic Frontend
+### Step 5: Create a dynamic frontend
 
 Create a frontend with the dynamic flag enabled:
 
@@ -243,7 +243,7 @@ Command breakdown:
   - can use `https` if you configure TLS in the frontend config
   
 
-### Step 6: Map Namespace to Frontend
+### Step 6: Map namespace to frontend
 
 Link the namespace to the frontend so shares in the namespace are served by this frontend:
 
@@ -265,7 +265,7 @@ zrok2 admin list namespaceFrontendMappings <namespaceToken>
 zrok2 admin list frontendNamespaceMappings <frontendToken>
 ```
 
-### Step 7: Configure dynamicProxy Frontend
+### Step 7: Configure dynamicProxy frontend
 
 Create a configuration file for the dynamicProxy frontend (e.g., `etc/dynamicProxy.yml`):
 
@@ -288,7 +288,7 @@ controller:
 
 Configuration parameters:
 
-#### Required Parameters
+#### Required parameters
 
 - **`v`**: configuration version (always `1`)
 - **`frontend_token`**: token from `zrok admin create frontend` (Step 5)
@@ -297,13 +297,13 @@ Configuration parameters:
 - **`controller.identity_path`**: path to the Ziti identity JSON file for the frontend
 - **`controller.service_name`**: Ziti service name for dynamicProxyController (must match Step 2 and controller config)
 
-#### Optional Parameters
+#### Optional parameters
 
 - **`identity`**: Ziti identity name to use (default: `"public"`)
 - **`bind_address`**: IP and port where the frontend listens (default: `"0.0.0.0:8080"`)
 - **`mapping_refresh_interval`**: how often to audit (and potentially refresh) mappings from controller (default: `5m`)
 
-#### OAuth Configuration (Optional)
+#### OAuth configuration (optional)
 
 To enable OAuth authentication, add an `oauth` section. For detailed OAuth setup, see the [OAuth Configuration Guide](oauth/configuring-oauth.md).
 
@@ -325,7 +325,7 @@ oauth:
       client_secret: "<google-client-secret>"
 ```
 
-#### TLS Configuration (Optional)
+#### TLS configuration (optional)
 
 For HTTPS frontends, add a `tls` section:
 
@@ -335,7 +335,7 @@ tls:
   key_path: /etc/letsencrypt/live/zrok.example.com/privkey.pem
 ```
 
-### Step 8: Start dynamicProxy Frontend
+### Step 8: Start dynamicProxy frontend
 
 Run the dynamicProxy frontend using your configuration:
 
@@ -378,7 +378,7 @@ sudo systemctl start zrok-dynamicproxy
 sudo systemctl status zrok-dynamicproxy
 ```
 
-### Step 9: Test with a Share
+### Step 9: Test with a share
 
 Create a test share to verify the setup:
 
@@ -404,11 +404,11 @@ If you see your shared content, congratulations! Your dynamicProxy setup is work
 
 If you're currently running `zrok access public` (publicProxy) and want to migrate to dynamicProxy, you have two main approaches:
 
-### Option 1: Side-by-Side Operation (Gradual Migration)
+### Option 1: Side-by-side operation (gradual migration)
 
 This approach allows both publicProxy and dynamicProxy to run simultaneously, enabling gradual user migration with no downtime.
 
-#### Setup Process
+#### Setup process
 
 1. **Complete Steps 1-8** from the Fresh Installation section without shutting down your existing publicProxy
 2. **Create separate DNS entries** for the new dynamicProxy frontend (e.g., `v2.zrok.example.com`)
@@ -417,7 +417,7 @@ This approach allows both publicProxy and dynamicProxy to run simultaneously, en
    - users on v2.0+ clients can start using namespaces and names with dynamicProxy
    - provide a migration deadline
 
-#### User Migration Process
+#### User migration process
 
 Users need to:
 
@@ -431,7 +431,7 @@ Users need to:
    zrok2 share public localhost:8080 -n <namespaceToken>:my-app
    ```
 
-#### Deprecation Timeline
+#### Deprecation timeline
 
 Once user adoption reaches your target threshold:
 
@@ -441,25 +441,25 @@ Once user adoption reaches your target threshold:
 4. Shut down publicProxy and remove DNS entries
 5. Update documentation to remove v1.x references
 
-### Option 2: Clean Cutover (With Downtime)
+### Option 2: Clean cutover (with downtime)
 
 This approach requires downtime but provides a clean migration in a single maintenance window.
 
-#### Preparation (Before Maintenance Window)
+#### Preparation (before maintenance window)
 
 1. **Complete Steps 1-7** from the Fresh Installation section
 2. **Test dynamicProxy configuration** thoroughly in a staging environment
 3. **Notify all users** of the scheduled maintenance window
 4. **Prepare migration documentation** for users
 
-#### During Maintenance Window
+#### During maintenance window
 
 1. **Shut down publicProxy** (`zrok access public` processes)
 2. **Start dynamicProxy** with the same DNS entries as the old publicProxy
 3. **Notify users** to upgrade to v2.0+ and recreate their shares using names
 4. **Provide support channels** for migration assistance
 
-#### Post-Migration
+#### Post-migration
 
 All users must:
 
@@ -471,7 +471,7 @@ All users must:
 Clean cutover means existing v1.x shares will stop working immediately. Only choose this approach if you can ensure all users upgrade and recreate their shares promptly, or if downtime is acceptable.
 :::
 
-### Comparing Migration Approaches
+### Comparing migration approaches
 
 | Aspect | Side-by-Side | Clean Cutover |
 |--------|--------------|---------------|
@@ -484,9 +484,9 @@ Clean cutover means existing v1.x shares will stop working immediately. Only cho
 
 Choose side-by-side for larger deployments with diverse users, or clean cutover for smaller deployments with coordinated users.
 
-## Configuration Reference
+## Configuration reference
 
-### Complete Configuration Example
+### Complete configuration example
 
 Here's a complete `dynamicProxy` configuration with all available options:
 
@@ -563,11 +563,11 @@ oauth:
 
 For detailed OAuth provider configuration, see the [OAuth Configuration Guide](oauth/configuring-oauth.md).
 
-## Namespace Management
+## Namespace management
 
 After setting up dynamicProxy, you'll need to manage namespaces and names for your users.
 
-### Creating Namespaces
+### Creating namespaces
 
 Namespaces can be **open** (anyone can create names) or **closed** (requires grants):
 
@@ -579,7 +579,7 @@ zrok2 admin create namespace public "Public Shares" -o
 zrok2 admin create namespace private "Private Shares"
 ```
 
-### Granting Namespace Access
+### Granting namespace access
 
 For closed namespaces, grant users access by email:
 
@@ -593,7 +593,7 @@ Remove grants with:
 zrok2 admin remove namespaceGrant <namespaceToken> user@example.com
 ```
 
-### Setting Default Namespace
+### Setting default namespace
 
 Users can set their default namespace to avoid specifying it on every command:
 
@@ -607,7 +607,7 @@ Or via environment variable:
 export ZROK2_DEFAULT_NAMESPACE=<namespaceToken>
 ```
 
-### Listing Namespaces
+### Listing namespaces
 
 Users can see available namespaces (based on grants and open namespaces):
 
@@ -623,7 +623,7 @@ zrok2 admin list namespaces
 
 ## Troubleshooting
 
-### Frontend Not Receiving Mapping Updates
+### Frontend not receiving mapping updates
 
 **Symptoms**: shares are created but don't resolve, frontend logs show no mapping updates
 
@@ -655,7 +655,7 @@ zrok2 admin list namespaces
 - Verify RabbitMQ is running and accessible from both controller and frontend hosts
 - Check firewall rules if RabbitMQ is on a separate host
 
-### Frontend Cannot Query Controller via gRPC
+### Frontend cannot query controller via gRPC
 
 **Symptoms**: frontend starts but shows errors querying mappings, shares don't resolve
 
@@ -687,7 +687,7 @@ zrok2 admin list namespaces
 - Confirm controller identity has bind permissions (Step 2)
 - Check that both identities are enrolled and connected to Ziti
 
-### Shares Don't Resolve (404 Errors)
+### Shares don't resolve (404 errors)
 
 **Symptoms**: accessing `http://<name>.zrok.example.com` returns 404
 
@@ -719,7 +719,7 @@ zrok2 admin list namespaces
 - Restart the share if it was created before the mapping
 - Check that the frontend token in config matches the frontend created in Step 5
 
-### DNS Not Resolving
+### DNS not resolving
 
 **Symptoms**: domain names don't resolve or resolve to wrong IP
 
@@ -738,7 +738,7 @@ nslookup my-share.zrok.example.com
 - Wait for DNS propagation (can take minutes to hours)
 - Use `/etc/hosts` for local testing: `127.0.0.1 my-share.zrok.example.com`
 
-### TLS Certificate Errors
+### TLS certificate errors
 
 **Symptoms**: browser shows certificate warnings, HTTPS connections fail
 
@@ -751,7 +751,7 @@ nslookup my-share.zrok.example.com
     -d '*.zrok.example.com' -d 'zrok.example.com'
   ```
 
-### High Memory Usage
+### High memory usage
 
 **Symptoms**: dynamicProxy or controller consuming excessive memory
 
@@ -771,9 +771,9 @@ curl -u guest:guest http://localhost:15672/api/queues/%2F/<queue-name>
 - Consider multiple frontend instances with load balancing instead of increasing resources
 - Monitor and limit the number of active shares per namespace
 
-## Advanced Configuration
+## Advanced configuration
 
-### Multiple Frontend Instances
+### Multiple frontend instances
 
 For high availability and load balancing, run multiple dynamicProxy instances:
 
@@ -786,7 +786,7 @@ For high availability and load balancing, run multiple dynamicProxy instances:
 3. Use a load balancer (nginx, HAProxy, etc.) in front of the instances
 4. Each instance will receive mapping updates via AMQP independently
 
-### Custom Exchange Names
+### Custom exchange names
 
 You can use different AMQP exchange names for different frontend groups:
 
@@ -805,7 +805,7 @@ amqp_subscriber:
 
 This allows you to isolate mapping updates between different deployment environments (prod, staging, etc.).
 
-### Monitoring and Metrics
+### Monitoring and metrics
 
 Integrate with your monitoring stack:
 
@@ -816,14 +816,14 @@ Integrate with your monitoring stack:
    - gRPC request latency
 3. **Frontend logs**: parse structured logs for error rates and performance data
 
-## Additional Resources
+## Additional resources
 
 - [OAuth Configuration Guide](oauth/configuring-oauth.md) - detailed OAuth provider setup
 - [Configuring Metrics](metrics-and-limits/configuring-metrics.md) - InfluxDB integration for monitoring
 - [Interstitial Page Configuration](interstitial-page.md) - customizing the interstitial page
 - [Error Pages](error-pages.md) - customizing error pages
 
-## Getting Help
+## Getting help
 
 If you encounter issues not covered in this guide:
 

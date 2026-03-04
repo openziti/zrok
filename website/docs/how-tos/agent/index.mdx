@@ -1,7 +1,10 @@
 ---
-title: Agent
+title: Use the zrok Agent
+sidebar_label: Use the zrok Agent
 sidebar_position: 20
 ---
+
+# Use the zrok Agent
 
 The zrok Agent centralizes management of your zrok shares and accesses. It provides both web-based and command-line interfaces, and changes how the `zrok2 share` and `zrok2 access` commands behave.
 
@@ -71,16 +74,16 @@ zrok2 agent status
 1 share in agent
 ```
 
-### Running the Agent in the background
+### Run the Agent in the background
 
 You can keep the Agent running reliably in the background by installing the Agent service in Windows or Linux.
 
 - Windows - [set up the Windows system service](./windows-service/index.mdx)
 - Linux - [install the Linux package `zrok2-agent`](./linux-service.mdx)
 
-## How the Agent Works
+## How the Agent works
 
-### Centralized Management
+### Centralized management
 
 Without the Agent running, each time you execute a `zrok2 share` or `zrok2 access` command, a separate process is created to handle that specific share or access.
 
@@ -93,7 +96,7 @@ When the Agent is running:
 - The Agent will remember and automatically restart your shares started with `share reserved`, and any accesses started with `access private`.
 - The Agent will not restart regular, ephemeral shares started with `share private` or `share public`.
 
-### Agent Console
+### Agent console
 
 The Agent provides a web-based console interface that can be accessed with:
 

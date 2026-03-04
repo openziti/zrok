@@ -1,13 +1,14 @@
 ---
-title: Drives
+title: Share and sync files with zrok drives
+sidebar_label: Share and sync files with zrok drives
 sidebar_position: 50
 ---
 
-# Drives
+# Share and sync files with zrok drives
 
 The zrok drives CLI tools allow for simple, ergonomic management and synchronization of local and remote files.
 
-## Sharing a Drive
+## Share a drive
 
 Virtual drives are shared through the `zrok` CLI using the `--backend-mode drive` flag through the `zrok2 share` command, using either the `public` or `private` sharing modes. We'll use the `private` sharing mode for this example:
 
@@ -23,7 +24,7 @@ The command shown above creates an ephemeral, `private` drive share pointed at t
 
 Notice that the share token allocated by `zrok` is `wkcfb58vj51l`. We'll use that share token to identify our virtual drive in the following operations.
 
-## Working with a Private Drive Share
+## Work with a private drive share
 
 First, let's copy a file into our virtual drive using the `zrok2 copy` command:
 
@@ -106,7 +107,7 @@ $ zrok2 ls zrok://wkcfb58vj51l
 └──────┴──────┴──────┴──────────┘
 ```
 
-## Working with Public Shares
+## Work with public shares
 
 Public shares work very similarly to private shares, they just use a different URL scheme:
 
@@ -148,7 +149,7 @@ Alternatively, the authentication can be set using the `ZROK2_DRIVES_BASIC_AUTH`
 $ export ZROK2_DRIVES_BASIC_AUTH=username:password
 ```
 
-## One-way Synchronization
+## One-way synchronization
 
 The `zrok2 copy` command includes a `--sync` flag, which only copies files detected as _modified_. `zrok` considers a file with the same modification timestamp and size to be the same. Of course, this is not a strong guarantee that the files are equivalent. Future `zrok` drives versions will provide a cryptographically strong mechanism (a-la `rsync` and friends) to guarantee that files and trees of files are synchronized.
 
@@ -211,7 +212,7 @@ copy complete!
 
 Because we removed the `images/` tree from the virtual drive, `zrok2 copy --sync` detected this and copied the local `images/` tree back onto the virtual drive.
 
-## Drive-to-Drive Copies and Synchronization
+## Drive-to-drive copies and synchronization
 
 The `zrok2 copy` CLI can operate on pairs of virtual drives remotely, without ever having to store files locally. This allow for drive-to-drive copies and synchronization.
 
@@ -241,7 +242,7 @@ $ zrok2 copy --sync https://glmv049c62p7.share.zrok.io zrok://hsml272j3xzf
 copy complete!
 ```
 
-## Copying from Drives to the Local Filesystem
+## Copy from drives to the local filesystem
 
 In the current version of the drives CLI, `zrok2 copy` always assumes the destination is a directory. There is currently no way to do:
 
@@ -286,7 +287,7 @@ total 12
 -rw-rw-r-- 1 michael michael 11346 Jan 19 13:30 LICENSE
 ```
 
-## Unique Names and Reserved Shares
+## Unique names and reserved shares
 
 Private reserved shares with unque names can be particularly useful with the drives CLI:
 
@@ -311,7 +312,7 @@ $ zrok2 ls zrok://mydrive
 └──────┴─────────┴─────────┴───────────────────────────────┘
 ```
 
-## Future Enhancements
+## Future enhancements
 
 Coming in a future release of `zrok` drives are features like:
 

@@ -1,7 +1,8 @@
 {
-  "label": "Metrics and Limits",
+  "label": "Metrics and limits",
   "position": 60,
   "link": {
-    "type": "generated-index"
+    "type": "generated-index",
+    "description": "Configure InfluxDB metrics collection and resource or bandwidth limits for your self-hosted zrok instance."
   }
 }

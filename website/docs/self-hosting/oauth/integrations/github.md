@@ -2,11 +2,11 @@
 sidebar_position: 20
 ---
 
-# GitHub OAuth Setup
+# GitHub OAuth setup
 
 This guide covers setting up GitHub OAuth for your zrok public frontend.
 
-## Register OAuth Application
+## Register OAuth application
 
 Navigate to your GitHub account settings: **Settings > Developer Settings > OAuth Apps > Register a new application**
 
@@ -24,7 +24,7 @@ Create a new client secret:
 
 Save the client ID and client secret for your frontend configuration.
 
-## Frontend Configuration
+## Frontend configuration
 
 Add the GitHub provider to your `frontend.yml`:
 
@@ -37,7 +37,7 @@ oauth:
       client_secret: "<your-github-client-secret>"
 ```
 
-## Redirect URL Format
+## Redirect URL format
 
 For GitHub OAuth with the provider name `"github"`, the redirect URL should be:
 ```

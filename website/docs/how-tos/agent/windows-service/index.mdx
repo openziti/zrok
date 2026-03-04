@@ -1,6 +1,6 @@
 ---
-title: Configuring a Windows Service
-sidebar_label: Windows Agent Service
+title: Set up the Windows agent service
+sidebar_label: Windows agent service
 ---
 
 In Windows environments, it can be useful to run the zrok Agent as a service, allowing it to automatically restart with your system.
@@ -21,7 +21,7 @@ We're going to use a command prompt to install and configure our Agent service. 
 
 ![Empty Command Prompt](images/empty-command-prompt.png)
 
-## Enabling the Service Environment
+## Enable the service environment
 
 On Windows, the `USERPROFILE` environment variable controls the "home" where zrok will look for the enabled environment. When running as a service on Windows, the process will be running as the `Local System` user, which uses the directory `C:\Windows\System32\config\systemprofile` directory as the user's "home" directory.
 
@@ -41,7 +41,7 @@ C:\Program Files\zrok2>zrok2 enable <accountToken>
 
 Now we've got a new, enabled environment to use with our Agent running as a Windows service.
 
-## Installing the Service
+## Install the service
 
 In the `C:\Program Files\zrok2` directory, execute this command to invoke `nssm` to create the new Windows service for our zrok Agent:
 
@@ -101,7 +101,7 @@ And this will open a web interface which allows the Agent to be managed:
 
 The Agent console can be used to directly create shares and accesses, and the zrok command-line can also be used.
 
-## Non-interactive Service Installation
+## Non-interactive service installation
 
 `nssm` provides a command-line that can do this configuration without interacting with the `nssm` GUI. We would create our service like this:
 
@@ -125,7 +125,7 @@ C:\Program Files\zrok2>sc start zrokAgent
 
 ![nssm CLI installation](images/nssm-cli-installation.png)
 
-## Removing the zrok Agent Service
+## Remove the zrok Agent service
 
 The following commands (in a Command Prompt running as Administrator) can be used to remove the service from your system:
 

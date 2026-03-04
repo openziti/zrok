@@ -1,6 +1,6 @@
 ---
-title: Interstitial Pages
-sidebar_label: Interstitial Pages
+title: Interstitial pages
+sidebar_label: Interstitial pages
 sidebar_position: 18
 ---
 
@@ -14,7 +14,7 @@ By default, if you do not specifically enable interstitial pages on a public fro
 
 Let's take a look at how the interstitial pages mechanism works. The following diagram shows the share configuration rendezvous made between the zrok controller and a zrok frontend:
 
-![zrok_interstitial_rendezvous](../../images/zrok_interstitial_rendezvous.png)
+![zrok_interstitial_rendezvous](../images/zrok_interstitial_rendezvous.png)
 
 Every zrok share has a _config_ recorded in the underlying OpenZiti network. The config is of type `zrok.proxy.v1`. The frontend uses the information in this config to understand the disposition of the share. The config can contain an `interstitial: true` setting. If the config has this setting, and the frontend is configured to enable interstitial pages, then end users accessing the share will receive the interstitial page on first visit.
 
@@ -54,7 +54,7 @@ The frontend configuration controls what the frontend will do with the share con
 
 Setting `enabled: true` in the `interstitial` stanza of the frontend config will allow the configured frontend to offer an interstitial page if the share config enables the interstitial page for that share. The `user_agent_prefixes` array can be used to specify which specific `User-Agent` types receive the interstitial. User agents that match a prefix in the list will receive the interstitial, while others will not. If the `user_agent_prefixes` list is omitted, _all_ user agents will receive the interstitial page.
 
-## Bypassing the Interstitial
+## Bypassing the interstitial
 
 The interstitial page will be presented unless the client shows up with a `zrok_interstitial` cookie (depending on `user_agent_prefixes` configuration). When the user is presented with the interstitial page, there is a button they can click which sets the necessary cookie and allows them to visit the site. The cookie is set to expire in one week.
 

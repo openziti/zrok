@@ -1,6 +1,6 @@
 ---
-title: Personalized Frontend
-sidebar_label: Personalized Frontend
+title: Personalized frontend
+sidebar_label: Personalized frontend
 sidebar_position: 15
 ---
 

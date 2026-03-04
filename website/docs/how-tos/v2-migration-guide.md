@@ -1,10 +1,10 @@
 ---
-title: Migrating from v1 to v2
-sidebar_label: v2 Migration Guide
+title: Migrate from zrok v1 to v2
+sidebar_label: Migrate from v1 to v2
 sidebar_position: 5
 ---
 
-# Migrating from zrok v1 to v2
+# Migrate from zrok v1 to v2
 
 This guide helps you transition from zrok v1.x to v2.0, focusing on the paradigm shift from reserved shares to the new namespaces model.
 
@@ -12,9 +12,9 @@ This guide helps you transition from zrok v1.x to v2.0, focusing on the paradigm
 zrok v2.0 introduces breaking changes. The reserved sharing commands (`zrok reserve`, `zrok release`, `zrok share reserved`) have been removed and replaced with a more flexible namespace system.
 :::
 
-## What's Changing?
+## What's changing?
 
-### The Big Picture
+### The big picture
 
 In v1.x, you created reserved shares with persistent share tokens using `zrok reserve`. In v2.0, this concept has evolved into a more powerful system:
 
@@ -25,13 +25,13 @@ This new model provides:
 - Less coupling between environments and external names; this means you can more easily move your share backends around between hosts and reconfigure how you're sharing, without changing the names you're sharing with
 - Support for multiple names per share
 
-### Configuration Changes
+### Configuration changes
 
 The `defaultFrontend` configuration option has been replaced with `defaultNamespace`. You'll need to update your configuration files accordingly (see `zrok status` and `zrok config --help`).
 
 ---
 
-## Concept Mapping: v1 → v2
+## Concept mapping: v1 → v2
 
 | v1.x concept | v2.0 equivalent | description |
 |--------------|----------------|-------------|
@@ -42,9 +42,9 @@ The `defaultFrontend` configuration option has been replaced with `defaultNamesp
 
 ---
 
-## Command Reference
+## Command reference
 
-### Removed Commands
+### Removed commands
 
 These commands no longer exist in v2.0:
 
@@ -57,9 +57,9 @@ zrok2 release <token>
 zrok2 overview public-frontends
 ```
 
-### New Commands
+### New commands
 
-#### Namespace Management (End Users)
+#### Namespace management (end users)
 
 ```bash
 # list available namespaces
@@ -90,9 +90,9 @@ zrok2 share private <target> --share-token my-custom-token
 
 ---
 
-## Migration Walkthrough
+## Migration walkthrough
 
-### Scenario 1: Simple Reserved Public Share
+### Scenario 1: Simple reserved public share
 
 **v1.x workflow:**
 
@@ -133,7 +133,7 @@ $ zrok2 share public localhost:8080 -n public:api
 $ zrok2 delete name -n public api
 ```
 
-### Scenario 2: Private Reserved Share
+### Scenario 2: Private reserved share
 
 **v1.x workflow:**
 
@@ -159,7 +159,7 @@ $ zrok2 share private http://localhost:8080 -s myapi-prod
 $ zrok2 access private myapi-prod
 ```
 
-### Scenario 3: Ephemeral Shares (Unchanged)
+### Scenario 3: Ephemeral shares (unchanged)
 
 Ephemeral shares work mostly the same, but now support optional name selections:
 
@@ -170,15 +170,15 @@ $ zrok2 share public :8080
 
 ---
 
-## Using the zrok Agent with v2
+## Use the zrok Agent with v2
 
 If you're using the zrok agent, there are significant improvements in v2.0:
 
-### Automatic Retry and Error Handling
+### Automatic retry and error handling
 
 The agent now automatically retries failed shares with exponential backoff. Errored processes receive transient `err_XXXX` tokens for management.
 
-### Persistent Shares
+### Persistent shares
 
 Shares with reserved name selections automatically restart after abnormal exit or agent restart:
 
@@ -194,7 +194,7 @@ $ zrok2 share public http://localhost:3000 -n public:myapp
 $ zrok2 share private http://localhost:3000 --share-token myapp
 ```
 
-### Improved Status Command
+### Improved status command
 
 The `zrok2 agent status` command now shows:
 - Detailed error states for failed processes
@@ -203,7 +203,7 @@ The `zrok2 agent status` command now shows:
 
 ---
 
-## Working with Multiple Names
+## Work with multiple names
 
 One powerful v2.0 feature: a single share can use multiple name selections:
 
@@ -224,16 +224,16 @@ $ zrok2 share public http://localhost:3000 \
 
 ---
 
-## Understanding Namespaces
+## Understand namespaces
 
-### What is a Namespace?
+### What is a namespace?
 
 A namespace is a logical grouping for names, similar to how a DNS zone works. Your zrok instance may have one or more namespaces available:
 
 - **public** - typically the default namespace for all users
 - **custom namespaces** - may be created by administrators for specific purposes (custom domains, for example)
 
-### Listing Available Namespaces
+### List available namespaces
 
 ```bash
 $ zrok2 list namespaces
@@ -248,9 +248,9 @@ $ zrok2 list namespaces
 
 ---
 
-## Checking Your Current Shares and Names
+## Check your current shares and names
 
-### View All Your Names
+### View all your names
 
 ```bash
 $ zrok2 list names
@@ -262,7 +262,7 @@ $ zrok2 list names
 ╰───────────────────────────────┴─────────┴───────────┴─────────────┴──────────┴─────────────────────╯
 ```
 
-### View Overview (Now Includes Names)
+### View overview (now includes names)
 
 ```bash
 $ zrok2 overview
@@ -274,31 +274,31 @@ $ zrok2 overview --json
 
 ---
 
-## Common Questions
+## Common questions
 
-### Do I Need to Keep the Same URL?
+### Do I need to keep the same URL?
 
 No, with the namespace/name system, your URLs will change based on the name you choose. If you need to maintain the same identifier, you can choose a name that matches your old token, though the full URL structure may differ based on how your zrok instance's frontends are configured.
 
-### Can I Use the Old Share Tokens as Names?
+### Can I use the old share tokens as names?
 
 Yes, names can use the same format as old share tokens. However, this is your opportunity to choose more meaningful, memorable names for your shares.
 
-### What Happens to Permission Modes?
+### What happens to permission modes?
 
 Permission modes (open/closed) still work the same way with `--open` and `--closed` flags, plus the `--access-grant` flag for granting access to specific accounts.
 
-### Do Ephemeral Shares Still Work?
+### Do ephemeral shares still work?
 
 Yes! Ephemeral shares work just as before. The main difference is they now support optional name selections, and by default names created without a reserved name selection are ephemeral.
 
-### What if I Have Scripts Using the Old Commands?
+### What if I have scripts using the old commands?
 
 You'll need to update your scripts to use the new command structure. The good news is the new system is more flexible and often requires fewer steps for common workflows.
 
 ---
 
-## Getting Help
+## Get help
 
 If you run into issues during migration:
 

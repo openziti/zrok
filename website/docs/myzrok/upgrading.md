@@ -1,5 +1,5 @@
 ---
-title: Upgrading From 0.4 to 1.0
+title: Upgrading from 0.4 to 1.0
 ---
 
 ## Upgrading an existing 0.4 environment

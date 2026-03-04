@@ -1,9 +1,10 @@
 ---
+title: Configure permission modes
 sidebar_position: 22
-sidebar_label: Permission Modes
+sidebar_label: Configure permission modes
 ---
 
-# Permission Modes
+# Configure permission modes
 
 :::note
 As of `v1.0.5` zrok sharing now defaults to the `closed` permission mode. The `--closed` flag has been removed and has been replaced with a new `--open` flag for users who want to retain the open permission model. Otherwise, the closed permission mode works exactly the same.
@@ -17,7 +18,7 @@ zrok now supports a _closed permission mode_, which allows for more fine-grained
 
 zrok defaults to continuing to create shares with the _open permission mode_. This will likely change in a future release. We're leaving the default behavior in place to allow users a period of time to get comfortable with the new permission modes.
 
-## Creating a Share with Closed Permission Mode
+## Create a share with closed permission mode
 
 Adding the `--closed` flag to the `zrok2 share` command will create shares using the _closed permission mode_:
 
@@ -50,7 +51,7 @@ $ zrok2 access private --headless y6h4at5xvn6o
 [   0.051]    INFO main.(*accessPrivateCommand).run: access the zrok share at the following endpoint: http://127.0.0.1:9191
 ```
 
-## Adding and Removing Access Grants for Existing Shares
+## Add and remove access grants for existing shares
 
 If you've created a share (either reserved or ephemeral) and you forgot to include an access grant, or want to remove an access grant that was mistakenly added, you can use the `zrok2 modify share` command to make the adjustments:
 
@@ -76,7 +77,7 @@ $ zrok2 modify share s4czjylwk7wa --remove-access-grant anotheruser@test.com
 updated
 ```
 
-## Using Permission Modes with Reserved Names (v2.0)
+## Use permission modes with reserved names (v2.0)
 
 In zrok v2.0, you can use permission modes with reserved names for persistent public shares:
 

@@ -2,7 +2,7 @@
 sidebar_position: 22
 ---
 
-# Sharing HTTP Servers
+# Sharing HTTP servers
 
 zrok can share HTTP and HTTPS resources natively. If you have an existing web server that you want to share with other users, you can use the `zrok2 share` command using the `--backend-mode proxy` flag.
 

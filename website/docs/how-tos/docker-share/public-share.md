@@ -1,7 +1,7 @@
 ---
-title: Docker Compose Public Share
+title: Create a public Docker share
 sidebar_position: 10
-sidebar_label: Public Share
+sidebar_label: Create a public Docker share
 ---
 
 ## Goal
@@ -14,11 +14,11 @@ With zrok, you can publicly share a service that's running in Docker. You need a
 
 Here's a short article with an overview of [public sharing with zrok](../../concepts/sharing-public.mdx).
 
-## Walkthrough Video
+## Walkthrough video
 
 <iframe width="100%" height="315" src="https://www.youtube.com/embed/ycov--9ZtB4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-## How it Works
+## How it works
 
 The Docker Compose project uses your zrok account token to reserve a public subdomain and keep sharing the backend
 target.
@@ -65,7 +65,7 @@ When the project runs it will:
 
 This concludes the minimum steps to begin sharing the demo web server. Read on to learn how to pivot to sharing any website or web service by leveraging additional zrok backend modes.
 
-## Proxy Any Web Server
+## Proxy any web server
 
 The simplest way to share your existing HTTP server is to set `ZROK2_TARGET` (e.g. `https://example.com`) in the environment of the `docker compose up` command. When you restart the share will auto-configure for that URL.
 
@@ -81,7 +81,7 @@ docker compose down && docker compose up
 
 You can require a password or an OAuth login with certain email addresses.
 
-### OAuth Email
+### OAuth email
 
 You can allow specific email addresse patterns by setting `ZROK2_OAUTH_PROVIDER` to `github` or `google` and
 `ZROK2_OAUTH_EMAILS`. Read more about the OAuth features in [this blog
@@ -92,7 +92,7 @@ ZROK2_OAUTH_PROVIDER="github"
 ZROK2_OAUTH_EMAILS="alice@example.com *@acme.example.com"
 ```
 
-## Caddy is Powerful
+## Caddy is powerful
 
 The reserved public share project uses zrok's default backend mode, `proxy`. Another backend mode, `caddy`, accepts a path to [a Caddyfile](https://caddyserver.com/docs/caddyfile) as the value of `ZROK2_TARGET` ([zrok Caddyfile examples](https://github.com/openziti/zrok/tree/main/etc/caddy)). 
 

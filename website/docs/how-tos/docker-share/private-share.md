@@ -1,7 +1,7 @@
 ---
-title: Docker Private Share
+title: Create a private Docker share
 sidebar_position: 20
-sidebar_label: Private Share
+sidebar_label: Create a private Docker share
 ---
 
 ## Goal
@@ -14,11 +14,11 @@ With zrok, you can privately share a service that's running in Docker. You need 
 
 Here's a short article with an overview of [private sharing with zrok](../../concepts/sharing-private.mdx).
 
-## Walkthrough Video
+## Walkthrough video
 
 <iframe width="100%" height="315" src="https://www.youtube.com/embed/HxyvtFAvwUE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-## How it Works
+## How it works
 
 The Docker Compose project uses your zrok account token to reserve a private share token and keep sharing the backend target.
 
@@ -28,13 +28,13 @@ When the project runs it will:
 1. reserve a private share token for the service unless `/mnt/.zrok2/reserved.json` exists
 1. start sharing the target specified in the `ZROK2_TARGET` environment variable
 
-## Before You Begin
+## Before you begin
 
 To follow this guide you will need [Docker](https://docs.docker.com/get-docker/).
 
 If you have installed Docker Desktop on macOS or Windows then you are all set.
 
-## Begin Sharing Privately with zrok in Docker
+## Share privately with zrok in Docker
 
 First, let's create the private share.
 
@@ -69,7 +69,7 @@ First, let's create the private share.
 
     Keep track of this token so you can use it in your zrok private access project.
 
-## Access the Private Share
+## Access the private share
 
 Now that we have a private share we can access it with the zrok command or by running a separate Docker Compose project.
 
@@ -99,7 +99,7 @@ Now that we have a private share we can access it with the zrok command or by ru
 
 1. Now your zrok private access proxy is ready on http://127.0.0.1:9191. You can visit the demo web server in your browser.
 
-## Closed Permission Mode
+## Closed permission mode
 
 Normally, you need only the share token to access a private share. You can further restrict access with "closed" permission mode.
 
@@ -123,7 +123,7 @@ You can adjust the access grants by running the CLI inside the `zrok-share` cont
 docker compose exec zrok-share zrok2 modify ${ZROK2_UNIQUE_NAME} --remove-access-grant bob@example.com
 ```
 
-## Going Further with Private Access
+## Go further with private access
 
 1. Try changing the demo web server used in the private share project. One alternative demo server is provided: `httpbin`.
 1. Try accessing the private share from _inside_ a container running in the private access project. One demo client is provided: `demo-client`. You can run it like this.
@@ -134,7 +134,7 @@ docker compose exec zrok-share zrok2 modify ${ZROK2_UNIQUE_NAME} --remove-access
 
 1. You'll see in the terminal output that the demo-client container is getting a response from the private share indicating the source IP of the request from the perspective of the demo server: `httpbin` that's running in the private share project.
 
-## Cleaning Up
+## Clean up
 
 Run the "down" command in both Compose projects to destroy them when you're all done. This will stop the running containers and delete zrok environments' storage volumes. Then delete the selected zrok environment by clicking "Actions" in the web console.
 

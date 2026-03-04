@@ -2,17 +2,17 @@
 sidebar_position: 10
 ---
 
-# OAuth Public Frontend Configuration
+# OAuth public frontend configuration
 
 zrok includes OAuth integration for public frontends, allowing you to authenticate users through various OAuth providers before they can access your shared resources. You can configure multiple OAuth providers and restrict access based on email address patterns.
 
-## Planning for the OAuth Frontend
+## Planning for the OAuth frontend
 
 The OAuth public frontend uses an HTTP listener with a stable name to handle redirects from OAuth providers. You'll need to configure a DNS name and port for this listener that is accessible by your end users.
 
 The OAuth frontend address will be used as the "redirect URL" when configuring OAuth clients with your providers. Each provider will redirect authenticated users back to this address, which then forwards them to their original destination.
 
-## Configuring your Public Frontend
+## Configuring your public frontend
 
 Add an `oauth` section to your frontend configuration:
 
@@ -47,7 +47,7 @@ oauth:
       supports_pkce:          true
 ```
 
-### Configuration Parameters
+### Configuration parameters
 
 All of the following parmeters _must_ be specified in the frontend configuration. There are no defaults.
 
@@ -60,7 +60,7 @@ All of the following parmeters _must_ be specified in the frontend configuration
 - **`signing_key`**: Unique 32+ character string for securing authentication payloads
 - **`encryption_key`**: Unique 24+ character string for encrypting session data
 
-### OAuth Providers
+### OAuth providers
 
 The `providers` array supports multiple OAuth configurations. Each provider requires:
 
@@ -73,7 +73,7 @@ Providers may also require additional configuration values. For detailed setup i
 - [GitHub OAuth Setup](integrations/github.md)  
 - [Generic OIDC Setup](integrations/oidc.md)
 
-## OAuth Identity Flow
+## OAuth identity flow
 
 When a user accesses a zrok public share protected with OAuth, the following flow occurs:
 
@@ -112,7 +112,7 @@ sequenceDiagram
     Note over User, Provider: Session remains valid for configured session_lifetime
 ```
 
-### Flow Steps
+### Flow steps
 
 1. **Initial Access**: User visits the zrok public share URL
 2. **Authentication Check**: zrok checks for a valid authentication session cookie
@@ -125,13 +125,13 @@ sequenceDiagram
 9. **Final Redirect**: User is redirected back to the original zrok share URL
 10. **Access Granted**: User can now access the protected resource
 
-### Session Management
+### Session management
 
 - **Maximum Session Duration**: Controlled by the `session_lifetime` configuration
 - **Re-authentication**: Users must re-authenticate when sessions expire or when `--oauth-check-interval` is reached. Some providers (like the generic OIDC provider) support token refresh and will attempt to transparently refresh at this interval, rather than provoking the user to re-authenticate
 - **Cross-Share Access**: Sessions are not shared between shares using the same provider; switching zrok shares will re-start the authentication flow for the specified provider 
 
-## Using OAuth with Public Shares
+## Using OAuth with public shares
 
 Once your public frontend is configured with OAuth providers, you can enable authentication on public shares using these command line options:
 
@@ -151,11 +151,11 @@ zrok share public --backend-mode web \
 
 This creates a public share that requires Google OAuth authentication and only allows users with `@example.com` email addresses or any `admin@*` email address.
 
-## HTTP Headers for Proxied Requests
+## HTTP headers for proxied requests
 
 When zrok successfully authenticates a user via OAuth, it automatically adds authentication headers to all proxied requests sent to your backend application. These headers allow your application to identify the authenticated user and make authorization decisions.
 
-### Authentication Headers
+### Authentication headers
 
 zrok sets the following HTTP headers on every proxied request after successful OAuth authentication:
 
@@ -163,11 +163,11 @@ zrok sets the following HTTP headers on every proxied request after successful O
 - **`zrok-auth-email`**: The authenticated user's email address as provided by the OAuth provider
 - **`zrok-auth-expires`**: The timestamp when the authentication session will expire, formatted as RFC3339 (e.g., `2024-01-15T14:30:00Z`)
 
-### Example Usage in Backend Applications
+### Example usage in backend applications
 
 Your backend application can read these headers to implement user-specific logic:
 
-#### Python/Flask Example
+#### Python/Flask example
 ```python
 from flask import Flask, request
 
@@ -182,7 +182,7 @@ def index():
     return f"Welcome {email}! Authenticated via {provider}. Session expires: {expires}"
 ```
 
-#### Go Example
+#### Go example
 ```go
 func handler(w http.ResponseWriter, r *http.Request) {
     provider := r.Header.Get("zrok-auth-provider")
@@ -194,7 +194,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-#### Node.js/Express Example
+#### Node.js/Express example
 ```javascript
 app.get('/', (req, res) => {
     const provider = req.headers['zrok-auth-provider'];
@@ -205,17 +205,17 @@ app.get('/', (req, res) => {
 });
 ```
 
-### Security Considerations
+### Security considerations
 
 - **Trust Boundary**: These headers are only present when requests come through zrok's OAuth-protected frontend. Direct access to your backend would not include these headers.
 - **Header Validation**: Your application should validate that these headers are present when OAuth protection is expected.
 - **Session Expiration**: Use the `zrok-auth-expires` header to implement client-side session warnings or automatic logout.
 
-## Logout Endpoint
+## Logout endpoint
 
 Each configured OAuth provider automatically exposes a logout endpoint at `/<providerName>/logout`. This endpoint provides a secure way for users to terminate their authenticated sessions.
 
-### Logout Process
+### Logout process
 
 When a user accesses the logout endpoint, zrok performs the following actions:
 
@@ -230,21 +230,21 @@ When a user accesses the logout endpoint, zrok performs the following actions:
    - A custom URL specified via the `redirect_url` query parameter
    - The provider's login page (default behavior)
 
-#### Usage Examples
+#### Usage examples
 
-##### Basic Logout
+##### Basic logout
 ```
 GET https://oauth.your-domain.com/google/logout
 ```
 This logs the user out and redirects them to the Google OAuth login page.
 
-##### Logout with Custom Redirect
+##### Logout with custom redirect
 ```
 GET https://oauth.your-domain.com/github/logout?redirect_url=https://example.com/goodbye
 ```
 This logs the user out and redirects them to `https://example.com/goodbye`.
 
-#### Implementation Notes
+#### Implementation notes
 
 - The logout endpoint validates that the session belongs to the correct provider before proceeding
 - If token revocation fails with the OAuth provider, the logout process will still clear the local session
