@@ -116,7 +116,7 @@ jobs:
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: '~> v2'
+          version: '~> v2.14'
           args: build --snapshot --clean --config .goreleaser-windows.yml
 
       - uses: actions/upload-artifact@v4
