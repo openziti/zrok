@@ -1,13 +1,12 @@
 ---
 title: Getting Started
 sidebar_label: Getting Started
-sidebar_position: 10
 ---
 
 import { AssetsProvider } from '@zrokroot/src/components/assets-context';
 import DownloadCard from '@zrokroot/src/components/download-card.jsx';
 import DownloadCardStyles from '@zrokroot/src/css/download-card.module.css';
-import InstallCards from '@zrokroot/docs/guides/install/_install_cards.mdx';
+import InstallCards from '@zrokroot/docs/how-tos/install/_install_cards.mdx';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## Your Secure Internet Sharing Perimeter
@@ -20,9 +19,9 @@ at [myzrok.io](https://myzrok.io) with a generous free tier.
 
 Use zrok to share a running service, like a web server or a network socket, or to share a directory of static files. zrok goes beyond simple tunneling to provide sharing solutions for a variety of network and storage use cases.
 
-When using zrok to [share publicly](./concepts/sharing-public.mdx), you can reserve a public hostname, enable authentication options, or both. Public shares proxy HTTPS to your service or files.
+When using zrok to [share publicly](../concepts/sharing-public.mdx), you can reserve a public hostname, enable authentication options, or both. Public shares proxy HTTPS to your service or files.
 
-If [sharing privately](./concepts/sharing-private.mdx), only users with the share token (and the appropriate permission grants) can access your share. In addition to what you can share publicly, private shares can include TCP and UDP services.
+If [sharing privately](../concepts/sharing-private.mdx), only users with the share token (and the appropriate permission grants) can access your share. In addition to what you can share publicly, private shares can include TCP and UDP services.
 
 Here's a quick overview of what's involved in getting started with zrok:
 
@@ -77,7 +76,7 @@ Here's a quick overview of what's involved in getting started with zrok:
 
 5. Visit the public URL displayed in your terminal
 
-    ![zrok share public](images/zrok-share-public.png)
+    ![zrok share public](../images/zrok-share-public.png)
 
 # A Deeper Look at Getting Started
 
@@ -103,11 +102,11 @@ Log into the API console at:
 
 When you first log into your account on the API console, your interface will look like this:
 
-![zrok API console, empty](images/zrok-getting-started-button.png)
+![zrok API console, empty](../images/zrok-getting-started-button.png)
 
 In the toolbar, there is a big green button that says "CLICK HERE TO GET STARTED!". If you click that button, you'll see the getting started wizard, which looks like this:
 
-![zrok getting started modal](images/zrok-getting-started-modal.png)
+![zrok getting started modal](../images/zrok-getting-started-modal.png)
 
 This wizard is broken into multiple steps. The first step we've already covered, which gets the zrok software installed onto your system.
 
@@ -148,7 +147,7 @@ Excellent... our environment is now fully enabled.
 
 If we return to the _API console_, we'll now see the new environment reflected in the API console visualizer:
 
-![New Environment in Web UI](images/zrok-visualizer-enabled.png)
+![New Environment in Web UI](../images/zrok-visualizer-enabled.png)
 
 In my case, the environment is named `michael@testing`, which is the username of my shell and the hostname of the system the shell is running on.
 
@@ -158,9 +157,9 @@ Should you want to use a non-default name for your environment, you can pass the
 
 If you click on the environment node in the explorer in the _web console_, the details panel shown at the bottom of the page will change:
 
-![Empty Environment](images/zrok-visualizer-environment.png)
+![Empty Environment](../images/zrok-visualizer-environment.png)
 
-The visualizer supports clicking, dragging, mouse wheel zooming, and selecting the nodes in the graph for more information (and available actions) for the selected node. If you ever get lost in the visualizer, click the ![Zoom to Fit](images/zrok-zoom-to-fit.png) _zoom to fit_ icon in the lower right corner of the explorer.
+The visualizer supports clicking, dragging, mouse wheel zooming, and selecting the nodes in the graph for more information (and available actions) for the selected node. If you ever get lost in the visualizer, click the ![Zoom to Fit](../images/zrok-zoom-to-fit.png) _zoom to fit_ icon in the lower right corner of the explorer.
 
 :::note
 With your zrok account you can `zrok2 enable` multiple environments. This will allow you to share (and access your shares) from multiple environments simultaneously.
@@ -192,22 +191,22 @@ In this case, my share was given the "share token" of `xxr2b7tzfx64`. That URL c
 
 If we return to the web console, we see our share in the explorer:
 
-![Web Console Share](images/zrok-visualizer-public-share.png)
+![Web Console Share](../images/zrok-visualizer-public-share.png)
 
 If we click on the _frontend endpoint_ a new browser tab opens and we see the content of our share:
-![Share Frontend](images/zrok_web_console_share_frontend.png)
+![Share Frontend](../images/zrok_web_console_share_frontend.png)
 
 When we start accessing our share, notice the _sparkline_ graphs showing the activity:
 
-![Environment Spark Line](images/zrok-visualizer-sparklines.png)
+![Environment Spark Line](../images/zrok-visualizer-sparklines.png)
 
 And as soon as I terminate the `zrok2 share` client, the resources are removed from the zrok environment.
 
 If we try to reload the frontend endpoint in our web browser, we'll see:
 
-![Not Found](images/zrok-not-found.png)
+![Not Found](../images/zrok-not-found.png)
 
-[More about public shares](./concepts/sharing-public.mdx)
+[More about public shares](../concepts/sharing-public.mdx)
 
 ### Private Shares
 
@@ -266,7 +265,7 @@ $ zrok2 share private v0.3_getting_started --share-token my-docs-share
 
 ...results in a new share backend starting up and connecting to the existing persistent share:
 
-![zrok share private with token](images/zrok_share_reserved.png)
+![zrok share private with token](../images/zrok_share_reserved.png)
 
 Other zrok users can access your persistent private share using the `zrok2 access private` command with your share token.
 
@@ -291,7 +290,7 @@ Here's a quick review of the zrok mental model and the vocabulary.
 
 You create an _account_ with a zrok _instance_. Your account is identified by a username and a password, which you use to log into the _web console_. Your account also has a _secret token_, which you will use to authenticate from the zrok command-line to interact with the _instance_.
 
-You create a new _account_ with NetFoundry's zrok _instance_ by subscribing in [myzrok.io](https://myzrok.io) or in a self-hosted zrok _instance_ by running [the `zrok2 invite` command](./guides/self-hosting/self-service-invite.mdx) or the `zrok2 admin create account` command.
+You create a new _account_ with NetFoundry's zrok _instance_ by subscribing in [myzrok.io](https://myzrok.io) or in a self-hosted zrok _instance_ by running [the `zrok2 invite` command](../self-hosting/self-service-invite.mdx) or the `zrok2 admin create account` command.
 
 ### Environment
 

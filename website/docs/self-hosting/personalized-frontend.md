@@ -20,7 +20,7 @@ We're using the shared zrok instance at zrok.io to provide our secure sharing in
 
 Our deployment will end up looking like this:
 
-![personalized-frontend-1](../../images/personalized-frontend-1.png)
+![personalized-frontend-1](../images/personalized-frontend-1.png)
 
 We're creating reserved names in a namespace for the `A`, `B`, and `C` shares, giving them specific names. These shares could be located together in a single environment on a single host, or can be located at completely different spots on the planet on completely different hosts. You could want to use significantly more shares than 3, or less. The secure sharing fabric allows seamless secure connectivity for these shared resources. This implementation will scale up or down as needed (use multiple hosts behind a load balancer for really big workloads).
 
@@ -36,7 +36,7 @@ Imagine that we own the domain `example.com`. In our example, we want to expose 
 
 We can accomplish this easily with cheap VPS instance. You could also do it with containers through a container hosting service. The VPS will need an IP address exposed to the internet. You'll also need to be able to create DNS entries for the `example.com` domain.
 
-To accomplish this, we're going to run 3 separate `zrok2 access private` commands on our VPS (see the [frontdoor guide](../frontdoor.mdx), or [zrok-private-access Docker Compose guide](../../guides/docker-share/docker_private_share_guide.md#access-the-private-share) for details on an approach for setting this up). One command each for shares `A`, `B`, and `C`. The `zrok2 access private` command works like this:
+To accomplish this, we're going to run 3 separate `zrok2 access private` commands on our VPS (see the [frontdoor guide](../how-tos/frontdoor.mdx), or [zrok-private-access Docker Compose guide](../how-tos/docker-share/private-share.md#access-the-private-share) for details on an approach for setting this up). One command each for shares `A`, `B`, and `C`. The `zrok2 access private` command works like this:
 
 ```
 $ zrok2 access private

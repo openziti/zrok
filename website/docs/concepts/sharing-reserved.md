@@ -5,7 +5,7 @@ sidebar_position: 10
 # Reserved Names and Namespaces
 
 :::info v2.0 feature
-This guide describes the v2.0 namespace and name system. If you're migrating from v1.x, see the [v2 migration guide](/guides/v2-migration-guide.md) for details on how this replaces the old `zrok reserve` workflow.
+This guide describes the v2.0 namespace and name system. If you're migrating from v1.x, see the [v2 migration guide](/how-tos/v2-migration-guide.md) for details on how this replaces the old `zrok reserve` workflow.
 :::
 
 By default, when you create a `public` or `private` share using the `zrok2 share` command, zrok assigns it a randomly generated _share token_. When you terminate the `zrok2 share` command, the share is deleted and the token is no longer valid. If you run `zrok2 share` again, you will receive a brand new share token.
@@ -177,7 +177,7 @@ If you're coming from zrok v1.x, here's the mapping:
 | `zrok2 release <token>` | `zrok2 delete name <name>` |
 | `zrok2 reserve private <target>` | `zrok2 share private <target> --share-token <name>` |
 
-See the [v2 migration guide](/guides/v2-migration-guide.md) for comprehensive migration instructions.
+See the [v2 migration guide](/how-tos/v2-migration-guide.md) for comprehensive migration instructions.
 
 ## Benefits of the Namespace/Name System
 
