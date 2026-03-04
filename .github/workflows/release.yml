@@ -97,9 +97,15 @@ jobs:
           else
             SEMVER_PRE=${SEMVER#*-}
           fi
+          BINARY_PACKAGES=(zrok2)
+          META_PACKAGES=(zrok2-agent)
           # for PAX in zrok2{,-agent,-controller,-frontend,-metrics}; do
-          for PAX in zrok2{,-agent}; do
+          for PAX in "${BINARY_PACKAGES[@]}" "${META_PACKAGES[@]}"; do
             _pattern="./dist/${PAX}-${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*.${ARCH}.rpm"
+            if ! compgen -G "$_pattern" > /dev/null && [[ " ${META_PACKAGES[*]} " == *" ${PAX} "* ]]; then
+              # Fall back to noarch for meta packages like zrok2-agent
+              _pattern="./dist/${PAX}-${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*.noarch.rpm"
+            fi
             if ! compgen -G "$_pattern" > /dev/null; then
               echo "ERROR: No RPM files found matching pattern '${_pattern}'" >&2
               ls -1 ./dist/
@@ -134,9 +140,15 @@ jobs:
           else
             SEMVER_PRE=${SEMVER#*-}
           fi
+          BINARY_PACKAGES=(zrok2)
+          META_PACKAGES=(zrok2-agent)
           # for PAX in zrok2{,-agent,-controller,-frontend,-metrics}; do
-          for PAX in zrok2{,-agent}; do
+          for PAX in "${BINARY_PACKAGES[@]}" "${META_PACKAGES[@]}"; do
             _pattern="./dist/${PAX}_${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*_${ARCH}.deb"
+            if ! compgen -G "$_pattern" > /dev/null && [[ " ${META_PACKAGES[*]} " == *" ${PAX} "* ]]; then
+              # Fall back to all for meta packages like zrok2-agent
+              _pattern="./dist/${PAX}_${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*_all.deb"
+            fi
             if ! compgen -G "$_pattern" > /dev/null; then
               echo "ERROR: No DEB files found matching pattern '${_pattern}'" >&2
               ls -1 ./dist/
