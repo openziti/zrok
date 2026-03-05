@@ -2,7 +2,7 @@
 sidebar_position: 100
 ---
 
-# Open Source
+# Open source
 
 It's important to the `zrok` project that it remain free and open source software. The code is available on [GitHub](https://github.com/openziti/zrok)
 for the world to use, inspect, and build upon!

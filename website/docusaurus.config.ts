@@ -94,20 +94,20 @@ const config: Config = {
             {
                 redirects: [
                     {
-                        to: `$/docs/zrok/guides/self-hosting/linux`,
-                        from: [`/docs/zrok/guides/self-hosting/self_hosting_guide`],
+                        to: `$/docs/zrok/self-hosting/linux`,
+                        from: [`/docs/zrok/guides/self-hosting/self_hosting_guide`, `/docs/zrok/guides/self-hosting/linux`],
                     },
                     {
-                        to: `/docs/zrok/guides/self-hosting/linux/nginx`,
-                        from: [`/docs/zrok/guides/self-hosting/nginx_tls_guide/`]
+                        to: `/docs/zrok/self-hosting/linux/nginx`,
+                        from: [`/docs/zrok/guides/self-hosting/nginx_tls_guide/`, `/docs/zrok/guides/self-hosting/linux/nginx`]
                     },
                     {
-                        to: `/docs/zrok/guides/self-hosting/metrics-and-limits/configuring-limits`,
-                        from: [`/docs/zrok/guides/metrics-and-limits/configuring-limits`],
+                        to: `/docs/zrok/self-hosting/metrics-and-limits/configuring-limits`,
+                        from: [`/docs/zrok/guides/metrics-and-limits/configuring-limits`, `/docs/zrok/guides/self-hosting/metrics-and-limits/configuring-limits`],
                     },
                     {
-                        to: `/docs/zrok/guides/self-hosting/metrics-and-limits/configuring-metrics`,
-                        from: [`/docs/zrok/guides/metrics-and-limits/configuring-metrics`],
+                        to: `/docs/zrok/self-hosting/metrics-and-limits/configuring-metrics`,
+                        from: [`/docs/zrok/guides/metrics-and-limits/configuring-metrics`, `/docs/zrok/guides/self-hosting/metrics-and-limits/configuring-metrics`],
                     }
                 ]
             }

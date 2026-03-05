@@ -2,17 +2,17 @@
 sidebar_position: 10
 ---
 
-# Reserved Names and Namespaces
+# Reserved names and namespaces
 
 :::info v2.0 feature
-This guide describes the v2.0 namespace and name system. If you're migrating from v1.x, see the [v2 migration guide](/guides/v2-migration-guide.md) for details on how this replaces the old `zrok reserve` workflow.
+This guide describes the v2.0 namespace and name system. If you're migrating from v1.x, see the [v2 migration guide](/how-tos/v2-migration-guide.md) for details on how this replaces the old `zrok reserve` workflow.
 :::
 
 By default, when you create a `public` or `private` share using the `zrok2 share` command, zrok assigns it a randomly generated _share token_. When you terminate the `zrok2 share` command, the share is deleted and the token is no longer valid. If you run `zrok2 share` again, you will receive a brand new share token.
 
 In v2.0, zrok introduces a more powerful system for creating persistent shares through **namespaces** and **names**.
 
-## Understanding Namespaces and Names
+## Understanding namespaces and names
 
 ### Namespaces
 
@@ -40,7 +40,7 @@ A **name** is a unique identifier within a namespace. Names can be:
 
 Think of names as similar to DNS A records within a zone. For example, if you create a name `api` in the `public` namespace (corresponding to `share.zrok.io`), your share might be accessible at `https://api.share.zrok.io`.
 
-## Creating Reserved Names
+## Creating reserved names
 
 To create a reserved name, use the `zrok2 create name` command:
 
@@ -57,9 +57,9 @@ zrok2 create name -n <namespaceToken> api
 
 Once created, you can use this name repeatedly across share sessions. The name persists even when your share is not running.
 
-## Using Names with Shares
+## Using names with shares
 
-### Public Shares with Names
+### Public shares with names
 
 Use the `-n` flag to specify a name selection when creating a public share:
 
@@ -73,7 +73,7 @@ zrok2 share public localhost:8080 -n <namespaceToken>:api
 
 The name can be either reserved (created with `zrok2 create name`) or ephemeral (created on-the-fly).
 
-### Private Shares with Custom Tokens
+### Private shares with custom tokens
 
 For private shares, you can use the `--share-token` flag to specify a persistent vanity token:
 
@@ -87,7 +87,7 @@ zrok2 access private myapi-prod
 
 When using the zrok agent, shares with `--share-token` are automatically persistent and will restart after abnormal exit or agent restart.
 
-### Multiple Names on One Share
+### Multiple names on one share
 
 A powerful v2.0 feature: you can specify multiple names for a single share:
 
@@ -106,7 +106,7 @@ Both URLs will point to the same backend target, allowing you to use different n
 
 ## Managing Names
 
-### Listing Your Names
+### Listing your names
 
 See all your names across all namespaces:
 
@@ -122,7 +122,7 @@ This shows a table with:
 - Reserved status
 - Creation timestamp
 
-### Modifying Name Status
+### Modifying name status
 
 Toggle the reserved status of a name:
 
@@ -146,7 +146,7 @@ zrok2 delete name myapp
 zrok2 delete name -n <namespaceToken> api
 ```
 
-## Configuring Default Namespace
+## Configuring default namespace
 
 You can set a default namespace to avoid specifying `-n` on every command:
 
@@ -177,9 +177,9 @@ If you're coming from zrok v1.x, here's the mapping:
 | `zrok2 release <token>` | `zrok2 delete name <name>` |
 | `zrok2 reserve private <target>` | `zrok2 share private <target> --share-token <name>` |
 
-See the [v2 migration guide](/guides/v2-migration-guide.md) for comprehensive migration instructions.
+See the [v2 migration guide](/how-tos/v2-migration-guide.md) for comprehensive migration instructions.
 
-## Benefits of the Namespace/Name System
+## Benefits of the namespace/name system
 
 The v2.0 namespace and name system provides several advantages over v1.x reserved shares:
 

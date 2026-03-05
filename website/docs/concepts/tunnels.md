@@ -2,7 +2,7 @@
 sidebar_position: 25
 ---
 
-# Sharing TCP and UDP Servers
+# Sharing TCP and UDP servers
 
 `zrok` includes support for sharing low-level TCP and UDP network resources using the `tcpTunnel` and `udpTunnel` backend modes.
 

@@ -1,5 +1,5 @@
 ---
-title: Sharing Websites and Files
+title: Sharing websites and files
 sidebar_position: 30
 ---
 

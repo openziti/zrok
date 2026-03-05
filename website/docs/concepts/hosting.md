@@ -4,12 +4,12 @@ sidebar_position: 200
 
 # Hosting
 
-## Self-Hosted
+## Self-hosted
 
-`zrok` is not limited to a managed offering. You can [host your own](../guides/self-hosting/linux/index.mdx) instance of `zrok` as well. `zrok` is
+`zrok` is not limited to a managed offering. You can [host your own](../self-hosting/linux/index.mdx) instance of `zrok` as well. `zrok` is
 also freely available as open source software hosted by GitHub under a very permissive Apache v2 license.
 
-## Managed Service
+## Managed service
 
 `zrok` is also offered as a cloud service, making it instantly accessible to a large population immediately.
 NetFoundry provides a manged version of `zrok` at https://zrok.io. This provides the easy-to-use,
