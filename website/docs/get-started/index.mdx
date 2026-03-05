@@ -94,7 +94,7 @@ After you have [an account](#your-first-share), you can enable your zrok environ
 
 A zrok environment usually refers to an enabled device where shares and accesses can be created, .e.g., `~/.zrok2` on a Unix machine. It can be a specific user's environment or a system-wide agent's environment owned by the administrator.
 
-When your zrok account was created, the service generated an account token that identifies and authenticates in a single step. Protect your account token as if it were a password, or an important account number; it's a *secret*, protect it.
+When your zrok account was created, the service generated an *account token* that identifies and authenticates in a single step. Protect your account token as if it were a password, or an important account number; it's a *secret*, protect it.
 
 When we left off you had downloaded, extracted, and configured your zrok software. In order to use that environment with your account, you'll need to `enable` an *environment* on your system. Enabling an environment generates a secure identity and the necessary underlying security policies with the OpenZiti network hosting the zrok service so that you can begin sharing.
 
@@ -133,16 +133,16 @@ $ zrok2 status
 
 Config:
 
- CONFIG           VALUE                   SOURCE 
- apiEndpoint      https://api-v2.zrok.io  env    
- defaultFrontend  public                  binary 
- headless         false                   binary 
+ CONFIG           VALUE                   SOURCE
+ apiEndpoint      https://api-v2.zrok.io  env
+ defaultFrontend  public                  binary
+ headless         false                   binary
 
 Environment:
 
- PROPERTY       VALUE   
- Account Token  <<SET>> 
- Ziti Identity  <<SET>> 
+ PROPERTY       VALUE
+ Account Token  <<SET>>
+ Ziti Identity  <<SET>>
 ```
 
 Excellent... our environment is now fully enabled.
@@ -232,7 +232,7 @@ The `zrok2 access private wvszln4dyz9q` command can be run by any zrok user, all
 
 ### Proxy backend mode
 
-Without specifying a *backend mode*, the `zrok2 share` command will assume that you're trying to share a `proxy` resource. A `proxy` resource is usually some private HTTP/HTTPS endpoint (like a development server, or a private application) running in your local environment. Usually such an endpoint would have no inbound connectivity except for however it is reachable from your local environment. It might be running on `localhost`, or only listening on a private LAN segment behind a firewall. 
+Without specifying a *backend mode*, the `zrok2 share` command will assume that you're trying to share a `proxy` resource. A `proxy` resource is usually some private HTTP/HTTPS endpoint (like a development server, or a private application) running in your local environment. Usually such an endpoint would have no inbound connectivity except for however it is reachable from your local environment. It might be running on `localhost`, or only listening on a private LAN segment behind a firewall.
 
 For these services a `proxy` share will allow those endpoints to be reached, either *publicly* or *privately* through the zrok service.
 
