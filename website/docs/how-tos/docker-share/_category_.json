@@ -1,8 +1,0 @@
-{
-  "label": "Docker share",
-  "position": 40,
-  "link": {
-    "type": "doc",
-    "id": "how-tos/docker-share/index"
-  }
-}

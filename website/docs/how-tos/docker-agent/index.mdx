@@ -56,6 +56,10 @@ services:
       - start
       - --console-address
       - 0.0.0.0
+      - --console-start-port
+      - "8888"
+      - --console-end-port
+      - "8888"
     expose:
       - 8888  # agent web console
     # ports:
@@ -175,6 +179,8 @@ services:
       - --console-address
       - 0.0.0.0
       - --console-start-port
+      - "${ZROK2_AGENT_CONSOLE_PORT:-8888}"
+      - --console-end-port
       - "${ZROK2_AGENT_CONSOLE_PORT:-8888}"
     expose:
       - "${ZROK2_AGENT_CONSOLE_PORT:-8888}"
