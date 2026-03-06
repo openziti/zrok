@@ -80,7 +80,7 @@ $ docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.11-
 Once RabbitMQ is running, you can start the `zrok` metrics bridge by pointing it at your `zrok` controller configuration, like this:
 
 ```
-$ zrok ctrl metrics bridge <path/to/zrok-controller.yaml>
+$ zrok2 controller metrics bridge <path/to/zrok-controller.yaml>
 ```
 
 ## Configuring zrok metrics
