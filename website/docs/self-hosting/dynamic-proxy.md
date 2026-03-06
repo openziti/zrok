@@ -4,7 +4,7 @@ sidebar_position: 20
 
 # Dynamic proxy frontend migration guide
 
-This guide helps self-hosting system administrators migrate from the legacy `zrok access public` (`publicProxy`) to the new v2.0 `zrok access dynamicProxy` (`dynamicProxy`) architecture. The dynamicProxy system provides enhanced scalability, namespace-based naming mapping, and full support for OAuth integration.
+This guide helps self-hosting system administrators migrate from the legacy `zrok access public` (`publicProxy`) to the new v2.0 `zrok2 access dynamicProxy` (`dynamicProxy`) architecture. The dynamicProxy system provides enhanced scalability, namespace-based naming mapping, and full support for OAuth integration.
 
 ## Overview
 
@@ -36,7 +36,7 @@ The dynamicProxy system consists of three main components:
    - enables real-time synchronization across distributed frontends
    - requires minimal configuration (topic exchange)
 
-3. **dynamicProxy Frontend** (runs via `zrok access dynamicProxy`)
+3. **dynamicProxy Frontend** (runs via `zrok2 access dynamicProxy`)
    - HTTP/HTTPS listener serving dynamic share mappings
    - AMQP subscriber receiving mapping updates
    - gRPC client for initial mapping queries and on-demand lookups
@@ -221,7 +221,7 @@ The command outputs a namespace token (e.g., `abc123xyz`). Save this token as yo
 
 Parameters:
 - `--token` specifies the namespace token used to refer to this specific namespace (the identifier)
-- `--open`: open mode (users can create names without grants); without `--open` is "closed mode" where users need explicit grants to create names in the namespace (use `zrok admin create namespace-grant`)
+- `--open`: open mode (users can create names without grants); without `--open` is "closed mode" where users need explicit grants to create names in the namespace (use `zrok2 admin create namespace-grant`)
 - And the name (`zrok.example.com`) is the DNS name for the namespace; names will end up being `myshare.zrok.example.com`
 
 ### Step 5: Create a dynamic frontend
@@ -253,7 +253,7 @@ zrok2 admin create namespace-frontend <namespaceToken> <frontendToken>
 
 You can map multiple frontends to a single namespace for load balancing and high availability. All mapped frontends will receive the same mapping updates via AMQP.
 
-For simple horizontal scalability (behind a load balancer) you can create one logical frontend in the zrok controller, and share the frontendToken and identity amongst multiple `zrok access dynamicProxy` instances
+For simple horizontal scalability (behind a load balancer) you can create one logical frontend in the zrok controller, and share the frontendToken and identity amongst multiple `zrok2 access dynamicProxy` instances
 
 To view existing mappings:
 
@@ -291,7 +291,7 @@ Configuration parameters:
 #### Required parameters
 
 - **`v`**: configuration version (always `1`)
-- **`frontend_token`**: token from `zrok admin create frontend` (Step 5)
+- **`frontend_token`**: token from `zrok2 admin create frontend` (Step 5)
 - **`amqp_subscriber.url`**: RabbitMQ connection URL (must match controller's `amqp_publisher.url`)
 - **`amqp_subscriber.exchange_name`**: AMQP exchange name (must match controller's `amqp_publisher.exchange_name`)
 - **`controller.identity_path`**: path to the Ziti identity JSON file for the frontend

@@ -29,13 +29,13 @@ Download the binary distribution for your macOS architecture. For Intel Macs use
 1. Unarchive the distribution in a temporary directory.
 
     ```text
-    cd ~/Downloads && mkdir -p /tmp/zrok && tar -xf ./zrok*darwin*.tar.gz -C /tmp/zrok
+    cd ~/Downloads && mkdir -p /tmp/zrok2 && tar -xf ./zrok*darwin*.tar.gz -C /tmp/zrok2
     ```
 
-1. Install the `zrok` executable.
+1. Install the `zrok2` executable.
 
     ```text
-    mkdir -p ~/bin && install /tmp/zrok/zrok ~/bin/
+    mkdir -p ~/bin && install /tmp/zrok2/zrok2 ~/bin/
     ```
 
 1. Add `~/bin` to your shell's executable search path. Optionally add this to your ~/.zshenv to persist the change.
@@ -44,7 +44,7 @@ Download the binary distribution for your macOS architecture. For Intel Macs use
     PATH=~/bin:$PATH
     ```
 
-1. With the `zrok` executable in your path, you can then execute the `zrok2` command from your shell:
+1. With the `zrok2` executable in your path, you can then run the `zrok2` command from your shell:
 
     ```text
     zrok2 version
@@ -57,5 +57,5 @@ Download the binary distribution for your macOS architecture. For Intel Macs use
      / /| | | (_) |   < 
     /___|_|  \___/|_|\_\
     
-    v0.4.0 [c889005]
+    v2.0.0 [c889005]
     ```

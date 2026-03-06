@@ -28,7 +28,7 @@ zrok limits can be specified _globally_, applying to all users in a service inst
 
 :::note v2.0 terminology
 In zrok v2.0, the namespace and name system replaced the v1.x reserved share workflow:
-- `reserved_shares` now refers to reserved names created with `zrok create name -n <namespace> <name>`
+- `reserved_shares` now refers to reserved names created with `zrok2 create name -n <namespace> <name>`
 - `unique_names` still exists; the effective number of reserved names is the minimum of `reserved_shares` and `unique_names`
 - For private shares, using `--share-token` creates a persistent share that is not counted against the number of reserved names
 
