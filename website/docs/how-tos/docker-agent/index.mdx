@@ -17,11 +17,11 @@ Both approaches run the agent as a long-lived container. Once the agent is runni
 - [Docker](https://docs.docker.com/get-docker/) with Compose v2
 - A zrok account token
 
-## Bind-Mount Approach
+## Bind-mount approach
 
 This approach mirrors the [Linux systemd agent service](../agent/linux-service.mdx) — you enable the zrok environment on the Docker host and mount it into the container.
 
-### 1. Enable the Environment on the Host
+### 1. Enable the environment on the host
 
 If you haven't already, [install `zrok2`](../install/index.mdx) and enable your account:
 
@@ -35,7 +35,7 @@ Verify with:
 zrok2 status
 ```
 
-### 2. Start the Agent Container
+### 2. Start the agent container
 
 ```yaml title="compose.yml"
 services:
@@ -84,7 +84,7 @@ Verify it's running:
 docker compose logs zrok-agent
 ```
 
-### 3. Interact with the Agent
+### 3. Interact with the agent
 
 Use `docker compose exec` to run `zrok2` commands inside the running container:
 
@@ -106,7 +106,7 @@ docker compose exec zrok-agent zrok2 agent status
 To share a service running on the Docker host, use `host.docker.internal` as the hostname. On Linux, you may also need `--network=host` on the container or add `extra_hosts: ["host.docker.internal:host-gateway"]` to the compose service.
 :::
 
-### Troubleshooting: `~/.zrok2` Owned by Root
+### Troubleshooting: `~/.zrok2` owned by root
 
 If `~/.zrok2` does not exist on the Docker host when you first run `docker compose up`, Docker will create the directory automatically — but it will be owned by `root`. The agent container will fail with permission errors.
 
@@ -128,7 +128,7 @@ docker compose up -d
 
 To avoid this entirely, always run `zrok2 enable` on the host before the first `docker compose up`.
 
-## Self-Contained Approach
+## Self-contained approach
 
 This approach uses Docker named volumes and init containers to manage the zrok environment entirely within Docker. No host-side `zrok2` installation or `~/.zrok2` directory is needed — only an account token.
 
@@ -203,7 +203,7 @@ ZROK2_ENABLE_TOKEN=<your_account_token>
 # ZROK2_AGENT_CONSOLE_PORT=8888                # agent web console port
 ```
 
-### Start and Use
+### Start and use
 
 ```bash
 docker compose up -d
@@ -217,7 +217,7 @@ docker compose exec zrok-agent zrok2 create name myapp
 docker compose exec zrok-agent zrok2 share public http://some-service:8080 -n public:myapp
 ```
 
-### Cleaning Up
+### Cleaning up
 
 To destroy the environment and start fresh, remove the named volume:
 
@@ -227,7 +227,7 @@ docker compose down --volumes
 
 Then delete the zrok environment from the web console or with `zrok2 admin`.
 
-## Agent Lifecycle Reference
+## Agent lifecycle reference
 
 Once the agent is running (in either approach), the workflow is the same as any other zrok platform. See the [Agent guide](../agent/index.mdx) for the full tutorial, including:
 

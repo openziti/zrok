@@ -51,5 +51,9 @@ conventions and idioms. The log formatting examples for Go are applicable to all
 
 ### Docusaurus
 
-+ This project uses [Docusaurus](https://docusaurus.io/) with NodeJS 18 to build static content for docs.zrok.io.
++ This project uses [Docusaurus](https://docusaurus.io/) with NodeJS 20+ to build static content for docs.zrok.io.
 + Use `npm` to manage Node modules, not `yarn` (Ken plans to switch from `npm` to `yarn` if no one else does).
++ Documentation changes must always target the current (unversioned) docs tree at `website/docs/`. The `versioned_docs/` and `zrok_versioned_docs/` directories preserve past generations of documentation and are not maintained.
++ Use sentence-style capitalization for all Markdown headings: capitalize only the first letter of the heading (and any proper nouns or acronyms). Do not use title case.
+  + Correct: `## Self-contained approach`, `### Configure OpenZiti metrics events`
+  + Incorrect: `## Self-Contained Approach`, `### Configure OpenZiti Metrics Events`

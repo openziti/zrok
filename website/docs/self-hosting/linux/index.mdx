@@ -4,7 +4,7 @@ title: Self-hosting guide for Linux
 sidebar_label: Linux
 ---
 
-## Before you Begin
+## Before you begin
 
 This will get you up and running with a self-hosted instance of zrok. I'll assume you have the following:
 
@@ -30,7 +30,7 @@ Follow [the Linux installation guide](../../how-tos/install/linux.mdx) to instal
 sudo apt install zrok2 zrok2-controller zrok2-frontend zrok2-metrics
 ```
 
-## Automated Bootstrap
+## Automated bootstrap
 
 A bootstrap script is provided that automates the full deployment: PostgreSQL, RabbitMQ, InfluxDB, controller configuration, metrics bridge, dynamic frontend creation, namespace setup, and Ziti service policies. It is idempotent and safe to re-run.
 
@@ -51,9 +51,9 @@ The bootstrap script uses PostgreSQL by default. To use SQLite3 instead (single-
 
 If you prefer to understand each step or need to customize the setup, continue reading below.
 
-## Manual Setup
+## Manual setup
 
-### Step 1: Install Dependencies
+### Step 1: Install dependencies
 
 Install the supporting services. The dynamic frontend and metrics systems use RabbitMQ (AMQP), PostgreSQL stores the controller database, and InfluxDB stores usage metrics.
 
@@ -86,7 +86,7 @@ SERVER_ADDITIONAL_ERL_ARGS="-kernel inet_dist_use_interface {127,0,0,1}"
 
 Then restart: `sudo systemctl restart rabbitmq-server`
 
-#### PostgreSQL Setup
+#### PostgreSQL setup
 
 Create a database and user for the zrok controller:
 
@@ -105,7 +105,7 @@ store:
 PostgreSQL is recommended for production and is required for multi-controller deployments and pessimistic locking used by the limits system.
 :::
 
-#### InfluxDB Setup
+#### InfluxDB setup
 
 Run the InfluxDB initial setup to create an organization, bucket, and admin token:
 
@@ -122,7 +122,7 @@ influx setup \
 
 Save the `--token` value — you'll need it for the controller configuration.
 
-### Step 2: Configure the Controller
+### Step 2: Configure the controller
 
 Create `/etc/zrok2/ctrl.yml`. The key sections are:
 
@@ -207,7 +207,7 @@ See the separate guides on [configuring metrics](../metrics-and-limits/configuri
 
 :::
 
-### Step 3: Environment Variables
+### Step 3: Environment variables
 
 The `zrok2` binaries default to using `api-v2.zrok.io` as the API endpoint. For a self-hosted deployment, set `ZROK2_API_ENDPOINT`:
 
@@ -230,13 +230,13 @@ This creates the zrok database, Ziti identities for the controller (`ctrl`) and 
 
 If you need to re-run bootstrap, add `--skip-frontend` to avoid re-creating the frontend identity.
 
-### Step 5: Start the Controller
+### Step 5: Start the controller
 
 ```bash
 sudo systemctl enable --now zrok2-controller
 ```
 
-### Step 6: Create a Dynamic Frontend
+### Step 6: Create a dynamic frontend
 
 With `ZROK2_ADMIN_TOKEN` and `ZROK2_API_ENDPOINT` set, create a dynamic frontend:
 
@@ -248,7 +248,7 @@ This outputs a frontend token (e.g., `zEjQqHliYXF6`). Save it — you'll need it
 
 The `--dynamic` flag enables the v2.0 dynamicProxy mode with namespace-based naming.
 
-### Step 7: Create dynamicProxyController Identity and Ziti Resources
+### Step 7: Create dynamicProxyController identity and Ziti resources
 
 Create a Ziti identity for the dynamicProxyController gRPC service:
 
@@ -310,7 +310,7 @@ Restart the controller to activate the dynamicProxyController:
 sudo systemctl restart zrok2-controller
 ```
 
-### Step 8: Create a Namespace
+### Step 8: Create a namespace
 
 Namespaces organize share names (similar to DNS zones). Create a public namespace:
 
@@ -320,7 +320,7 @@ zrok2 admin create namespace --token public --open zrok.example.com
 
 The `--open` flag allows any account to create names in this namespace. Without it, users need explicit grants.
 
-### Step 9: Map Namespace to Frontend
+### Step 9: Map namespace to frontend
 
 Link the namespace to the dynamic frontend so shares are served by this frontend:
 
@@ -328,7 +328,7 @@ Link the namespace to the dynamic frontend so shares are served by this frontend
 zrok2 admin create namespace-frontend public <frontend-token> --default
 ```
 
-### Step 10: Configure the Dynamic Frontend
+### Step 10: Configure the dynamic frontend
 
 Create `/etc/zrok2/frontend.yml`:
 
@@ -375,7 +375,7 @@ sudo chmod o+x /etc/letsencrypt /etc/letsencrypt/live /etc/letsencrypt/archive
 
 For a complete reference of all frontend options including OAuth, see the [Dynamic Proxy Frontend Guide](../dynamic-proxy.md).
 
-### Step 11: Start the Frontend
+### Step 11: Start the frontend
 
 ```bash
 sudo systemctl enable --now zrok2-frontend
@@ -387,7 +387,7 @@ Verify it's running:
 sudo journalctl -u zrok2-frontend -f
 ```
 
-### Step 12: Configure OpenZiti Metrics Events
+### Step 12: Configure OpenZiti metrics events
 
 The zrok metrics pipeline starts at the OpenZiti controller, which emits `fabric.usage` events. Add the following to your OpenZiti controller configuration:
 
@@ -423,7 +423,7 @@ Restart the OpenZiti controller and routers after making these changes.
 
 For more details, see [Configuring Metrics](../metrics-and-limits/configuring-metrics.md).
 
-### Step 13: Start the Metrics Bridge
+### Step 13: Start the metrics bridge
 
 The `zrok2-metrics` service runs the metrics bridge as a separate process. It reads the `bridge` section from `/etc/zrok2/ctrl.yml` to consume `fabric.usage` events and publish them to the AMQP queue, where the controller's metrics agent picks them up and writes them to InfluxDB.
 
@@ -462,7 +462,7 @@ The output is the account token used to enable zrok environments on devices.
 SuGzRPjVDIcF
 ```
 
-## Enable Your Environment
+## Enable your environment
 
 On a client device that can reach your server, configure the API endpoint and enable:
 
@@ -483,7 +483,7 @@ zrok2 status
 
 Congratulations. You have a working zrok environment!
 
-## Running as systemd Services
+## Running as systemd services
 
 The `zrok2-controller`, `zrok2-frontend`, and `zrok2-metrics` packages install systemd service units for production deployments. The `zrok2-agent` package installs a systemd user service for the client side.
 
