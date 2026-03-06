@@ -21,10 +21,10 @@ Expected output:
 ## Basic Usage
 
 ```python
-from zrok.proxy import ProxyShare
-import zrok
+from zrok2.proxy import ProxyShare
+import zrok2
 
-# Load the user's zrok environment from ~/.zrok
+# Load the user's zrok environment from ~/.zrok2
 zrok_env = zrok.environment.root.Load()
 
 # Create a temporary proxy share (will be cleaned up on exit)

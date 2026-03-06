@@ -1,8 +1,8 @@
 #!python3
 from flask import Flask
 import sys
-import zrok
-from zrok.model import ShareRequest
+import zrok2
+from zrok2.model import ShareRequest
 import atexit
 
 app = Flask(__name__)

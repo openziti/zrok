@@ -1,140 +1,45 @@
 # Build
 
-## Quick start: containerized build (recommended)
+## Quick start: build with Go
 
-The easiest way to build zrok is using the provided `build.bash` wrapper script, which uses Docker to create a reproducible build environment:
-
-Run this:
+Building zrok requires **Go** (see `go.mod` for the minimum version), **Node.js v18+**, and a **C compiler** (CGO is required for SQLite3). On Windows, [TDM-GCC](https://jmeubank.github.io/tdm-gcc/download/) works well.
 
 ```bash
-./build.bash
+# Build the UI assets (only needed once, or when the UI changes)
+(cd ui && npm install && npm run build)
+(cd agent/agentUi && npm install && npm run build)
+
+# Build the zrok2 binary
+mkdir -p dist
+go build -o dist ./cmd/zrok2
 ```
 
-**Expected output (quiet mode):**
+The binary is written to `dist/zrok2`.
 
-```text
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✓ Build completed successfully (goreleaser snapshot)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## Build with goreleaser (snapshot)
 
-GoReleaser output directory: ./dist/
-
-Built binaries:
-  • ./dist/zrok-amd64_linux_amd64_v1/zrok2
-    (config: .goreleaser-linux-amd64.yml)
-
-Embedded UIs:
-  • ./ui/dist           → /api/v1/static (main UI)
-  • ./agent/agentUi/dist → /agent (agent UI)
-
-Note: GoReleaser also generates archives and metadata in ./dist/
-```
-
-**What it does:**
-
-* Automatically detects your host architecture (amd64, arm64, or armhf)
-* Builds the `zrok-builder` container image if needed (one-time setup)
-* Rebuilds the image automatically if the Dockerfile or build script changes
-* Builds zrok with embedded UIs using goreleaser snapshots
-* Outputs only errors and a final build report (use `--verbose` for full output)
-* Places the binary in `./dist/zrok2_linux_<arch>_<variant>/zrok2`
-
-**Requirements:**
-
-* Docker installed and running
-* No other dependencies needed (Go, Node.js, etc. are in the container)
-
-**Advantages:**
-
-* More consistent builds with pinned toolchain versions
-* No need to install Go, Node.js, or build tools on your host
-* Resembles the CI/CD build environment
-* Clean, quiet output by default
-
-For cross-compilation, multiple architectures, or debug mode, see [Cross-build zrok with Docker](#cross-build-zrok-with-docker) below.
-
-## zrok
-
-At this time, building zrok is pretty straightforward. You will require `node` v18+ to be installed in order to complete the build as well as `go`. Because `zrok` uses CGO, you will also need to have a working C compiler toolchain. [TDM-GCC](https://jmeubank.github.io/tdm-gcc/download/) works great on Windows (just make sure it's in your PATH).
-
-To build, follow these steps:
-
-* clone the repository
-* change to the existing `ui` folder
-* run `npm install`
-* run `npm run build` (this process takes a while the first time and only needs to be run if the ui changes)
-* change back to the checkout root
-* change to the existing `agent/agentUi/` folder
-* run `npm install`
-* run `npm run build` (this process takes a while the first time and only needs to be run if the ui changes)
-* change back to the checkout root
-* make sure the dist directory exists: `mkdir -p dist`
-* build the go project normally: `go build -o dist ./...`
-
-## Build Docker image from source
-
-Build the `openziti/zrok2` Docker image directly from source using the
-multi-stage `Dockerfile.build`. This compiles the UI assets (Vite), the Go
-binary (with CGO for SQLite3), and packages everything into the same
-`openziti/ziti-cli` base image used by published releases.
+goreleaser produces the same snapshot packages that CI generates, with embedded UIs:
 
 ```bash
-docker build -f docker/compose/zrok2-instance/Dockerfile.build \
-  -t openziti/zrok2:local .
+goreleaser build --snapshot --clean -f .goreleaser-linux-amd64.yml
 ```
 
-The resulting image includes:
+The binary lands in `dist/zrok2_linux_amd64_v1/zrok2`.
 
-* `/usr/local/bin/zrok2` — the compiled binary with embedded UIs
-* `/usr/local/bin/zrok2-enable` — the enable helper script
-* `/usr/local/bin/zrok2-bootstrap` — the bootstrap script (for sourcing
-  utility functions or running directly)
+## Build with Docker
 
-Use the image with Docker Compose via the build overlay:
-
-```bash
-cd docker/compose/zrok2-instance
-cp .env.example .env
-# edit .env with required values
-COMPOSE_FILE=compose.yml:compose.build.yml docker compose up -d --build --wait
-```
-
-## Cross-build zrok with Docker
-
-For advanced use cases including cross-compilation for multiple architectures, verbose/debug output, or direct control over the build process, see the [cross-build documentation](./docker/images/cross-build/README.md).
-
-**Supported architectures:** amd64, arm64, armhf, armel
-
-**Quick example:**
-
-```bash
-# Build for arm64
-docker run --user "$(id -u):$(id -g)" --rm \
-  --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
-  --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
-  --volume="${PWD}:/mnt" \
-  zrok-builder arm64
-
-# Build for amd64 (in a separate run)
-docker run --user "$(id -u):$(id -g)" --rm \
-  --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
-  --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
-  --volume="${PWD}:/mnt" \
-  zrok-builder amd64
-```
-
-**Note:** Each architecture must be built in a separate `docker run` command. The `./dist/` directory will be cleaned at the start of each build by Goreleaser.
+For Docker-based builds — including `bin/build.bash`, the `openziti/zrok2`
+container image, and cross-compilation for multiple architectures — see the
+[Docker build documentation](docker/images/cross-build/README.md).
 
 ## Documentation/Website
 
-The doc website is based on [Docusaurus](https://docusaurus.io/) which in turn will require `npm` to be installed. `yarn`
-is another tool which is used to start the Docusaurus dev site.
+The doc website uses [Docusaurus](https://docusaurus.io/) and requires `npm`.
 
-To build the doc:
+```bash
+cd website
+yarn install   # usually only needed once
+yarn start     # development server on port 3000
+```
 
-* cd to `website`
-* run `yarn install` (usually only needed once)
-* run `yarn start` to start the development server (make sure port 3000 is open or change the port)
-
-The development server infrequently behaves differently than the 'production' build. If you must use the 'production'
-build it is slower, but you can accomplish that with `yarn build`.
+For a production build: `yarn build`.

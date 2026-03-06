@@ -1,4 +1,4 @@
-FROM golang:1.24 AS golang
+FROM golang:1.26 AS golang
 
 FROM debian:bookworm-slim
 #

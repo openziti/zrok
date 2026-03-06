@@ -1,0 +1,149 @@
+---
+name: Integration Tests
+
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+    branches: [main]
+    paths:
+      - 'sdk/python/**'
+      - 'sdk/golang/**'
+      - 'docker/compose/zrok2-instance/**'
+      - 'website/build/zrok2-instance/**'
+      - 'nfpm/**'
+      - '.goreleaser-linux-amd64.yml'
+      - '.github/workflows/integration-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'sdk/python/**'
+      - 'sdk/golang/**'
+      - 'docker/compose/zrok2-instance/**'
+      - 'website/build/zrok2-instance/**'
+      - 'nfpm/**'
+      - '.goreleaser-linux-amd64.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Docker Compose: build from source, start the full stack, run Python
+  # SDK integration tests against the live API.
+  docker-compose:
+    name: Docker Compose + Python SDK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python SDK
+        run: pip install -e sdk/python/src/[test]
+
+      - name: Start zrok2 instance (built from source)
+        run: bash docker/compose/zrok2-instance/dangerous.docker.test.bash --keep
+        timeout-minutes: 13
+
+      - name: Run Python SDK integration tests
+        run: |
+          source docker/compose/zrok2-instance/.env
+          pytest sdk/python/tests/integration/ -v --tb=short
+        env:
+          ZROK2_API_ENDPOINT: http://localhost:18080
+
+      - name: Dump container logs on failure
+        if: failure()
+        run: |
+          cd docker/compose/zrok2-instance
+          docker compose logs --tail=200 || true
+
+      - name: Tear down
+        if: always()
+        run: bash docker/compose/zrok2-instance/dangerous.docker.test.bash --only-clean
+
+  # Linux: build packages with goreleaser, install Ziti from APT, install
+  # zrok2 packages, run zrok2-bootstrap.bash, verify all services, run Go SDK integration tests.
+  linux-deploy:
+    name: Linux Package Deploy + Go SDK Integration Tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install goreleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          install-only: true
+
+      - name: Resolve Ziti version
+        id: ziti-version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ZITI_LINUX_VERSION: ${{ vars.ZITI_LINUX_VERSION }}
+        run: |
+          if [[ -n "${ZITI_LINUX_VERSION:-}" ]]; then
+            V="${ZITI_LINUX_VERSION}"
+            echo "Using pinned version: ${V}"
+          else
+            V=$(
+              gh api --method GET \
+                'repos/openziti/ziti/releases?per_page=100' \
+                --jq '
+                  [.[]
+                   | select(.prerelease == false
+                            and .draft == false)
+                  ] | first | .tag_name | ltrimstr("v")'
+            )
+            echo "Resolved latest stable: ${V}"
+          fi
+          V="${V#v}"
+          if [[ -z "${V}" ]]; then
+            echo "ERROR: could not resolve Ziti version" >&2
+            exit 1
+          fi
+          echo "ZITI_VERSION=${V}" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Run Linux deployment test (keep instance)
+        env:
+          ZITIPAX_DEB: ${{ vars.ZITIPAX_DEB }}
+          ZITIPAX_RPM: ${{ vars.ZITIPAX_RPM }}
+        run: |
+          bash ./nfpm/dangerous.linux.test.bash \
+            --keep \
+            --ziti-version "${{ steps.ziti-version.outputs.ZITI_VERSION }}"
+
+      - name: Run Go SDK integration tests
+        run: |
+          ADMIN_TOKEN=$(sudo grep -A1 'secrets:' /etc/zrok2/ctrl.yml | tail -1 | tr -d ' -')
+          ZROK2_API_ENDPOINT=http://localhost:18080 \
+          ZROK2_ADMIN_TOKEN="${ADMIN_TOKEN}" \
+          go test ./sdk/golang/sdk/... -run Integration -v -count=1
+
+      - name: Tear down Linux instance
+        if: always()
+        run: bash ./nfpm/dangerous.linux.test.bash --only-clean
+
+      - name: Dump journals on failure
+        if: failure()
+        run: |
+          for svc in ziti-controller ziti-router \
+            zrok2-controller zrok2-frontend \
+            zrok2-metrics-bridge rabbitmq-server \
+            postgresql influxdb; do
+            echo "=== ${svc} ==="
+            sudo journalctl -u "${svc}" \
+              --no-pager -n 200 2>/dev/null || true
+          done

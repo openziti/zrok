@@ -3,10 +3,10 @@ import argparse
 import atexit
 import sys
 import os
-import zrok
-import zrok.listener
-import zrok.dialer
-from zrok.model import AccessRequest, ShareRequest
+import zrok2
+import zrok2.listener
+import zrok2.dialer
+from zrok2.model import AccessRequest, ShareRequest
 import signal
 import threading
 

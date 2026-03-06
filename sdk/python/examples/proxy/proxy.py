@@ -12,8 +12,8 @@ This example demonstrates how to:
 import argparse
 import logging
 
-import zrok
-from zrok.proxy import ProxyShare
+import zrok2
+from zrok2.proxy import ProxyShare
 
 # Setup logging
 logging.basicConfig(

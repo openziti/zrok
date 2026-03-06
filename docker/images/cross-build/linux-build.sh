@@ -221,14 +221,14 @@ for ARCH in "${JOBS[@]}"; do
         if [[ "$VERBOSE" == "true" ]]; then
             goreleaser release --snapshot ${CLEAN_FLAG} --skip=publish,validate --config "${CONFIG_FILE}"
         else
-            goreleaser release --snapshot ${CLEAN_FLAG} --skip=publish,validate --config "${CONFIG_FILE}" >/dev/null 2>&1
+            goreleaser release --snapshot ${CLEAN_FLAG} --skip=publish,validate --config "${CONFIG_FILE}" >/dev/null
         fi
     else
         # Use 'build' for binaries only
         if [[ "$VERBOSE" == "true" ]]; then
             goreleaser build --snapshot ${CLEAN_FLAG} --config "${CONFIG_FILE}"
         else
-            goreleaser build --snapshot ${CLEAN_FLAG} --config "${CONFIG_FILE}" >/dev/null 2>&1
+            goreleaser build --snapshot ${CLEAN_FLAG} --config "${CONFIG_FILE}" >/dev/null
         fi
     fi
     
