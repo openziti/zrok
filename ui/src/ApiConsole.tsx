@@ -1,6 +1,7 @@
 import {JSX, useCallback, useEffect, useRef, useState} from "react";
-import {Graph, layout, mergeGraph, nodesEqual} from "./model/graph.ts";
-import {Grid2} from "@mui/material";
+import {Graph, focusGraph, layout, mergeGraph, nodesEqual} from "./model/graph.ts";
+import {Grid2, IconButton, Typography} from "@mui/material";
+import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import NavBar from "./NavBar.tsx";
 import Visualizer from "./Visualizer.tsx";
 import AccountPanel from "./AccountPanel.tsx";
@@ -34,11 +35,36 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const updateNodes = useApiConsoleStore((state) => state.updateNodes);
     const updateEdges = useApiConsoleStore((state) => state.updateEdges);
     const selectedNode = useApiConsoleStore((state) => state.selectedNode);
+    const selectedNodeRef = useRef<Node>(selectedNode);
+    selectedNodeRef.current = selectedNode;
+    const focusNodeId = useApiConsoleStore((state) => state.focusNodeId);
+    const focusNodeIdRef = useRef<string | null>(focusNodeId);
+    focusNodeIdRef.current = focusNodeId;
+    const updateFocusNodeId = useApiConsoleStore((state) => state.updateFocusNodeId);
     const [mainPanel, setMainPanel] = useState(<Visualizer />);
     const [sidePanel, setSidePanel] = useState<JSX>(null);
     const [visualizerEnabled, setVisualizerEnabled] = useState<boolean>(true);
+    const [panelMinimized, setPanelMinimized] = useState<boolean>(false);
+    const panelMinimizedRef = useRef<boolean>(false);
+    panelMinimizedRef.current = panelMinimized;
 
     let visualizer = true;
+
+    const applyFocusAndLayout = (graph: Graph, newFocusId: string | null) => {
+        updateFocusNodeId(newFocusId);
+        let graphToLayout = graph;
+        if(newFocusId) {
+            graphToLayout = focusGraph(graph, newFocusId);
+        }
+        let laidOut = layout(graphToLayout.nodes, graphToLayout.edges);
+        let selected = laidOut.nodes.map((n) => ({
+            ...n,
+            selected: selectedNodeRef.current ? selectedNodeRef.current.id === n.id : false,
+        }));
+        updateNodes(selected);
+        updateEdges(laidOut.edges);
+    };
+
     const handleKeyPress = useCallback((event) => {
         if(event.ctrlKey === true && event.key === '`') {
             setVisualizerEnabled(!visualizer);
@@ -48,6 +74,25 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             } else {
                 setMainPanel(<TabularView />);
             }
+            return;
+        }
+        let tag = (event.target as HTMLElement)?.tagName?.toLowerCase();
+        if(tag === "input" || tag === "textarea") return;
+        if(event.key === 'f') {
+            if(focusNodeIdRef.current) {
+                applyFocusAndLayout(oldGraph.current, null);
+            } else if(selectedNodeRef.current && selectedNodeRef.current.type !== "account") {
+                applyFocusAndLayout(oldGraph.current, selectedNodeRef.current.id);
+            }
+            return;
+        }
+        if(event.key === 'p') {
+            setPanelMinimized(!panelMinimizedRef.current);
+            return;
+        }
+        if(event.key === 'Escape' && focusNodeIdRef.current) {
+            applyFocusAndLayout(oldGraph.current, null);
+            return;
         }
     }, []);
 
@@ -61,7 +106,16 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                     updateGraph(newVov);
                     oldGraph.current = newVov;
 
-                    let laidOut = layout(newVov.nodes, newVov.edges);
+                    let graphToLayout = newVov;
+                    if(focusNodeIdRef.current) {
+                        if(!newVov.nodes.find(n => n.id === focusNodeIdRef.current)) {
+                            updateFocusNodeId(null);
+                        } else {
+                            graphToLayout = focusGraph(newVov, focusNodeIdRef.current);
+                        }
+                    }
+
+                    let laidOut = layout(graphToLayout.nodes, graphToLayout.edges);
                     let selected = laidOut.nodes.map((n) => ({
                         ...n,
                         selected: selectedNode ? selectedNode.id === n.id : false,
@@ -181,12 +235,24 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     return (
         <div>
             <NavBar logout={logout} visualizer={visualizerEnabled} toggleMode={setVisualizerEnabled} />
-            <Grid2 container spacing={2} columns={{ xs: 4, sm: 10, md: 12 }}>
-                <Grid2 size="grow">
-                    {mainPanel}
+            <div style={{ position: "relative" }}>
+                <Grid2 container spacing={2} columns={{ xs: 4, sm: 10, md: 12 }}>
+                    <Grid2 size="grow">
+                        {mainPanel}
+                    </Grid2>
+                    {sidePanel && !panelMinimized ? <Grid2 container size={4}><Grid2 >{sidePanel}</Grid2></Grid2> : null}
                 </Grid2>
-                {sidePanel ? <Grid2 container size={5}><Grid2 >{sidePanel}</Grid2></Grid2> : null}
-            </Grid2>
+                {sidePanel && panelMinimized ? (
+                    <div style={{ position: "absolute", top: 16, right: 16, zIndex: 5, display: "flex", alignItems: "center", gap: 4, background: "rgba(36, 23, 117, 0.85)", borderRadius: 8, padding: "4px 12px" }}>
+                        <Typography variant="body2" sx={{ color: "#fff", whiteSpace: "nowrap" }}>
+                            {selectedNode?.type}
+                        </Typography>
+                        <IconButton size="small" onClick={() => setPanelMinimized(false)} sx={{ color: "#fff", p: 0.25 }}>
+                            <OpenInFullIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                    </div>
+                ) : null}
+            </div>
         </div>
     );
 }

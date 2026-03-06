@@ -14,6 +14,7 @@ type StoreState = {
     nodes: Node[];
     edges: Edge[];
     selectedNode: Node;
+    focusNodeId: string | null;
     viewport: Viewport;
     pagination: MRT_PaginationState;
     sorting: MRT_SortingState;
@@ -28,6 +29,7 @@ type StoreAction = {
     updateNodes: (nodes: StoreState['nodes']) => void,
     updateEdges: (edges: StoreState['edges']) => void,
     updateSelectedNode: (selectedNode: StoreState['selectedNode']) => void,
+    updateFocusNodeId: (focusNodeId: StoreState['focusNodeId']) => void,
     updateViewport: (viewport: StoreState['viewport']) => void,
     updatePagination: (pagination: StoreState['pagination']) => void,
     updateSorting: (sorting: StoreState['sorting']) => void,
@@ -42,6 +44,7 @@ const useApiConsoleStore = create<StoreState & StoreAction>((set) => ({
     nodes: [],
     edges: [],
     selectedNode: null,
+    focusNodeId: null,
     viewport: {x: 0, y: 0, zoom: 1},
     pagination: {pageIndex: 0, pageSize: 15},
     sorting: [{id: "data.label", desc: false}] as MRT_SortingState,
@@ -53,6 +56,7 @@ const useApiConsoleStore = create<StoreState & StoreAction>((set) => ({
     updateNodes: (nodes) => set({nodes: nodes}),
     updateEdges: (edges) => set({edges: edges}),
     updateSelectedNode: (selectedNode) => set({selectedNode: selectedNode}),
+    updateFocusNodeId: (focusNodeId) => set({focusNodeId: focusNodeId}),
     updateViewport: (viewport) => set({viewport: viewport}),
     updatePagination: (pagination) => set({pagination: pagination}),
     updateSorting: (sorting) => set({sorting: sorting})

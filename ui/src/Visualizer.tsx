@@ -40,6 +40,7 @@ const Visualizer = () => {
     const viewport = useApiConsoleStore((state) => state.viewport);
     const updateViewport = useApiConsoleStore((state) => state.updateViewport);
     const selectedNode = useApiConsoleStore((state) => state.selectedNode);
+    const focusNodeId = useApiConsoleStore((state) => state.focusNodeId);
     const nodes = useApiConsoleStore((state) => state.nodes);
     const updateNodes = useApiConsoleStore((state) => state.updateNodes);
     const edges = useApiConsoleStore((state) => state.edges);
@@ -103,6 +104,25 @@ const Visualizer = () => {
             defaultViewport={viewport}
             fitView={fitView}
         >
+            {focusNodeId && (
+                <div style={{
+                    position: "absolute",
+                    top: 10,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: "rgba(36, 23, 117, 0.85)",
+                    color: "#fff",
+                    padding: "4px 14px",
+                    borderRadius: 6,
+                    fontFamily: "Poppins",
+                    fontSize: 13,
+                    zIndex: 5,
+                    pointerEvents: "none",
+                    whiteSpace: "nowrap",
+                }}>
+                    Focus mode — press f or Esc to exit
+                </div>
+            )}
             <Background  />
             <Controls position="bottom-left" orientation="horizontal" showInteractive={false} />
             <MiniMap

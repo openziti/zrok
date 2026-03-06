@@ -175,6 +175,82 @@ export const nodesEqual = (a: Node[], b: Node[]) => {
     return a.every((e, i) => e.id === b[i].id && e.data.limited === b[i].data.limited && e.data.label === b[i].data.label);
 }
 
+export const focusGraph = (graph: Graph, focusNodeId: string): Graph => {
+    let nodeMap = new Map<string, Node>();
+    for(let n of graph.nodes) {
+        nodeMap.set(n.id, n);
+    }
+
+    let parentOf = new Map<string, string>();
+    for(let e of graph.edges) {
+        if(e.type === "hierarchy") {
+            parentOf.set(e.target, e.source);
+        }
+    }
+
+    let childrenOf = new Map<string, string[]>();
+    for(let e of graph.edges) {
+        if(e.type === "hierarchy") {
+            let list = childrenOf.get(e.source) || [];
+            list.push(e.target);
+            childrenOf.set(e.source, list);
+        }
+    }
+
+    let focusNode = nodeMap.get(focusNodeId);
+    if(!focusNode) return graph;
+
+    let included = new Set<string>();
+
+    let addWithParents = (id: string) => {
+        let cur = id;
+        while(cur) {
+            included.add(cur);
+            cur = parentOf.get(cur);
+        }
+    };
+
+    if(focusNode.type === "account") {
+        return graph;
+    } else if(focusNode.type === "environment") {
+        addWithParents(focusNodeId);
+        let children = childrenOf.get(focusNodeId) || [];
+        for(let childId of children) {
+            included.add(childId);
+            let child = nodeMap.get(childId);
+            if(child?.type === "access") {
+                for(let e of graph.edges) {
+                    if(e.type === "access" && e.source === childId) {
+                        included.add(e.target);
+                        addWithParents(e.target);
+                    }
+                }
+            }
+        }
+    } else if(focusNode.type === "share") {
+        addWithParents(focusNodeId);
+        for(let e of graph.edges) {
+            if(e.type === "access" && e.target === focusNodeId) {
+                included.add(e.source);
+                addWithParents(e.source);
+            }
+        }
+    } else if(focusNode.type === "access") {
+        addWithParents(focusNodeId);
+        for(let e of graph.edges) {
+            if(e.type === "access" && e.source === focusNodeId) {
+                included.add(e.target);
+                addWithParents(e.target);
+            }
+        }
+    }
+
+    let out = new Graph();
+    out.nodes = graph.nodes.filter(n => included.has(n.id));
+    out.edges = graph.edges.filter(e => included.has(e.source) && included.has(e.target));
+    return out;
+}
+
 export const layout = (nodes, edges): Graph => {
     if(!nodes || nodes.length === 0) {
         return { nodes: nodes || [], edges };
