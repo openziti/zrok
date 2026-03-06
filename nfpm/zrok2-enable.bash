@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# this script uses a zrok2 account token to enable a zrok2 environment in $HOME/.zrok2
+# this script uses a zrok2 enable token to enable a zrok2 environment in $HOME/.zrok2
 #
 
 set -o errexit
@@ -21,6 +21,12 @@ if (( $# )); then
   esac
 fi
 
+# set HOME to the first colon-sep dir in STATE_DIRECTORY inherited from systemd, e.g. /var/lib/zrok2-share
+if [[ -n "${STATE_DIRECTORY:-}" ]]; then
+  export HOME="${STATE_DIRECTORY%:*}"
+else
+  echo "WARNING: STATE_DIRECTORY is undefined. Using HOME=${HOME}" >&2
+fi
 echo "DEBUG: zrok2 state directory is ${HOME}/.zrok2"
 
 if [[ -s ~/.zrok2/environment.json ]]; then
