@@ -98,7 +98,7 @@ const config: Config = {
                         from: [`/docs/zrok/guides/self-hosting/self_hosting_guide`, `/docs/zrok/guides/self-hosting/linux`],
                     },
                     {
-                        to: `/docs/zrok/self-hosting/linux/nginx`,
+                        to: `/docs/zrok/self-hosting/linux`,
                         from: [`/docs/zrok/guides/self-hosting/nginx_tls_guide/`, `/docs/zrok/guides/self-hosting/linux/nginx`]
                     },
                     {
