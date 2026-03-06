@@ -38,7 +38,7 @@ export function zrokRedirects(routeBasePath: string = 'docs/zrok'): PluginConfig
                 { to: `${p}/self-hosting/interstitial-page`, from: [`${p}/guides/self-hosting/interstitial-page`] },
                 { to: `${p}/self-hosting/kubernetes`, from: [`${p}/guides/self-hosting/kubernetes`] },
                 { to: `${p}/self-hosting/linux/`, from: [`${p}/guides/self-hosting/self_hosting_guide`, `${p}/guides/self-hosting/linux`] },
-                { to: `${p}/self-hosting/linux/nginx`, from: [`${p}/guides/self-hosting/nginx_tls_guide/`, `${p}/guides/self-hosting/linux/nginx`] },
+                { to: `${p}/self-hosting/linux`, from: [`${p}/guides/self-hosting/nginx_tls_guide/`, `${p}/guides/self-hosting/linux/nginx`] },
                 { to: `${p}/self-hosting/metrics-and-limits/configuring-limits`, from: [`${p}/guides/metrics-and-limits/configuring-limits`, `${p}/guides/self-hosting/metrics-and-limits/configuring-limits`] },
                 { to: `${p}/self-hosting/metrics-and-limits/configuring-metrics`, from: [`${p}/guides/metrics-and-limits/configuring-metrics`, `${p}/guides/self-hosting/metrics-and-limits/configuring-metrics`] },
                 { to: `${p}/self-hosting/oauth/configuring-oauth`, from: [`${p}/guides/self-hosting/oauth/configuring-oauth`] },
