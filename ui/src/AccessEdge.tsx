@@ -1,14 +1,23 @@
-import {BaseEdge, EdgeProps} from "@xyflow/react";
+import {BaseEdge, EdgeProps, getSmoothStepPath, Position} from "@xyflow/react";
 
 const AccessEdge = (props: EdgeProps) => {
-    const { sourceX, sourceY, targetX, targetY, id, markerEnd } = props;
-    const edgePath = `M ${sourceX} ${sourceY} ` +
-        `L ${sourceX} ${sourceY + 20} ` +
-        `L ${sourceX + (targetX - sourceX) / 2} ${sourceY + 50 + ((sourceX - targetX) * .05) + (targetY - sourceY) / 2} ` +
-        `L ${targetX} ${targetY + 20} ` +
-        `L ${targetX} ${targetY}`;
+    const { sourceX, sourceY, targetX, targetY, id, markerEnd, data } = props;
+    const laneIndex = (data as any)?.laneIndex ?? 0;
+    const offset = 25 + laneIndex * 15;
 
-    return <BaseEdge path={edgePath} markerEnd={markerEnd} />;
+    const [edgePath] = getSmoothStepPath({
+        sourceX,
+        sourceY,
+        sourcePosition: Position.Bottom,
+        targetX,
+        targetY,
+        targetPosition: Position.Bottom,
+        borderRadius: 8,
+        offset,
+    });
+
+    return <BaseEdge id={id} path={edgePath} markerEnd={markerEnd}
+        style={{ strokeDasharray: "8 4", strokeWidth: 1.5 }} />;
 }
 
 export default AccessEdge;

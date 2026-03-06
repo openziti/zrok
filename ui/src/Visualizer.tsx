@@ -8,6 +8,7 @@ import {
     Node,
     ReactFlow,
     ReactFlowProvider,
+    useNodesInitialized,
     useOnViewportChange,
     Viewport
 } from "@xyflow/react";
@@ -16,11 +17,15 @@ import EnvironmentNode from "./EnvironmentNode.tsx";
 import AccountNode from "./AccountNode.tsx";
 import AccessNode from "./AccessNode.tsx";
 import {Box} from "@mui/material";
+import {useEffect, useRef} from "react";
 import useApiConsoleStore from "./model/store.ts";
+import {layout} from "./model/graph.ts";
 import AccessEdge from "./AccessEdge.tsx";
+import HierarchyEdge from "./HierarchyEdge.tsx";
 
 const edgeTypes = {
-    access: AccessEdge
+    access: AccessEdge,
+    hierarchy: HierarchyEdge,
 };
 
 const nodeTypes = {
@@ -34,9 +39,26 @@ const Visualizer = () => {
     const updateSelectedNode = useApiConsoleStore((state) => state.updateSelectedNode);
     const viewport = useApiConsoleStore((state) => state.viewport);
     const updateViewport = useApiConsoleStore((state) => state.updateViewport);
+    const selectedNode = useApiConsoleStore((state) => state.selectedNode);
     const nodes = useApiConsoleStore((state) => state.nodes);
     const updateNodes = useApiConsoleStore((state) => state.updateNodes);
     const edges = useApiConsoleStore((state) => state.edges);
+    const updateEdges = useApiConsoleStore((state) => state.updateEdges);
+    const nodesInitialized = useNodesInitialized();
+    const prevInitialized = useRef(false);
+
+    // re-layout once after React Flow measures node dimensions for tighter spacing
+    useEffect(() => {
+        if(nodesInitialized && !prevInitialized.current && nodes.length > 0) {
+            const laidOut = layout(nodes, edges);
+            updateNodes(laidOut.nodes.map((n) => ({
+                ...n,
+                selected: selectedNode ? selectedNode.id === n.id : false,
+            })));
+            updateEdges(laidOut.edges);
+        }
+        prevInitialized.current = nodesInitialized;
+    }, [nodesInitialized]);
 
     const onNodesChange = (changes) => {
         updateNodes(applyNodeChanges(changes, nodes));

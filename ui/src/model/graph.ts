@@ -43,7 +43,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                 id: accountNode.id + "-" + envNode.id,
                 source: accountNode.id!,
                 target: envNode.id!,
-                type: "straight"
+                type: "hierarchy"
             });
             if(env.shares) {
                 envNode.data.empty = false;
@@ -70,7 +70,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                         id: envNode.id + "-" + shrNode.id,
                         source: envNode.id!,
                         target: shrNode.id!,
-                        type: "straight"
+                        type: "hierarchy"
                     });
                 });
             }
@@ -96,7 +96,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                         id: envNode.id + "-" + feNode.id,
                         source: envNode.id!,
                         target: feNode.id!,
-                        type: "straight"
+                        type: "hierarchy"
                     });
                 });
             }
@@ -176,22 +176,65 @@ export const nodesEqual = (a: Node[], b: Node[]) => {
 }
 
 export const layout = (nodes, edges): Graph => {
-    if(!nodes) {
-        return { nodes: [], edges: [] };
+    if(!nodes || nodes.length === 0) {
+        return { nodes: nodes || [], edges };
     }
-    let g = tree();
-    if(nodes.length === 0) return { nodes, edges };
-    const width = 100;
-    const height = 75;
+
+    const hierarchyEdges = edges.filter((edge) => edge.type !== "access");
+
+    // compute spacing from measured node dimensions if available
+    let maxWidth = 0;
+    let maxHeight = 0;
+    let hasMeasurements = false;
+    for(const node of nodes) {
+        if(node.measured?.width && node.measured?.height) {
+            hasMeasurements = true;
+            maxWidth = Math.max(maxWidth, node.measured.width);
+            maxHeight = Math.max(maxHeight, node.measured.height);
+        }
+    }
+
+    // use actual node sizes + padding, or compact defaults before first measurement
+    const nodeWidth = hasMeasurements ? maxWidth + 10 : 120;
+    const nodeHeight = hasMeasurements ? (maxHeight + 60) * 2 : 260;
+
     const hierarchy = stratify()
         .id((node) => node.id)
-        .parentId((node) => edges.find((edge) => edge.target === node.id)?.source);
+        .parentId((node) => hierarchyEdges.find((edge) => edge.target === node.id)?.source);
+
     const root = hierarchy(nodes);
-    const layout = g.nodeSize([width * 2, height * 2])(root);
+
+    // sort children: shares left, accesses right
+    root.each((node) => {
+        if(node.children) {
+            node.children.sort((a, b) => {
+                const aType = a.data.type || "";
+                const bType = b.data.type || "";
+                if(aType === "share" && bType === "access") return -1;
+                if(aType === "access" && bType === "share") return 1;
+                return (a.data.id || "").localeCompare(b.data.id || "");
+            });
+        }
+    });
+
+    const g = tree()
+        .nodeSize([nodeWidth, nodeHeight])
+        .separation(() => 1);
+    const laid = g(root);
+
+    // assign lane indices to access edges for distinct routing
+    let accessEdgeIndex = 0;
+    const laneCount = edges.filter(e => e.type === "access").length;
+    const indexedEdges = edges.map((edge) => {
+        if(edge.type === "access") {
+            return { ...edge, data: { ...edge.data, laneIndex: accessEdgeIndex++, laneCount } };
+        }
+        return edge;
+    });
+
     return {
-        nodes: layout
-            .descendants()
+        nodes: laid.descendants()
             .map((node) => ({...node.data, position: {x: node.x, y: node.y}})),
-        edges,
-    } as Graph
+        edges: indexedEdges,
+    } as Graph;
 }
