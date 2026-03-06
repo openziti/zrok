@@ -100,6 +100,11 @@ nfpms:
           owner: zrok-controller
           group: zrok-controller
 
+      - dst: /opt/openziti/etc/zrok2/zrok2-bootstrap.bash
+        src: ./nfpm/zrok2-bootstrap.bash
+        file_info:
+          mode: 0755
+
       - dst: /etc/zrok2
         type: dir
         file_info:
