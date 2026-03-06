@@ -1,0 +1,8 @@
+{
+  "label": "Docker agent",
+  "position": 40,
+  "link": {
+    "type": "doc",
+    "id": "how-tos/docker-agent/index"
+  }
+}
