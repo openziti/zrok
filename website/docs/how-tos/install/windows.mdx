@@ -25,13 +25,13 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
     cd "$env:USERPROFILE\Downloads"
     ```
 
-1. In PowerShell, install zrok in your home directory (`bin\zrok.exe`), and permanently set the executable search path.
+1. In PowerShell, install `zrok2` in your home directory (`bin\zrok2.exe`), and permanently set the executable search path.
 
     ```text
     $binDir = Join-Path -Path $env:USERPROFILE -ChildPath "bin"
     New-Item -Path $binDir -ItemType Directory -ErrorAction SilentlyContinue
     $latest = Get-ChildItem -Path .\zrok*windows*.tar.gz | Sort-Object LastWriteTime | Select-Object -Last 1
-    tar -xf $latest.FullName -C $binDir zrok.exe
+    tar -xf $latest.FullName -C $binDir zrok2.exe
     $currentPath = [System.Environment]::GetEnvironmentVariable('PATH', [System.EnvironmentVariableTarget]::User)
     if ($currentPath -notlike "*$binDir*") {
         $newPath = "$currentPath;$binDir"
@@ -40,7 +40,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
     }
     ```
 
-1. With the `zrok` executable in your path, you can then execute the `zrok2` directly.
+1. With the `zrok2` executable in your path, you can then run the `zrok2` command.
 
     ```text
     zrok2 version
@@ -53,5 +53,5 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
      / /| | | (_) |   <
     /___|_|  \___/|_|\_\
 
-    v0.4.0 [c889005]
+    v2.0.0 [c889005]
     ```
