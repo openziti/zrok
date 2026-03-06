@@ -52,6 +52,145 @@ nfpms:
     # Contents to add to the package.
     contents: []
 
+  - package_name: zrok2-controller
+    id: zrok-controller
+    vendor: NetFoundry
+    homepage: https://zrok.io/
+    maintainer: support@zrok.io
+    description: |-
+      This package provides zrok2-controller.service for running a self-hosted zrok controller.
+      Configure /etc/zrok2/ctrl.yml and run "systemctl enable --now zrok2-controller".
+    license: Apache 2.0
+
+    meta: true
+
+    formats:
+      - deb
+      - rpm
+
+    file_name_template: "{{ .ConventionalFileName }}"
+    umask: 0o002
+    release: 1
+    section: default
+    priority: optional
+
+    dependencies:
+      - zrok2
+
+    scripts:
+      postinstall: ./nfpm/postinstall-controller.bash
+
+    contents:
+      - dst: /lib/systemd/system/
+        src: ./nfpm/zrok2-controller.service
+
+      - dst: /usr/bin/zrok2-controller.bash
+        src: ./nfpm/zrok2-controller.bash
+        file_info:
+          mode: 0755
+
+      - dst: /etc/zrok2/ctrl.yml.example
+        src: ./etc/ctrl.yml
+        file_info:
+          mode: 0640
+          owner: zrok-controller
+          group: zrok-controller
+
+      - dst: /etc/zrok2
+        type: dir
+        file_info:
+          mode: 0755
+          owner: root
+          group: root
+
+  - package_name: zrok2-metrics
+    id: zrok-metrics
+    vendor: NetFoundry
+    homepage: https://zrok.io/
+    maintainer: support@zrok.io
+    description: |-
+      This package provides zrok2-metrics.service for running the zrok controller metrics bridge.
+      Configure /etc/zrok2/ctrl.yml and run "systemctl enable --now zrok2-metrics".
+    license: Apache 2.0
+
+    meta: true
+
+    formats:
+      - deb
+      - rpm
+
+    file_name_template: "{{ .ConventionalFileName }}"
+    umask: 0o002
+    release: 1
+    section: default
+    priority: optional
+
+    dependencies:
+      - zrok2
+
+    scripts:
+      postinstall: ./nfpm/postinstall-metrics.bash
+
+    contents:
+      - dst: /lib/systemd/system/
+        src: ./nfpm/zrok2-metrics.service
+
+      - dst: /usr/bin/zrok2-metrics-bridge.bash
+        src: ./nfpm/zrok2-metrics-bridge.bash
+        file_info:
+          mode: 0755
+
+  - package_name: zrok2-frontend
+    id: zrok-frontend
+    vendor: NetFoundry
+    homepage: https://zrok.io/
+    maintainer: support@zrok.io
+    description: |-
+      This package provides zrok2-frontend.service for running a zrok public frontend.
+      Configure /etc/zrok2/frontend.yml and run "systemctl enable --now zrok2-frontend".
+    license: Apache 2.0
+
+    meta: true
+
+    formats:
+      - deb
+      - rpm
+
+    file_name_template: "{{ .ConventionalFileName }}"
+    umask: 0o002
+    release: 1
+    section: default
+    priority: optional
+
+    dependencies:
+      - zrok2
+
+    scripts:
+      postinstall: ./nfpm/postinstall-frontend.bash
+
+    contents:
+      - dst: /lib/systemd/system/
+        src: ./nfpm/zrok2-frontend.service
+
+      - dst: /usr/bin/zrok2-frontend.bash
+        src: ./nfpm/zrok2-frontend.bash
+        file_info:
+          mode: 0755
+
+      - dst: /etc/zrok2/frontend.yml.example
+        src: ./etc/dynamicProxy.yml
+        file_info:
+          mode: 0640
+          owner: zrok-frontend
+          group: zrok-frontend
+
+      - dst: /etc/zrok2
+        type: dir
+        file_info:
+          mode: 0755
+          owner: root
+          group: root
+
   - package_name: zrok2-agent
     id: zrok-agent
     vendor: NetFoundry
