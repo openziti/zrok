@@ -37,8 +37,8 @@ This opens the agent UI in your browser. You can create and monitor shares from 
 
 For reliable, always-on shares, install the agent as a system service:
 
-- **Windows** — [Set up the Windows agent service](../how-tos/agent/windows-service/)
-- **Linux** — [Install the Linux agent package `zrok2-agent`](../how-tos/agent/linux-service)
+- **Windows** — [Set up the Windows agent service](../../how-tos/agent/windows-service/)
+- **Linux** — [Install the Linux agent package `zrok2-agent`](../../how-tos/agent/linux-service)
 
 :::note
 A native macOS agent package is not yet available. macOS users can run `zrok2 agent` in the foreground or use a
@@ -48,6 +48,6 @@ third-party process manager.
 Once the agent is running, use `zrok2 reserve` and `zrok2 share reserved` to create persistent shares that the agent
 restarts automatically after a reboot.
 
-For more detail on what the agent can do, see [Use the zrok Agent](../how-tos/agent/).
+For more detail on what the agent can do, see [Use the zrok Agent](../../how-tos/agent/).
 
 <div style={{marginBottom: '2rem'}} />
