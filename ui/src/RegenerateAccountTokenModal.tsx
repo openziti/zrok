@@ -40,7 +40,6 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
                     email: user.email!,
                     token: d.accountToken!,
                 }
-                console.log(user, newUser);
                 updateUser(newUser);
                 localStorage.setItem("user", JSON.stringify(newUser));
                 document.dispatchEvent(new Event("userUpdated"));
@@ -56,7 +55,6 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
                     setErrorMessage(<Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
                         <Typography color="red">{ex.message}</Typography>
                     </Grid2>);
-                    console.log("releaseAccess", ex.message);
                 });
             });
     }

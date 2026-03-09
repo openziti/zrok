@@ -16,7 +16,6 @@ const ForgotPasswordForm = ({ doRequest }: ForgotPasswordFormProps) => {
             email: ""
         },
         onSubmit: v => {
-            console.log(v);
             doRequest(v.email);
         },
         validationSchema: Yup.object({
@@ -74,14 +73,11 @@ const RequestSubmittedMessage = () => {
 
 const ForgotPassword = () => {
     const requestResetPassword = (email) => {
-        console.log("requestResetPassword", email);
         new AccountApi().resetPasswordRequest({body: {emailAddress: email}})
             .then(() => {
                 setControl(<RequestSubmittedMessage />);
             })
-            .catch(e => {
-                console.log("resetPasswordRequest", e);
-            })
+            .catch(() => {})
     }
 
     const [control, setControl] = useState<React.JSX.Element>(<ForgotPasswordForm doRequest={requestResetPassword} />);

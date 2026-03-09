@@ -55,9 +55,7 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
                 delete env.zId;
                 setDetail(env);
             })
-            .catch(e => {
-                console.log("EnvironmentPanel", e);
-            })
+            .catch(() => {})
     }, [environment]);
 
     return (

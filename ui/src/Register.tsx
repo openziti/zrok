@@ -26,7 +26,6 @@ const SetPasswordForm = ({ email, touLink, register }: SetPasswordFormProps) => 
             confirm: "",
         },
         onSubmit: v => {
-            console.log(v);
             register(v);
         },
         validationSchema: Yup.object({
@@ -190,24 +189,19 @@ const Register = () => {
     const doRegistration = (v) => {
         new AccountApi().register({body: {registerToken: regToken, password: v.password}})
             .then(d => {
-                console.log(d);
                 setComponent(<RegistrationComplete token={d.accountToken!} />);
             })
-            .catch(e => {
-                console.log("doRegistration", e);
-            });
+            .catch(() => {});
     }
 
     useEffect(() => {
         if(regToken) {
             new AccountApi().verify({body: {registerToken: regToken}})
                 .then((d) => {
-                    console.log(d);
                     setEmail(d.email);
                 })
-                .catch(e => {
+                .catch(() => {
                     setError(true);
-                    console.log("error", e);
                 });
         }
     }, [regToken]);
@@ -218,11 +212,7 @@ const Register = () => {
                 .then(d => {
                     setTouLink(d.touLink);
                 })
-                .catch(e => {
-                    e.response.json().then(ex => {
-                        console.log("register", ex.message);
-                    })
-                });
+                .catch(() => {});
         }
     }, [email]);
 

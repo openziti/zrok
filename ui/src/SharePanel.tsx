@@ -87,9 +87,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
                 }
                 setDetail(d);
             })
-            .catch(e => {
-                console.log("SharePanel", e);
-            })
+            .catch(() => {})
     }, [share]);
 
     return (

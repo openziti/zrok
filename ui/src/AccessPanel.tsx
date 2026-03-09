@@ -35,9 +35,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
                 delete d.description;
                 setDetail(d);
             })
-            .catch(e => {
-                console.log("AccessPanel", e);
-            })
+            .catch(() => {})
     }, [access]);
 
     const customProperties = {

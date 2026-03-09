@@ -96,7 +96,6 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                 updateLimited(d.accountLimited!);
                 let newVov = mergeGraph(oldGraph.current, user, d.accountLimited!, d);
                 if(!nodesEqual(oldGraph.current.nodes, newVov.nodes)) {
-                    console.log("refreshed vov", oldGraph.current.nodes, newVov.nodes);
                     updateGraph(newVov);
                     oldGraph.current = newVov;
 
@@ -118,9 +117,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                     updateEdges(laidOut.edges);
                 }
             })
-            .catch(e => {
-                console.log(e);
-            });
+            .catch(() => {});
     }
 
     const retrieveSparklines = () => {
@@ -158,8 +155,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                     updateSparkdata(new Map<string, Number[]>());
                 }
             })
-            .catch(e => {
-                console.log("getSparklines", e);
+            .catch(() => {
             });
     }
 

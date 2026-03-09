@@ -25,29 +25,17 @@ const EnvironmentMetricsModal = ({ close, isOpen, user, environment }: Environme
             .then(d => {
                 setMetrics30(buildMetrics(d));
             })
-            .catch(e => {
-                e.response.json().then(ex => {
-                    console.log("environmentMetricsModal", ex.message);
-                });
-            });
+            .catch(() => {});
         metadataApi.getAccountMetrics({envId: String(environment.data.envZId), duration: "168h"})
             .then(d => {
                 setMetrics7(buildMetrics(d));
             })
-            .catch(e => {
-                e.response.json().then(ex => {
-                    console.log("environmentMetricsModal", ex.message);
-                });
-            });
+            .catch(() => {});
         metadataApi.getAccountMetrics({envId: String(environment.data.envZId), duration: "24h"})
             .then(d => {
                 setMetrics1(buildMetrics(d));
             })
-            .catch(e => {
-                e.response.json().then(ex => {
-                    console.log("environmentMetricsModal", ex.message);
-                });
-            });
+            .catch(() => {});
     }, [isOpen, environment]);
 
     return (

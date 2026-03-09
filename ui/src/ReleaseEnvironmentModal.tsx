@@ -46,10 +46,7 @@ const ReleaseEnvironmentModal = ({ close, isOpen, user, environment, detail }: R
                 .then(() => {
                     close();
                 })
-                .catch(e => {
-                    e.response.json().then(ex => {
-                        console.log("releaseEnvironment", ex.message);
-                    });
+                .catch(() => {
                     setErrorMessage(<Typography color="red">An error occurred releasing your environment <code>{environment.id}</code>!</Typography>);
                     setTimeout(() => {
                         setErrorMessage(null);

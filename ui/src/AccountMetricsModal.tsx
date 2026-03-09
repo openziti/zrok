@@ -23,29 +23,17 @@ const AccountMetricsModal = ({ close, isOpen, user }: AccountMetricsModalProps) 
             .then(d => {
                 setMetrics30(buildMetrics(d));
             })
-            .catch(e => {
-                e.response.json().then(ex => {
-                    console.log("accountMetricsModal", ex.message);
-                });
-            });
+            .catch(() => {});
         metadataApi.getAccountMetrics({duration: "168h"})
             .then(d => {
                 setMetrics7(buildMetrics(d));
             })
-            .catch(e => {
-                e.response.json().then(ex => {
-                    console.log("accountMetricsModal", ex.message);
-                });
-            });
+            .catch(() => {});
         metadataApi.getAccountMetrics({duration: "24h"})
             .then(d => {
                 setMetrics1(buildMetrics(d));
             })
-            .catch(e => {
-                e.response.json().then(ex => {
-                    console.log("accountMetricsModal", ex.message);
-                });
-            });
+            .catch(() => {});
     }, [isOpen]);
 
     return (

@@ -20,7 +20,6 @@ const Login = ({ onLogin }: LoginProps) => {
     useEffect(() => {
         new MetadataApi()._configuration()
             .then(d => {
-                console.log("d", d);
                 if(d.touLink && d.touLink.trim() !== "") {
                     setTou(d.touLink);
                 }
@@ -28,9 +27,7 @@ const Login = ({ onLogin }: LoginProps) => {
                     setNewAccountLink(d.newAccountLink)
                 }
             })
-            .catch(e => {
-                console.log(e);
-            });
+            .catch(() => {});
     }, []);
 
     const login = async e => {
@@ -40,8 +37,7 @@ const Login = ({ onLogin }: LoginProps) => {
             .then(d => {
                 onLogin({email: email, token: d.toString()});
             })
-            .catch(e => {
-                console.log(e);
+            .catch(() => {
                 setMessage("login failed!")
             });
     }

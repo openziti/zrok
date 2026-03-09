@@ -25,29 +25,17 @@ const ShareMetricsModal = ({ close, isOpen, user, share }: ShareMetricsModalProp
             .then(d => {
                 setMetrics30(buildMetrics(d));
             })
-            .catch(e => {
-                e.response.json().then(ex => {
-                    console.log("shareMetricsModal", ex.message);
-                });
-            });
+            .catch(() => {});
         metadataApi.getShareMetrics({shareToken: share.id, duration: "168h"})
             .then(d => {
                 setMetrics7(buildMetrics(d));
             })
-            .catch(e => {
-                e.response.json().then(ex => {
-                    console.log("shareMetricsModal", ex.message);
-                });
-            });
+            .catch(() => {});
         metadataApi.getShareMetrics({shareToken: share.id, duration: "24h"})
             .then(d => {
                 setMetrics1(buildMetrics(d));
             })
-            .catch(e => {
-                e.response.json().then(ex => {
-                    console.log("shareMetricsModal", ex.message);
-                });
-            });
+            .catch(() => {});
     }, [isOpen, share]);
 
     return (

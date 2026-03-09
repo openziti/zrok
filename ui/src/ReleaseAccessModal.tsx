@@ -48,10 +48,7 @@ const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAcce
                 .then(() => {
                     close();
                 })
-                .catch(e => {
-                    e.response.json().then(ex => {
-                        console.log("releaseAccess", ex.message);
-                    });
+                .catch(() => {
                     setErrorMessage(<Typography color="red">An error occurred releasing your access <code>{detail.frontendToken}</code>!</Typography>);
                     setTimeout(() => {
                         setErrorMessage(null);

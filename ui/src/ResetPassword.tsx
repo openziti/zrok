@@ -144,9 +144,8 @@ const ResetPassword = () => {
             .then(() => {
                 setComponent(<ResetComplete />);
             })
-            .catch(e => {
+            .catch(() => {
                 setComponent(<ResetFailed />);
-                console.log("doReset", e);
             });
     }
 

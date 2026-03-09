@@ -45,13 +45,10 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
                     reserved: detail.reserved
                 }
             })
-                .then(d => {
+                .then(() => {
                     close();
                 })
-                .catch(e => {
-                    e.response.json().then(ex => {
-                        console.log("releaseShare", ex.message);
-                    });
+                .catch(() => {
                     setErrorMessage(<Typography color="red">An error occurred releasing your share <code>{detail.shareToken}</code>!</Typography>);
                     setTimeout(() => {
                         setErrorMessage(null);
