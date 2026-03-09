@@ -1,7 +1,8 @@
 import {JSX, useCallback, useEffect, useRef, useState} from "react";
 import {Graph, focusGraph, layout, mergeGraph, nodesEqual} from "./model/graph.ts";
-import {Grid2, IconButton, Typography} from "@mui/material";
+import {Box, Button, Grid2, IconButton, Typography} from "@mui/material";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
+import ErrorBoundary from "./ErrorBoundary.tsx";
 import NavBar from "./NavBar.tsx";
 import Visualizer from "./Visualizer.tsx";
 import AccountPanel from "./AccountPanel.tsx";
@@ -227,9 +228,16 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             <div style={{ position: "relative" }}>
                 <Grid2 container spacing={2} columns={{ xs: 4, sm: 10, md: 12 }}>
                     <Grid2 size="grow">
-                        {mainPanel}
+                        <ErrorBoundary fallback={({ reset }) => (
+                            <Box sx={{ p: 3, textAlign: "center" }}>
+                                <Typography color="error">The view encountered an error.</Typography>
+                                <Button onClick={reset} variant="outlined" sx={{ mt: 1 }}>Try Again</Button>
+                            </Box>
+                        )}>
+                            {mainPanel}
+                        </ErrorBoundary>
                     </Grid2>
-                    {sidePanel && !panelMinimized ? <Grid2 container size={4}><Grid2 >{sidePanel}</Grid2></Grid2> : null}
+                    {sidePanel && !panelMinimized ? <Grid2 container size={4}><Grid2><ErrorBoundary key={selectedNode?.id}>{sidePanel}</ErrorBoundary></Grid2></Grid2> : null}
                 </Grid2>
                 {sidePanel && panelMinimized ? (
                     <div style={{ position: "absolute", top: 16, right: 16, zIndex: 5, display: "flex", alignItems: "center", gap: 4, background: "rgba(36, 23, 117, 0.85)", borderRadius: 8, padding: "4px 12px" }}>
