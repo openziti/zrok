@@ -50,7 +50,7 @@ const useApiConsoleStore = create<StoreState & StoreAction>((set) => ({
     sorting: [{id: "data.label", desc: false}] as MRT_SortingState,
     updateUser: (user) => set({user: user}),
     updateLimited: (limited) => set({limited: limited}),
-    updateGraph: (vov) => set({overview: vov}),
+    updateGraph: (vov) => set({graph: vov}),
     updateEnvironments: (environments) => set({environments: environments}),
     updateSparkdata: (sparkdata) => set({sparkdata: sparkdata}),
     updateNodes: (nodes) => set({nodes: nodes}),
