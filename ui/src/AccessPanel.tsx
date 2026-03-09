@@ -32,10 +32,8 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
     useEffect(() => {
         getMetadataApi(user).getFrontendDetail({frontendId: access.data.feId as number})
             .then(d => {
-                delete d.id;
-                delete d.zId;
-                delete d.description;
-                setDetail(d);
+                const { id, zId, description, ...rest } = d;
+                setDetail(rest as Frontend);
             })
             .catch(async (e) => {
                 const msg = await extractErrorMessage(e, "failed to load access details");

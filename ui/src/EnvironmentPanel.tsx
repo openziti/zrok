@@ -51,11 +51,8 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
     useEffect(() => {
         getMetadataApi(user).getEnvironmentDetail({envZId: environment.data!.envZId! as string})
             .then(d => {
-                let env = d.environment!;
-                delete env.activity;
-                delete env.limited;
-                delete env.zId;
-                setDetail(env);
+                const { activity, limited, zId, ...rest } = d.environment!;
+                setDetail(rest as Environment);
             })
             .catch(async (e) => {
                 const msg = await extractErrorMessage(e, "failed to load environment details");

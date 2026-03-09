@@ -81,13 +81,13 @@ const SharePanel = ({ share }: SharePanelProps) => {
     useEffect(() => {
         getMetadataApi(user).getShareDetail({ shareToken: share.data!.shareToken! as string })
             .then(d => {
-                delete d.activity;
-                delete d.limited;
-                delete d.zId;
-                if(d.shareMode === "private") {
-                    delete d.frontendEndpoints;
+                const { activity, limited, zId, ...rest } = d;
+                if(rest.shareMode === "private") {
+                    const { frontendEndpoints, ...withoutEndpoints } = rest;
+                    setDetail(withoutEndpoints as Share);
+                } else {
+                    setDetail(rest as Share);
                 }
-                setDetail(d);
             })
             .catch(async (e) => {
                 const msg = await extractErrorMessage(e, "failed to load share details");
