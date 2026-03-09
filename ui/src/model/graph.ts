@@ -12,7 +12,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
     let newVov = new Graph();
 
     let accountNode = {
-        id: u.token,
+        id: u.email,
         data: {
             label: u.email,
             limited: limited
