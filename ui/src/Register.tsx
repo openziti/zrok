@@ -202,23 +202,27 @@ const Register = () => {
 
     useEffect(() => {
         if(regToken) {
-            new AccountApi().verify({body: {registerToken: regToken}})
+            const controller = new AbortController();
+            new AccountApi().verify({body: {registerToken: regToken}}, { signal: controller.signal })
                 .then((d) => {
                     setEmail(d.email);
                 })
                 .catch(() => {
                     setError(true);
                 });
+            return () => controller.abort();
         }
     }, [regToken]);
 
     useEffect(() => {
         if(email) {
-            new MetadataApi()._configuration()
+            const controller = new AbortController();
+            new MetadataApi()._configuration({ signal: controller.signal })
                 .then(d => {
                     setTouLink(d.touLink);
                 })
                 .catch(() => {});
+            return () => controller.abort();
         }
     }, [email]);
 

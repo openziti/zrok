@@ -1,5 +1,11 @@
 import {ResponseError, FetchError} from "../api/runtime";
 
+export function isAbortError(e: unknown): boolean {
+    if (e instanceof DOMException && e.name === "AbortError") return true;
+    if (e instanceof FetchError && e.cause?.name === "AbortError") return true;
+    return false;
+}
+
 export async function extractErrorMessage(e: unknown, fallback = "an error occurred"): Promise<string> {
     if (e instanceof ResponseError) {
         try {

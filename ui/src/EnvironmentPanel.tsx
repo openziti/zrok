@@ -12,7 +12,7 @@ import {getMetadataApi} from "./model/api.ts";
 import MetricsIcon from "@mui/icons-material/QueryStats";
 import EnvironmentMetricsModal from "./EnvironmentMetricsModal.tsx";
 import BandwidthLimitedWarning from "./BandwidthLimitedWarning.tsx";
-import {extractErrorMessage} from "./model/errors.ts";
+import {extractErrorMessage, isAbortError} from "./model/errors.ts";
 
 interface EnvironmentPanelProps {
     environment: Node;
@@ -49,16 +49,19 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
     }
 
     useEffect(() => {
-        getMetadataApi(user).getEnvironmentDetail({envZId: environment.data!.envZId! as string})
+        const controller = new AbortController();
+        getMetadataApi(user).getEnvironmentDetail({envZId: environment.data!.envZId! as string}, { signal: controller.signal })
             .then(d => {
                 const { activity, limited, zId, ...rest } = d.environment!;
                 setDetail(rest as Environment);
             })
             .catch(async (e) => {
+                if (isAbortError(e)) return;
                 const msg = await extractErrorMessage(e, "failed to load environment details");
                 setErrorMessage(msg);
             })
-    }, [environment]);
+        return () => controller.abort();
+    }, [environment.data.envZId]);
 
     return (
         <>

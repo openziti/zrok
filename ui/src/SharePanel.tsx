@@ -12,7 +12,7 @@ import ClipboardText from "./ClipboardText.tsx";
 import MetricsIcon from "@mui/icons-material/QueryStats";
 import ShareMetricsModal from "./ShareMetricsModal.tsx";
 import BandwidthLimitedWarning from "./BandwidthLimitedWarning.tsx";
-import {extractErrorMessage} from "./model/errors.ts";
+import {extractErrorMessage, isAbortError} from "./model/errors.ts";
 
 interface SharePanelProps {
     share: Node;
@@ -79,7 +79,8 @@ const SharePanel = ({ share }: SharePanelProps) => {
     }
 
     useEffect(() => {
-        getMetadataApi(user).getShareDetail({ shareToken: share.data!.shareToken! as string })
+        const controller = new AbortController();
+        getMetadataApi(user).getShareDetail({ shareToken: share.data!.shareToken! as string }, { signal: controller.signal })
             .then(d => {
                 const { activity, limited, zId, ...rest } = d;
                 if(rest.shareMode === "private") {
@@ -90,10 +91,12 @@ const SharePanel = ({ share }: SharePanelProps) => {
                 }
             })
             .catch(async (e) => {
+                if (isAbortError(e)) return;
                 const msg = await extractErrorMessage(e, "failed to load share details");
                 setErrorMessage(msg);
             })
-    }, [share]);
+        return () => controller.abort();
+    }, [share.id]);
 
     return (
         <>

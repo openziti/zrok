@@ -10,7 +10,7 @@ import ReleaseAccessModal from "./ReleaseAccessModal.tsx";
 import {getMetadataApi} from "./model/api.ts";
 import ClipboardText from "./ClipboardText.tsx";
 import BandwidthLimitedWarning from "./BandwidthLimitedWarning.tsx";
-import {extractErrorMessage} from "./model/errors.ts";
+import {extractErrorMessage, isAbortError} from "./model/errors.ts";
 
 interface AccessPanelProps {
     access: Node;
@@ -30,16 +30,19 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
     }
 
     useEffect(() => {
-        getMetadataApi(user).getFrontendDetail({frontendId: access.data.feId as number})
+        const controller = new AbortController();
+        getMetadataApi(user).getFrontendDetail({frontendId: access.data.feId as number}, { signal: controller.signal })
             .then(d => {
                 const { id, zId, description, ...rest } = d;
                 setDetail(rest as Frontend);
             })
             .catch(async (e) => {
+                if (isAbortError(e)) return;
                 const msg = await extractErrorMessage(e, "failed to load access details");
                 setErrorMessage(msg);
             })
-    }, [access]);
+        return () => controller.abort();
+    }, [access.data.feId]);
 
     const customProperties = {
         bindAddress: row => <>

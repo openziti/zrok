@@ -19,7 +19,8 @@ const Login = ({ onLogin }: LoginProps) => {
     const [newAccountLink, setNewAccountLink] = useState<string>("");
 
     useEffect(() => {
-        new MetadataApi()._configuration()
+        const controller = new AbortController();
+        new MetadataApi()._configuration({ signal: controller.signal })
             .then(d => {
                 if(d.touLink && d.touLink.trim() !== "") {
                     setTou(d.touLink);
@@ -29,6 +30,7 @@ const Login = ({ onLogin }: LoginProps) => {
                 }
             })
             .catch(() => {});
+        return () => controller.abort();
     }, []);
 
     const login = async e => {

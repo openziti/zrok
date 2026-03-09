@@ -91,8 +91,8 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         }
     }, []);
 
-    const retrieveOverview = () => {
-        getMetadataApi(userRef.current).overview()
+    const retrieveOverview = (signal?: AbortSignal) => {
+        getMetadataApi(userRef.current).overview({ signal })
             .then(d => {
                 updateLimited(d.accountLimited!);
                 let newVov = mergeGraph(oldGraph.current, user, d.accountLimited!, d);
@@ -121,7 +121,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             .catch(() => {});
     }
 
-    const retrieveSparklines = () => {
+    const retrieveSparklines = (signal?: AbortSignal) => {
         let environments: string[] = [];
         let shares: string[] = [];
         if(nodesRef.current) {
@@ -135,7 +135,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             });
         }
 
-        getMetadataApi(user).getSparklines({body: {environments: environments, shares: shares}})
+        getMetadataApi(user).getSparklines({body: {environments: environments, shares: shares}}, { signal })
             .then(d => {
                 if(d.sparklines) {
                     let sparkdataIn = new Map<string, Number[]>();
@@ -176,24 +176,23 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     }, [handleKeyPress]);
 
     useEffect(() => {
-        retrieveOverview();
-        let mounted = true;
-        let interval = setInterval(() => {
-            if(mounted) {
-                retrieveOverview();
-            }
-        }, 1000);
+        const controller = new AbortController();
+        const doRetrieve = () => retrieveOverview(controller.signal);
+        doRetrieve();
+        let interval = setInterval(doRetrieve, 1000);
         return () => {
-            mounted = false;
+            controller.abort();
             clearInterval(interval);
         }
     }, []);
 
     useEffect(() => {
+        const controller = new AbortController();
         let interval = setInterval(() => {
-            retrieveSparklines();
+            retrieveSparklines(controller.signal);
         }, 5000);
         return () => {
+            controller.abort();
             clearInterval(interval);
         }
     }, []);

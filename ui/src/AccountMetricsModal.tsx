@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import {buildMetrics} from "./model/util.ts";
 import {getMetadataApi} from "./model/api.ts";
 import MetricsGraph from "./MetricsGraph.tsx";
-import {extractErrorMessage} from "./model/errors.ts";
+import {extractErrorMessage, isAbortError} from "./model/errors.ts";
 
 interface AccountMetricsModalProps {
     close: () => void;
@@ -20,32 +20,38 @@ const AccountMetricsModal = ({ close, isOpen, user }: AccountMetricsModalProps) 
     const [errorMessage, setErrorMessage] = useState<string>("");
 
     useEffect(() => {
+        if (!isOpen) return;
+        const controller = new AbortController();
         setErrorMessage("");
         let metadataApi = getMetadataApi(user);
-        metadataApi.getAccountMetrics()
+        metadataApi.getAccountMetrics(undefined, { signal: controller.signal })
             .then(d => {
                 setMetrics30(buildMetrics(d));
             })
             .catch(async (e) => {
+                if (isAbortError(e)) return;
                 const msg = await extractErrorMessage(e, "unable to load metrics");
                 setErrorMessage(msg);
             });
-        metadataApi.getAccountMetrics({duration: "168h"})
+        metadataApi.getAccountMetrics({duration: "168h"}, { signal: controller.signal })
             .then(d => {
                 setMetrics7(buildMetrics(d));
             })
             .catch(async (e) => {
+                if (isAbortError(e)) return;
                 const msg = await extractErrorMessage(e, "unable to load metrics");
                 setErrorMessage(msg);
             });
-        metadataApi.getAccountMetrics({duration: "24h"})
+        metadataApi.getAccountMetrics({duration: "24h"}, { signal: controller.signal })
             .then(d => {
                 setMetrics1(buildMetrics(d));
             })
             .catch(async (e) => {
+                if (isAbortError(e)) return;
                 const msg = await extractErrorMessage(e, "unable to load metrics");
                 setErrorMessage(msg);
             });
+        return () => controller.abort();
     }, [isOpen]);
 
     return (
