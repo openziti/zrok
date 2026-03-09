@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import {useEffect, useRef, useState} from "react";
 import {AccountApi, MetadataApi} from "./api";
 import ClipboardText from "./ClipboardText.tsx";
+import {sanitizeHtml} from "./model/html.ts";
 
 interface SetPasswordFormProps {
     email: string;
@@ -81,7 +82,7 @@ const SetPasswordForm = ({ email, touLink, register }: SetPasswordFormProps) => 
                 helperText={form.errors.confirm}
                 sx={{ mt: 2 }}
             />
-            <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I accept the <span dangerouslySetInnerHTML={{__html: touLink as string}}></span></p>} sx={{ mt: 2 }} />
+            <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I accept the <span dangerouslySetInnerHTML={{__html: sanitizeHtml(touLink ?? "")}}></span></p>} sx={{ mt: 2 }} />
             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} style={{ color: "#9bf316" }} disabled={!checked}>
                 Register Account
             </Button>

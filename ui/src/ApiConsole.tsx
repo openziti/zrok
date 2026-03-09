@@ -47,8 +47,8 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const [panelMinimized, setPanelMinimized] = useState<boolean>(false);
     const panelMinimizedRef = useRef<boolean>(false);
     panelMinimizedRef.current = panelMinimized;
-
-    let visualizer = true;
+    const visualizerRef = useRef<boolean>(true);
+    visualizerRef.current = visualizerEnabled;
 
     const applyFocusAndLayout = (graph: Graph, newFocusId: string | null) => {
         updateFocusNodeId(newFocusId);
@@ -67,13 +67,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
 
     const handleKeyPress = useCallback((event) => {
         if(event.ctrlKey === true && event.key === '`') {
-            setVisualizerEnabled(!visualizer);
-            visualizer = !visualizer;
-            if(visualizer) {
-                setMainPanel(<Visualizer />);
-            } else {
-                setMainPanel(<TabularView />);
-            }
+            setVisualizerEnabled(!visualizerRef.current);
             return;
         }
         let tag = (event.target as HTMLElement)?.tagName?.toLowerCase();
@@ -170,8 +164,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     }
 
     useEffect(() => {
-        visualizer = visualizerEnabled;
-        if(visualizer) {
+        if(visualizerEnabled) {
             setMainPanel(<Visualizer />);
         } else {
             setMainPanel(<TabularView />);

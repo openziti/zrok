@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {AccountApi, MetadataApi} from "./api";
 import {Link} from "react-router";
 import zroket from "./assets/zrok-1.0.0-rocket-purple.svg";
+import {sanitizeHtml} from "./model/html.ts";
 
 interface LoginProps {
     onLogin: (user: User) => void;
@@ -92,10 +93,10 @@ const Login = ({ onLogin }: LoginProps) => {
                             <Link to="/forgotPassword">Forgot Password?</Link>
                         </Box>
                         <Box component="div" style={{ textAlign: "center" }}>
-                            <div dangerouslySetInnerHTML={{__html: newAccountLink}}></div>
+                            <div dangerouslySetInnerHTML={{__html: sanitizeHtml(newAccountLink)}}></div>
                         </Box>
                         <Box component="div" style={{ textAlign: "center" }}>
-                            <div dangerouslySetInnerHTML={{__html: tou}}></div>
+                            <div dangerouslySetInnerHTML={{__html: sanitizeHtml(tou)}}></div>
                         </Box>
                     </Box>
                 </Box>
