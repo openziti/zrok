@@ -49,7 +49,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                 envNode.data.empty = false;
                 env.shares.forEach(shr => {
                     let shrLabel = shr.shareToken!;
-                    if(shr.target !== "") {
+                    if(shr.target) {
                         shrLabel = shr.target!;
                     }
                     let shrNode = {
@@ -80,7 +80,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                     let feNode = {
                         id: fe.frontendToken!,
                         data: {
-                            label: fe.frontendToken!,
+                            label: fe.bindAddress ? fe.bindAddress : fe.frontendToken!,
                             feId: fe.id,
                             target: fe.shareToken,
                             bindAddress: fe.bindAddress,
