@@ -12,6 +12,7 @@ import {getMetadataApi} from "./model/api.ts";
 import MetricsIcon from "@mui/icons-material/QueryStats";
 import EnvironmentMetricsModal from "./EnvironmentMetricsModal.tsx";
 import BandwidthLimitedWarning from "./BandwidthLimitedWarning.tsx";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface EnvironmentPanelProps {
     environment: Node;
@@ -20,6 +21,7 @@ interface EnvironmentPanelProps {
 const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
     const user = useApiConsoleStore((state) => state.user);
     const [detail, setDetail] = useState<Environment>(null);
+    const [errorMessage, setErrorMessage] = useState<string>("");
     const [environmentMetricsOpen, setEnvironmentMetricsOpen] = useState<boolean>(false);
     const openEnvironmentMetrics = () => {
         setEnvironmentMetricsOpen(true);
@@ -55,7 +57,10 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
                 delete env.zId;
                 setDetail(env);
             })
-            .catch(() => {})
+            .catch(async (e) => {
+                const msg = await extractErrorMessage(e, "failed to load environment details");
+                setErrorMessage(msg);
+            })
     }, [environment]);
 
     return (
@@ -68,6 +73,7 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
                 <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2, p: 0 }} alignItems="center">
                     <h5 style={{ margin: 0 }}>An environment on a host with address <code>{detail ? detail.address : ''}</code></h5>
                 </Grid2>
+                { errorMessage && <Typography color="error" sx={{ mb: 2 }}>{errorMessage}</Typography> }
                 { environment.data.limited ? <BandwidthLimitedWarning /> : null }
                 <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                     <Tooltip title="Environment Metrics">

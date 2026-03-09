@@ -5,6 +5,7 @@ import {Box, Button, Grid2, Modal, TextField, Typography} from "@mui/material";
 import {useFormik} from "formik";
 import * as Yup from 'yup';
 import {getAccountApi} from "./model/api.ts";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface AccountPasswordChangeModalProps {
     close: () => void;
@@ -36,8 +37,9 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
                     setBottomControl(<Typography>Your password has been changed!</Typography>);
                     setTimeout(() => { close() }, 3000);
                 })
-                .catch(e => {
-                    setErrorMessage(<Typography color="red">Password change failed! Check your current password!</Typography>);
+                .catch(async (e) => {
+                    const msg = await extractErrorMessage(e, "password change failed");
+                    setErrorMessage(<Typography color="red">{msg}</Typography>);
                 })
         },
         validationSchema: Yup.object({

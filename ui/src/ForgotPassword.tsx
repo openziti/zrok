@@ -5,6 +5,7 @@ import {AccountApi} from "./api";
 import {useFormik} from "formik";
 import * as Yup from 'yup';
 import {useState} from "react";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface ForgotPasswordFormProps {
     doRequest: ({ email: string }) => void;
@@ -77,7 +78,22 @@ const ForgotPassword = () => {
             .then(() => {
                 setControl(<RequestSubmittedMessage />);
             })
-            .catch(() => {})
+            .catch(async (e) => {
+                const msg = await extractErrorMessage(e, "password reset request failed");
+                setControl(
+                    <Paper sx={{ p: 5 }}>
+                        <Box component="div">
+                            <Typography component="div" align="center"><h2>Request Failed</h2></Typography>
+                            <Typography component="div" color="error" align="center">
+                                <p>{msg}</p>
+                            </Typography>
+                            <Box component="div" style={{ textAlign: "center" }}>
+                                <Link to="/">Return to Login</Link>
+                            </Box>
+                        </Box>
+                    </Paper>
+                );
+            })
     }
 
     const [control, setControl] = useState<React.JSX.Element>(<ForgotPasswordForm doRequest={requestResetPassword} />);

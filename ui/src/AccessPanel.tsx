@@ -10,6 +10,7 @@ import ReleaseAccessModal from "./ReleaseAccessModal.tsx";
 import {getMetadataApi} from "./model/api.ts";
 import ClipboardText from "./ClipboardText.tsx";
 import BandwidthLimitedWarning from "./BandwidthLimitedWarning.tsx";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface AccessPanelProps {
     access: Node;
@@ -19,6 +20,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
     const user = useApiConsoleStore((state) => state.user);
     const limited = useApiConsoleStore((state) => state.limited);
     const [detail, setDetail] = useState<Frontend>(null);
+    const [errorMessage, setErrorMessage] = useState<string>("");
     const [releaseAccessOpen, setReleaseAccessOpen] = useState<boolean>(false);
     const openReleaseAccess = () => {
         setReleaseAccessOpen(true);
@@ -35,7 +37,10 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
                 delete d.description;
                 setDetail(d);
             })
-            .catch(() => {})
+            .catch(async (e) => {
+                const msg = await extractErrorMessage(e, "failed to load access details");
+                setErrorMessage(msg);
+            })
     }, [access]);
 
     const customProperties = {
@@ -90,6 +95,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
                         <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2, p: 0 }} alignItems="center">
                             <h5 style={{ margin: 0 }}>A private access frontend {detail && detail.bindAddress ? <span>at <code>{detail.bindAddress}</code></span> : <span>with frontend token <code>{detail?.frontendToken}</code></span>}</h5>
                         </Grid2>
+                        { errorMessage && <Typography color="error" sx={{ mb: 2 }}>{errorMessage}</Typography> }
                         { limited ? <BandwidthLimitedWarning /> : null }
                         <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                             <Tooltip title="Release Access">

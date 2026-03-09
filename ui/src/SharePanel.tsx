@@ -12,6 +12,7 @@ import ClipboardText from "./ClipboardText.tsx";
 import MetricsIcon from "@mui/icons-material/QueryStats";
 import ShareMetricsModal from "./ShareMetricsModal.tsx";
 import BandwidthLimitedWarning from "./BandwidthLimitedWarning.tsx";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface SharePanelProps {
     share: Node;
@@ -20,6 +21,7 @@ interface SharePanelProps {
 const SharePanel = ({ share }: SharePanelProps) => {
     const user = useApiConsoleStore((state) => state.user);
     const [detail, setDetail] = useState<Share>(null);
+    const [errorMessage, setErrorMessage] = useState<string>("");
     const [shareMetricsOpen, setShareMetricsOpen] = useState<boolean>(false);
     const openShareMetrics = () => {
         setShareMetricsOpen(true);
@@ -87,7 +89,10 @@ const SharePanel = ({ share }: SharePanelProps) => {
                 }
                 setDetail(d);
             })
-            .catch(() => {})
+            .catch(async (e) => {
+                const msg = await extractErrorMessage(e, "failed to load share details");
+                setErrorMessage(msg);
+            })
     }, [share]);
 
     return (
@@ -100,6 +105,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
                 <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2 }} alignItems="center">
                     <h5 style={{ margin: 0 }}>A {detail ? detail.shareMode : ''}{detail && detail.reserved ? ', reserved ' : ''} {detail?.backendMode} share with the share token <code>{share.id}</code></h5>
                 </Grid2>
+                { errorMessage && <Typography color="error" sx={{ mb: 2 }}>{errorMessage}</Typography> }
                 { share.data.limited ? <BandwidthLimitedWarning /> : null }
                 <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                     <Tooltip title="Share Metrics">

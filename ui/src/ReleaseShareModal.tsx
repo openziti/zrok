@@ -5,6 +5,7 @@ import {modalStyle} from "./styling/theme.ts";
 import {User} from "./model/user.ts";
 import {Node} from "@xyflow/react";
 import {getShareApi} from "./model/api.ts";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface ReleaseShareProps {
     close: () => void;
@@ -48,8 +49,9 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
                 .then(() => {
                     close();
                 })
-                .catch(() => {
-                    setErrorMessage(<Typography color="red">An error occurred releasing your share <code>{detail.shareToken}</code>!</Typography>);
+                .catch(async (e) => {
+                    const msg = await extractErrorMessage(e, "an error occurred releasing your share");
+                    setErrorMessage(<Typography color="red">{msg}</Typography>);
                     setTimeout(() => {
                         setErrorMessage(null);
                         setChecked(false);

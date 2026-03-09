@@ -5,6 +5,7 @@ import {AccountApi, MetadataApi} from "./api";
 import {Link} from "react-router";
 import zroket from "./assets/zrok-1.0.0-rocket-purple.svg";
 import {sanitizeHtml} from "./model/html.ts";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface LoginProps {
     onLogin: (user: User) => void;
@@ -37,8 +38,9 @@ const Login = ({ onLogin }: LoginProps) => {
             .then(d => {
                 onLogin({email: email, token: d.toString()});
             })
-            .catch(() => {
-                setMessage("login failed!")
+            .catch(async (e) => {
+                const msg = await extractErrorMessage(e, "login failed");
+                setMessage(msg);
             });
     }
 

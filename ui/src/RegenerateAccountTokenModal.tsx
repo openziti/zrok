@@ -5,6 +5,7 @@ import {Box, Button, Checkbox, FormControlLabel, Grid2, Modal, Typography} from 
 import {getAccountApi} from "./model/api.ts";
 import useApiConsoleStore from "./model/store.ts";
 import ClipboardText from "./ClipboardText.tsx";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface RegenerateAccountTokenModalProps {
     close: () => void;
@@ -50,12 +51,11 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
                     <Button type="primary" variant="contained" onClick={reload}>Reload API Console</Button>
                 </Grid2></>);
             })
-            .catch(e => {
-                e.response.json().then(ex => {
-                    setErrorMessage(<Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
-                        <Typography color="red">{ex.message}</Typography>
-                    </Grid2>);
-                });
+            .catch(async (e) => {
+                const msg = await extractErrorMessage(e, "failed to regenerate account token");
+                setErrorMessage(<Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
+                    <Typography color="red">{msg}</Typography>
+                </Grid2>);
             });
     }
 

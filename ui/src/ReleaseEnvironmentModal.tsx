@@ -5,6 +5,7 @@ import {modalStyle} from "./styling/theme.ts";
 import {User} from "./model/user.ts";
 import {Node} from "@xyflow/react";
 import {getEnvironmentApi} from "./model/api.ts";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface ReleaseEnvironmentProps {
     close: () => void;
@@ -46,8 +47,9 @@ const ReleaseEnvironmentModal = ({ close, isOpen, user, environment, detail }: R
                 .then(() => {
                     close();
                 })
-                .catch(() => {
-                    setErrorMessage(<Typography color="red">An error occurred releasing your environment <code>{environment.id}</code>!</Typography>);
+                .catch(async (e) => {
+                    const msg = await extractErrorMessage(e, "an error occurred releasing your environment");
+                    setErrorMessage(<Typography color="red">{msg}</Typography>);
                     setTimeout(() => {
                         setErrorMessage(null);
                         setChecked(false);

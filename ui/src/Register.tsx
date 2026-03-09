@@ -7,6 +7,7 @@ import {useEffect, useRef, useState} from "react";
 import {AccountApi, MetadataApi} from "./api";
 import ClipboardText from "./ClipboardText.tsx";
 import {sanitizeHtml} from "./model/html.ts";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface SetPasswordFormProps {
     email: string;
@@ -183,15 +184,20 @@ const Register = () => {
     const { regToken } = useParams();
     const [component, setComponent] = useState<React.JSX.Element>(null);
     const [error, setError] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>("");
     const [email, setEmail] = useState<string>();
     const [touLink, setTouLink] = useState<string>();
 
     const doRegistration = (v) => {
+        setErrorMessage("");
         new AccountApi().register({body: {registerToken: regToken, password: v.password}})
             .then(d => {
                 setComponent(<RegistrationComplete token={d.accountToken!} />);
             })
-            .catch(() => {});
+            .catch(async (e) => {
+                const msg = await extractErrorMessage(e, "registration failed");
+                setErrorMessage(msg);
+            });
     }
 
     useEffect(() => {
@@ -232,6 +238,7 @@ const Register = () => {
                 <Box sx={{marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
                     <img src={zrokLogo} height="300"/>
                     <h1 style={{ color: "#241775" }}>z r o k</h1>
+                    { errorMessage && <Typography color="error">{errorMessage}</Typography> }
                     {component}
                 </Box>
             </Container>

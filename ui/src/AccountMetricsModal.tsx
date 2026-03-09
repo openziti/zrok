@@ -5,6 +5,7 @@ import {useEffect, useState} from "react";
 import {buildMetrics} from "./model/util.ts";
 import {getMetadataApi} from "./model/api.ts";
 import MetricsGraph from "./MetricsGraph.tsx";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface AccountMetricsModalProps {
     close: () => void;
@@ -16,24 +17,35 @@ const AccountMetricsModal = ({ close, isOpen, user }: AccountMetricsModalProps) 
     const [metrics30, setMetrics30] = useState(buildMetrics([]));
     const [metrics7, setMetrics7] = useState(buildMetrics([]));
     const [metrics1, setMetrics1] = useState(buildMetrics([]));
+    const [errorMessage, setErrorMessage] = useState<string>("");
 
     useEffect(() => {
+        setErrorMessage("");
         let metadataApi = getMetadataApi(user);
         metadataApi.getAccountMetrics()
             .then(d => {
                 setMetrics30(buildMetrics(d));
             })
-            .catch(() => {});
+            .catch(async (e) => {
+                const msg = await extractErrorMessage(e, "unable to load metrics");
+                setErrorMessage(msg);
+            });
         metadataApi.getAccountMetrics({duration: "168h"})
             .then(d => {
                 setMetrics7(buildMetrics(d));
             })
-            .catch(() => {});
+            .catch(async (e) => {
+                const msg = await extractErrorMessage(e, "unable to load metrics");
+                setErrorMessage(msg);
+            });
         metadataApi.getAccountMetrics({duration: "24h"})
             .then(d => {
                 setMetrics1(buildMetrics(d));
             })
-            .catch(() => {});
+            .catch(async (e) => {
+                const msg = await extractErrorMessage(e, "unable to load metrics");
+                setErrorMessage(msg);
+            });
     }, [isOpen]);
 
     return (
@@ -42,6 +54,7 @@ const AccountMetricsModal = ({ close, isOpen, user }: AccountMetricsModalProps) 
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography variant="h5"><strong>Account Metrics</strong></Typography>
                 </Grid2>
+                { errorMessage && <Grid2 container sx={{ flexGrow: 1, p: 1 }}><Typography color="error">{errorMessage}</Typography></Grid2> }
                 <MetricsGraph title="Last 30 Days" data={metrics30.data} />
                 <MetricsGraph title="Last 7 Days" data={metrics7.data} showTime />
                 <MetricsGraph title="Last 24 Hours" data={metrics1.data} showTime />
