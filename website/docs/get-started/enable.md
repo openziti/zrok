@@ -8,7 +8,7 @@ sidebar_position: 4
 In this step, you'll enable a zrok environment on your machine using your account token. Enabling creates a secure
 identity tied to your device so you can start creating shares.
 
-## Self-hosted: set your API endpoint first
+## Self-hosted: Set your API endpoint first
 
 If you're using a self-hosted zrok instance, configure your API endpoint before enabling:
 
@@ -20,13 +20,13 @@ Skip this step if you're using myzrok.io.
 
 ## Enable your environment
 
-Run the following command with your account token from Step 1:
+Run this command with your account token from Step 1:
 
 ```bash
 zrok2 enable <your_account_token>
 ```
 
-After a few seconds you'll see:
+After a few seconds, you'll see:
 
 ```
 ⣻  the zrok environment was successfully enabled...
@@ -59,12 +59,11 @@ Environment:
 
 Both `Account Token` and `Ziti Identity` should show `<<SET>>`. Your environment is ready.
 
-If you open the [API console](https://api-v2.zrok.io/), you'll see your new environment reflected in the visualizer:
+## Visualize your environment
 
-![New environment in web console](../images/zrok-visualizer-enabled.png)
-
-The environment is named after your shell username and hostname. Click on the environment node in the explorer to
-see its details in the panel at the bottom of the page:
+If you open the [API console](https://api-v2.zrok.io/), you'll see your new environment reflected in the
+visualizer. The environment is named after your shell username and hostname. Click the environment node in the
+explorer to see its details in the panel at the bottom of the page:
 
 ![Empty environment details](../images/zrok-visualizer-environment.png)
 

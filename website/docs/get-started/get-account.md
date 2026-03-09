@@ -10,17 +10,14 @@ In this step, you'll create a zrok account and get the account token you need to
 ## myzrok.io (hosted)
 
 1. Go to [myzrok.io](https://myzrok.io) and sign up for a free account.
-2. After signing in, open the [API console](https://api-v2.zrok.io/). Your interface will look like this:
-
-    ![zrok API console, empty](../images/zrok-getting-started-button.png)
+2. After signing in, click the **zrok** icon in the left sidebar to open the [API console](https://api-v2.zrok.io/).
 
 3. Click the green **CLICK HERE TO GET STARTED!** button. The getting started wizard opens:
 
     ![zrok getting started wizard](../images/zrok-getting-started-modal.png)
 
-4. Locate your account token under step 2 of the wizard. It looks like a short alphanumeric string,
-   for example `7g3K6gVKikWb`.
-5. Copy and save your account token. Treat it like a password—it authenticates your device to the zrok service.
+4. Under step 2 of the wizard, copy and save your account token (a short alphanumeric string like `7g3K6gVKikWb`).
+   Treat it like a password: it authenticates your device to the zrok service.
 
 ## Self-hosted instance
 
