@@ -4,6 +4,7 @@
 .vscode
 .contexts
 CLAUDE.md
+/.claude/
 *.db
 /automated-release-build/
 etc/dev*
