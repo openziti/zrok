@@ -32,5 +32,3 @@ If you've deployed your own zrok instance, there are two ways to create an accou
     ```
 
 Either way, the result is an account token. Copy it for use in Step 3.
-
-<div style={{marginBottom: '2rem'}} />

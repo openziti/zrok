@@ -81,5 +81,3 @@ the lower right corner of the explorer to reset the view.
 You can enable multiple environments with the same account—one per device. Use `zrok2 enable -d <name>` to give an
 environment a custom name.
 :::
-
-<div style={{marginBottom: '2rem'}} />

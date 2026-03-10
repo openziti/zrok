@@ -44,5 +44,3 @@ shares are ephemeral by default.
 
 This is a good way to understand how zrok works, but it's not the right approach for services you need to keep
 running. That's what the agent is for.
-
-<div style={{marginBottom: '2rem'}} />

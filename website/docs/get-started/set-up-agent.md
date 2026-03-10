@@ -52,5 +52,3 @@ third-party process manager.
 :::
 
 For more detail on what the agent can do, see [Use the zrok Agent](../../how-tos/agent/).
-
-<div style={{marginBottom: '2rem'}} />
