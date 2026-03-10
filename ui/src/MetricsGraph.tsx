@@ -3,11 +3,18 @@ import {LineChart} from "@mui/x-charts";
 import {useEffect, useState} from "react";
 import {bytesToSize} from "./model/util.ts";
 import {format} from "date-fns";
+import {MetricsSample} from "./api";
 
-const MetricsGraph = ({ title, showTime, data }) => {
-    const [rxData, setRxData] = useState([]);
-    const [txData, setTxData] = useState([]);
-    const [timestamps, setTimestamps] = useState([]);
+interface MetricsGraphProps {
+    title: string;
+    showTime?: boolean;
+    data: MetricsSample[] | undefined;
+}
+
+const MetricsGraph = ({ title, showTime, data }: MetricsGraphProps) => {
+    const [rxData, setRxData] = useState<number[]>([]);
+    const [txData, setTxData] = useState<number[]>([]);
+    const [timestamps, setTimestamps] = useState<number[]>([]);
     const dateFormat = showTime ? "dd-MMM H:mm" : "dd-MMM"
 
     useEffect(() => {

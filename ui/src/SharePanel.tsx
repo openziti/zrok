@@ -13,6 +13,7 @@ import MetricsIcon from "@mui/icons-material/QueryStats";
 import ShareMetricsModal from "./ShareMetricsModal.tsx";
 import BandwidthLimitedWarning from "./BandwidthLimitedWarning.tsx";
 import {extractErrorMessage, isAbortError} from "./model/errors.ts";
+import {PropertyRow} from "./model/util.ts";
 
 interface SharePanelProps {
     share: Node;
@@ -38,20 +39,20 @@ const SharePanel = ({ share }: SharePanelProps) => {
     }
 
     const customProperties = {
-        createdAt: row => new Date(row.value).toLocaleString(),
-        updatedAt: row => new Date(row.value).toLocaleString(),
-        reserved: row => row.value ? "reserved" : "ephemeral",
-        shareToken: row => <>
+        createdAt: (row: PropertyRow) => new Date(row.value as string).toLocaleString(),
+        updatedAt: (row: PropertyRow) => new Date(row.value as string).toLocaleString(),
+        reserved: (row: PropertyRow) => row.value ? "reserved" : "ephemeral",
+        shareToken: (row: PropertyRow) => <>
             <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
                 <Grid2 display="flex" justifyContent="left">
-                    <span>{row.value}</span>
+                    <span>{row.value as string}</span>
                 </Grid2>
                 <Grid2 display="flex" justifyContent="right" sx={{ flexGrow: 1 }}>
-                    <ClipboardText text={row.value} />
+                    <ClipboardText text={row.value as string} />
                 </Grid2>
             </Grid2>
         </>,
-        frontendEndpoints: row => {
+        frontendEndpoints: (row: PropertyRow) => {
             if (!row.value || row.value.length === 0) {
                 return <span>None</span>;
             }

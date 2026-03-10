@@ -24,7 +24,7 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
             newPassword: "",
             duplicateNewPassword: "",
         },
-        onSubmit: v => {
+        onSubmit: (v: typeof passwordChangeForm.initialValues) => {
             setErrorMessage(null);
             getAccountApi(user).changePassword({
                 body: {

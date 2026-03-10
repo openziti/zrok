@@ -1,21 +1,21 @@
-import {useEffect, useState} from "react";
-import {camelToWords, objectToRows} from "./model/util.ts";
+import React, {useEffect, useState} from "react";
+import {camelToWords, objectToRows, PropertyRow} from "./model/util.ts";
 import {Paper, Table, TableBody, TableCell, TableRow} from "@mui/material";
 
 type PropertyTableProps = {
-    object: any;
-    custom: any;
-    labels: any;
+    object: Record<string, unknown> | null;
+    custom?: Record<string, (row: PropertyRow) => React.ReactNode>;
+    labels?: Record<string, string>;
 }
 
 const PropertyTable = ({ object, custom, labels }: PropertyTableProps) => {
-    const [data, setData] = useState([]);
+    const [data, setData] = useState<PropertyRow[]>([]);
 
     useEffect(() => {
         setData(objectToRows(object));
     }, [object]);
 
-    const value = (row) => {
+    const value = (row: PropertyRow) => {
         if(custom) {
             if(row.property in custom) {
                 return custom[row.property](row);
@@ -24,7 +24,7 @@ const PropertyTable = ({ object, custom, labels }: PropertyTableProps) => {
         return row.value;
     }
 
-    const renderLabel = (row) => {
+    const renderLabel = (row: PropertyRow) => {
         if(labels) {
             if(row.property in labels) {
                 return labels[row.property];

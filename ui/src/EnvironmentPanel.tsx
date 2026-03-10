@@ -13,6 +13,7 @@ import MetricsIcon from "@mui/icons-material/QueryStats";
 import EnvironmentMetricsModal from "./EnvironmentMetricsModal.tsx";
 import BandwidthLimitedWarning from "./BandwidthLimitedWarning.tsx";
 import {extractErrorMessage, isAbortError} from "./model/errors.ts";
+import {PropertyRow} from "./model/util.ts";
 
 interface EnvironmentPanelProps {
     environment: Node;
@@ -38,9 +39,9 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
     }
 
     const customProperties = {
-        zId: row => <SecretToggle secret={row.value} />,
-        createdAt: row => new Date(row.value).toLocaleString(),
-        updatedAt: row => new Date(row.value).toLocaleString()
+        zId: (row: PropertyRow) => <SecretToggle secret={row.value as string} />,
+        createdAt: (row: PropertyRow) => new Date(row.value as string).toLocaleString(),
+        updatedAt: (row: PropertyRow) => new Date(row.value as string).toLocaleString()
     }
 
     const labels = {

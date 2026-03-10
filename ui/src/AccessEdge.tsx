@@ -1,8 +1,13 @@
-import {BaseEdge, EdgeProps, getSmoothStepPath, Position} from "@xyflow/react";
+import {BaseEdge, Edge, EdgeProps, getSmoothStepPath, Position} from "@xyflow/react";
 
-const AccessEdge = (props: EdgeProps) => {
+interface AccessEdgeData {
+    laneIndex?: number;
+    laneCount?: number;
+}
+
+const AccessEdge = (props: EdgeProps<Edge<AccessEdgeData>>) => {
     const { sourceX, sourceY, targetX, targetY, id, markerEnd, data } = props;
-    const laneIndex = (data as any)?.laneIndex ?? 0;
+    const laneIndex = data?.laneIndex ?? 0;
     const offset = 25 + laneIndex * 15;
 
     const [edgePath] = getSmoothStepPath({

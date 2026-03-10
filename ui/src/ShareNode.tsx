@@ -1,10 +1,11 @@
-import {Handle, Position, useUpdateNodeInternals} from "@xyflow/react";
+import {Handle, Node, NodeProps, Position, useUpdateNodeInternals} from "@xyflow/react";
 import {Grid2} from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import useApiConsoleStore from "./model/store.ts";
 import {SparkLineChart} from "@mui/x-charts";
+import {ShareNodeData} from "./model/graph.ts";
 
-const ShareNode = ({ data }) => {
+const ShareNode = ({ data }: NodeProps<Node<ShareNodeData>>) => {
     const sparkdata = useApiConsoleStore((state) => state.sparkdata);
     const updateNodeInternals = useUpdateNodeInternals();
 

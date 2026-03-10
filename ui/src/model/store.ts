@@ -10,7 +10,7 @@ type StoreState = {
     limited: boolean;
     graph: Graph;
     environments: Array<Environment>;
-    sparkdata: Map<string, Number[]>;
+    sparkdata: Map<string, number[]>;
     nodes: Node[];
     edges: Edge[];
     selectedNode: Node;
@@ -40,7 +40,7 @@ const useApiConsoleStore = create<StoreState & StoreAction>((set) => ({
     limited: false,
     graph: new Graph(),
     environments: new Array<Environment>(),
-    sparkdata: new Map<string, Number[]>(),
+    sparkdata: new Map<string, number[]>(),
     nodes: [],
     edges: [],
     selectedNode: null,

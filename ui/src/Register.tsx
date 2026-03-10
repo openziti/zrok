@@ -9,10 +9,15 @@ import ClipboardText from "./ClipboardText.tsx";
 import {sanitizeHtml} from "./model/html.ts";
 import {extractErrorMessage} from "./model/errors.ts";
 
+interface SetPasswordValues {
+    password: string;
+    confirm: string;
+}
+
 interface SetPasswordFormProps {
     email: string;
     touLink: string;
-    register: (v) => void;
+    register: (v: SetPasswordValues) => void;
 }
 
 const SetPasswordForm = ({ email, touLink, register }: SetPasswordFormProps) => {
@@ -188,7 +193,7 @@ const Register = () => {
     const [email, setEmail] = useState<string>();
     const [touLink, setTouLink] = useState<string>();
 
-    const doRegistration = (v) => {
+    const doRegistration = (v: SetPasswordValues) => {
         setErrorMessage("");
         new AccountApi().register({body: {registerToken: regToken, password: v.password}})
             .then(d => {

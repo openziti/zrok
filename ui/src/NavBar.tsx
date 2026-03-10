@@ -13,7 +13,7 @@ import GettingStartedModal from "./GettingStartedModal.tsx";
 interface NavBarProps {
     logout: () => void;
     visualizer: boolean;
-    toggleMode: (boolean) => void;
+    toggleMode: (mode: boolean) => void;
 }
 
 const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {

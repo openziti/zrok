@@ -16,9 +16,9 @@ interface ShareMetricsModalProps {
 }
 
 const ShareMetricsModal = ({ close, isOpen, user, share }: ShareMetricsModalProps) => {
-    const [metrics30, setMetrics30] = useState(buildMetrics([]));
-    const [metrics7, setMetrics7] = useState(buildMetrics([]));
-    const [metrics1, setMetrics1] = useState(buildMetrics([]));
+    const [metrics30, setMetrics30] = useState(buildMetrics({}));
+    const [metrics7, setMetrics7] = useState(buildMetrics({}));
+    const [metrics1, setMetrics1] = useState(buildMetrics({}));
     const [errorMessage, setErrorMessage] = useState<string>("");
 
     useEffect(() => {

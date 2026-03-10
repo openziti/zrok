@@ -1,8 +1,9 @@
-import {Handle, Position, useUpdateNodeInternals} from "@xyflow/react";
+import {Handle, Node, NodeProps, Position, useUpdateNodeInternals} from "@xyflow/react";
 import {Grid2} from "@mui/material";
 import AccessIcon from "@mui/icons-material/Lan";
+import {AccessNodeData} from "./model/graph.ts";
 
-const AccessNode = ({ data }) => {
+const AccessNode = ({ data }: NodeProps<Node<AccessNodeData>>) => {
     const updateNodeInternals = useUpdateNodeInternals();
 
     let shareHandle = <></>;

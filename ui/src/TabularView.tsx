@@ -65,7 +65,7 @@ const TabularView = () => {
         updateNodes(nodes.map(node => (sn && node.id === sn.id) ? { ...node, selected: true } : { ...node, selected: false }));
     }, [rowSelection]);
 
-    const sparkdataTip = (row) => {
+    const sparkdataTip = (row: Node): number => {
         if(row.data && row.data.activity) {
             // - 2; - 1 is sometimes undefined?
             return row.data.activity[row.data.activity.length - 2];
@@ -73,7 +73,7 @@ const TabularView = () => {
         return 0;
     }
 
-    const sparkdataTipFmt = (row) => {
+    const sparkdataTipFmt = (row: Node): string => {
         let tip = sparkdataTip(row);
         if(tip > 0) {
             return bytesToSize(tip);
@@ -81,7 +81,7 @@ const TabularView = () => {
         return "";
     };
 
-    const sparkdataAverage = (row) => {
+    const sparkdataAverage = (row: Node): number => {
         if(row.data && row.data.activity) {
             let average = row.data.activity.reduce((acc, curr) => { return acc + curr }, 0);
             average /= row.data.activity.length;
@@ -90,7 +90,7 @@ const TabularView = () => {
         return 0;
     }
 
-    const sparkdataAverageFmt = (row) => {
+    const sparkdataAverageFmt = (row: Node): string => {
         let average = sparkdataAverage(row);
         if(average > 0) {
             return bytesToSize(average);

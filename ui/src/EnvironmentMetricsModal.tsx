@@ -16,9 +16,9 @@ interface EnvironmentMetricsModalProps {
 }
 
 const EnvironmentMetricsModal = ({ close, isOpen, user, environment }: EnvironmentMetricsModalProps) => {
-    const [metrics30, setMetrics30] = useState(buildMetrics([]));
-    const [metrics7, setMetrics7] = useState(buildMetrics([]));
-    const [metrics1, setMetrics1] = useState(buildMetrics([]));
+    const [metrics30, setMetrics30] = useState(buildMetrics({}));
+    const [metrics7, setMetrics7] = useState(buildMetrics({}));
+    const [metrics1, setMetrics1] = useState(buildMetrics({}));
     const [errorMessage, setErrorMessage] = useState<string>("");
 
     useEffect(() => {

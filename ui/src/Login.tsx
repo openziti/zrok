@@ -1,6 +1,6 @@
 import {Box, Button, Container, TextField, Typography} from "@mui/material";
 import {User} from "./model/user.ts";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {AccountApi, MetadataApi} from "./api";
 import {Link} from "react-router";
 import zroket from "./assets/zrok-1.0.0-rocket-purple.svg";
@@ -33,7 +33,7 @@ const Login = ({ onLogin }: LoginProps) => {
         return () => controller.abort();
     }, []);
 
-    const login = async e => {
+    const login = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         new AccountApi().login({body: {"email": email, "password": password}})

@@ -11,6 +11,7 @@ import {getMetadataApi} from "./model/api.ts";
 import ClipboardText from "./ClipboardText.tsx";
 import BandwidthLimitedWarning from "./BandwidthLimitedWarning.tsx";
 import {extractErrorMessage, isAbortError} from "./model/errors.ts";
+import {PropertyRow} from "./model/util.ts";
 
 interface AccessPanelProps {
     access: Node;
@@ -45,38 +46,38 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
     }, [access.data.feId]);
 
     const customProperties = {
-        bindAddress: row => <>
+        bindAddress: (row: PropertyRow) => <>
             <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
                 <Grid2 display="flex" justifyContent="left">
-                    <span>{row.value}</span>
+                    <span>{row.value as string}</span>
                 </Grid2>
                 <Grid2 display="flex" justifyContent="right" sx={{ flexGrow: 1 }}>
-                    <ClipboardText text={row.value} />
+                    <ClipboardText text={row.value as string} />
                 </Grid2>
             </Grid2>
         </>,
-        frontendToken: row => <>
+        frontendToken: (row: PropertyRow) => <>
             <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
                 <Grid2 display="flex" justifyContent="left">
-                    <span>{row.value}</span>
+                    <span>{row.value as string}</span>
                 </Grid2>
                 <Grid2 display="flex" justifyContent="right" sx={{ flexGrow: 1 }}>
-                    <ClipboardText text={row.value} />
+                    <ClipboardText text={row.value as string} />
                 </Grid2>
             </Grid2>
         </>,
-        shareToken: row => <>
+        shareToken: (row: PropertyRow) => <>
             <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
                 <Grid2 display="flex" justifyContent="left">
-                    <span>{row.value}</span>
+                    <span>{row.value as string}</span>
                 </Grid2>
                 <Grid2 display="flex" justifyContent="right" sx={{ flexGrow: 1 }}>
-                    <ClipboardText text={row.value} />
+                    <ClipboardText text={row.value as string} />
                 </Grid2>
             </Grid2>
         </>,
-        createdAt: row => new Date(row.value).toLocaleString(),
-        updatedAt: row => new Date(row.value).toLocaleString(),
+        createdAt: (row: PropertyRow) => new Date(row.value as string).toLocaleString(),
+        updatedAt: (row: PropertyRow) => new Date(row.value as string).toLocaleString(),
     }
 
     const labels = {

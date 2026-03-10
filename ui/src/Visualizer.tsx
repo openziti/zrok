@@ -6,6 +6,7 @@ import {
     Controls,
     MiniMap,
     Node,
+    NodeChange,
     ReactFlow,
     ReactFlowProvider,
     useNodesInitialized,
@@ -61,7 +62,7 @@ const Visualizer = () => {
         prevInitialized.current = nodesInitialized;
     }, [nodesInitialized]);
 
-    const onNodesChange = (changes) => {
+    const onNodesChange = (changes: NodeChange[]) => {
         updateNodes(applyNodeChanges(changes, nodes));
     }
 
@@ -71,7 +72,7 @@ const Visualizer = () => {
         }
     });
 
-    const onSelectionChange = ({ nodes }) => {
+    const onSelectionChange = ({ nodes }: { nodes: Node[] }) => {
         if(nodes.length > 0) {
             updateSelectedNode(nodes[0]);
         } else {
@@ -79,7 +80,7 @@ const Visualizer = () => {
         }
     };
 
-    const nodeColor = (node) => {
+    const nodeColor = (node: Node) => {
         if(node.selected) {
             return "#9bf316";
         }

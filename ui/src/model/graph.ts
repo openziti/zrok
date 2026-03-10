@@ -8,6 +8,36 @@ export class Graph {
     edges: Edge[];
 }
 
+export interface AccountNodeData {
+    label: string;
+    limited: boolean;
+}
+
+export interface EnvironmentNodeData {
+    label: string;
+    envZId: string;
+    limited: boolean;
+    empty: boolean;
+}
+
+export interface ShareNodeData {
+    label: string;
+    shareToken: string;
+    envZId: string;
+    limited: boolean;
+    accessed: boolean;
+}
+
+export interface AccessNodeData {
+    label: string;
+    feId: number;
+    target: string;
+    bindAddress: string;
+    backendMode: string;
+    envZId: string;
+    ownedShare?: boolean;
+}
+
 export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Overview): Graph => {
     let newVov = new Graph();
 
@@ -155,7 +185,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
     return newVov;
 }
 
-const sortNodes = (nodes) => {
+const sortNodes = (nodes: Node[]): Node[] => {
     return nodes.sort((a, b) => {
         if(a.id > b.id) {
             return 1;
@@ -251,7 +281,7 @@ export const focusGraph = (graph: Graph, focusNodeId: string): Graph => {
     return out;
 }
 
-export const layout = (nodes, edges): Graph => {
+export const layout = (nodes: Node[], edges: Edge[]): Graph => {
     if(!nodes || nodes.length === 0) {
         return { nodes: nodes || [], edges };
     }
