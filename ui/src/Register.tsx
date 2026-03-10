@@ -245,7 +245,7 @@ const Register = () => {
         <Typography component="div">
             <Container maxWidth="sm">
                 <Box sx={{marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
-                    <img src={zrokLogo} height="300"/>
+                    <img src={zrokLogo} height="300" alt="zrok logo"/>
                     <h1 style={{ color: "#241775" }}>z r o k</h1>
                     { errorMessage && <Typography color="error">{errorMessage}</Typography> }
                     {component}

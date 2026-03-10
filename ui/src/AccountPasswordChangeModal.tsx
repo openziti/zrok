@@ -76,10 +76,10 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
     }, [isOpen]);
 
     return (
-        <Modal open={isOpen} onClose={close}>
+        <Modal open={isOpen} onClose={close} aria-labelledby="modal-title-change-password">
             <Box sx={{ ...modalStyle }}>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Typography variant="h5"><strong>Change Password</strong></Typography>
+                    <Typography variant="h5" id="modal-title-change-password"><strong>Change Password</strong></Typography>
                 </Grid2>
                 <form onSubmit={passwordChangeForm.handleSubmit}>
                     <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">

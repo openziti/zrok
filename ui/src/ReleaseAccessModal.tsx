@@ -61,10 +61,10 @@ const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAcce
     }
 
     return (
-        <Modal open={isOpen} onClose={close}>
+        <Modal open={isOpen} onClose={close} aria-labelledby="modal-title-release-access">
             <Box sx={{ ...modalStyle }}>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Typography variant="h5"><strong>Release Access</strong></Typography>
+                    <Typography variant="h5" id="modal-title-release-access"><strong>Release Access</strong></Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography variant="body1">Would you like to release the access <code>{frontendToken}</code> ?</Typography>

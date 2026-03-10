@@ -64,13 +64,13 @@ const AccountPanel = ({ account }: AccountPanelProps) => {
                 { limited ? <BandwidthLimitedWarning /> : null }
                 <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                     <Tooltip title="Account Metrics">
-                        <Button variant="contained" onClick={openAccountMetrics}><MetricsIcon /></Button>
+                        <Button variant="contained" aria-label="Account Metrics" onClick={openAccountMetrics}><MetricsIcon /></Button>
                     </Tooltip>
                     <Tooltip title="Change Password" sx={{ ml: 1 }}>
-                        <Button variant="contained" color="error" onClick={openChangePassword}><PasswordIcon /></Button>
+                        <Button variant="contained" color="error" aria-label="Change Password" onClick={openChangePassword}><PasswordIcon /></Button>
                     </Tooltip>
                     <Tooltip title="Regenerate Account Token" sx={{ ml: 1 }}>
-                        <Button variant="contained" color="error" onClick={openRegenerate}><TokenIcon /></Button>
+                        <Button variant="contained" color="error" aria-label="Regenerate Account Token" onClick={openRegenerate}><TokenIcon /></Button>
                     </Tooltip>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1 }}>

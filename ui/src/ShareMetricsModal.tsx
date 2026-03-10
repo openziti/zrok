@@ -57,10 +57,10 @@ const ShareMetricsModal = ({ close, isOpen, user, share }: ShareMetricsModalProp
     }, [isOpen, share]);
 
     return (
-        <Modal open={isOpen} onClose={close}>
+        <Modal open={isOpen} onClose={close} aria-labelledby="modal-title-share-metrics">
             <Box sx={{ ...modalStyle }}>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Typography variant="h5"><strong>Share Metrics</strong></Typography>
+                    <Typography variant="h5" id="modal-title-share-metrics"><strong>Share Metrics</strong></Typography>
                 </Grid2>
                 { errorMessage && <Grid2 container sx={{ flexGrow: 1, p: 1 }}><Typography color="error">{errorMessage}</Typography></Grid2> }
                 <MetricsGraph title="Last 30 Days" data={metrics30.data} />

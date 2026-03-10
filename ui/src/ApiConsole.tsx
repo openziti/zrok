@@ -243,7 +243,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                         <Typography variant="body2" sx={{ color: "#fff", whiteSpace: "nowrap" }}>
                             {selectedNode?.type}
                         </Typography>
-                        <IconButton size="small" onClick={() => setPanelMinimized(false)} sx={{ color: "#fff", p: 0.25 }}>
+                        <IconButton size="small" aria-label="Expand panel" onClick={() => setPanelMinimized(false)} sx={{ color: "#fff", p: 0.25 }}>
                             <OpenInFullIcon sx={{ fontSize: 16 }} />
                         </IconButton>
                     </div>

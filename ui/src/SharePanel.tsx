@@ -113,10 +113,10 @@ const SharePanel = ({ share }: SharePanelProps) => {
                 { share.data.limited ? <BandwidthLimitedWarning /> : null }
                 <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                     <Tooltip title="Share Metrics">
-                        <Button variant="contained" onClick={openShareMetrics}><MetricsIcon /></Button>
+                        <Button variant="contained" aria-label="Share Metrics" onClick={openShareMetrics}><MetricsIcon /></Button>
                     </Tooltip>
                     <Tooltip title="Release Share" sx={{ ml: 1 }}>
-                        <Button variant="contained" color="error" onClick={openReleaseShare}><DeleteIcon /></Button>
+                        <Button variant="contained" color="error" aria-label="Release Share" onClick={openReleaseShare}><DeleteIcon /></Button>
                     </Tooltip>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1 }}>

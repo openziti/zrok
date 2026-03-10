@@ -78,10 +78,10 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
                 { environment.data.limited ? <BandwidthLimitedWarning /> : null }
                 <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                     <Tooltip title="Environment Metrics">
-                        <Button variant="contained" onClick={openEnvironmentMetrics}><MetricsIcon /></Button>
+                        <Button variant="contained" aria-label="Environment Metrics" onClick={openEnvironmentMetrics}><MetricsIcon /></Button>
                     </Tooltip>
                     <Tooltip title="Release Environment" sx={{ ml: 1 }}>
-                        <Button variant="contained" color="error" onClick={openReleaseEnvironment}><DeleteIcon /></Button>
+                        <Button variant="contained" color="error" aria-label="Release Environment" onClick={openReleaseEnvironment}><DeleteIcon /></Button>
                     </Tooltip>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1 }}>

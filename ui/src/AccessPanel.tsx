@@ -101,7 +101,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
                         { limited ? <BandwidthLimitedWarning /> : null }
                         <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                             <Tooltip title="Release Access">
-                                <Button variant="contained" color="error" onClick={openReleaseAccess}><DeleteIcon /></Button>
+                                <Button variant="contained" color="error" aria-label="Release Access" onClick={openReleaseAccess}><DeleteIcon /></Button>
                             </Tooltip>
                         </Grid2>
                         <Grid2 container sx={{ flexGrow: 1 }}>

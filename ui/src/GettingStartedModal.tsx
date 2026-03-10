@@ -42,10 +42,10 @@ const GettingStartedModal = ({ close, isOpen }: GettingStartedModalProps) => {
     }, [nodes]);
 
     return (
-        <Modal open={isOpen} onClose={close}>
+        <Modal open={isOpen} onClose={close} aria-labelledby="modal-title-getting-started">
             <Box sx={{ ...modalStyle }}>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Typography variant="h5"><strong>Getting Started Wizard</strong></Typography>
+                    <Typography variant="h5" id="modal-title-getting-started"><strong>Getting Started Wizard</strong></Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography>
