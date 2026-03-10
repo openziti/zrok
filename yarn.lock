@@ -175,10 +175,10 @@
     "@docsearch/css" "3.9.0"
     algoliasearch "^5.14.2"
 
-"@netfoundry/docusaurus-theme@0.7.3":
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/@netfoundry/docusaurus-theme/-/docusaurus-theme-0.7.3.tgz#4fc4688d5e600eec538e460037dd32890e242699"
-  integrity sha512-QIBudsKCa/DmInPAMjf2FSoxfhGw7mNuZg5EMxtiki8AgbwLvcqTt6sH7lRW3wyAo5ugfTgYkkWuKntJ4khwGw==
+"@netfoundry/docusaurus-theme@0.7.4":
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/@netfoundry/docusaurus-theme/-/docusaurus-theme-0.7.4.tgz#b43ff4b0dfd7814724ee3170e009728d77b26fbd"
+  integrity sha512-LV5tbuJT/mYxuPlOtXP/HuJc/Ft90j4mH6mzcKBOvX/iWZy04N7zcU4EPHHn5BuqGpcGxauqO3bxvgoBjwB4hQ==
   dependencies:
     "@docsearch/react" "^3"
     algoliasearch "^5"

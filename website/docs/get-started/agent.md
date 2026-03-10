@@ -3,10 +3,10 @@ sidebar_label: "5. Set up the agent"
 sidebar_position: 6
 ---
 
-# Step 5: Set up the agent for always-on shares
+# Step 5: Set up the agent
 
-In this step, you'll set up the zrok agent—the recommended approach for shares that need to survive terminal
-sessions and system restarts.
+In this step, you'll set up the zrok agent—the recommended approach for always-on shares that need to survive
+terminal sessions and system restarts.
 
 ## Why use the agent?
 
@@ -21,17 +21,20 @@ running even after you disconnect.
 
 To try the agent before installing it as a service:
 
-```bash
-zrok2 agent
-```
+1. Start the agent:
 
-In another terminal, open the agent console:
+    ```bash
+    zrok2 agent
+    ```
 
-```bash
-zrok2 agent console
-```
+1. In another terminal, open the agent console:
 
-This opens the agent UI in your browser. You can create and monitor shares from there, or continue using the CLI.
+    ```bash
+    zrok2 agent console
+    ```
+
+    This opens the agent UI in your browser. You can create and monitor shares from there, or continue using the
+    CLI.
 
 ## Install the agent as a background service
 

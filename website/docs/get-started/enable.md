@@ -28,7 +28,7 @@ zrok2 enable <your_account_token>
 
 After a few seconds, you'll see:
 
-```
+```console
 ⣻  the zrok environment was successfully enabled...
 ```
 
@@ -42,22 +42,29 @@ zrok2 status
 
 You should see output like this:
 
-```
+```console
 Config:
 
- CONFIG           VALUE                   SOURCE
- apiEndpoint      https://api-v2.zrok.io  env
- defaultFrontend  public                  binary
- headless         false                   binary
+╭──────────────────┬────────────────────────┬────────╮
+│ CONFIG           │ VALUE                  │ SOURCE │
+├──────────────────┼────────────────────────┼────────┤
+│ apiEndpoint      │ https://api-v2.zrok.io │ env    │
+│ defaultNamespace │ public                 │ binary │
+│ headless         │ false                  │ config │
+│ superNetwork     │ false                  │ config │
+╰──────────────────┴────────────────────────┴────────╯
 
 Environment:
 
- PROPERTY       VALUE
- Account Token  <<SET>>
- Ziti Identity  <<SET>>
+╭───────────────┬─────────╮
+│ PROPERTY      │ VALUE   │
+├───────────────┼─────────┤
+│ Account Token │ <<SET>> │
+│ EnvZId        │ <<SET>> │
+╰───────────────┴─────────╯
 ```
 
-Both `Account Token` and `Ziti Identity` should show `<<SET>>`. Your environment is ready.
+Both `Account Token` and `EnvZId` should show `<<SET>>`. Your environment is ready.
 
 ## Visualize your environment
 

@@ -21,12 +21,16 @@ In this step, you'll create a zrok account and get the account token you need to
 
 ## Self-hosted instance
 
-If you've deployed your own zrok instance, an administrator creates your account with:
+If you've deployed your own zrok instance, there are two ways to create an account:
 
-```bash
-zrok2 admin create account <username> <password>
-```
+- **Self-service** — If your instance has invitations enabled, run `zrok2 invite` and follow the prompts to register
+  with your email address. See [Invitations](../self-hosting/self-service-invite.mdx) for details.
+- **Admin** — An administrator can create an account directly:
 
-The command outputs your account token. Copy it for use in Step 3.
+    ```bash
+    zrok2 admin create account <username> <password>
+    ```
+
+Either way, the result is an account token. Copy it for use in Step 3.
 
 <div style={{marginBottom: '2rem'}} />
