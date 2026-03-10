@@ -1,0 +1,31 @@
+{
+	acme_ca {$CADDY_ACME_API}
+}
+
+# zrok2 controller API
+zrok2.{$ZROK2_DNS_ZONE} {
+	reverse_proxy zrok2-controller:{$ZROK2_CTRL_PORT}
+	tls {
+		dns {$CADDY_DNS_PLUGIN} {$CADDY_DNS_PLUGIN_TOKEN}
+	}
+}
+
+# zrok2 public frontend — wildcard
+*.{$ZROK2_DNS_ZONE} {
+	reverse_proxy zrok2-frontend:{$ZROK2_FRONTEND_PORT}
+	tls {
+		dns {$CADDY_DNS_PLUGIN} {$CADDY_DNS_PLUGIN_TOKEN}
+	}
+}
+
+# Ziti controller management API (upstream serves self-signed TLS)
+ziti.{$ZROK2_DNS_ZONE} {
+	reverse_proxy https://ziti-controller:{$ZITI_CTRL_PORT} {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+	tls {
+		dns {$CADDY_DNS_PLUGIN} {$CADDY_DNS_PLUGIN_TOKEN}
+	}
+}

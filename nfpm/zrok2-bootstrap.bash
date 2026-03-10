@@ -52,7 +52,7 @@
 #   ZITI_CTRL_CONFIG        - Path to Ziti controller config (default: auto-detected)
 #
 
-set -euo pipefail
+# ── Utility functions (always available when sourced) ─────────────────────────
 
 # Color output
 RED='\033[0;31m'
@@ -101,54 +101,66 @@ pkg_query() {
     esac
 }
 
-OS_FAMILY="$(os_family)"
+# ── Initialise variables and validate environment ────────────────────────────
+#
+# Called by main() for direct execution.  Docker entrypoints may call this
+# after overriding path defaults via environment variables.
 
-# ── Validate required environment variables ──────────────────────────────────
+_init_vars() {
+    OS_FAMILY="$(os_family)"
 
-: "${ZROK2_DNS_ZONE:?Set ZROK2_DNS_ZONE to your DNS zone (e.g., zrok.example.com)}"
-: "${ZROK2_ADMIN_TOKEN:?Set ZROK2_ADMIN_TOKEN to the admin secret for the zrok2 controller}"
-: "${ZITI_API_ENDPOINT:?Set ZITI_API_ENDPOINT to the Ziti management API URL}"
-: "${ZITI_ADMIN_PASSWORD:?Set ZITI_ADMIN_PASSWORD to the Ziti admin password}"
+    # Required environment variables
+    : "${ZROK2_DNS_ZONE:?Set ZROK2_DNS_ZONE to your DNS zone (e.g., zrok.example.com)}"
+    : "${ZROK2_ADMIN_TOKEN:?Set ZROK2_ADMIN_TOKEN to the admin secret for the zrok2 controller}"
+    : "${ZITI_API_ENDPOINT:?Set ZITI_API_ENDPOINT to the Ziti management API URL}"
+    : "${ZITI_ADMIN_PASSWORD:?Set ZITI_ADMIN_PASSWORD to the Ziti admin password}"
 
-ZITI_ADMIN_USER="${ZITI_ADMIN_USER:-admin}"
-ZROK2_CTRL_PORT="${ZROK2_CTRL_PORT:-18080}"
-ZROK2_TLS_CERT="${ZROK2_TLS_CERT:-}"
-ZROK2_TLS_KEY="${ZROK2_TLS_KEY:-}"
-ZROK2_NAMESPACE_TOKEN="${ZROK2_NAMESPACE_TOKEN:-public}"
-ZROK2_AMQP_URL="${ZROK2_AMQP_URL:-amqp://guest:guest@127.0.0.1:5672}"
+    ZITI_ADMIN_USER="${ZITI_ADMIN_USER:-admin}"
+    ZROK2_CTRL_PORT="${ZROK2_CTRL_PORT:-18080}"
+    ZROK2_TLS_CERT="${ZROK2_TLS_CERT:-}"
+    ZROK2_TLS_KEY="${ZROK2_TLS_KEY:-}"
+    ZROK2_NAMESPACE_TOKEN="${ZROK2_NAMESPACE_TOKEN:-public}"
+    ZROK2_AMQP_URL="${ZROK2_AMQP_URL:-amqp://guest:guest@127.0.0.1:5672}"
 
-# Database defaults
-ZROK2_STORE_TYPE="${ZROK2_STORE_TYPE:-postgres}"
-ZROK2_DB_NAME="${ZROK2_DB_NAME:-zrok2}"
-ZROK2_DB_USER="${ZROK2_DB_USER:-zrok2}"
-ZROK2_DB_PASSWORD="${ZROK2_DB_PASSWORD:-}"
+    # Database defaults
+    ZROK2_STORE_TYPE="${ZROK2_STORE_TYPE:-postgres}"
+    ZROK2_DB_NAME="${ZROK2_DB_NAME:-zrok2}"
+    ZROK2_DB_USER="${ZROK2_DB_USER:-zrok2}"
+    ZROK2_DB_PASSWORD="${ZROK2_DB_PASSWORD:-}"
 
-# InfluxDB defaults
-ZROK2_INFLUX_URL="${ZROK2_INFLUX_URL:-http://127.0.0.1:8086}"
-ZROK2_INFLUX_ORG="${ZROK2_INFLUX_ORG:-zrok}"
-ZROK2_INFLUX_BUCKET="${ZROK2_INFLUX_BUCKET:-zrok}"
-ZROK2_INFLUX_TOKEN="${ZROK2_INFLUX_TOKEN:-}"
+    # InfluxDB defaults
+    ZROK2_INFLUX_URL="${ZROK2_INFLUX_URL:-http://127.0.0.1:8086}"
+    ZROK2_INFLUX_ORG="${ZROK2_INFLUX_ORG:-zrok}"
+    ZROK2_INFLUX_BUCKET="${ZROK2_INFLUX_BUCKET:-zrok}"
+    ZROK2_INFLUX_TOKEN="${ZROK2_INFLUX_TOKEN:-}"
 
-# Ziti controller config auto-detection
-ZITI_CTRL_CONFIG="${ZITI_CTRL_CONFIG:-}"
+    # Ziti controller config auto-detection
+    ZITI_CTRL_CONFIG="${ZITI_CTRL_CONFIG:-}"
 
-CTRL_CONFIG="/etc/zrok2/ctrl.yml"
-FRONTEND_CONFIG="/etc/zrok2/frontend.yml"
-CONTROLLER_HOME="/var/lib/zrok2-controller"
-FRONTEND_HOME="/var/lib/zrok2-frontend"
-FABRIC_USAGE_PATH="/var/lib/ziti-controller/fabric-usage.json"
+    # Paths — overridable via env vars for Docker or non-standard layouts
+    CTRL_CONFIG="${CTRL_CONFIG:-/etc/zrok2/ctrl.yml}"
+    FRONTEND_CONFIG="${FRONTEND_CONFIG:-/etc/zrok2/frontend.yml}"
+    CONTROLLER_HOME="${CONTROLLER_HOME:-/var/lib/zrok2-controller}"
+    FRONTEND_HOME="${FRONTEND_HOME:-/var/lib/zrok2-frontend}"
+    FABRIC_USAGE_PATH="${FABRIC_USAGE_PATH:-/var/lib/ziti-controller/fabric-usage.json}"
 
-# Determine the zrok2 API endpoint from TLS and port settings
-if [[ -n "$ZROK2_TLS_CERT" ]]; then
-    ZROK2_API_ENDPOINT="https://${ZROK2_DNS_ZONE}:${ZROK2_CTRL_PORT}"
-    ZROK2_FRONTEND_BIND="0.0.0.0:443"
-else
-    ZROK2_API_ENDPOINT="http://127.0.0.1:${ZROK2_CTRL_PORT}"
-    ZROK2_FRONTEND_BIND="0.0.0.0:8080"
-fi
+    # Database store — set by step_database() during Linux bootstrap, or
+    # pre-set via env vars when called from Docker entrypoints.
+    STORE_TYPE="${STORE_TYPE:-${ZROK2_STORE_TYPE}}"
+    STORE_PATH="${STORE_PATH:-}"
 
-export ZROK2_API_ENDPOINT
-export ZROK2_ADMIN_TOKEN
+    # Determine the zrok2 API endpoint from TLS and port settings
+    if [[ -n "$ZROK2_TLS_CERT" ]]; then
+        ZROK2_API_ENDPOINT="https://${ZROK2_DNS_ZONE}:${ZROK2_CTRL_PORT}"
+        ZROK2_FRONTEND_BIND="0.0.0.0:443"
+    else
+        ZROK2_API_ENDPOINT="${ZROK2_API_ENDPOINT:-http://127.0.0.1:${ZROK2_CTRL_PORT}}"
+        ZROK2_FRONTEND_BIND="${ZROK2_FRONTEND_BIND:-0.0.0.0:8080}"
+    fi
+
+    export ZROK2_API_ENDPOINT
+    export ZROK2_ADMIN_TOKEN
+}
 
 # ── Step 1: Install and configure RabbitMQ ───────────────────────────────────
 
@@ -491,7 +503,9 @@ ziti:
   password: "${ZITI_ADMIN_PASSWORD}"
 CTRLEOF
 
-    chown zrok2-controller:zrok2-controller "$CTRL_CONFIG"
+    if id -u zrok2-controller &>/dev/null; then
+        chown zrok2-controller:zrok2-controller "$CTRL_CONFIG"
+    fi
     chmod 640 "$CTRL_CONFIG"
     info "Controller config written to $CTRL_CONFIG"
 }
@@ -614,9 +628,14 @@ step_bootstrap() {
     fi
 
     info "Running zrok2 admin bootstrap..."
-    sudo -u zrok2-controller \
+    if id -u zrok2-controller &>/dev/null; then
+        sudo -u zrok2-controller \
+            ZROK2_ADMIN_TOKEN="$ZROK2_ADMIN_TOKEN" \
+            zrok2 admin bootstrap "$CTRL_CONFIG"
+    else
         ZROK2_ADMIN_TOKEN="$ZROK2_ADMIN_TOKEN" \
-        zrok2 admin bootstrap "$CTRL_CONFIG"
+            zrok2 admin bootstrap "$CTRL_CONFIG"
+    fi
 
     info "Bootstrap complete"
 }
@@ -692,7 +711,9 @@ step_dynamic_proxy_controller() {
         if [[ -f "${source_dir}/dynamicProxyController.json" ]]; then
             mkdir -p "$identity_dir"
             cp -v "${source_dir}/dynamicProxyController.json" "${identity_dir}/"
-            chown -R zrok2-controller:zrok2-controller "${CONTROLLER_HOME}/.zrok2"
+            if id -u zrok2-controller &>/dev/null; then
+                chown -R zrok2-controller:zrok2-controller "${CONTROLLER_HOME}/.zrok2"
+            fi
             info "Identity placed in $identity_dir"
         fi
     fi
@@ -772,7 +793,9 @@ step_frontend_identity() {
     if [[ -f "$source" ]]; then
         mkdir -p "$frontend_identity_dir"
         cp -v "$source" "${frontend_identity_dir}/public.json"
-        chown -R zrok2-frontend:zrok2-frontend "${FRONTEND_HOME}/.zrok2"
+        if id -u zrok2-frontend &>/dev/null; then
+            chown -R zrok2-frontend:zrok2-frontend "${FRONTEND_HOME}/.zrok2"
+        fi
         info "Frontend identity placed in $frontend_identity_dir"
     else
         warn "Could not find public.json identity file. You may need to copy it manually."
@@ -869,7 +892,9 @@ TLSEOF
 fi)
 FEEOF
 
-    chown zrok2-frontend:zrok2-frontend "$FRONTEND_CONFIG"
+    if id -u zrok2-frontend &>/dev/null; then
+        chown zrok2-frontend:zrok2-frontend "$FRONTEND_CONFIG"
+    fi
     chmod 640 "$FRONTEND_CONFIG"
     info "Frontend config written to $FRONTEND_CONFIG"
 }
@@ -1005,6 +1030,7 @@ step_start_services() {
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 main() {
+    _init_vars
     info "=== zrok2 Bootstrap ==="
     info "DNS zone:      $ZROK2_DNS_ZONE"
     info "API endpoint:  $ZROK2_API_ENDPOINT"
@@ -1051,4 +1077,14 @@ main() {
     info "     zrok2 share public localhost:8080"
 }
 
-main "$@"
+# ── Source / Execute guard ────────────────────────────────────────────────────
+#
+# When executed directly (Linux self-hosting), the full 17-step bootstrap runs.
+# When sourced (e.g., Docker entrypoints), only function definitions are loaded
+# and the caller drives execution by calling _init_vars() and step_*() as needed.
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    # Direct execution — full Linux bootstrap
+    set -o errexit -o nounset -o pipefail
+    main "$@"
+fi
