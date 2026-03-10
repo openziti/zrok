@@ -19,12 +19,15 @@ running even after you disconnect.
 
 ## Try the agent in the foreground
 
+The foreground share from step 4 won't carry over to the agent—it started as its own process and the agent begins
+fresh. You can leave it running or cancel it; either way, you'll create shares through the agent separately.
+
 To try the agent before installing it as a service:
 
 1. Start the agent:
 
     ```bash
-    zrok2 agent
+    zrok2 agent start
     ```
 
 1. In another terminal, open the agent console:
@@ -40,11 +43,11 @@ To try the agent before installing it as a service:
 
 For reliable, always-on shares, install the agent as a system service:
 
-- **Windows** — [Set up the Windows agent service](../../how-tos/agent/windows-service/)
-- **Linux** — [Install the Linux agent package `zrok2-agent`](../../how-tos/agent/linux-service)
+- **Windows**: [Set up the Windows agent service](../../how-tos/agent/windows-service/)
+- **Linux**: [Install the Linux agent package `zrok2-agent`](../../how-tos/agent/linux-service)
 
 :::note
-A native macOS agent package is not yet available. macOS users can run `zrok2 agent` in the foreground or use a
+A native macOS agent package is not yet available. macOS users can run `zrok2 agent start` in the foreground or use a
 third-party process manager.
 :::
 
