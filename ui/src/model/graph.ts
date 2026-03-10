@@ -328,12 +328,20 @@ export const layout = (nodes: Node[], edges: Edge[]): Graph => {
         .separation(() => 1);
     const laid = g(root);
 
+    // compute global baseline Y for access edge lane routing
+    // lanes start below the tallest node so they never overlap with sparkline content
+    let laneBaseY = 0;
+    for (const desc of laid.descendants()) {
+        const bottomY = desc.y + (desc.data.measured?.height ?? 50) + 25;
+        laneBaseY = Math.max(laneBaseY, bottomY);
+    }
+
     // assign lane indices to access edges for distinct routing
     let accessEdgeIndex = 0;
     const laneCount = edges.filter(e => e.type === "access").length;
     const indexedEdges = edges.map((edge) => {
         if(edge.type === "access") {
-            return { ...edge, data: { ...edge.data, laneIndex: accessEdgeIndex++, laneCount } };
+            return { ...edge, data: { ...edge.data, laneIndex: accessEdgeIndex++, laneCount, laneBaseY } };
         }
         return edge;
     });
