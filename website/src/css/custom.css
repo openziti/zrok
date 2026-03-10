@@ -4,7 +4,6 @@
  */
 @import "@netfoundry/docusaurus-theme/css/legacy.css";
 @import "@netfoundry/docusaurus-theme/css/tabs-v8-float.css";
-@import '@netfoundry/docusaurus-theme/css/layout.css';
 
 /* Import zrok-specific fonts */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
