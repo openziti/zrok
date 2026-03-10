@@ -92,7 +92,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     }, []);
 
     const retrieveOverview = (signal?: AbortSignal) => {
-        getMetadataApi(userRef.current).overview({ signal })
+        return getMetadataApi(userRef.current).overview({ signal })
             .then(d => {
                 updateLimited(d.accountLimited!);
                 let newVov = mergeGraph(oldGraph.current, user, d.accountLimited!, d);
@@ -135,7 +135,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             });
         }
 
-        getMetadataApi(user).getSparklines({body: {environments: environments, shares: shares}}, { signal })
+        return getMetadataApi(user).getSparklines({body: {environments: environments, shares: shares}}, { signal })
             .then(d => {
                 if(d.sparklines) {
                     let sparkdataIn = new Map<string, Number[]>();
@@ -177,24 +177,40 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
 
     useEffect(() => {
         const controller = new AbortController();
-        const doRetrieve = () => retrieveOverview(controller.signal);
-        doRetrieve();
-        let interval = setInterval(doRetrieve, 1000);
-        return () => {
-            controller.abort();
-            clearInterval(interval);
-        }
-    }, []);
+        let overviewTimeout: ReturnType<typeof setTimeout>;
+        let sparkTimeout: ReturnType<typeof setTimeout>;
+        let overviewDelay = 5000;
+        let sparkDelay = 15000;
 
-    useEffect(() => {
-        const controller = new AbortController();
-        let interval = setInterval(() => {
-            retrieveSparklines(controller.signal);
-        }, 5000);
+        const pollOverview = () => {
+            retrieveOverview(controller.signal)
+                .then(() => { overviewDelay = 5000; })
+                .catch(() => { overviewDelay = Math.min(overviewDelay * 2, 30000); })
+                .finally(() => { overviewTimeout = setTimeout(pollOverview, overviewDelay); });
+        };
+
+        const pollSparklines = () => {
+            retrieveSparklines(controller.signal)
+                .then(() => { sparkDelay = 15000; })
+                .catch(() => { sparkDelay = Math.min(sparkDelay * 2, 30000); })
+                .finally(() => { sparkTimeout = setTimeout(pollSparklines, sparkDelay); });
+        };
+
+        // initial load: overview first, then sparklines once nodes are populated
+        retrieveOverview(controller.signal)
+            .then(() => { overviewDelay = 5000; })
+            .catch(() => { overviewDelay = Math.min(overviewDelay * 2, 30000); })
+            .then(() => retrieveSparklines(controller.signal).catch(() => {}))
+            .finally(() => {
+                overviewTimeout = setTimeout(pollOverview, overviewDelay);
+                sparkTimeout = setTimeout(pollSparklines, sparkDelay);
+            });
+
         return () => {
             controller.abort();
-            clearInterval(interval);
-        }
+            clearTimeout(overviewTimeout);
+            clearTimeout(sparkTimeout);
+        };
     }, []);
 
     useEffect(() => {
