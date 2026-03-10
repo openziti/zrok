@@ -173,7 +173,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
 
     // and then do the opposite; add any nodes that are in the new overview, but missing from the old overview.
     outNodes.push(...newVov.nodes.filter(newNode => !outNodes.find(oldNode => oldNode.id === newNode.id
-        && oldNode.data.accessed == newNode.data.accessed
+        && oldNode.data.accessed === newNode.data.accessed
         && oldNode.data.ownedShare === newNode.data.ownedShare
         && oldNode.data.limited === newNode.data.limited
         && oldNode.data.label === newNode.data.label)));
@@ -202,7 +202,11 @@ export const nodesEqual = (a: Node[], b: Node[]) => {
     if(a && !b) return false;
     if(b && !a) return false;
     if(a.length !== b.length) return false;
-    return a.every((e, i) => e.id === b[i].id && e.data.limited === b[i].data.limited && e.data.label === b[i].data.label);
+    return a.every((e, i) => e.id === b[i].id
+        && e.data.limited === b[i].data.limited
+        && e.data.label === b[i].data.label
+        && e.data.accessed === b[i].data.accessed
+        && e.data.ownedShare === b[i].data.ownedShare);
 }
 
 export const focusGraph = (graph: Graph, focusNodeId: string): Graph => {
