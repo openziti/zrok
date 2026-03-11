@@ -1,5 +1,4 @@
 ---
-title: Migrate away from the VPN backend mode
 sidebar_label: Migrate away from VPN
 ---
 

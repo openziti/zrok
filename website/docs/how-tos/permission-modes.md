@@ -1,5 +1,4 @@
 ---
-title: Configure permission modes
 sidebar_position: 22
 sidebar_label: Configure permission modes
 ---
