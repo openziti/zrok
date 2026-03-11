@@ -1,5 +1,5 @@
 import {Node} from "@xyflow/react";
-import {Button, Grid2, Tooltip, Typography} from "@mui/material";
+import {Button, CircularProgress, Grid2, Tooltip, Typography} from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import {Share} from "./api";
 import React, {useEffect, useState} from "react";
@@ -22,6 +22,7 @@ interface SharePanelProps {
 const SharePanel = ({ share }: SharePanelProps) => {
     const user = useApiConsoleStore((state) => state.user);
     const [detail, setDetail] = useState<Share>(null);
+    const [loading, setLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [shareMetricsOpen, setShareMetricsOpen] = useState<boolean>(false);
     const openShareMetrics = () => {
@@ -80,6 +81,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
     }
 
     useEffect(() => {
+        setLoading(true);
         const controller = new AbortController();
         getMetadataApi(user).getShareDetail({ shareToken: share.data!.shareToken! as string }, { signal: controller.signal })
             .then(d => {
@@ -90,11 +92,13 @@ const SharePanel = ({ share }: SharePanelProps) => {
                 } else {
                     setDetail(rest as Share);
                 }
+                setLoading(false);
             })
             .catch(async (e) => {
                 if (isAbortError(e)) return;
                 const msg = await extractErrorMessage(e, "failed to load share details");
                 setErrorMessage(msg);
+                setLoading(false);
             })
         return () => controller.abort();
     }, [share.id]);
@@ -106,24 +110,30 @@ const SharePanel = ({ share }: SharePanelProps) => {
                     <Grid2 display="flex"><ShareIcon sx={{ fontSize: 30, mr: 0.5 }}/></Grid2>
                     <Grid2 display="flex" component="h4">{String(share.data.label)}</Grid2>
                 </Grid2>
-                <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2 }} alignItems="center">
-                    <h5 style={{ margin: 0 }}>A {detail ? detail.shareMode : ''}{detail && detail.reserved ? ', reserved ' : ''} {detail?.backendMode} share with the share token <code>{share.id}</code></h5>
-                </Grid2>
-                { errorMessage && <Typography color="error" sx={{ mb: 2 }}>{errorMessage}</Typography> }
-                { share.data.limited ? <BandwidthLimitedWarning /> : null }
-                <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
-                    <Tooltip title="Share Metrics">
-                        <Button variant="contained" aria-label="Share Metrics" onClick={openShareMetrics}><MetricsIcon /></Button>
-                    </Tooltip>
-                    <Tooltip title="Release Share" sx={{ ml: 1 }}>
-                        <Button variant="contained" color="error" aria-label="Release Share" onClick={openReleaseShare}><DeleteIcon /></Button>
-                    </Tooltip>
-                </Grid2>
-                <Grid2 container sx={{ flexGrow: 1 }}>
-                    <Grid2 display="flex">
-                        <PropertyTable object={detail} custom={customProperties} labels={labels} />
-                    </Grid2>
-                </Grid2>
+                {loading ? (
+                    <Grid2 container justifyContent="center" sx={{ mt: 4 }}><CircularProgress /></Grid2>
+                ) : (
+                    <>
+                        <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2 }} alignItems="center">
+                            <h5 style={{ margin: 0 }}>A {detail ? detail.shareMode : ''}{detail && detail.reserved ? ', reserved ' : ''} {detail?.backendMode} share with the share token <code>{share.id}</code></h5>
+                        </Grid2>
+                        { errorMessage && <Typography color="error" sx={{ mb: 2 }}>{errorMessage}</Typography> }
+                        { share.data.limited ? <BandwidthLimitedWarning /> : null }
+                        <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
+                            <Tooltip title="Share Metrics">
+                                <Button variant="contained" aria-label="Share Metrics" onClick={openShareMetrics}><MetricsIcon /></Button>
+                            </Tooltip>
+                            <Tooltip title="Release Share" sx={{ ml: 1 }}>
+                                <Button variant="contained" color="error" aria-label="Release Share" onClick={openReleaseShare}><DeleteIcon /></Button>
+                            </Tooltip>
+                        </Grid2>
+                        <Grid2 container sx={{ flexGrow: 1 }}>
+                            <Grid2 display="flex">
+                                <PropertyTable object={detail} custom={customProperties} labels={labels} />
+                            </Grid2>
+                        </Grid2>
+                    </>
+                )}
             </Typography>
             <ShareMetricsModal close={closeShareMetrics} isOpen={shareMetricsOpen} user={user} share={share} />
             <ReleaseShareModal close={closeReleaseShare} isOpen={releaseShareOpen} user={user} share={share} detail={detail} />

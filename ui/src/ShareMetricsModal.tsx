@@ -3,7 +3,7 @@ import {Node} from "@xyflow/react";
 import {useEffect, useState} from "react";
 import {buildMetrics} from "./model/util.ts";
 import {getMetadataApi} from "./model/api.ts";
-import {Box, Grid2, Modal, Typography} from "@mui/material";
+import {Box, CircularProgress, Grid2, Modal, Typography} from "@mui/material";
 import {modalStyle} from "./styling/theme.ts";
 import MetricsGraph from "./MetricsGraph.tsx";
 import {extractErrorMessage, isAbortError} from "./model/errors.ts";
@@ -20,13 +20,15 @@ const ShareMetricsModal = ({ close, isOpen, user, share }: ShareMetricsModalProp
     const [metrics7, setMetrics7] = useState(buildMetrics({}));
     const [metrics1, setMetrics1] = useState(buildMetrics({}));
     const [errorMessage, setErrorMessage] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         if (!isOpen) return;
         const controller = new AbortController();
         setErrorMessage("");
+        setLoading(true);
         let metadataApi = getMetadataApi(user);
-        metadataApi.getShareMetrics({shareToken: share.id}, { signal: controller.signal })
+        const p1 = metadataApi.getShareMetrics({shareToken: share.id}, { signal: controller.signal })
             .then(d => {
                 setMetrics30(buildMetrics(d));
             })
@@ -35,7 +37,7 @@ const ShareMetricsModal = ({ close, isOpen, user, share }: ShareMetricsModalProp
                 const msg = await extractErrorMessage(e, "unable to load metrics");
                 setErrorMessage(msg);
             });
-        metadataApi.getShareMetrics({shareToken: share.id, duration: "168h"}, { signal: controller.signal })
+        const p2 = metadataApi.getShareMetrics({shareToken: share.id, duration: "168h"}, { signal: controller.signal })
             .then(d => {
                 setMetrics7(buildMetrics(d));
             })
@@ -44,7 +46,7 @@ const ShareMetricsModal = ({ close, isOpen, user, share }: ShareMetricsModalProp
                 const msg = await extractErrorMessage(e, "unable to load metrics");
                 setErrorMessage(msg);
             });
-        metadataApi.getShareMetrics({shareToken: share.id, duration: "24h"}, { signal: controller.signal })
+        const p3 = metadataApi.getShareMetrics({shareToken: share.id, duration: "24h"}, { signal: controller.signal })
             .then(d => {
                 setMetrics1(buildMetrics(d));
             })
@@ -53,6 +55,7 @@ const ShareMetricsModal = ({ close, isOpen, user, share }: ShareMetricsModalProp
                 const msg = await extractErrorMessage(e, "unable to load metrics");
                 setErrorMessage(msg);
             });
+        Promise.all([p1, p2, p3]).then(() => setLoading(false));
         return () => controller.abort();
     }, [isOpen, share]);
 
@@ -63,9 +66,15 @@ const ShareMetricsModal = ({ close, isOpen, user, share }: ShareMetricsModalProp
                     <Typography variant="h5" id="modal-title-share-metrics"><strong>Share Metrics</strong></Typography>
                 </Grid2>
                 { errorMessage && <Grid2 container sx={{ flexGrow: 1, p: 1 }}><Typography color="error">{errorMessage}</Typography></Grid2> }
-                <MetricsGraph title="Last 30 Days" data={metrics30.data} />
-                <MetricsGraph title="Last 7 Days" data={metrics7.data} showTime />
-                <MetricsGraph title="Last 24 Hours" data={metrics1.data} showTime />
+                {loading ? (
+                    <Grid2 container justifyContent="center" sx={{ mt: 4 }}><CircularProgress /></Grid2>
+                ) : (
+                    <>
+                        <MetricsGraph title="Last 30 Days" data={metrics30.data} />
+                        <MetricsGraph title="Last 7 Days" data={metrics7.data} showTime />
+                        <MetricsGraph title="Last 24 Hours" data={metrics1.data} showTime />
+                    </>
+                )}
             </Box>
         </Modal>
     );

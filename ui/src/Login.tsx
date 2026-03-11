@@ -1,4 +1,4 @@
-import {Box, Button, Container, TextField, Typography} from "@mui/material";
+import {Box, Button, CircularProgress, Container, TextField, Typography} from "@mui/material";
 import {User} from "./model/user.ts";
 import React, {useEffect, useState} from "react";
 import {AccountApi, MetadataApi} from "./api";
@@ -15,6 +15,7 @@ const Login = ({ onLogin }: LoginProps) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
     const [tou, setTou] = useState<string>("");
     const [newAccountLink, setNewAccountLink] = useState<string>("");
 
@@ -36,6 +37,7 @@ const Login = ({ onLogin }: LoginProps) => {
     const login = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        setLoading(true);
         new AccountApi().login({body: {"email": email, "password": password}})
             .then(d => {
                 onLogin({email: email, token: d.toString()});
@@ -43,6 +45,7 @@ const Login = ({ onLogin }: LoginProps) => {
             .catch(async (e) => {
                 const msg = await extractErrorMessage(e, "login failed");
                 setMessage(msg);
+                setLoading(false);
             });
     }
 
@@ -83,8 +86,8 @@ const Login = ({ onLogin }: LoginProps) => {
                                 setPassword(v.target.value)
                             }}
                         />
-                        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} style={{ color: "#9bf316" }}>
-                            Log In
+                        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} style={{ color: "#9bf316" }} disabled={loading}>
+                            {loading ? <CircularProgress size={24} sx={{ color: "#9bf316" }} /> : "Log In"}
                         </Button>
                         <Box component="div" style={{ textAlign: "center" }}>
                             <Box component="h3" style={{ color: "red" }}>{message}</Box>

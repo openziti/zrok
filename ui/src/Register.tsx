@@ -1,4 +1,4 @@
-import {Box, Button, Checkbox, Container, FormControlLabel, Grid2, Paper, TextField, Typography} from "@mui/material";
+import {Box, Button, Checkbox, CircularProgress, Container, FormControlLabel, Grid2, Paper, TextField, Typography} from "@mui/material";
 import zrokLogo from "./assets/zrok-1.0.0-rocket-purple.svg";
 import {useParams} from "react-router";
 import {useFormik} from "formik";
@@ -187,7 +187,9 @@ const InvalidToken = () => {
 
 const Register = () => {
     const { regToken } = useParams();
-    const [component, setComponent] = useState<React.JSX.Element>(null);
+    const [component, setComponent] = useState<React.JSX.Element>(
+        <Grid2 container sx={{ justifyContent: "center", mt: 4 }}><CircularProgress /></Grid2>
+    );
     const [error, setError] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [email, setEmail] = useState<string>();
