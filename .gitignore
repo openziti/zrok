@@ -40,7 +40,8 @@ yarn-error.log*
 sdk/nodejs/sdk/dist
 
 # py module artifacts
-/sdk/python/src/**/*.egg-info/
-/sdk/python/src/**/__pycache__/
+*.egg-info/
+__pycache__/
 /.coverage
 /sdk/python/src/dist/
+/sdk/python/.coverage
