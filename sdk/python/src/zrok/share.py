@@ -1,8 +1,10 @@
-from zrok_api.api import ShareApi
+from zrok_api.api import ShareApi, MetadataApi
 from zrok.environment.root import Root
 from zrok_api.models.auth_user import AuthUser
 from zrok_api.models.share_request import ShareRequest
+from zrok_api.models.name_selection import NameSelection as ApiNameSelection
 from zrok_api.models.unshare_request import UnshareRequest
+from zrok_api.models.update_share_request import UpdateShareRequest
 import json
 from zrok_api.exceptions import ApiException
 import zrok.model as model
@@ -37,10 +39,6 @@ def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:
             out = __newPublicShare(root, request)
         case _:
             raise Exception("unknown share mode " + request.ShareMode)
-    out.reserved = request.Reserved
-    if request.Reserved:
-        out.unique_name = request.UniqueName
-
     if len(request.BasicAuth) > 0:
         out.auth_scheme = model.AUTH_SCHEME_BASIC
         for pair in request.BasicAuth:
@@ -106,17 +104,38 @@ def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:
 
 
 def __newPrivateShare(root: Root, request: model.ShareRequest) -> ShareRequest:
+    name_selections = None
+    if request.NameSelections:
+        name_selections = [
+            ApiNameSelection(
+                namespace_token=ns.NamespaceToken,
+                name=ns.Name,
+            )
+            for ns in request.NameSelections
+        ]
+
     return ShareRequest(env_zid=root.env.ZitiIdentity,
                         share_mode=request.ShareMode,
                         backend_mode=request.BackendMode,
                         backend_proxy_endpoint=request.Target,
                         auth_scheme=model.AUTH_SCHEME_NONE,
                         permission_mode=request.PermissionMode,
-                        access_grants=request.AccessGrants
+                        access_grants=request.AccessGrants,
+                        name_selections=name_selections,
                         )
 
 
 def __newPublicShare(root: Root, request: model.ShareRequest) -> ShareRequest:
+    name_selections = None
+    if request.NameSelections:
+        name_selections = [
+            ApiNameSelection(
+                namespace_token=ns.NamespaceToken,
+                name=ns.Name,
+            )
+            for ns in request.NameSelections
+        ]
+
     ret = ShareRequest(env_zid=root.env.ZitiIdentity,
                        share_mode=request.ShareMode,
                        frontend_selection=request.Frontends,
@@ -126,7 +145,8 @@ def __newPublicShare(root: Root, request: model.ShareRequest) -> ShareRequest:
                        oauth_email_domains=request.OauthEmailAddressPatterns,
                        oauth_authorization_check_interval=request.OauthAuthorizationCheckInterval,
                        permission_mode=request.PermissionMode,
-                       access_grants=request.AccessGrants
+                       access_grants=request.AccessGrants,
+                       name_selections=name_selections,
                        )
     if request.OauthProvider != "":
         ret.oauth_provider = request.OauthProvider
@@ -197,3 +217,80 @@ def ReleaseReservedShare(root: Root, shr: model.Share):
             raise Exception("error releasing share", e)
     except Exception as e:
         raise Exception("error releasing share", e)
+
+
+def ModifyShare(root: Root, share_token: str, add_access_grants: list[str] = None,
+                remove_access_grants: list[str] = None):
+    """Update share properties after creation.
+
+    Args:
+        root: The Root environment context.
+        share_token: The share token to modify.
+        add_access_grants: Access grants to add.
+        remove_access_grants: Access grants to remove.
+    """
+    if not root.IsEnabled():
+        raise Exception("environment is not enabled; enable with 'zrok enable' first!")
+
+    req = UpdateShareRequest(
+        share_token=share_token,
+        add_access_grants=add_access_grants or [],
+        remove_access_grants=remove_access_grants or [],
+    )
+
+    try:
+        zrok = root.Client()
+    except Exception as e:
+        raise Exception("error getting zrok client", e)
+
+    try:
+        share_api = ShareApi(zrok)
+        custom_headers = {
+            'Accept': 'application/json, application/zrok.v1+json'
+        }
+        share_api.update_share_with_http_info(body=req, _headers=custom_headers)
+    except ApiException as e:
+        if "Unsupported content type: application/zrok.v1+json" in str(e) and (200 <= e.status <= 299):
+            pass
+        else:
+            raise Exception("error modifying share", e)
+    except Exception as e:
+        raise Exception("error modifying share", e)
+
+
+def GetShareDetail(root: Root, share_token: str) -> model.ShareDetail:
+    """Get detailed metadata for a single share.
+
+    Args:
+        root: The Root environment context.
+        share_token: The share token to look up.
+
+    Returns:
+        A ShareDetail with the share's metadata.
+    """
+    if not root.IsEnabled():
+        raise Exception("environment is not enabled; enable with 'zrok enable' first!")
+
+    try:
+        zrok = root.Client()
+    except Exception as e:
+        raise Exception("error getting zrok client", e)
+
+    try:
+        metadata_api = MetadataApi(zrok)
+        res = metadata_api.get_share_detail(share_token=share_token)
+    except Exception as e:
+        raise Exception("error getting share detail", e)
+
+    return model.ShareDetail(
+        Token=res.share_token or "",
+        ZId=res.z_id or "",
+        EnvZId=res.env_zid or "",
+        ShareMode=res.share_mode or "",
+        BackendMode=res.backend_mode or "",
+        FrontendEndpoints=res.frontend_endpoints or [],
+        Target=res.target or "",
+        Limited=res.limited or False,
+        CreatedAt=res.created_at or 0,
+        UpdatedAt=res.updated_at or 0,
+    )

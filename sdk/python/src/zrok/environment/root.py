@@ -1,13 +1,14 @@
 from dataclasses import dataclass, field
 from typing import NamedTuple
-from .dirs import identityFile, rootDir, configFile, environmentFile, metadataFile
+from .dirs import identityFile, identitiesDir, rootDir, configFile, environmentFile, metadataFile
 import os
 import json
+import sys
 import zrok_api as zrok
 from zrok_api.configuration import Configuration
 from zrok_api.models.client_version_check_request import ClientVersionCheckRequest
 
-V = "v1.0"
+V = "v2.0"
 
 
 @dataclass
@@ -68,10 +69,16 @@ class Root:
             apiEndpoint = self.cfg.ApiEndpoint
             frm = "config"
 
-        env = os.getenv("ZROK_API_ENDPOINT")
-        if env != "":
+        env = os.getenv("ZROK2_API_ENDPOINT", "")
+        if env:
+            apiEndpoint = env
+            frm = "ZROK2_API_ENDPOINT"
+        elif os.getenv("ZROK_API_ENDPOINT", ""):
+            env = os.getenv("ZROK_API_ENDPOINT", "")
             apiEndpoint = env
             frm = "ZROK_API_ENDPOINT"
+            print("WARNING: ZROK_API_ENDPOINT is deprecated, use ZROK2_API_ENDPOINT instead",
+                  file=sys.stderr)
 
         if self.IsEnabled():
             apiEndpoint = self.env.ApiEndpoint
@@ -90,6 +97,34 @@ class Root:
 
     def ZitiIdentityNamed(self, name: str) -> str:
         return identityFile(name)
+
+    def SetEnvironment(self, env: Environment) -> None:
+        ef = environmentFile()
+        os.makedirs(os.path.dirname(ef), exist_ok=True)
+        data = {
+            "zrok_token": env.Token,
+            "ziti_identity": env.ZitiIdentity,
+            "api_endpoint": env.ApiEndpoint,
+        }
+        with open(ef, "w") as f:
+            json.dump(data, f, indent=2)
+        self.env = env
+
+    def SaveZitiIdentityNamed(self, name: str, cfg: str) -> None:
+        idd = identitiesDir()
+        os.makedirs(idd, exist_ok=True)
+        idf = identityFile(name)
+        with open(idf, "w") as f:
+            f.write(cfg)
+
+    def DeleteEnvironment(self) -> None:
+        ef = environmentFile()
+        if os.path.isfile(ef):
+            os.remove(ef)
+        idf = identityFile(self.EnvironmentIdentityName())
+        if os.path.isfile(idf):
+            os.remove(idf)
+        self.env = Environment()
 
     def client_version_check(self, zrock_client):
         """Check if the client version is compatible with the API."""

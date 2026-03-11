@@ -26,15 +26,16 @@ class ShareRequest:
     BackendMode: BackendMode
     ShareMode: ShareMode
     Target: str
-    Frontends: list[str] = field(default_factory=list[str])
-    BasicAuth: list[str] = field(default_factory=list[str])
+    Frontends: list[str] = field(default_factory=list)
+    BasicAuth: list[str] = field(default_factory=list)
     OauthProvider: str = ""
-    OauthEmailAddressPatterns: list[str] = field(default_factory=list[str])
+    OauthEmailAddressPatterns: list[str] = field(default_factory=list)
     OauthAuthorizationCheckInterval: str = ""
     Reserved: bool = False
     UniqueName: str = ""
     PermissionMode: PermissionMode = OPEN_PERMISSION_MODE
-    AccessGrants: list[str] = field(default_factory=list[str])
+    AccessGrants: list[str] = field(default_factory=list)
+    NameSelections: list = field(default_factory=list)
 
 
 @dataclass
@@ -73,3 +74,69 @@ AuthScheme = str
 AUTH_SCHEME_NONE: AuthScheme = "none"
 AUTH_SCHEME_BASIC: AuthScheme = "basic"
 AUTH_SCHEME_OAUTH: AuthScheme = "oauth"
+
+
+@dataclass
+class EnableRequest:
+    Description: str = ""
+    Host: str = ""
+
+
+@dataclass
+class NameSelection:
+    NamespaceToken: str = ""
+    Name: str = ""
+
+
+@dataclass
+class ShareDetail:
+    Token: str = ""
+    ZId: str = ""
+    EnvZId: str = ""
+    ShareMode: str = ""
+    BackendMode: str = ""
+    FrontendEndpoints: list[str] = field(default_factory=list)
+    Target: str = ""
+    Limited: bool = False
+    CreatedAt: int = 0
+    UpdatedAt: int = 0
+
+
+@dataclass
+class AccessDetail:
+    Id: int = 0
+    FrontendToken: str = ""
+    EnvZId: str = ""
+    ShareToken: str = ""
+    BackendMode: str = ""
+    BindAddress: str = ""
+    Description: str = ""
+    Limited: bool = False
+    CreatedAt: int = 0
+    UpdatedAt: int = 0
+
+
+@dataclass
+class NameEntry:
+    NamespaceToken: str = ""
+    NamespaceName: str = ""
+    Name: str = ""
+    ShareToken: str = ""
+    Reserved: bool = False
+    CreatedAt: int = 0
+
+
+@dataclass
+class Namespace:
+    NamespaceToken: str = ""
+    Name: str = ""
+    Description: str = ""
+
+
+@dataclass
+class Status:
+    Enabled: bool = False
+    ApiEndpoint: str = ""
+    ApiEndpointSource: str = ""
+    Token: str = ""
+    ZitiIdentity: str = ""
