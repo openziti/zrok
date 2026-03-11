@@ -10,12 +10,10 @@ terminal sessions and system restarts.
 
 ## Why use the agent?
 
-The foreground `zrok2 share` command in Step 4 works for quick testing, but it stops the moment you close the
-terminal. The zrok agent runs in the background and manages all your shares and accesses as a single persistent
-process. It also provides a web UI for monitoring and managing your shares.
-
-When the agent is running, `zrok2 share` and `zrok2 access` commands delegate to it automatically—your shares keep
-running even after you disconnect.
+The foreground `zrok2 share` command in Step 4 stops the moment you close the terminal. The zrok agent runs in the
+background, manages all your shares and accesses as a single persistent process, and provides a web UI. When the agent
+is running, `zrok2 share` and `zrok2 access` commands delegate to it automatically. For a full explanation, see
+[zrok agent](../concepts/agent.md).
 
 ## Try the agent in the foreground
 
@@ -45,11 +43,11 @@ For reliable, always-on shares, install the agent as a system service:
 
 - **Windows**: [Set up the Windows agent service](../how-tos/agent/windows-service/index.mdx)
 - **Linux**: [Install the Linux agent package `zrok2-agent`](../how-tos/agent/linux-service.mdx)
-- **Docker**: [Run the zrok agent in Docker](../how-tos/docker-agent/index.mdx)
+- **Docker**: [Run the zrok agent in Docker](../how-tos/agent/docker-agent.mdx)
 
 :::note
 A native macOS agent package is not yet available. macOS users can run `zrok2 agent start` in the foreground or use a
 third-party process manager.
 :::
 
-For more detail on what the agent can do, see [Use the zrok Agent](../how-tos/agent/index.mdx).
+For more detail on managing shares with the agent, see [Manage shares with the agent](../how-tos/agent/manage-shares.mdx).

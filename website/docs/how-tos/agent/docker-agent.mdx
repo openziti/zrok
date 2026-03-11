@@ -1,6 +1,7 @@
 ---
-title: Running the zrok Agent in Docker
-sidebar_label: Docker
+title: Run the zrok agent in Docker
+sidebar_label: Run the zrok agent in Docker
+sidebar_position: 50
 ---
 
 import Details from '@theme/MDXComponents/Details';
@@ -10,7 +11,7 @@ The `zrok2` agent runs in Docker using the `docker.io/openziti/zrok2` container 
 1. **Bind-mount approach** — mount your existing `~/.zrok2` directory from the Docker host. Quick to set up; requires enabling the zrok environment on the host first.
 2. **Self-contained approach** — use Docker named volumes and init containers to enable the environment automatically. No host-side setup required beyond an account token.
 
-Both approaches run the agent as a long-lived container. Once the agent is running, you interact with it using `docker compose exec` to create names, start shares, and manage the lifecycle described in the [Agent guide](../agent/index.mdx).
+Both approaches run the agent as a long-lived container. Once the agent is running, you interact with it using `docker compose exec` to create names, start shares, and manage the lifecycle described in the [Agent guide](./index.mdx).
 
 ## Prerequisites
 
@@ -19,7 +20,7 @@ Both approaches run the agent as a long-lived container. Once the agent is runni
 
 ## Bind-mount approach
 
-This approach mirrors the [Linux systemd agent service](../agent/linux-service.mdx) — you enable the zrok environment on the Docker host and mount it into the container.
+This approach mirrors the [Linux systemd agent service](./linux-service.mdx) — you enable the zrok environment on the Docker host and mount it into the container.
 
 ### 1. Enable the environment on the host
 
@@ -229,7 +230,7 @@ Then delete the zrok environment from the web console or with `zrok2 admin`.
 
 ## Agent lifecycle reference
 
-Once the agent is running (in either approach), the workflow is the same as any other zrok platform. See the [Agent guide](../agent/index.mdx) for the full tutorial, including:
+Once the agent is running (in either approach), the workflow is the same as any other zrok platform. See the [Agent guide](./index.mdx) for the full tutorial, including:
 
 - Creating and deleting names
 - Starting public and private shares

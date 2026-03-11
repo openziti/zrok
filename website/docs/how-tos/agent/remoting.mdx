@@ -4,9 +4,9 @@ sidebar_label: Enable agent remoting
 sidebar_position: 20
 ---
 
-As of `v1.0.5` the zrok Agent and controller support secure, opt-in remote control for creating shares and accesses through the central zrok API.
+As of `v1.0.5` the zrok agent and controller support secure, opt-in remote control for creating shares and accesses through the central zrok API.
 
-## Enable Agent remoting in the zrok controller
+## Enable agent remoting in the zrok controller
 
 Create an identity for your zrok controller to use for interacting with remote agents:
 
@@ -28,7 +28,7 @@ agent_controller:
 
 Restart your controller with this configuration and the agent remoting endpoints will become available.
 
-## Enroll an Agent
+## Enroll an agent
 
 Enrolling an Agent in remoting requires an enabled environment. You can use the `zrok2 agent enroll` command from an enabled environment to enroll your agent:
 
@@ -57,7 +57,7 @@ When you restart your agent, you will notice the following message in the Agent'
 [   0.001]    INFO zrok/agent.(*Agent).remoteAgent: listening for remote commands at 'yC9atRbCOskz'
 ```
 
-## The Agent remoting API
+## Agent remoting API
 
 :::note
 See the [zrok OpenAPI spec](https://github.com/openziti/zrok/blob/main/specs/zrok.yml) for complete details of `/agent` endpoints.
@@ -117,7 +117,7 @@ $ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+j
 
 The `/agent/access` and `/agent/unaccess` endpoints also exist and allow for creating and removing private access frontends remotely.
 
-## Unenroll an Agent
+## Unenroll an agent
 
 The `zrok2 agent unenroll` command will remove all remote control access from an Agent in an environment:
 

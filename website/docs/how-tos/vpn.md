@@ -1,126 +1,110 @@
 ---
-title: VPN backend mode (deprecated)
-sidebar_label: VPN (deprecated)
+title: Migrate away from the VPN backend mode
+sidebar_label: Migrate away from VPN
 ---
 
-# VPN backend mode (deprecated)
+# Migrate away from the VPN backend mode
 
-The `vpn` backend mode has been removed from zrok as of `v1.1.11`.
+:::note
+The `vpn` backend mode was removed in `v1.1.11` due to dependency conflicts with core zrok libraries.
+:::
 
-## Why the VPN mode was removed
+If you were using the VPN backend mode, consider these alternatives depending on your use case.
 
-The VPN backend mode was removed from the core zrok distribution due to dependency management issues. The underlying libraries required for VPN functionality (specifically the TUN device management libraries) created conflicts that prevented updates to critical dependencies in the zrok codebase.
+## For host-to-host connectivity
 
-Maintaining these dependencies while keeping the rest of zrok's dependencies current proved to be increasingly difficult. After careful consideration, we decided to remove the VPN backend mode from core zrok to ensure the stability and security of the main codebase.
+### TCP tunnel mode
 
-## Future Plans
+The `tcpTunnel` backend mode tunnels specific TCP ports between hosts. Use this when you need to access a specific
+service on a remote machine.
 
-We are exploring the possibility of re-introducing VPN functionality as a separate "layer" product built on top of zrok. This would be delivered as a separate CLI tool (such as `zrok-vpn`) that provides VPN capabilities within a zrok environment, without the dependency conflicts affecting the core zrok distribution.
+#### Example: SSH access to a remote machine
 
-This approach would allow:
+1. On the machine you want to access, create a private share of the SSH port:
 
-- The core zrok tool to remain lean and maintainable
-- VPN functionality to be developed and released on its own schedule
-- Users who need VPN features to opt-in to the additional tool
-- The VPN implementation could support a different subset of platforms than core zrok
+    ```bash
+    zrok2 share private --backend-mode tcpTunnel localhost:22
+    ```
 
-## Migrate away from VPN
+1. On your local machine, bind the share to a local port:
 
-If you were using the VPN backend mode, consider these alternatives:
+    ```bash
+    zrok2 access private --bind 127.0.0.1:2222 <share-token>
+    ```
 
-### For host-to-host connectivity
+1. Connect via SSH through the tunnel:
 
-#### TCP tunnel mode
+    ```bash
+    ssh -p 2222 user@127.0.0.1
+    ```
 
-The `tcpTunnel` backend mode allows you to tunnel specific TCP ports between hosts. This is ideal when you need to access a specific service on a remote machine.
+#### Example: Database on a remote server
 
-**Example: Sharing SSH access to a remote machine**
+1. On the remote machine, create a private share of the database port:
 
-On the machine you want to access (the "sharing" side):
+    ```bash
+    zrok2 share private --backend-mode tcpTunnel localhost:5432
+    ```
 
-```bash
-zrok2 share private --backend-mode tcpTunnel localhost:22
-```
+1. On your local machine, bind the share to a local port:
 
-This creates a private share and outputs a share token (e.g., `abc123`).
+    ```bash
+    zrok2 access private --bind 127.0.0.1:5432 <share-token>
+    ```
 
-On your local machine (the "accessing" side):
+1. Connect with your database client:
 
-```bash
-zrok2 access private --bind 127.0.0.1:2222 abc123
-```
+    ```bash
+    psql -h 127.0.0.1 -p 5432 -U myuser mydatabase
+    ```
 
-Now you can SSH to the remote machine through the tunnel:
+### SOCKS proxy mode
 
-```bash
-ssh -p 2222 user@127.0.0.1
-```
+The `socks` backend mode creates a SOCKS5 proxy for dynamic port forwarding to multiple destinations through a single
+share. Use this when you need to access multiple services on a remote network.
 
-**Example: Accessing a database on a remote server**
+1. On the remote machine, create a private share in SOCKS mode:
 
-Share a PostgreSQL database:
+    ```bash
+    zrok2 share private --backend-mode socks
+    ```
 
-```bash
-zrok2 share private --backend-mode tcpTunnel localhost:5432
-```
+1. On your local machine, bind the share to a local SOCKS5 port:
 
-Access it locally:
+    ```bash
+    zrok2 access private --bind 127.0.0.1:1080 <share-token>
+    ```
 
-```bash
-zrok2 access private --bind 127.0.0.1:5432 <share-token>
-```
+1. Configure your applications to use the SOCKS5 proxy at `127.0.0.1:1080`. For example:
 
-Connect with your database client:
+    **curl:**
 
-```bash
-psql -h 127.0.0.1 -p 5432 -U myuser mydatabase
-```
+    ```bash
+    curl --socks5-hostname 127.0.0.1:1080 http://internal-server:8080/api
+    ```
 
-#### SOCKS proxy mode
+    **SSH:**
 
-The `socks` backend mode creates a SOCKS5 proxy, enabling dynamic port forwarding to multiple destinations through a single share. This is useful when you need to access multiple services on a remote network.
+    ```bash
+    ssh -o ProxyCommand='nc -x 127.0.0.1:1080 %h %p' user@internal-host
+    ```
 
-**Example: Creating a SOCKS proxy to a remote network**
+    **Browser:** Configure your browser's proxy settings to use SOCKS5 proxy `127.0.0.1:1080`.
 
-On the remote machine (the "sharing" side):
+### When to use each mode
 
-```bash
-zrok2 share private --backend-mode socks
-```
-
-On your local machine (the "accessing" side):
-
-```bash
-zrok2 access private --bind 127.0.0.1:1080 <share-token>
-```
-
-Now configure your applications to use the SOCKS5 proxy at `127.0.0.1:1080`. For example:
-
-**curl:**
-```bash
-curl --socks5-hostname 127.0.0.1:1080 http://internal-server:8080/api
-```
-
-**SSH (to access any host reachable from the remote machine):**
-```bash
-ssh -o ProxyCommand='nc -x 127.0.0.1:1080 %h %p' user@internal-host
-```
-
-**Browser:** Configure your browser's proxy settings to use SOCKS5 proxy `127.0.0.1:1080` to browse internal web applications.
-
-#### When to use each mode
-
-| Use Case | Recommended Mode |
-|----------|------------------|
+| Use case | Recommended mode |
+|---|---|
 | Access a single TCP service (SSH, database, etc.) | `tcpTunnel` |
 | Access multiple services on a remote network | `socks` |
 | Web browsing through a remote network | `socks` |
 | Persistent service tunneling | `tcpTunnel` with reserved name |
 
-### For network-level access
+## For network-level access
 
-- Consider deploying an OpenZiti network directly for full network-level zero-trust connectivity
+Consider deploying an OpenZiti network directly for full network-level zero-trust connectivity.
 
-## Questions or Feedback
+## Support
 
-If you have questions about this change or need help migrating your workflows, please start a discussion on the [OpenZiti Discourse Group](https://openziti.discourse.group/).
+If you have questions or need help migrating, start a discussion on the
+[OpenZiti Discourse Group](https://openziti.discourse.group/).

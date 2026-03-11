@@ -1,11 +1,11 @@
 ---
 title: Set up the Windows agent service
-sidebar_label: Windows agent service
+sidebar_label: Set up the Windows agent service
 ---
 
-In Windows environments, it can be useful to run the zrok Agent as a service, allowing it to automatically restart with your system.
+In Windows environments, it can be useful to run the zrok agent as a service, allowing it to automatically restart with your system.
 
-Support for running the zrok Agent as a Windows service is handled through a third party utility, `nssm`, which is available here:
+Support for running the zrok agent as a Windows service is handled through a third party utility, `nssm`, which is available here:
 
 [https://nssm.cc/download](https://nssm.cc/download)
 
@@ -43,7 +43,7 @@ Now we've got a new, enabled environment to use with our Agent running as a Wind
 
 ## Install the service
 
-In the `C:\Program Files\zrok2` directory, execute this command to invoke `nssm` to create the new Windows service for our zrok Agent:
+In the `C:\Program Files\zrok2` directory, execute this command to invoke `nssm` to create the new Windows service for our zrok agent:
 
 ```cmd
 C:\Program Files\zrok2>nssm install zrokAgent
@@ -79,7 +79,7 @@ If we open the "Services" utility in Windows, we can see our new `zrokAgent` ser
 
 ![Service Manager](images/services.png)
 
-If we click the start button in the toolbar, or right-click on the service and select "start", our new zrok Agent service will start:
+If we click the start button in the toolbar, or right-click on the service and select "start", our new zrok agent service will start:
 
 ![Service Running](images/services-running.png)
 
@@ -87,7 +87,7 @@ If we open a Windows Explorer in the folder `C:\Windows\System32\config\systempr
 
 ![zrokdir](images/zrokdir.png)
 
-This zrok Agent service is now available for use. Whenever a Windows Command Prompt wants to interact with this environment, it is important that the `USERPROFILE` environment variable is properly set to `C:\Windows\System32\config\systemprofile`, otherwise the zrok commands will attempt to interact with the environment that would be created in the user's default profile directory.
+This zrok agent service is now available for use. Whenever a Windows Command Prompt wants to interact with this environment, it is important that the `USERPROFILE` environment variable is properly set to `C:\Windows\System32\config\systemprofile`, otherwise the zrok commands will attempt to interact with the environment that would be created in the user's default profile directory.
 
 We can access the Agent console using this command:
 
@@ -125,7 +125,7 @@ C:\Program Files\zrok2>sc start zrokAgent
 
 ![nssm CLI installation](images/nssm-cli-installation.png)
 
-## Remove the zrok Agent service
+## Remove the zrok agent service
 
 The following commands (in a Command Prompt running as Administrator) can be used to remove the service from your system:
 

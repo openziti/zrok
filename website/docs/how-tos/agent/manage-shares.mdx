@@ -1,0 +1,78 @@
+---
+title: Manage shares with the agent
+sidebar_label: Manage shares with the agent
+sidebar_position: 10
+---
+
+# Manage shares with the agent
+
+For a full explanation of how the agent works, see [zrok agent](../../concepts/agent.md).
+
+## Before you begin
+
+The agent must be running. If it's not already installed as a background service, start it in the foreground:
+
+```bash
+zrok2 agent
+```
+
+## Create a public share
+
+To share a local port publicly:
+
+1. Run:
+
+    ```bash
+    zrok2 share public 8080
+    ```
+
+    ```buttonless title="Output"
+    token:"zje5x8p0k9pi" frontendEndpoints:"https://zje5x8p0k9pi.share.zrok.io"
+    ```
+
+1. The share appears in the agent UI and is accessible at the public share URL.
+
+## Reserve and share a private share
+
+To create a persistent private share using a reserved token:
+
+1. Reserve a private share with a unique name:
+
+    ```bash
+    zrok2 reserve private 8080 --closed --unique-name "myshare"
+    ```
+
+    ```buttonless title="Output"
+    [   1.883]    INFO main.(*reserveCommand).run: your reserved share token is 'myshare'
+    ```
+
+1. Start sharing the reserved share:
+
+    ```bash
+    zrok2 share reserved "myshare"
+    ```
+
+    ```buttonless title="Output"
+    [   0.001]    INFO main.(*shareReservedCommand).shareAgent: starting
+    token:"myshare" backendMode:"proxy" shareMode:"private" target:"http://127.0.0.1:8080"
+    ```
+
+1. The share appears in the agent UI. To access it from another device on the same zrok account, run
+   `zrok2 access "myshare"`.
+
+## Check agent status
+
+Run `zrok2 agent status` to see all active shares and accesses:
+
+```bash
+zrok2 agent status
+```
+
+```buttonless title="Output"
+ FRONTEND TOKEN  TOKEN  BIND ADDRESS
+0 accesses in agent
+
+ TOKEN         RESERVED  SHARE MODE  BACKEND MODE  TARGET
+ myshare       true      private     tcpTunnel     127.0.0.1:8080
+1 share in agent
+```
