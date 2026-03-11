@@ -1,78 +1,91 @@
 ---
-title: Enable agent remoting
 sidebar_label: Enable agent remoting
 sidebar_position: 20
 ---
 
-As of `v1.0.5` the zrok Agent and controller support secure, opt-in remote control for creating shares and accesses through the central zrok API.
+# Enable agent remoting
 
-## Enable Agent remoting in the zrok controller
+As of `v1.0.5`, the zrok agent and controller support secure, opt-in remote control for creating shares and
+accesses through the central zrok API.
 
-Create an identity for your zrok controller to use for interacting with remote agents:
+## Enable agent remoting in the zrok controller
 
-```
-$ zrok2 admin create identity agentremoting
-zrok identity 'agentremoting' created with ziti id 'WEfGMIx-e4'
-```
+1. Create an identity for your zrok controller to use for interacting with remote agents:
+
+    ```bash
+    zrok2 admin create identity agentremoting
+    ```
+
+    ```buttonless title="Output"
+    zrok identity 'agentremoting' created with ziti id 'WEfGMIx-e4'
+    ```
+
+    :::note
+    The identity can be named anything; `agentremoting` is used here as an example.
+    :::
+
+2. Add the identity to your controller configuration:
+
+    ```yaml
+    agent_controller:
+      z_id:             WEfGMIx-e4
+      identity_path:    /home/michael/.zrok2/identities/agentremoting.json
+    ```
+
+3. Restart your controller. The agent remoting endpoints will become available once it's running.
+
+## Enroll an agent
+
+Enrolling an agent in remoting requires an enabled environment.
+
+1. Run `zrok2 agent enroll` from an enabled environment:
+
+    ```bash
+    zrok2 agent enroll
+    ```
+
+    ```buttonless title="Output"
+    warning! proceeding will allow remote control of your zrok agent!
+
+    your agent will accept remote commands from:
+
+    https://api-v2.zrok.io
+
+    you should only proceed if you understand the implications of this action!
+
+    to proceed, type 'yes': yes
+
+    agent enrolled with token 'yC9atRbCOskz'
+
+    restart your zrok agent to enable remote control
+    ```
+
+2. Restart the agent. The following message confirms remoting is active:
+
+    ```buttonless title="Agent log"
+    [   0.001]    INFO zrok/agent.(*Agent).remoteAgent: listening for remote commands at 'yC9atRbCOskz'
+    ```
+
+## Agent remoting API
+
 :::note
-The indentity can be named anything; I chose `agentremoting` just for this example.
-:::
-
-Next, you'll need to configure remoting in your controller config like this:
-
-```yaml
-agent_controller:
-  z_id:             WEfGMIx-e4
-  identity_path:    /home/michael/.zrok2/identities/agentremoting.json
-```
-
-Restart your controller with this configuration and the agent remoting endpoints will become available.
-
-## Enroll an Agent
-
-Enrolling an Agent in remoting requires an enabled environment. You can use the `zrok2 agent enroll` command from an enabled environment to enroll your agent:
-
-```
-$ zrok2 agent enroll
-
-warning! proceeding will allow remote control of your zrok agent!
-
-your agent will accept remote commands from:
-
-https://api-v2.zrok.io
-
-you should only proceed if you understand the implications of this action!
-
-to proceed, type 'yes': yes
-
-agent enrolled with token 'yC9atRbCOskz'
-
-restart your zrok agent to enable remote control
-
-```
-
-When you restart your agent, you will notice the following message in the Agent's log:
-
-```
-[   0.001]    INFO zrok/agent.(*Agent).remoteAgent: listening for remote commands at 'yC9atRbCOskz'
-```
-
-## The Agent remoting API
-
-:::note
-See the [zrok OpenAPI spec](https://github.com/openziti/zrok/blob/main/specs/zrok.yml) for complete details of `/agent` endpoints.
+- See the [zrok OpenAPI spec](https://github.com/openziti/zrok/blob/main/specs/zrok.yml) for complete details of
+  `/agent` endpoints.
+- The `apiEndpoint` `http://localhost:18080` in the examples below refers to a local development controller. The
+  credentials shown are already invalid and are included for illustration only.
 :::
 
 ### Create a remote share
 
-:::note
-The `apiEndpoint` `http://localhost:18080` is a zrok controller in a local development environment. All of the credentials in this document are local to that instance and already invalid as of publication of this document. It's just an example.
-:::
+Call the `/agent/share` endpoint to create a share on a remote agent:
 
-You can call the `/agent/share` endpoint to create a share on a remote Agent through the API:
-
+```bash
+curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" \
+  -d '{"envZId": "qDWmgIxne4", "shareMode": "public", "backendMode": "web", "target": "/home/michael/Repos/nf/zrok"}' \
+  http://localhost:18080/api/v2/agent/share | jq
 ```
-$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4", "shareMode": "public", "backendMode": "web", "target": "/home/michael/Repos/nf/zrok"}' http://localhost:18080/api/v2/agent/share | jq
+
+```buttonless title="Output"
 {
   "frontendEndpoints": [
     "http://51bnatug7ua3.zrok.quigley.com:8080"
@@ -81,10 +94,17 @@ $ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+j
 }
 ```
 
-### Query the status of the remote Agent
+### Query the status of the remote agent
 
+Call the `/agent/status` endpoint to see active shares and accesses:
+
+```bash
+curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" \
+  -d '{"envZId": "qDWmgIxne4"}' \
+  http://localhost:18080/api/v2/agent/status | jq
 ```
-$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4"}' http://localhost:18080/api/v2/agent/status | jq
+
+```buttonless title="Output"
 {
   "accesses": null,
   "shares": [
@@ -103,10 +123,21 @@ $ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+j
 
 ### Remove the remote share
 
-```
-$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4", "token": "51bnatug7ua3"}' http://localhost:18080/api/v2/agent/unshare
+Call `/agent/unshare` to remove a share, then verify with `/agent/status`:
 
-$ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" -d '{"envZId": "qDWmgIxne4"}' http://localhost:18080/api/v2/agent/status | jq
+```bash
+curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" \
+  -d '{"envZId": "qDWmgIxne4", "token": "51bnatug7ua3"}' \
+  http://localhost:18080/api/v2/agent/unshare
+```
+
+```bash
+curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+json" \
+  -d '{"envZId": "qDWmgIxne4"}' \
+  http://localhost:18080/api/v2/agent/status | jq
+```
+
+```buttonless title="Output"
 {
   "accesses": null,
   "shares": null
@@ -115,16 +146,22 @@ $ curl -H "X-TOKEN: ojF2fna5GKlt" -XPOST -H "Content-Type: application/zrok.v1+j
 
 ### Create and remove private access
 
-The `/agent/access` and `/agent/unaccess` endpoints also exist and allow for creating and removing private access frontends remotely.
+The `/agent/access` and `/agent/unaccess` endpoints allow for creating and removing private access frontends
+remotely.
 
-## Unenroll an Agent
+## Unenroll an agent
 
-The `zrok2 agent unenroll` command will remove all remote control access from an Agent in an environment:
+Run `zrok2 agent unenroll` to remove all remote control access from an agent in an environment:
 
+```bash
+zrok2 agent unenroll
 ```
-$ zrok2 agent unenroll
+
+```buttonless title="Output"
 SUCCESS: unenrolled agent from 'https://api-v2.zrok.io'
 SUCCESS: removed agent-enrollment.json
 ```
 
-Unenrolling an agent currently enrolled in remoting will result in (ignorable) agent errors. Restart your agent to resume unenrolled operation.
+:::note
+Unenrolling an active agent will produce ignorable errors. Restart the agent to resume unenrolled operation.
+:::

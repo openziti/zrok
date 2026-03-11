@@ -1,5 +1,4 @@
 ---
-title: Install zrok on Windows
 sidebar_label: Windows
 ---
 
@@ -8,7 +7,11 @@ import DownloadCard from '@zrokroot/src/components/download-card';
 import styles from '@zrokroot/src/css/download-card.module.css';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-## Windows binary
+# Install zrok on Windows
+
+Download and install the `zrok2` binary for Windows.
+
+## Install the binary
 
 <AssetsProvider>
   <div className={styles.downloadContainer}>
@@ -19,15 +22,15 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   </div>
 </AssetsProvider>
 
-1. In PowerShell, change to the directory where you downloaded zrok.
+1. In PowerShell, change to the directory where you downloaded zrok:
 
-    ```text
+    ```powershell
     cd "$env:USERPROFILE\Downloads"
     ```
 
-1. In PowerShell, install `zrok2` in your home directory (`bin\zrok2.exe`), and permanently set the executable search path.
+2. Install `zrok2` in your home directory (`bin\zrok2.exe`) and permanently add it to your executable search path:
 
-    ```text
+    ```powershell
     $binDir = Join-Path -Path $env:USERPROFILE -ChildPath "bin"
     New-Item -Path $binDir -ItemType Directory -ErrorAction SilentlyContinue
     $latest = Get-ChildItem -Path .\zrok*windows*.tar.gz | Sort-Object LastWriteTime | Select-Object -Last 1
@@ -40,14 +43,14 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
     }
     ```
 
-1. With the `zrok2` executable in your path, you can then run the `zrok2` command.
+3. Verify the install:
 
-    ```text
+    ```powershell
     zrok2 version
     ```
 
     ```buttonless title="Output"
-
+                   _
      _____ __ ___ | | __
     |_  / '__/ _ \| |/ /
      / /| | | (_) |   <

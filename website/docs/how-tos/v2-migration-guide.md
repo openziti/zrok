@@ -1,5 +1,4 @@
 ---
-title: Migrate from zrok v1 to v2
 sidebar_label: Migrate from v1 to v2
 sidebar_position: 5
 ---

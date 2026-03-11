@@ -39,3 +39,8 @@ mode and is identified by a *share token*. You use `zrok2 share` to create ephem
 By default, shares are ephemeral—when you terminate `zrok2 share`, the share and its token are gone. zrok also
 supports *persistent shares* with consistent tokens that survive restarts. See
 [reserved names and namespaces](./sharing-reserved.md) for the full v2.0 workflow.
+
+## The agent
+
+The zrok agent centralizes management of your shares and accesses as a single persistent background process. See
+[zrok agent](./agent.md) for more info.
