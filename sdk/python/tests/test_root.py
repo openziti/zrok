@@ -2,12 +2,11 @@
 
 import json
 import os
-import sys
 import pytest
 from unittest.mock import patch, MagicMock
 
 from zrok.environment.root import (
-    Root, Metadata, Config, Environment, Default, Load, V, ApiEndpoint as ApiEndpointTuple,
+    Root, Metadata, Config, Environment, Default, V,
 )
 
 

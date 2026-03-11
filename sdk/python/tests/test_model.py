@@ -1,7 +1,5 @@
 """Tests for zrok.model — dataclass construction and constants."""
 
-import pytest
-
 import zrok.model as model
 
 

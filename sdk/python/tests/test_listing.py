@@ -4,7 +4,6 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 from zrok.listing import list_shares, list_accesses
-import zrok.model as model
 
 
 class TestListShares:

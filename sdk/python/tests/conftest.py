@@ -1,7 +1,6 @@
 """Shared fixtures for zrok SDK unit tests."""
 
 import json
-import os
 import pytest
 from unittest.mock import MagicMock, patch
 

@@ -5,7 +5,6 @@ from zrok_api.models.enable_request import EnableRequest as ApiEnableRequest
 from zrok_api.models.disable_request import DisableRequest as ApiDisableRequest
 from zrok_api.exceptions import ApiException
 from zrok.environment.root import Root, Environment
-import zrok.model as model
 
 
 def enable(root: Root, token: str, description: str = None, host: str = None) -> Environment:

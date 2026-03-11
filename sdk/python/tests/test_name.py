@@ -4,7 +4,6 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 from zrok.name import create_name, delete_name, list_names, list_namespaces
-import zrok.model as model
 
 
 class TestCreateName:

@@ -1,7 +1,7 @@
 """Tests for zrok.environment.enable — enable() and disable()."""
 
 import pytest
-from unittest.mock import patch, MagicMock, PropertyMock
+from unittest.mock import patch, MagicMock
 
 from zrok.environment.enable import enable, disable
 from zrok.environment.root import Root, Metadata, Config, Environment, V
@@ -72,7 +72,7 @@ class TestDisable:
         disable(disabled_root)
 
     def test_disable_calls_api_and_cleans_up(self, mock_root, tmp_zrok_dir):
-        mock_client = mock_root.Client()
+        mock_root.Client()
         mock_env_api = MagicMock()
 
         env_file = str(tmp_zrok_dir / "environment.json")

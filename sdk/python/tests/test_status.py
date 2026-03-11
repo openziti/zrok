@@ -1,11 +1,7 @@
 """Tests for zrok.status — status()."""
 
-import pytest
-from unittest.mock import patch
-
 from zrok.status import status
-from zrok.environment.root import Root, Config, Environment
-import zrok.model as model
+from zrok.environment.root import Root
 
 
 class TestStatus:

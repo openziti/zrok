@@ -41,7 +41,8 @@ class TestCreateShare:
         )
 
         with patch("zrok.share.ShareApi", return_value=mock_share_api), \
-             patch("zrok.share._ShareRequest__newPublicShare", return_value=_make_mock_api_share_request(), create=True) as _, \
+             patch("zrok.share._ShareRequest__newPublicShare",
+                   return_value=_make_mock_api_share_request(), create=True) as _, \
              patch("zrok.share.ShareRequest", return_value=_make_mock_api_share_request()):
             share = CreateShare(mock_root, req)
             assert share.Token == "shr_abc123"
