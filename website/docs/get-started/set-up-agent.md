@@ -1,5 +1,5 @@
 ---
-sidebar_label: "5. Set up the agent"
+sidebar_label: 5. Set up the agent
 sidebar_position: 6
 ---
 
@@ -43,8 +43,9 @@ To try the agent before installing it as a service:
 
 For reliable, always-on shares, install the agent as a system service:
 
-- **Windows**: [Set up the Windows agent service](../../how-tos/agent/windows-service/)
-- **Linux**: [Install the Linux agent package `zrok2-agent`](../../how-tos/agent/linux-service)
+- **Windows**: [Set up the Windows agent service](../how-tos/agent/windows-service/index.mdx)
+- **Linux**: [Install the Linux agent package `zrok2-agent`](../how-tos/agent/linux-service.mdx)
+- **Docker**: [Run the zrok agent in Docker](../how-tos/docker-agent/index.mdx)
 
 :::note
 A native macOS agent package is not yet available. macOS users can run `zrok2 agent start` in the foreground or use a

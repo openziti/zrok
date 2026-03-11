@@ -1,5 +1,5 @@
 ---
-sidebar_label: "4. Create your first share"
+sidebar_label: 4. Create your first share
 sidebar_position: 5
 ---
 
@@ -8,19 +8,18 @@ sidebar_position: 5
 In this step, you'll create a public share that exposes a local HTTP service to the internet. You'll see exactly how
 the share works and what its limitations are before you move on to the agent.
 
-1. Start a service listening on a local port. If you don't have one handy, start a quick test server on port 8080:
+1. In one terminal, start zrok's built-in test endpoint:
 
     ```bash
-    python3 -m http.server 8080
+    zrok2 test endpoint
     ```
 
-    This serves a browsable listing of your current directory over HTTP—just a throwaway server to give zrok
-    something to share.
+    This starts a simple HTTP listener on port 9090—just a throwaway server to give zrok something to share.
 
 1. In another terminal, run:
 
     ```bash
-    zrok2 share public 8080
+    zrok2 share public 9090
     ```
 
     zrok assigns a public URL and displays it along with the share type and a live feed of incoming requests:

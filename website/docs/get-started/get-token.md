@@ -1,5 +1,5 @@
 ---
-sidebar_label: "1. Get an account token"
+sidebar_label: 1. Get an account token
 sidebar_position: 2
 ---
 
@@ -31,4 +31,4 @@ If you've deployed your own zrok instance, there are two ways to create an accou
     zrok2 admin create account <username> <password>
     ```
 
-Either way, the result is an account token. Copy it for use in Step 3.
+Either way, the result is an account token. Copy it for use in [Step 3: Enable your environment](./enable-env.md).

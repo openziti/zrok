@@ -1,5 +1,5 @@
 ---
-sidebar_label: "3. Enable your environment"
+sidebar_label: 3. Enable your environment
 sidebar_position: 4
 ---
 
@@ -66,6 +66,10 @@ Environment:
 
 Both `Account Token` and `EnvZId` should show `<<SET>>`. Your environment is ready.
 
+:::note
+If you're self-hosted, the `apiEndpoint` value will show your instance's URL instead of `https://api-v2.zrok.io`.
+:::
+
 ## Visualize your environment
 
 If you open the [API console](https://api-v2.zrok.io/), you'll see your new environment reflected in the
@@ -75,7 +79,7 @@ explorer to see its details in the panel at the bottom of the page:
 ![Empty environment details](../images/zrok-visualizer-environment.png)
 
 The visualizer supports clicking, dragging, and mouse wheel zooming. If you get lost, click the zoom-to-fit icon in
-the lower right corner of the explorer to reset the view.
+the lower-left corner of the explorer to reset the view.
 
 :::note
 You can enable multiple environments with the same account—one per device. Use `zrok2 enable -d <name>` to give an
