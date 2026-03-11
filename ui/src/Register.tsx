@@ -187,9 +187,8 @@ const InvalidToken = () => {
 
 const Register = () => {
     const { regToken } = useParams();
-    const [component, setComponent] = useState<React.JSX.Element>(
-        <Grid2 container sx={{ justifyContent: "center", mt: 4 }}><CircularProgress /></Grid2>
-    );
+    const [view, setView] = useState<"loading" | "form" | "complete" | "invalidToken">("loading");
+    const [accountToken, setAccountToken] = useState<string>("");
     const [error, setError] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [email, setEmail] = useState<string>();
@@ -199,7 +198,8 @@ const Register = () => {
         setErrorMessage("");
         new AccountApi().register({body: {registerToken: regToken, password: v.password}})
             .then(d => {
-                setComponent(<RegistrationComplete token={d.accountToken!} />);
+                setAccountToken(d.accountToken!);
+                setView("complete");
             })
             .catch(async (e) => {
                 const msg = await extractErrorMessage(e, "registration failed");
@@ -235,10 +235,10 @@ const Register = () => {
 
     useEffect(() => {
         if(!error && email && touLink) {
-            setComponent(<SetPasswordForm email={email!} touLink={touLink!} register={doRegistration} />);
+            setView("form");
         } else {
             if(error) {
-                setComponent(<InvalidToken />);
+                setView("invalidToken");
             }
         }
     }, [touLink, error]);
@@ -250,7 +250,10 @@ const Register = () => {
                     <img src={zrokLogo} height="300" alt="zrok logo"/>
                     <h1 style={{ color: "#241775" }}>z r o k</h1>
                     { errorMessage && <Typography color="error">{errorMessage}</Typography> }
-                    {component}
+                    {view === "loading" && <Grid2 container sx={{ justifyContent: "center", mt: 4 }}><CircularProgress /></Grid2>}
+                    {view === "form" && <SetPasswordForm email={email!} touLink={touLink!} register={doRegistration} />}
+                    {view === "complete" && <RegistrationComplete token={accountToken} />}
+                    {view === "invalidToken" && <InvalidToken />}
                 </Box>
             </Container>
         </Typography>

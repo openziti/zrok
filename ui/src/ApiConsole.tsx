@@ -1,4 +1,4 @@
-import {JSX, useCallback, useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {Graph, focusGraph, layout, mergeGraph, nodesEqual} from "./model/graph.ts";
 import {Box, Button, Grid2, IconButton, Typography} from "@mui/material";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
@@ -42,8 +42,6 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const focusNodeIdRef = useRef<string | null>(focusNodeId);
     focusNodeIdRef.current = focusNodeId;
     const updateFocusNodeId = useApiConsoleStore((state) => state.updateFocusNodeId);
-    const [mainPanel, setMainPanel] = useState(<Visualizer />);
-    const [sidePanel, setSidePanel] = useState<JSX>(null);
     const [visualizerEnabled, setVisualizerEnabled] = useState<boolean>(true);
     const [panelMinimized, setPanelMinimized] = useState<boolean>(false);
     const panelMinimizedRef = useRef<boolean>(false);
@@ -160,13 +158,16 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             });
     }
 
-    useEffect(() => {
-        if(visualizerEnabled) {
-            setMainPanel(<Visualizer />);
-        } else {
-            setMainPanel(<TabularView />);
+    const renderSidePanel = () => {
+        if (!selectedNode) return null;
+        switch (selectedNode.type) {
+            case "account": return <AccountPanel account={selectedNode} />;
+            case "environment": return <EnvironmentPanel environment={selectedNode} />;
+            case "share": return <SharePanel share={selectedNode} />;
+            case "access": return <AccessPanel access={selectedNode} />;
+            default: return null;
         }
-    }, [visualizerEnabled]);
+    };
 
     useEffect(() => {
         document.addEventListener('keydown', handleKeyPress);
@@ -213,30 +214,6 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         };
     }, []);
 
-    useEffect(() => {
-        if(selectedNode) {
-            switch(selectedNode.type) {
-                case "account":
-                    setSidePanel(<AccountPanel account={selectedNode} />);
-                    break;
-
-                case "environment":
-                    setSidePanel(<EnvironmentPanel environment={selectedNode} />);
-                    break;
-
-                case "share":
-                    setSidePanel(<SharePanel share={selectedNode} />);
-                    break;
-
-                case "access":
-                    setSidePanel(<AccessPanel access={selectedNode} />);
-                    break;
-            }
-        } else {
-            setSidePanel(null);
-        }
-    }, [selectedNode]);
-
     return (
         <div>
             <NavBar logout={logout} visualizer={visualizerEnabled} toggleMode={setVisualizerEnabled} />
@@ -249,12 +226,12 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                                 <Button onClick={reset} variant="outlined" sx={{ mt: 1 }}>Try Again</Button>
                             </Box>
                         )}>
-                            {mainPanel}
+                            {visualizerEnabled ? <Visualizer /> : <TabularView />}
                         </ErrorBoundary>
                     </Grid2>
-                    {sidePanel && !panelMinimized ? <Grid2 container size={4}><Grid2><ErrorBoundary key={selectedNode?.id}>{sidePanel}</ErrorBoundary></Grid2></Grid2> : null}
+                    {selectedNode && !panelMinimized ? <Grid2 container size={4}><Grid2><ErrorBoundary key={selectedNode?.id}>{renderSidePanel()}</ErrorBoundary></Grid2></Grid2> : null}
                 </Grid2>
-                {sidePanel && panelMinimized ? (
+                {selectedNode && panelMinimized ? (
                     <div style={{ position: "absolute", top: 16, right: 16, zIndex: 5, display: "flex", alignItems: "center", gap: 4, background: "rgba(36, 23, 117, 0.85)", borderRadius: 8, padding: "4px 12px" }}>
                         <Typography variant="body2" sx={{ color: "#fff", whiteSpace: "nowrap" }}>
                             {selectedNode?.type}
