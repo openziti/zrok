@@ -168,6 +168,36 @@ This adds RabbitMQ and InfluxDB. Configure the metrics bridge in your
 [Linux guide](/docs/zrok/self-hosting/linux/) for the full configuration
 reference).
 
+## Optional: Building from Source
+
+For development or CI, you can build the zrok2 image from source instead of
+pulling a published image. This uses the `compose.build.yml` overlay, which
+adds a multi-stage Docker build (Go compilation + UI assets) to each zrok2
+service.
+
+```bash
+COMPOSE_FILE=compose.yml:compose.build.yml docker compose up -d --build --wait
+```
+
+The build context is the repository root, so run this from a cloned
+repository:
+
+```bash
+git clone https://github.com/openziti/zrok.git
+cd zrok/docker/compose/zrok2-instance
+cp .env.example .env
+# edit .env with your values...
+COMPOSE_FILE=compose.yml:compose.build.yml docker compose up -d --build --wait
+```
+
+The first build takes several minutes (Go module download + compilation). The
+build overlay can be combined with other overlays:
+
+```bash
+COMPOSE_FILE=compose.yml:compose.build.yml:compose.caddy.yml \
+  docker compose up -d --build --wait
+```
+
 ## Troubleshooting
 
 ### Bootstrap fails with "connection refused"

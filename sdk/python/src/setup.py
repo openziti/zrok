@@ -52,6 +52,9 @@ setup(
     url="",
     keywords=["zrok", "zrok2"],
     install_requires=REQUIRES,
+    extras_require={
+        "test": ["pytest>=7.0", "pytest-cov"],
+    },
     python_requires='>3.10.0',
     packages=find_packages(),
     include_package_data=True,

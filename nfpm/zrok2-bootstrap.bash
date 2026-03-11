@@ -65,6 +65,44 @@ warn()  { printf "${YELLOW}[WARN]${NC} %s\n" "$*"; }
 error() { printf "${RED}[ERROR]${NC} %s\n" "$*" >&2; }
 die()   { error "$@"; exit 1; }
 
+# Retry a command with backoff.  Usage:
+#   retry <max_attempts> <delay_seconds> <description> <command...>
+# Retries up to max_attempts times with a fixed delay between attempts.
+# Returns the command's exit code on success, or dies after exhausting retries.
+retry() {
+    local max_attempts="$1" delay="$2" description="$3"
+    shift 3
+    local attempt=1
+    while true; do
+        if "$@"; then
+            return 0
+        fi
+        if (( attempt >= max_attempts )); then
+            die "$description failed after $max_attempts attempts"
+        fi
+        warn "$description failed (attempt $attempt/$max_attempts), retrying in ${delay}s..."
+        sleep "$delay"
+        (( attempt++ ))
+    done
+}
+
+# Wait for a condition to become true.  Usage:
+#   wait_for <timeout_seconds> <poll_interval> <description> <command...>
+# Polls the command every poll_interval seconds until it succeeds or the
+# timeout is reached.  Returns 0 on success, dies on timeout.
+wait_for() {
+    local timeout="$1" interval="$2" description="$3"
+    shift 3
+    local deadline=$(( SECONDS + timeout ))
+    while (( SECONDS < deadline )); do
+        if "$@"; then
+            return 0
+        fi
+        sleep "$interval"
+    done
+    die "$description timed out after ${timeout}s"
+}
+
 # ── OS family detection and package helpers ──────────────────────────────────
 
 os_family() {
