@@ -1,0 +1,68 @@
+name: Python SDK
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'sdk/python/**'
+      - 'docker/compose/zrok2-instance/**'
+      - '.github/workflows/python-sdk.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'sdk/python/**'
+      - 'docker/compose/zrok2-instance/**'
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e sdk/python/src/[test]
+      - run: pytest sdk/python/tests/ -v --tb=short --ignore=sdk/python/tests/integration
+
+  integration-tests:
+    runs-on: ubuntu-24.04
+    needs: unit-tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate secrets
+        run: |
+          echo "ZROK2_ADMIN_TOKEN=$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom | head -c32)" >> "$GITHUB_ENV"
+          echo "ZITI_PWD=$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom | head -c32)" >> "$GITHUB_ENV"
+          echo "ZROK2_DB_PASSWORD=$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom | head -c32)" >> "$GITHUB_ENV"
+          echo "ZROK2_INFLUX_TOKEN=$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom | head -c32)" >> "$GITHUB_ENV"
+          echo "ZROK2_INFLUX_PASSWORD=$(LC_ALL=C tr -dc A-Za-z0-9 </dev/urandom | head -c32)" >> "$GITHUB_ENV"
+      - name: Start zrok2 instance (built from source)
+        run: |
+          cd docker/compose/zrok2-instance
+          cp .env.example .env
+          sed -i "s/^ZROK2_ADMIN_TOKEN=.*/ZROK2_ADMIN_TOKEN=$ZROK2_ADMIN_TOKEN/" .env
+          sed -i "s/^ZITI_PWD=.*/ZITI_PWD=$ZITI_PWD/" .env
+          sed -i "s/^ZROK2_DB_PASSWORD=.*/ZROK2_DB_PASSWORD=$ZROK2_DB_PASSWORD/" .env
+          sed -i "s/^ZROK2_INFLUX_TOKEN=.*/ZROK2_INFLUX_TOKEN=$ZROK2_INFLUX_TOKEN/" .env
+          sed -i "s/^# *ZROK2_INFLUX_PASSWORD=.*/ZROK2_INFLUX_PASSWORD=$ZROK2_INFLUX_PASSWORD/" .env
+          sed -i "s/^ZROK2_DNS_ZONE=.*/ZROK2_DNS_ZONE=localhost/" .env
+          COMPOSE_FILE=compose.yml:compose.build.yml \
+            docker compose up -d --build --wait --wait-timeout 180
+        timeout-minutes: 10
+      - run: pip install -e sdk/python/src/[test]
+      - name: Run integration tests
+        run: pytest sdk/python/tests/integration/ -v --tb=short
+        env:
+          ZROK2_API_ENDPOINT: http://localhost:18080
+          ZROK2_ADMIN_TOKEN: ${{ env.ZROK2_ADMIN_TOKEN }}
+      - name: Tear down
+        if: always()
+        run: |
+          cd docker/compose/zrok2-instance
+          docker compose down -v

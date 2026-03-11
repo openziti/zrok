@@ -2,20 +2,21 @@
 #
 # entrypoint-init.bash — Docker init container for zrok2 self-hosting
 #
-# Sources zrok2-bootstrap.bash for utility functions (info, warn, die) and
-# handles the complete init sequence:
+# Sources zrok2-bootstrap.bash for utility functions (info, warn, die,
+# retry, wait_for) and handles the complete init sequence:
 #   1. Generate controller and frontend configuration
-#   2. Run zrok2 admin bootstrap (creates Ziti identities/policies)
-#   3. Start a temporary controller to run admin commands
-#   4. Create the default public frontend, namespace, and mapping
-#   5. Save identity files and fix permissions
+#   2. Wait for Ziti controller and log in
+#   3. Run zrok2 admin bootstrap (creates Ziti identities/policies)
+#   4. Start a temporary controller to run admin commands
+#   5. Create the default public frontend, namespace, and mapping
+#   6. Save identity files and fix permissions
 #
 # This replaces the previous zrok2-init and zrok2-post-init inline scripts
 # with a single init container.
 
 set -o errexit -o nounset -o pipefail
 
-# Source the bootstrap library for utility functions (info, warn, die)
+# Source the bootstrap library for utility functions
 # shellcheck source=../../../nfpm/zrok2-bootstrap.bash
 source /bootstrap/zrok2-bootstrap.bash
 
@@ -34,8 +35,34 @@ else
     STORE_PATH="/var/lib/zrok2/zrok2.sqlite3"
 fi
 
-export ZROK2_API_ENDPOINT="http://localhost:${ZROK2_CTRL_PORT:-18080}"
+ZITI_ENDPOINT="https://ziti.${ZROK2_DNS_ZONE}:${ZITI_CTRL_PORT:-1280}"
+ZROK2_PORT="${ZROK2_CTRL_PORT:-18080}"
+
+export ZROK2_API_ENDPOINT="http://localhost:${ZROK2_PORT}"
 export ZROK2_ADMIN_TOKEN
+
+# ── Helper: commands wrapped for retry/wait_for ──────────────────────────────
+
+_ziti_login() {
+    ziti edge login "$ZITI_ENDPOINT" \
+        --username "${ZITI_USER:-admin}" \
+        --password "${ZITI_PWD}" \
+        --yes 2>/dev/null
+}
+
+_zrok2_bootstrap() {
+    zrok2 admin bootstrap "$CTRL_CONFIG" 2>&1 \
+        | tee /dev/stderr \
+        | grep -qE '(bootstrap complete|already bootstrapped)'
+}
+
+_zrok2_ctrl_healthy() {
+    curl -sf "http://127.0.0.1:${ZROK2_PORT}/api/v1/version" &>/dev/null
+}
+
+_zrok2_ctrl_alive() {
+    kill -0 "$CTRL_PID" 2>/dev/null
+}
 
 # ── Step 1: Generate controller config (Docker-minimal) ─────────────────────
 #
@@ -53,12 +80,12 @@ admin:
     - "${ZROK2_ADMIN_TOKEN}"
 endpoint:
   host: 0.0.0.0
-  port: ${ZROK2_CTRL_PORT:-18080}
+  port: ${ZROK2_PORT}
 store:
   path: "${STORE_PATH}"
   type: "${STORE_TYPE}"
 ziti:
-  api_endpoint: "https://ziti.${ZROK2_DNS_ZONE}:${ZITI_CTRL_PORT:-1280}"
+  api_endpoint: "${ZITI_ENDPOINT}"
   username: "${ZITI_USER:-admin}"
   password: "${ZITI_PWD}"
 maintenance:
@@ -96,24 +123,13 @@ info "Generated ctrl.yaml and frontend.yaml"
 # ── Step 3: Wait for Ziti controller ─────────────────────────────────────────
 
 info "Waiting for Ziti controller..."
-until ziti edge login \
-    "https://ziti.${ZROK2_DNS_ZONE}:${ZITI_CTRL_PORT:-1280}" \
-    --username "${ZITI_USER:-admin}" \
-    --password "${ZITI_PWD}" \
-    --yes 2>/dev/null; do
-    sleep 3
-done
+wait_for 300 3 "Ziti controller login" _ziti_login
 info "Logged into Ziti controller"
 
-# ── Step 4: Run zrok2 admin bootstrap (retries until DB ready) ───────────────
+# ── Step 4: Run zrok2 admin bootstrap ────────────────────────────────────────
 
 info "Running zrok2 admin bootstrap..."
-until zrok2 admin bootstrap "$CTRL_CONFIG" 2>&1 \
-    | tee /dev/stderr \
-    | grep -qE '(bootstrap complete|already bootstrapped)'; do
-    info "Bootstrap not ready, retrying in 3s..."
-    sleep 3
-done
+wait_for 120 3 "zrok2 admin bootstrap" _zrok2_bootstrap
 info "zrok2 bootstrap complete"
 
 # ── Step 5: Start temporary controller for admin commands ────────────────────
@@ -122,63 +138,88 @@ info "Starting temporary zrok2 controller for admin commands..."
 zrok2 controller "$CTRL_CONFIG" &
 CTRL_PID=$!
 
+# Ensure the temporary controller is cleaned up on exit (normal or error)
+trap 'kill "$CTRL_PID" 2>/dev/null; wait "$CTRL_PID" 2>/dev/null || true' EXIT
+
 info "Waiting for temporary controller to become healthy..."
-for _i in $(seq 1 30); do
-    if curl -sf "http://127.0.0.1:${ZROK2_CTRL_PORT:-18080}/api/v1/version" &>/dev/null; then
-        break
-    fi
-    if ! kill -0 "$CTRL_PID" 2>/dev/null; then
-        die "Temporary controller exited unexpectedly"
-    fi
-    sleep 1
-done
+wait_for 60 1 "temporary zrok2 controller health" _zrok2_ctrl_healthy
+
+# Sanity check — make sure the process didn't crash during startup
+if ! _zrok2_ctrl_alive; then
+    die "Temporary controller exited unexpectedly"
+fi
 info "Temporary controller is healthy"
 
 # ── Step 6: Create frontend, namespace, and mapping ──────────────────────────
 
 # Get the Ziti identity ID for "public" (created during bootstrap)
-PUBLIC_ZID=$(ziti edge list identities 'name="public"' -j \
-    | jq -r '.data[0].id')
+_get_public_zid() {
+    local zid
+    zid=$(ziti edge list identities 'name="public"' -j 2>/dev/null \
+        | jq -r '.data[0].id')
+    [[ -n "$zid" && "$zid" != "null" ]]
+}
+
+retry 5 3 "Ziti identity lookup for 'public'" _get_public_zid
+PUBLIC_ZID=$(ziti edge list identities 'name="public"' -j | jq -r '.data[0].id')
 info "Public identity Ziti ID = $PUBLIC_ZID"
 
 # Create the dynamic frontend (idempotent)
-EXISTING=$(zrok2 admin list frontends 2>/dev/null || true)
-if echo "$EXISTING" | grep -q 'public'; then
-    FRONTEND_TOKEN=$(echo "$EXISTING" | awk '/public/ {print $1; exit}')
-    info "Frontend already exists: $FRONTEND_TOKEN"
-else
-    OUTPUT=$(zrok2 admin create frontend \
+_create_frontend() {
+    local existing
+    existing=$(zrok2 admin list frontends 2>/dev/null || true)
+    if echo "$existing" | grep -q 'public'; then
+        FRONTEND_TOKEN=$(echo "$existing" | awk '/public/ {print $1; exit}')
+        info "Frontend already exists: $FRONTEND_TOKEN"
+        return 0
+    fi
+
+    local output
+    output=$(zrok2 admin create frontend \
         --dynamic "$PUBLIC_ZID" public \
         "https://{token}.${ZROK2_DNS_ZONE}" 2>&1)
-    FRONTEND_TOKEN=$(echo "$OUTPUT" \
+    FRONTEND_TOKEN=$(echo "$output" \
         | grep -oP "(?<=frontend ').*(?=')" || true)
     if [[ -z "$FRONTEND_TOKEN" ]]; then
         FRONTEND_TOKEN=$(zrok2 admin list frontends 2>/dev/null \
             | awk '/public/ {print $1; exit}')
     fi
-    info "Created frontend: $FRONTEND_TOKEN"
-fi
+    [[ -n "$FRONTEND_TOKEN" ]]
+}
+
+FRONTEND_TOKEN=""
+retry 5 3 "create dynamic frontend" _create_frontend
+info "Frontend token: $FRONTEND_TOKEN"
 
 # Create the public namespace (idempotent)
-EXISTING_NS=$(zrok2 admin list namespaces 2>/dev/null || true)
-if echo "$EXISTING_NS" | grep -q 'public'; then
-    info "Namespace 'public' already exists"
-else
+_create_namespace() {
+    local existing
+    existing=$(zrok2 admin list namespaces 2>/dev/null || true)
+    if echo "$existing" | grep -q 'public'; then
+        info "Namespace 'public' already exists"
+        return 0
+    fi
     zrok2 admin create namespace \
         --open --token public "${ZROK2_DNS_ZONE}"
-    info "Created namespace 'public'"
-fi
+}
+
+retry 5 3 "create public namespace" _create_namespace
+info "Namespace 'public' ready"
 
 # Map namespace to frontend (idempotent)
-EXISTING_MAP=$(zrok2 admin list namespace-frontend public \
-    2>/dev/null || true)
-if echo "$EXISTING_MAP" | grep -q "$FRONTEND_TOKEN"; then
-    info "Namespace-frontend mapping already exists"
-else
+_map_namespace_frontend() {
+    local existing
+    existing=$(zrok2 admin list namespace-frontend public 2>/dev/null || true)
+    if echo "$existing" | grep -q "$FRONTEND_TOKEN"; then
+        info "Namespace-frontend mapping already exists"
+        return 0
+    fi
     zrok2 admin create namespace-frontend \
         --default public "$FRONTEND_TOKEN"
-    info "Mapped namespace 'public' to frontend '$FRONTEND_TOKEN'"
-fi
+}
+
+retry 5 3 "map namespace to frontend" _map_namespace_frontend
+info "Namespace-frontend mapping ready"
 
 # ── Step 7: Save frontend identity ───────────────────────────────────────────
 
@@ -188,10 +229,12 @@ if [[ -f "${HOME}/.zrok2/identities/public.json" ]]; then
 fi
 
 # ── Step 8: Stop temporary controller ────────────────────────────────────────
+# (handled by EXIT trap, but be explicit for logging)
 
 info "Stopping temporary controller..."
 kill "$CTRL_PID" 2>/dev/null || true
 wait "$CTRL_PID" 2>/dev/null || true
+trap - EXIT
 
 # ── Step 9: Fix ownership for non-root zrok2 containers ─────────────────────
 
