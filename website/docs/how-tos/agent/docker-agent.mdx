@@ -5,12 +5,18 @@ sidebar_position: 50
 
 import Details from '@theme/MDXComponents/Details';
 
-The `zrok2` agent runs in Docker using the `docker.io/openziti/zrok2` container image. This guide covers two approaches:
+# Run the zrok agent in Docker
 
-1. **Bind-mount approach** — mount your existing `~/.zrok2` directory from the Docker host. Quick to set up; requires enabling the zrok environment on the host first.
-2. **Self-contained approach** — use Docker named volumes and init containers to enable the environment automatically. No host-side setup required beyond an account token.
+The `zrok2` agent runs in Docker using the `docker.io/openziti/zrok2` container image. This guide covers two
+approaches:
 
-Both approaches run the agent as a long-lived container. Once the agent is running, you interact with it using `docker compose exec` to create names, start shares, and manage the lifecycle described in the [Agent guide](./index.mdx).
+1. **Bind-mount approach** — mount your existing `~/.zrok2` directory from the Docker host. Quick to set up;
+   requires enabling the zrok environment on the host first.
+2. **Self-contained approach** — use Docker named volumes and init containers to enable the environment
+   automatically. No host-side setup required beyond an account token.
+
+Both approaches run the agent as a long-lived container. Once the agent is running, interact with it using
+`docker compose exec` to create names, start shares, and manage the lifecycle.
 
 ## Prerequisites
 
@@ -19,205 +25,214 @@ Both approaches run the agent as a long-lived container. Once the agent is runni
 
 ## Bind-mount approach
 
-This approach mirrors the [Linux systemd agent service](./linux-service.mdx) — you enable the zrok environment on the Docker host and mount it into the container.
+This approach mirrors the [Linux agent service](./linux-service.mdx) — you enable the zrok environment on the
+Docker host and mount it into the container.
 
-### 1. Enable the environment on the host
+1. If you haven't already, [install `zrok2`](../install/index.mdx) and enable your account:
 
-If you haven't already, [install `zrok2`](../install/index.mdx) and enable your account:
+    ```bash
+    zrok2 enable <your_account_token>
+    ```
 
-```bash
-zrok2 enable <your_account_token>
-```
+    Verify with:
 
-Verify with:
+    ```bash
+    zrok2 status
+    ```
 
-```bash
-zrok2 status
-```
+1. Save the following as `compose.yml`:
 
-### 2. Start the agent container
+    ```yaml title="compose.yml"
+    services:
+      zrok-agent:
+        image: docker.io/openziti/zrok2
+        restart: unless-stopped
+        user: "${UID:-1000}"
+        environment:
+          HOME: /mnt
+        entrypoint:
+          - bash
+          - -c
+          - rm -f /mnt/.zrok2/agent.socket && exec "$@"
+        command:
+          - --
+          - zrok2
+          - agent
+          - start
+          - --console-address
+          - 0.0.0.0
+          - --console-start-port
+          - "8888"
+          - --console-end-port
+          - "8888"
+        expose:
+          - 8888  # agent web console
+        # ports:
+        #   - 8888:8888  # uncomment to publish the agent console on the host
+        volumes:
+          - ${HOME}/.zrok2:/mnt/.zrok2
+    ```
 
-```yaml title="compose.yml"
-services:
-  zrok-agent:
-    image: docker.io/openziti/zrok2
-    restart: unless-stopped
-    user: "${UID:-1000}"
-    environment:
-      HOME: /mnt
-    entrypoint:
-      - bash
-      - -c
-      - rm -f /mnt/.zrok2/agent.socket && exec "$@"
-    command:
-      - --
-      - zrok2
-      - agent
-      - start
-      - --console-address
-      - 0.0.0.0
-      - --console-start-port
-      - "8888"
-      - --console-end-port
-      - "8888"
-    expose:
-      - 8888  # agent web console
-    # ports:
-    #   - 8888:8888  # uncomment to publish the agent console on the host
-    volumes:
-      - ${HOME}/.zrok2:/mnt/.zrok2
-```
+    :::warning Set the container user
+    The `user: "${UID:-1000}"` directive sets the container's effective UID to match your Docker host user. This is
+    required so the container can read and write to the bind-mounted `~/.zrok2` directory. If your UID is not 1000,
+    set `UID` in your shell or `.env` file.
+    :::
 
-:::warning Set the container user
-The `user: "${UID:-1000}"` directive sets the container's effective UID to match your Docker host user. This is required so the container can read and write to the bind-mounted `~/.zrok2` directory. If your UID is not 1000, set `UID` in your shell or `.env` file.
-:::
+1. Start the agent:
 
-Start the agent:
+    ```bash
+    docker compose up -d
+    ```
 
-```bash
-docker compose up -d
-```
+    Verify it's running:
 
-Verify it's running:
+    ```bash
+    docker compose logs zrok-agent
+    ```
 
-```bash
-docker compose logs zrok-agent
-```
+1. Use `docker compose exec` to run `zrok2` commands inside the running container:
 
-### 3. Interact with the agent
+    ```bash
+    docker compose exec zrok-agent zrok2 agent status
+    docker compose exec zrok-agent zrok2 create name myapp
+    docker compose exec zrok-agent zrok2 share public http://host.docker.internal:8080 -n public:myapp
+    ```
 
-Use `docker compose exec` to run `zrok2` commands inside the running container:
-
-```bash
-# check agent status
-docker compose exec zrok-agent zrok2 agent status
-
-# create a name in the default namespace
-docker compose exec zrok-agent zrok2 create name myapp
-
-# start a public share using the name
-docker compose exec zrok-agent zrok2 share public http://host.docker.internal:8080 -n public:myapp
-
-# list shares
-docker compose exec zrok-agent zrok2 agent status
-```
-
-:::tip host.docker.internal
-To share a service running on the Docker host, use `host.docker.internal` as the hostname. On Linux, you may also need `--network=host` on the container or add `extra_hosts: ["host.docker.internal:host-gateway"]` to the compose service.
-:::
+    :::tip host.docker.internal
+    To share a service running on the Docker host, use `host.docker.internal` as the hostname. On Linux, you may
+    also need `--network=host` on the container or add `extra_hosts: ["host.docker.internal:host-gateway"]` to the
+    compose service.
+    :::
 
 ### Troubleshooting: `~/.zrok2` owned by root
 
-If `~/.zrok2` does not exist on the Docker host when you first run `docker compose up`, Docker will create the directory automatically — but it will be owned by `root`. The agent container will fail with permission errors.
+If `~/.zrok2` does not exist on the Docker host when you first run `docker compose up`, Docker will create it
+automatically — but it will be owned by `root`. The agent container will fail with permission errors.
 
 To fix this:
 
-```bash
-# stop the container
-docker compose down
+1. Stop the container:
 
-# fix ownership to your user
-sudo chown -R "$(id -u):$(id -g)" ~/.zrok2
+    ```bash
+    docker compose down
+    ```
 
-# enable the environment
-zrok2 enable <your_account_token>
+1. Fix ownership:
 
-# restart
-docker compose up -d
-```
+    ```bash
+    sudo chown -R "$(id -u):$(id -g)" ~/.zrok2
+    ```
+
+1. Enable the environment:
+
+    ```bash
+    zrok2 enable <your_account_token>
+    ```
+
+1. Restart:
+
+    ```bash
+    docker compose up -d
+    ```
 
 To avoid this entirely, always run `zrok2 enable` on the host before the first `docker compose up`.
 
 ## Self-contained approach
 
-This approach uses Docker named volumes and init containers to manage the zrok environment entirely within Docker. No host-side `zrok2` installation or `~/.zrok2` directory is needed — only an account token.
+This approach uses Docker named volumes and init containers to manage the zrok environment entirely within Docker.
+No host-side `zrok2` installation or `~/.zrok2` directory is needed — only an account token.
 
-The `zrok2-enable` script included in the container image will enable the environment if the `ZROK2_ENABLE_TOKEN` variable is set, and does nothing if the environment is already enabled.
+The `zrok2-enable` script included in the container image enables the environment if `ZROK2_ENABLE_TOKEN` is set,
+and does nothing if the environment is already enabled.
 
-```yaml title="compose.yml"
-services:
-  # Set ownership on the named volume so the zrok2 user (UID 2171) can use it.
-  zrok-init:
-    image: busybox
-    command: chown -Rc 2171:2171 /mnt/
-    user: root
-    volumes:
-      - zrok_env:/mnt
+1. Save the following as `compose.yml`:
 
-  # Enable the zrok environment if not already enabled.
-  zrok-enable:
-    image: docker.io/openziti/zrok2
-    depends_on:
+    ```yaml title="compose.yml"
+    services:
+      # Set ownership on the named volume so the zrok2 user (UID 2171) can use it.
       zrok-init:
-        condition: service_completed_successfully
-    entrypoint: zrok2-enable
-    environment:
-      HOME: /mnt
-      ZROK2_ENABLE_TOKEN: ${ZROK2_ENABLE_TOKEN}
-      ZROK2_API_ENDPOINT: ${ZROK2_API_ENDPOINT:-}
-    volumes:
-      - zrok_env:/mnt
+        image: busybox
+        command: chown -Rc 2171:2171 /mnt/
+        user: root
+        volumes:
+          - zrok_env:/mnt
 
-  # Run the zrok agent.
-  zrok-agent:
-    image: docker.io/openziti/zrok2
-    restart: unless-stopped
-    depends_on:
+      # Enable the zrok environment if not already enabled.
       zrok-enable:
-        condition: service_completed_successfully
-    environment:
-      HOME: /mnt
-    entrypoint:
-      - bash
-      - -c
-      - rm -f /mnt/.zrok2/agent.socket && exec "$@"
-    command:
-      - --
-      - zrok2
-      - agent
-      - start
-      - --console-address
-      - 0.0.0.0
-      - --console-start-port
-      - "${ZROK2_AGENT_CONSOLE_PORT:-8888}"
-      - --console-end-port
-      - "${ZROK2_AGENT_CONSOLE_PORT:-8888}"
-    expose:
-      - "${ZROK2_AGENT_CONSOLE_PORT:-8888}"
-    # ports:
-    #   - "${ZROK2_AGENT_CONSOLE_PORT:-8888}:${ZROK2_AGENT_CONSOLE_PORT:-8888}"
+        image: docker.io/openziti/zrok2
+        depends_on:
+          zrok-init:
+            condition: service_completed_successfully
+        entrypoint: zrok2-enable
+        environment:
+          HOME: /mnt
+          ZROK2_ENABLE_TOKEN: ${ZROK2_ENABLE_TOKEN}
+          ZROK2_API_ENDPOINT: ${ZROK2_API_ENDPOINT:-}
+        volumes:
+          - zrok_env:/mnt
+
+      # Run the zrok agent.
+      zrok-agent:
+        image: docker.io/openziti/zrok2
+        restart: unless-stopped
+        depends_on:
+          zrok-enable:
+            condition: service_completed_successfully
+        environment:
+          HOME: /mnt
+        entrypoint:
+          - bash
+          - -c
+          - rm -f /mnt/.zrok2/agent.socket && exec "$@"
+        command:
+          - --
+          - zrok2
+          - agent
+          - start
+          - --console-address
+          - 0.0.0.0
+          - --console-start-port
+          - "${ZROK2_AGENT_CONSOLE_PORT:-8888}"
+          - --console-end-port
+          - "${ZROK2_AGENT_CONSOLE_PORT:-8888}"
+        expose:
+          - "${ZROK2_AGENT_CONSOLE_PORT:-8888}"
+        # ports:
+        #   - "${ZROK2_AGENT_CONSOLE_PORT:-8888}:${ZROK2_AGENT_CONSOLE_PORT:-8888}"
+        volumes:
+          - zrok_env:/mnt
+
     volumes:
-      - zrok_env:/mnt
+      zrok_env:
+    ```
 
-volumes:
-  zrok_env:
-```
+1. Create a `.env` file next to `compose.yml`:
 
-### .env
+    ```bash
+    ZROK2_ENABLE_TOKEN=<your_account_token>
+    # ZROK2_API_ENDPOINT=https://zrok.example.com  # uncomment for self-hosted
+    # ZROK2_AGENT_CONSOLE_PORT=8888                # agent web console port
+    ```
 
-Create a `.env` file next to `compose.yml`:
+1. Start the agent:
 
-```bash
-ZROK2_ENABLE_TOKEN=<your_account_token>
-# ZROK2_API_ENDPOINT=https://zrok.example.com  # uncomment for self-hosted
-# ZROK2_AGENT_CONSOLE_PORT=8888                # agent web console port
-```
+    ```bash
+    docker compose up -d
+    ```
 
-### Start and use
+    The init containers run first (set volume permissions, then enable the environment). The agent starts
+    automatically once the environment is ready.
 
-```bash
-docker compose up -d
-```
+1. Interact with the agent using `docker compose exec`:
 
-The init containers run first (set volume permissions, then enable the environment), and the agent starts automatically once the environment is ready. Interact with the agent the same way:
+    ```bash
+    docker compose exec zrok-agent zrok2 agent status
+    docker compose exec zrok-agent zrok2 create name myapp
+    docker compose exec zrok-agent zrok2 share public http://some-service:8080 -n public:myapp
+    ```
 
-```bash
-docker compose exec zrok-agent zrok2 agent status
-docker compose exec zrok-agent zrok2 create name myapp
-docker compose exec zrok-agent zrok2 share public http://some-service:8080 -n public:myapp
-```
-
-### Cleaning up
+### Clean up
 
 To destroy the environment and start fresh, remove the named volume:
 
@@ -227,12 +242,6 @@ docker compose down --volumes
 
 Then delete the zrok environment from the web console or with `zrok2 admin`.
 
-## Agent lifecycle reference
+## See also
 
-Once the agent is running (in either approach), the workflow is the same as any other zrok platform. See the [Agent guide](./index.mdx) for the full tutorial, including:
-
-- Creating and deleting names
-- Starting public and private shares
-- Reserving persistent share tokens
-- Accessing private shares
-- Using the agent web console
+- [Manage shares with the agent](./manage-shares.mdx)

@@ -13,7 +13,7 @@ terminal sessions and system restarts.
 The foreground `zrok2 share` command in Step 4 stops the moment you close the terminal. The zrok agent runs in the
 background, manages all your shares and accesses as a single persistent process, and provides a web UI. When the agent
 is running, `zrok2 share` and `zrok2 access` commands delegate to it automatically. For a full explanation, see
-[zrok agent](../concepts/agent.md).
+[zrok agent overview](../concepts/agent.md).
 
 ## Try the agent in the foreground
 

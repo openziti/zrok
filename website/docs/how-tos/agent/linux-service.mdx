@@ -25,18 +25,22 @@ zrok2 enable <your_account_token>
 
 ## Start the service
 
+Enable and start the `zrok2-agent` service so it runs automatically on login:
+
 ```bash
 systemctl --user enable --now zrok2-agent.service
 ```
-
-## Use the agent
-
-Learn more about using the zrok agent in the [agent guide](./index.mdx).
 
 ## Troubleshooting
 
 ### Check the user service log
 
+Use `journalctl` to view the live service log:
+
 ```bash
 journalctl --user -lfu zrok2-agent.service
 ```
+
+## See also
+
+- [Manage shares with the agent](./manage-shares.mdx)

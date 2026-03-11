@@ -1,9 +1,9 @@
 ---
-sidebar_label: zrok agent
+sidebar_label: zrok agent overview
 sidebar_position: 40
 ---
 
-# zrok agent
+# zrok agent overview
 
 The zrok agent centralizes management of your zrok shares and accesses as a single persistent background process. It
 provides both a web-based console and a CLI. When the agent is running, `zrok2 share` and `zrok2 access` commands
