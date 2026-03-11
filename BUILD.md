@@ -71,6 +71,34 @@ To build, follow these steps:
 * make sure the dist directory exists: `mkdir -p dist`
 * build the go project normally: `go build -o dist ./...`
 
+## Build Docker image from source
+
+Build the `openziti/zrok2` Docker image directly from source using the
+multi-stage `Dockerfile.build`. This compiles the UI assets (Vite), the Go
+binary (with CGO for SQLite3), and packages everything into the same
+`openziti/ziti-cli` base image used by published releases.
+
+```bash
+docker build -f docker/compose/zrok2-instance/Dockerfile.build \
+  -t openziti/zrok2:local .
+```
+
+The resulting image includes:
+
+* `/usr/local/bin/zrok2` — the compiled binary with embedded UIs
+* `/usr/local/bin/zrok2-enable` — the enable helper script
+* `/usr/local/bin/zrok2-bootstrap` — the bootstrap script (for sourcing
+  utility functions or running directly)
+
+Use the image with Docker Compose via the build overlay:
+
+```bash
+cd docker/compose/zrok2-instance
+cp .env.example .env
+# edit .env with required values
+COMPOSE_FILE=compose.yml:compose.build.yml docker compose up -d --build --wait
+```
+
 ## Cross-build zrok with Docker
 
 For advanced use cases including cross-compilation for multiple architectures, verbose/debug output, or direct control over the build process, see the [cross-build documentation](./docker/images/cross-build/README.md).
