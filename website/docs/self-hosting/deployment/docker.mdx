@@ -6,7 +6,7 @@ sidebar_position: 45
 
 This guide walks through deploying a self-hosted zrok2 instance using Docker
 Compose. The stack runs the same components as the
-[Linux self-hosting guide](/docs/zrok/self-hosting/linux/) — Ziti overlay, zrok2
+[Linux self-hosting guide](/docs/zrok/self-hosting/deployment/linux/) — Ziti overlay, zrok2
 controller, frontend, and PostgreSQL — using official container images with
 runtime configuration via environment variables.
 
@@ -49,7 +49,7 @@ At minimum, set these three values:
 | `ZITI_PWD` | Ziti controller admin password | `mysecurepassword` |
 
 These match the same variable names used in the
-[Linux guide](/docs/zrok/self-hosting/linux/).
+[Linux guide](/docs/zrok/self-hosting/deployment/linux/).
 
 ### Optional Variables
 
@@ -165,7 +165,7 @@ docker compose --profile metrics up -d
 
 This adds RabbitMQ and InfluxDB. Configure the metrics bridge in your
 `ctrl.yaml` by adding the `bridge` and `metrics` sections (see the
-[Linux guide](/docs/zrok/self-hosting/linux/) for the full configuration
+[Linux guide](/docs/zrok/self-hosting/deployment/linux/) for the full configuration
 reference).
 
 ## Optional: Building from Source
