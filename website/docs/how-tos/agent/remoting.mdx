@@ -24,7 +24,7 @@ accesses through the central zrok API.
     The identity can be named anything; `agentremoting` is used here as an example.
     :::
 
-1. Add the identity to your controller configuration:
+2. Add the identity to your controller configuration:
 
     ```yaml
     agent_controller:
@@ -32,7 +32,7 @@ accesses through the central zrok API.
       identity_path:    /home/michael/.zrok2/identities/agentremoting.json
     ```
 
-1. Restart your controller. The agent remoting endpoints will become available once it's running.
+3. Restart your controller. The agent remoting endpoints will become available once it's running.
 
 ## Enroll an agent
 
@@ -60,7 +60,7 @@ Enrolling an agent in remoting requires an enabled environment.
     restart your zrok agent to enable remote control
     ```
 
-1. Restart the agent. The following message confirms remoting is active:
+2. Restart the agent. The following message confirms remoting is active:
 
     ```buttonless title="Agent log"
     [   0.001]    INFO zrok/agent.(*Agent).remoteAgent: listening for remote commands at 'yC9atRbCOskz'

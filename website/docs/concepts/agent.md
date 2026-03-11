@@ -35,7 +35,7 @@ The agent provides a web-based console accessible with:
 zrok2 agent console
 ```
 
-From the console you can:
+From the console, you can:
 
 - View the status of all active shares and accesses
 - Create new shares and accesses

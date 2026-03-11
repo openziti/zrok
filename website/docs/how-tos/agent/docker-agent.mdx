@@ -25,7 +25,7 @@ Both approaches run the agent as a long-lived container. Once the agent is runni
 
 ## Bind-mount approach
 
-This approach mirrors the [Linux agent service](./linux-service.mdx) — you enable the zrok environment on the
+This approach mirrors the [Linux agent service](./linux-service.mdx)—you enable the zrok environment on the
 Docker host and mount it into the container.
 
 1. If you haven't already, [install `zrok2`](../install/index.mdx) and enable your account:
@@ -40,7 +40,7 @@ Docker host and mount it into the container.
     zrok2 status
     ```
 
-1. Save the following as `compose.yml`:
+2. Save the following as `compose.yml`:
 
     ```yaml title="compose.yml"
     services:
@@ -79,7 +79,7 @@ Docker host and mount it into the container.
     set `UID` in your shell or `.env` file.
     :::
 
-1. Start the agent:
+3. Start the agent:
 
     ```bash
     docker compose up -d
@@ -91,7 +91,7 @@ Docker host and mount it into the container.
     docker compose logs zrok-agent
     ```
 
-1. Use `docker compose exec` to run `zrok2` commands inside the running container:
+4. Use `docker compose exec` to run `zrok2` commands inside the running container:
 
     ```bash
     docker compose exec zrok-agent zrok2 agent status
@@ -107,8 +107,8 @@ Docker host and mount it into the container.
 
 ### Troubleshooting: `~/.zrok2` owned by root
 
-If `~/.zrok2` does not exist on the Docker host when you first run `docker compose up`, Docker will create it
-automatically — but it will be owned by `root`. The agent container will fail with permission errors.
+If `~/.zrok2` doesn't exist on the Docker host when you first run `docker compose up`, Docker will create it
+automatically—but it will be owned by `root`. The agent container will fail with permission errors.
 
 To fix this:
 
@@ -118,19 +118,19 @@ To fix this:
     docker compose down
     ```
 
-1. Fix ownership:
+2. Fix ownership:
 
     ```bash
     sudo chown -R "$(id -u):$(id -g)" ~/.zrok2
     ```
 
-1. Enable the environment:
+3. Enable the environment:
 
     ```bash
     zrok2 enable <your_account_token>
     ```
 
-1. Restart:
+4. Restart:
 
     ```bash
     docker compose up -d
@@ -207,7 +207,7 @@ and does nothing if the environment is already enabled.
       zrok_env:
     ```
 
-1. Create a `.env` file next to `compose.yml`:
+2. Create a `.env` file next to `compose.yml`:
 
     ```bash
     ZROK2_ENABLE_TOKEN=<your_account_token>
@@ -215,7 +215,7 @@ and does nothing if the environment is already enabled.
     # ZROK2_AGENT_CONSOLE_PORT=8888                # agent web console port
     ```
 
-1. Start the agent:
+3. Start the agent:
 
     ```bash
     docker compose up -d
@@ -224,7 +224,7 @@ and does nothing if the environment is already enabled.
     The init containers run first (set volume permissions, then enable the environment). The agent starts
     automatically once the environment is ready.
 
-1. Interact with the agent using `docker compose exec`:
+4. Interact with the agent using `docker compose exec`:
 
     ```bash
     docker compose exec zrok-agent zrok2 agent status

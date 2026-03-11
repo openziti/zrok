@@ -29,7 +29,7 @@ To share a local port publicly:
     token:"zje5x8p0k9pi" frontendEndpoints:"https://zje5x8p0k9pi.share.zrok.io"
     ```
 
-1. The share appears in the agent UI and is accessible at the public share URL.
+2. The share appears in the agent UI and is accessible at the public share URL.
 
 ## Reserve and share a private share
 
@@ -45,7 +45,7 @@ To create a persistent private share using a reserved token:
     [   1.883]    INFO main.(*reserveCommand).run: your reserved share token is 'myshare'
     ```
 
-1. Start sharing the reserved share:
+2. Start sharing the reserved share:
 
     ```bash
     zrok2 share reserved "myshare"
@@ -56,7 +56,7 @@ To create a persistent private share using a reserved token:
     token:"myshare" backendMode:"proxy" shareMode:"private" target:"http://127.0.0.1:8080"
     ```
 
-1. The share appears in the agent UI. To access it from another device on the same zrok account, run
+3. The share appears in the agent UI. To access it from another device on the same zrok account, run
    `zrok2 access "myshare"`.
 
 ## Check agent status

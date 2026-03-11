@@ -36,13 +36,13 @@ Silicon Macs use the `arm64` distribution.
     cd ~/Downloads && mkdir -p /tmp/zrok2 && tar -xf ./zrok*darwin*.tar.gz -C /tmp/zrok2
     ```
 
-1. Install the `zrok2` executable:
+2. Install the `zrok2` executable:
 
     ```bash
     mkdir -p ~/bin && install /tmp/zrok2/zrok2 ~/bin/
     ```
 
-1. Add `~/bin` to your shell's executable search path:
+3. Add `~/bin` to your shell's executable search path:
 
     ```bash
     PATH=~/bin:$PATH
@@ -50,7 +50,7 @@ Silicon Macs use the `arm64` distribution.
 
     To persist this across sessions, add the line above to your `~/.zshenv`.
 
-1. Verify the install:
+4. Verify the install:
 
     ```bash
     zrok2 version

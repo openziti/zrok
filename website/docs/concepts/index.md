@@ -43,4 +43,4 @@ supports *persistent shares* with consistent tokens that survive restarts. See
 ## The agent
 
 The zrok agent centralizes management of your shares and accesses as a single persistent background process. See
-[zrok agent](./agent.md) for how it works.
+[zrok agent](./agent.md) for more info.
