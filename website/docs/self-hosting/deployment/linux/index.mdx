@@ -24,7 +24,7 @@ ziti edge list edge-routers
 
 ## Install zrok
 
-Follow [the Linux installation guide](../../how-tos/install/linux.mdx) to install the `zrok2` package from the repository or manually install the binary for your platform.
+Follow [the Linux installation guide](../../../how-tos/install/linux.mdx) to install the `zrok2` package from the repository or manually install the binary for your platform.
 
 ```bash
 sudo apt install zrok2 zrok2-controller zrok2-frontend zrok2-metrics
@@ -203,7 +203,7 @@ The `dynamic_proxy_controller` section enables the gRPC/AMQP system for dynamic 
 
 See the [reference configuration at `etc/ctrl.yml`](https://github.com/openziti/zrok/blob/main/etc/ctrl.yml) for all configuration options.
 
-See the separate guides on [configuring metrics](../metrics-and-limits/configuring-metrics.md) and [configuring limits](../metrics-and-limits/configuring-limits.md) for details about these specialized areas of service instance configuration.
+See the separate guides on [configuring metrics](../../metrics-and-limits/configuring-metrics.md) and [configuring limits](../../metrics-and-limits/configuring-limits.md) for details about these specialized areas of service instance configuration.
 
 :::
 
@@ -216,7 +216,7 @@ export ZROK2_API_ENDPOINT=http://127.0.0.1:18080
 export ZROK2_ADMIN_TOKEN=<your-admin-token>
 ```
 
-[Read more about configuring your self-hosted zrok instance](../instance-configuration.mdx).
+[Read more about configuring your self-hosted zrok instance](../../instance-configuration.mdx).
 
 ### Step 4: Bootstrap OpenZiti for zrok
 
@@ -373,7 +373,7 @@ sudo chmod g+r /etc/letsencrypt/archive/zrok.example.com/*
 sudo chmod o+x /etc/letsencrypt /etc/letsencrypt/live /etc/letsencrypt/archive
 ```
 
-For a complete reference of all frontend options including OAuth, see the [Dynamic Proxy Frontend Guide](../dynamic-proxy.md).
+For a complete reference of all frontend options including OAuth, see the [Dynamic Proxy Frontend Guide](../../dynamic-proxy.md).
 
 ### Step 11: Start the frontend
 
@@ -421,7 +421,7 @@ metrics:
 
 Restart the OpenZiti controller and routers after making these changes.
 
-For more details, see [Configuring Metrics](../metrics-and-limits/configuring-metrics.md).
+For more details, see [Configuring Metrics](../../metrics-and-limits/configuring-metrics.md).
 
 ### Step 13: Start the metrics bridge
 
@@ -446,7 +446,7 @@ Verify it's processing events:
 sudo journalctl -u zrok2-metrics -f
 ```
 
-Once traffic flows through shares, you should see log output from the controller confirming metrics are being written to InfluxDB. See [Configuring Limits](../metrics-and-limits/configuring-limits.md) to enforce bandwidth and resource limits based on these metrics.
+Once traffic flows through shares, you should see log output from the controller confirming metrics are being written to InfluxDB. See [Configuring Limits](../../metrics-and-limits/configuring-limits.md) to enforce bandwidth and resource limits based on these metrics.
 
 ## Create a user account
 
@@ -531,6 +531,6 @@ sudo journalctl -u zrok2-controller --since "5 minutes ago"
 
 If a service fails to start, verify the configuration file syntax and that the OpenZiti network is reachable.
 
-For dynamic frontend troubleshooting (AMQP connectivity, gRPC errors, mapping issues), see the [Dynamic Proxy Frontend Guide](../dynamic-proxy.md#troubleshooting).
+For dynamic frontend troubleshooting (AMQP connectivity, gRPC errors, mapping issues), see the [Dynamic Proxy Frontend Guide](../../dynamic-proxy.md#troubleshooting).
 
-For metrics troubleshooting (InfluxDB connectivity, AMQP queues, event flow), see [Configuring Metrics](../metrics-and-limits/configuring-metrics.md).
+For metrics troubleshooting (InfluxDB connectivity, AMQP queues, event flow), see [Configuring Metrics](../../metrics-and-limits/configuring-metrics.md).

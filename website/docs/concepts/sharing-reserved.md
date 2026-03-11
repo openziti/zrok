@@ -85,6 +85,8 @@ zrok2 share private localhost:8080 --share-token myapi-prod
 zrok2 access private myapi-prod
 ```
 
+![zrok2 share private --share-token terminal output](../images/zrok_share_reserved.png)
+
 When using the zrok agent, shares with `--share-token` are automatically persistent and will restart after abnormal exit or agent restart.
 
 ### Multiple names on one share
