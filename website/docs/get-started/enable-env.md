@@ -8,16 +8,6 @@ sidebar_position: 4
 In this step, you'll enable a zrok environment on your machine using your account token. Enabling creates a secure
 identity tied to your device so you can start creating shares.
 
-## Self-hosted: Set your API endpoint first
-
-If you're using a self-hosted zrok instance, configure your API endpoint before enabling:
-
-```bash
-zrok2 config set apiEndpoint https://your-zrok-instance.example.com
-```
-
-Skip this step if you're using myzrok.io.
-
 ## Enable your environment
 
 Run this command with your account token from Step 1:
@@ -66,8 +56,14 @@ Environment:
 
 Both `Account Token` and `EnvZId` should show `<<SET>>`. Your environment is ready.
 
-:::note
-If you're self-hosted, the `apiEndpoint` value will show your instance's URL instead of `https://api-v2.zrok.io`.
+:::note Self-hosted API endpoint
+If you're using a self-hosted zrok instance, configure your API endpoint before enabling:
+
+```bash
+zrok2 config set apiEndpoint https://your-zrok-instance.example.com
+```
+
+Your `apiEndpoint` value in `zrok2 status` will show your instance's URL instead of `https://api-v2.zrok.io`.
 :::
 
 ## Visualize your environment
@@ -82,6 +78,6 @@ The visualizer supports clicking, dragging, and mouse wheel zooming. If you get 
 the lower-left corner of the explorer to reset the view.
 
 :::note
-You can enable multiple environments with the same account—one per device. Use `zrok2 enable -d <name>` to give an
-environment a custom name.
+With your zrok account, you can `zrok2 enable` multiple environments. This allows you to share (and access your
+shares) from multiple environments simultaneously.
 :::
