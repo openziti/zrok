@@ -68,9 +68,7 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
     });
 
     useEffect(() => {
-        passwordChangeForm.values.currentPassword = "";
-        passwordChangeForm.values.newPassword = "";
-        passwordChangeForm.values.duplicateNewPassword = "";
+        passwordChangeForm.resetForm();
         setErrorMessage(null);
         setBottomControl(submitButton);
     }, [isOpen]);
