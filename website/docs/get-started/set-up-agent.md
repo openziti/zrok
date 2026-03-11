@@ -52,4 +52,4 @@ A native macOS agent package is not yet available. macOS users can run `zrok2 ag
 third-party process manager.
 :::
 
-For more detail on what the agent can do, see [Use the zrok Agent](../../how-tos/agent/).
+For more detail on what the agent can do, see [Use the zrok Agent](../how-tos/agent/index.mdx).
