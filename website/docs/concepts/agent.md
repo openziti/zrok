@@ -11,7 +11,7 @@ delegate to it automatically.
 
 ## Centralized management
 
-Without the agent running, each `zrok2 share` or `zrok2 access` command creates a separate process for that share or
+Without the agent running, each `zrok2 share` or `zrok2 access` command creates a separate process for each share or
 access. When the agent is running:
 
 - All shares and accesses run under a single agent process.
