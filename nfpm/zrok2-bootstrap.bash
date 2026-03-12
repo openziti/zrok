@@ -49,6 +49,7 @@
 #   ZROK2_INFLUX_ORG        - InfluxDB organization (default: zrok)
 #   ZROK2_INFLUX_BUCKET     - InfluxDB bucket (default: zrok)
 #   ZROK2_INFLUX_TOKEN      - InfluxDB admin token (auto-generated if not set)
+#   ZROK2_INFLUX_PASSWORD   - InfluxDB admin password (auto-generated if not set)
 #   ZITI_CTRL_CONFIG        - Path to Ziti controller config (default: auto-detected)
 #
 
@@ -171,6 +172,7 @@ _init_vars() {
     ZROK2_INFLUX_ORG="${ZROK2_INFLUX_ORG:-zrok}"
     ZROK2_INFLUX_BUCKET="${ZROK2_INFLUX_BUCKET:-zrok}"
     ZROK2_INFLUX_TOKEN="${ZROK2_INFLUX_TOKEN:-}"
+    ZROK2_INFLUX_PASSWORD="${ZROK2_INFLUX_PASSWORD:-}"
 
     # Ziti controller config auto-detection
     ZITI_CTRL_CONFIG="${ZITI_CTRL_CONFIG:-}"
@@ -271,7 +273,7 @@ step_database_postgres() {
 
     # Generate a password if not provided
     if [[ -z "$ZROK2_DB_PASSWORD" ]]; then
-        ZROK2_DB_PASSWORD=$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c32)
+        ZROK2_DB_PASSWORD=$(head -c24 /dev/urandom | base64 -w0)
         info "Generated PostgreSQL password (saved in $CTRL_CONFIG)"
     fi
 
@@ -374,15 +376,20 @@ INFLUXEOF
 
         # Generate token if not provided
         if [[ -z "$ZROK2_INFLUX_TOKEN" ]]; then
-            ZROK2_INFLUX_TOKEN=$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c64)
+            ZROK2_INFLUX_TOKEN=$(head -c48 /dev/urandom | base64 -w0)
             info "Generated InfluxDB admin token (saved in $CTRL_CONFIG)"
+        fi
+
+        if [[ -z "$ZROK2_INFLUX_PASSWORD" ]]; then
+            ZROK2_INFLUX_PASSWORD=$(head -c24 /dev/urandom | base64 -w0)
+            info "Generated InfluxDB admin password (saved in comment in $CTRL_CONFIG)"
         fi
 
         influx setup \
             --org "$ZROK2_INFLUX_ORG" \
             --bucket "$ZROK2_INFLUX_BUCKET" \
             --username admin \
-            --password "$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c32)" \
+            --password "$ZROK2_INFLUX_PASSWORD" \
             --token "$ZROK2_INFLUX_TOKEN" \
             --retention 0 \
             --force
@@ -526,6 +533,7 @@ metrics:
     bucket: ${ZROK2_INFLUX_BUCKET}
     org: ${ZROK2_INFLUX_ORG}
     token: "${ZROK2_INFLUX_TOKEN}"
+        # Influx admin password used during 'influx setup': "${ZROK2_INFLUX_PASSWORD}"
 
 registration:
   registration_url_template: ${ZROK2_API_ENDPOINT}/register
