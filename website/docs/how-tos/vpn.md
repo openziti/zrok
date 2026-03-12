@@ -25,13 +25,15 @@ service on a remote machine.
     zrok2 share private --backend-mode tcpTunnel localhost:22
     ```
 
-1. On your local machine, bind the share to a local port:
+    This creates a private share and outputs a share token (e.g., `abc123`).
+
+2. On your local machine, bind the share to a local port:
 
     ```bash
     zrok2 access private --bind 127.0.0.1:2222 <share-token>
     ```
 
-1. Connect via SSH through the tunnel:
+3. Connect via SSH through the tunnel:
 
     ```bash
     ssh -p 2222 user@127.0.0.1
@@ -45,13 +47,13 @@ service on a remote machine.
     zrok2 share private --backend-mode tcpTunnel localhost:5432
     ```
 
-1. On your local machine, bind the share to a local port:
+2. On your local machine, bind the share to a local port:
 
     ```bash
     zrok2 access private --bind 127.0.0.1:5432 <share-token>
     ```
 
-1. Connect with your database client:
+3. Connect with your database client:
 
     ```bash
     psql -h 127.0.0.1 -p 5432 -U myuser mydatabase
@@ -68,13 +70,13 @@ share. Use this when you need to access multiple services on a remote network.
     zrok2 share private --backend-mode socks
     ```
 
-1. On your local machine, bind the share to a local SOCKS5 port:
+2. On your local machine, bind the share to a local SOCKS5 port:
 
     ```bash
     zrok2 access private --bind 127.0.0.1:1080 <share-token>
     ```
 
-1. Configure your applications to use the SOCKS5 proxy at `127.0.0.1:1080`. For example:
+3. Configure your applications to use the SOCKS5 proxy at `127.0.0.1:1080`. For example:
 
     **curl:**
 
@@ -82,13 +84,14 @@ share. Use this when you need to access multiple services on a remote network.
     curl --socks5-hostname 127.0.0.1:1080 http://internal-server:8080/api
     ```
 
-    **SSH:**
+    **SSH (to access any host reachable from the remote machine):**
 
     ```bash
     ssh -o ProxyCommand='nc -x 127.0.0.1:1080 %h %p' user@internal-host
     ```
 
-    **Browser:** Configure your browser's proxy settings to use SOCKS5 proxy `127.0.0.1:1080`.
+    **Browser:** Configure your browser's proxy settings to use SOCKS5 proxy `127.0.0.1:1080` to browse internal
+    web applications.
 
 ### When to use each mode
 
