@@ -6,105 +6,112 @@ sidebar_label: Configure permission modes
 # Configure permission modes
 
 :::note
-As of `v1.0.5` zrok sharing now defaults to the `closed` permission mode. The `--closed` flag has been removed and has been replaced with a new `--open` flag for users who want to retain the open permission model. Otherwise, the closed permission mode works exactly the same.
+As of `v1.0.5`, zrok sharing defaults to the *closed* permission mode. Use the `--open` flag if you want the open
+permission model instead.
 :::
 
-Shares created in zrok `v0.4.26` and newer now include a choice of _permission mode_. 
-
-Shares created with zrok `v0.4.25` and older were created using what is now called the _open permission mode_. Whether _public_ or _private_, these shares can be accessed by any user of the zrok service instance, as long as they know the _share token_ of the share. Effectively shares with the _open permission mode_ are accessible by any user of the zrok service instance.
-
-zrok now supports a _closed permission mode_, which allows for more fine-grained control over which zrok users are allowed to privately access your shares using `zrok2 access private`.
-
-zrok defaults to continuing to create shares with the _open permission mode_. This will likely change in a future release. We're leaving the default behavior in place to allow users a period of time to get comfortable with the new permission modes.
+Permission modes control who can access your zrok shares. In the *open* permission mode, any user of the zrok service
+instance can access your share if they know the share token. In the *closed* permission mode, only accounts you
+explicitly grant access to can use `zrok2 access private` to reach your share.
 
 ## Create a share with closed permission mode
 
-Adding the `--closed` flag to the `zrok2 share` command will create shares using the _closed permission mode_:
+1. Create a private share with the `--closed` flag:
 
-```
-$ zrok2 share private --headless --closed -b web .
-[   0.066]    INFO main.(*sharePrivateCommand).run: allow other to access your share with the following command:
-zrok2 access private 0vzwzodf0c7g
-```
+    ```bash
+    zrok2 share private --headless --closed -b web .
+    ```
 
-By default any environment owned by the account that created the share is _allowed_ to access the new share. But a user trying to access the share from an environment owned by a different account will enounter the following error message:
+    ```buttonless title="Output"
+    [   0.066]    INFO main.(*sharePrivateCommand).run: allow other to access your share with the following command:
+    zrok2 access private 0vzwzodf0c7g
+    ```
 
-```
-$ zrok2 access private 0vzwzodf0c7g
-[ERROR]: unable to access ([POST /access][401] accessUnauthorized)
-```
+2. Share the share token with authorized users. A user from a different account who tries to access the share without
+   a grant will see:
 
-The `zrok2 share` command includes an `--access-grant` flag, which allows you to specify additional zrok accounts that are allowed to access your shares:
+    ```buttonless title="Output"
+    [ERROR]: unable to access ([POST /access][401] accessUnauthorized)
+    ```
 
-```
-$ zrok2 share private --headless --closed --access-grant anotheruser@test.com -b web .
-[   0.062]    INFO main.(*sharePrivateCommand).run: allow other to access your share with the following command:
-zrok2 access private y6h4at5xvn6o
-```
+3. To grant access to another account, add the `--access-grant` flag when creating the share:
 
-And now `anotheruser@test.com` will be allowed to access the share:
+    ```bash
+    zrok2 share private --headless --closed --access-grant anotheruser@test.com -b web .
+    ```
 
-```
-$ zrok2 access private --headless y6h4at5xvn6o
-[   0.049]    INFO main.(*accessPrivateCommand).run: allocated frontend 'VyvrJihAOEHD'
-[   0.051]    INFO main.(*accessPrivateCommand).run: access the zrok share at the following endpoint: http://127.0.0.1:9191
-```
+    ```buttonless title="Output"
+    [   0.062]    INFO main.(*sharePrivateCommand).run: allow other to access your share with the following command:
+    zrok2 access private y6h4at5xvn6o
+    ```
+
+    `anotheruser@test.com` can now access the share:
+
+    ```bash
+    zrok2 access private --headless y6h4at5xvn6o
+    ```
+
+    ```buttonless title="Output"
+    [   0.049]    INFO main.(*accessPrivateCommand).run: allocated frontend 'VyvrJihAOEHD'
+    [   0.051]    INFO main.(*accessPrivateCommand).run: access the zrok share at the following endpoint: http://127.0.0.1:9191
+    ```
 
 ## Add and remove access grants for existing shares
 
-If you've created a share (either reserved or ephemeral) and you forgot to include an access grant, or want to remove an access grant that was mistakenly added, you can use the `zrok2 modify share` command to make the adjustments:
+If you forgot to include an access grant when creating a share, or want to remove one, use `zrok2 modify share`.
 
-Create a share:
+1. Create a closed share:
 
-```
-$ zrok2 share private --headless --closed -b web .
-[   0.064]    INFO main.(*sharePrivateCommand).run: allow other to access your share with the following command:
-zrok2 access private s4czjylwk7wa
-```
+    ```bash
+    zrok2 share private --headless --closed -b web .
+    ```
 
-In another shell in the same environment you can execute:
+    ```buttonless title="Output"
+    [   0.064]    INFO main.(*sharePrivateCommand).run: allow other to access your share with the following command:
+    zrok2 access private s4czjylwk7wa
+    ```
 
-```
-$ zrok2 modify share s4czjylwk7wa --add-access-grant anotheruser@test.com
-updated
-```
+2. Add an access grant:
 
-And to remove the grant:
+    ```bash
+    zrok2 modify share s4czjylwk7wa --add-access-grant anotheruser@test.com
+    ```
 
-```
-$ zrok2 modify share s4czjylwk7wa --remove-access-grant anotheruser@test.com
-updated
-```
+3. To remove the grant:
+
+    ```bash
+    zrok2 modify share s4czjylwk7wa --remove-access-grant anotheruser@test.com
+    ```
 
 ## Use permission modes with reserved names (v2.0)
 
-In zrok v2.0, you can use permission modes with reserved names for persistent public shares:
+In zrok v2.0, you can use permission modes with reserved names for persistent public shares.
+
+1. Create a reserved name:
+
+    ```bash
+    zrok2 create name -n public myapp
+    ```
+
+2. Share with closed permission mode using the name:
+
+    ```bash
+    zrok2 share public localhost:8080 -n public:myapp --closed --access-grant friend@example.com
+    ```
+
+For persistent private shares, use the `--share-token` flag:
 
 ```bash
-# create a reserved name
-$ zrok2 create name -n public myapp
-
-# share with closed permission mode using the name
-$ zrok2 share public localhost:8080 -n public:myapp --closed --access-grant friend@example.com
+zrok2 share private localhost:8080 --share-token myapi --closed --access-grant colleague@example.com
 ```
 
-For persistent private shares in v2.0, use the `--share-token` flag:
+To modify access grants after the fact, use the share token or custom share token:
 
 ```bash
-# create a persistent private share with custom token and closed permissions
-$ zrok2 share private localhost:8080 --share-token myapi --closed --access-grant colleague@example.com
+zrok2 modify share <currentShareToken> --add-access-grant user@example.com
+zrok2 modify share myapi --add-access-grant user@example.com
 ```
 
-You can modify access grants for shares using reserved names or custom share tokens:
-
-```bash
-# modify a share using a reserved name's current share token
-$ zrok2 modify share <currentShareToken> --add-access-grant user@example.com
-
-# or modify using the custom share token
-$ zrok2 modify share myapi --add-access-grant user@example.com
-```
-
-## Limitations
-
-As of `v0.4.26` there is currently no way to _list_ the current access grants. This will be addressed shortly in a subsequent update.
+:::note
+There is no way to list the access grants for a share.
+:::
