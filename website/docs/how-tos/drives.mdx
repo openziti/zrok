@@ -29,11 +29,12 @@ Virtual drives are shared using the `--backend-mode drive` flag with either the 
     zrok2 access private wkcfb58vj51l
     ```
 
-    The share token (`wkcfb58vj51l` in this example) identifies the virtual drive in subsequent operations.
+    This creates an ephemeral private drive share pointed at `/tmp/junk`. The share token (`wkcfb58vj51l` in this
+    example) identifies the virtual drive in subsequent operations.
 
 ## Work with a private drive share
 
-Use `zrok://` URLs with the drives CLI to refer to the contents of private virtual drives.
+Copy files into your private drive, organize them into directories, and remove them when done.
 
 1. Copy a file into the virtual drive:
 
@@ -45,6 +46,9 @@ Use `zrok://` URLs with the drives CLI to refer to the contents of private virtu
     [   0.119]    INFO zrok/drives/sync.OneWay: => /LICENSE
     copy complete!
     ```
+
+    Use `zrok://<shareToken>` URLs with the drives CLI to refer to the private virtual drive allocated with
+    `zrok2 share private`.
 
 2. List the contents of the virtual drive:
 
@@ -90,60 +94,58 @@ Use `zrok://` URLs with the drives CLI to refer to the contents of private virtu
 
 ## Work with public shares
 
-Public shares work the same way as private shares, but use an HTTPS URL instead of a `zrok://` URL.
+Public shares work the same way as private shares, but use an HTTPS URL instead of a `zrok://` URL. Share a
+directory as a public drive, then use the same drives CLI commands with the public HTTPS URL.
 
-1. Share a directory as a public drive:
-
-    ```bash
-    zrok2 share public --headless --backend-mode drive /tmp/junk
-    ```
-
-    ```buttonless title="Output"
-    [   0.708]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[05e0f48b-242b-4fd9-8edb-259488535c47]} new service session
-    [   0.878]    INFO main.(*sharePublicCommand).run: access your zrok share at the following endpoints:
-     https://6kiww4bn7iok.share.zrok.io
-    ```
-
-2. Copy files to the public drive:
-
-    ```bash
-    zrok2 copy util/ https://6kiww4bn7iok.share.zrok.io
-    ```
-
-    ```buttonless title="Output"
-    [   0.268]    INFO zrok/drives/sync.OneWay: => /email.go
-    [   0.406]    INFO zrok/drives/sync.OneWay: => /headers.go
-    [   0.530]    INFO zrok/drives/sync.OneWay: => /proxy.go
-    [   0.655]    INFO zrok/drives/sync.OneWay: => /size.go
-    [   0.714]    INFO zrok/drives/sync.OneWay: => /uniqueName.go
-    copy complete!
-    ```
-
-3. List the contents:
-
-    ```bash
-    zrok2 ls https://6kiww4bn7iok.share.zrok.io
-    ```
-
-    ```buttonless title="Output"
-    ┌──────┬───────────────┬───────┬───────────────────────────────┐
-    │ TYPE │ NAME          │ SIZE  │ MODIFIED                      │
-    ├──────┼───────────────┼───────┼───────────────────────────────┤
-    │      │ email.go      │ 329 B │ 2023-07-21 13:17:56 -0400 EDT │
-    │      │ headers.go    │ 456 B │ 2023-07-21 13:17:56 -0400 EDT │
-    │      │ proxy.go      │ 609 B │ 2023-07-21 13:17:56 -0400 EDT │
-    │      │ size.go       │ 361 B │ 2023-07-21 13:17:56 -0400 EDT │
-    │      │ uniqueName.go │ 423 B │ 2024-01-02 11:57:14 -0500 EST │
-    └──────┴───────────────┴───────┴───────────────────────────────┘
-    ```
-
-For basic authentication on public shares, pass credentials with `--basic-auth`:
+Share a directory as a public drive:
 
 ```bash
-zrok2 copy util/ https://6kiww4bn7iok.share.zrok.io --basic-auth username:password
+zrok2 share public --headless --backend-mode drive /tmp/junk
 ```
 
-Alternatively, set the `ZROK2_DRIVES_BASIC_AUTH` environment variable:
+```buttonless title="Output"
+[   0.708]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[05e0f48b-242b-4fd9-8edb-259488535c47]} new service session
+[   0.878]    INFO main.(*sharePublicCommand).run: access your zrok share at the following endpoints:
+ https://6kiww4bn7iok.share.zrok.io
+```
+
+The same commands from the previous section work with the HTTPS URL:
+
+- Copy files:
+
+  ```bash
+  zrok2 copy util/ https://6kiww4bn7iok.share.zrok.io
+  ```
+
+  ```buttonless title="Output"
+  [   0.268]    INFO zrok/drives/sync.OneWay: => /email.go
+  [   0.406]    INFO zrok/drives/sync.OneWay: => /headers.go
+  [   0.530]    INFO zrok/drives/sync.OneWay: => /proxy.go
+  [   0.655]    INFO zrok/drives/sync.OneWay: => /size.go
+  [   0.714]    INFO zrok/drives/sync.OneWay: => /uniqueName.go
+  copy complete!
+  ```
+
+- List contents:
+
+  ```bash
+  zrok2 ls https://6kiww4bn7iok.share.zrok.io
+  ```
+
+  ```buttonless title="Output"
+  ┌──────┬───────────────┬───────┬───────────────────────────────┐
+  │ TYPE │ NAME          │ SIZE  │ MODIFIED                      │
+  ├──────┼───────────────┼───────┼───────────────────────────────┤
+  │      │ email.go      │ 329 B │ 2023-07-21 13:17:56 -0400 EDT │
+  │      │ headers.go    │ 456 B │ 2023-07-21 13:17:56 -0400 EDT │
+  │      │ proxy.go      │ 609 B │ 2023-07-21 13:17:56 -0400 EDT │
+  │      │ size.go       │ 361 B │ 2023-07-21 13:17:56 -0400 EDT │
+  │      │ uniqueName.go │ 423 B │ 2024-01-02 11:57:14 -0500 EST │
+  └──────┴───────────────┴───────┴───────────────────────────────┘
+  ```
+
+For basic authentication on public shares, the drives CLI offers the `--basic-auth` flag, which accepts a
+`<username>:<password>` parameter. Alternatively, set the `ZROK2_DRIVES_BASIC_AUTH` environment variable:
 
 ```bash
 export ZROK2_DRIVES_BASIC_AUTH=username:password
@@ -151,57 +153,55 @@ export ZROK2_DRIVES_BASIC_AUTH=username:password
 
 ## One-way synchronization
 
-The `--sync` flag on `zrok2 copy` skips files that haven't changed, comparing modification timestamp and size. This is useful for resuming interrupted copies of large file trees.
+The `--sync` flag on `zrok2 copy` skips files that haven't changed, comparing modification timestamp and size. This
+provides a convenience mechanism for resuming interrupted copies of large file trees and gives a reasonable guarantee
+that the trees are in sync.
 
-1. Run an initial sync from a local directory to a public drive:
+On the first run against an empty drive, `--sync` copies the entire contents:
 
-    ```bash
-    zrok2 copy --sync docs/ https://glmv049c62p7.share.zrok.io
-    ```
+```bash
+zrok2 copy --sync docs/ https://glmv049c62p7.share.zrok.io
+```
 
-    ```buttonless title="Output"
-    [   0.636]    INFO zrok/drives/sync.OneWay: => /_attic/
-    [   0.760]    INFO zrok/drives/sync.OneWay: => /_attic/network/
-    ...
-    [   9.870]    INFO zrok/drives/sync.OneWay: => /images/zrok_zoom_to_fit.png
-    copy complete!
-    ```
+```buttonless title="Output"
+[   0.636]    INFO zrok/drives/sync.OneWay: => /_attic/
+[   0.760]    INFO zrok/drives/sync.OneWay: => /_attic/network/
+...
+[   9.870]    INFO zrok/drives/sync.OneWay: => /images/zrok_zoom_to_fit.png
+copy complete!
+```
 
-2. Run the same command again. Because the drive is already in sync, nothing is copied:
+Running the same command again does nothing, because it's already in sync:
 
-    ```bash
-    zrok2 copy --sync docs/ https://glmv049c62p7.share.zrok.io
-    ```
+```bash
+zrok2 copy --sync docs/ https://glmv049c62p7.share.zrok.io
+```
 
-    ```buttonless title="Output"
-    copy complete!
-    ```
+```buttonless title="Output"
+copy complete!
+```
 
-3. Remove a directory from the drive:
+If a directory is removed from the drive and you re-sync, `--sync` detects the missing files and copies them back:
 
-    ```bash
-    zrok2 rm https://glmv049c62p7.share.zrok.io/images
-    ```
+```bash
+zrok2 rm https://glmv049c62p7.share.zrok.io/images
+zrok2 copy --sync docs/ https://glmv049c62p7.share.zrok.io
+```
 
-4. Re-sync to restore it:
-
-    ```bash
-    zrok2 copy --sync docs/ https://glmv049c62p7.share.zrok.io
-    ```
-
-    ```buttonless title="Output"
-    [   0.364]    INFO zrok/drives/sync.OneWay: => /images/
-    [   0.456]    INFO zrok/drives/sync.OneWay: => /images/zrok.png
-    ...
-    [   2.391]    INFO zrok/drives/sync.OneWay: => /images/zrok_zoom_to_fit.png
-    copy complete!
-    ```
+```buttonless title="Output"
+[   0.364]    INFO zrok/drives/sync.OneWay: => /images/
+[   0.456]    INFO zrok/drives/sync.OneWay: => /images/zrok.png
+...
+[   2.391]    INFO zrok/drives/sync.OneWay: => /images/zrok_zoom_to_fit.png
+copy complete!
+```
 
 ## Drive-to-drive copies and synchronization
 
 `zrok2 copy` can operate on pairs of virtual drives without storing files locally.
 
-Syncing a drive to itself always results in nothing being copied:
+Specifying the same URL for both source and target of a `--sync` operation always results in nothing being
+copied, because they're the same drive with the same state:
 
 ```bash
 zrok2 copy --sync https://glmv049c62p7.share.zrok.io https://glmv049c62p7.share.zrok.io
@@ -211,7 +211,7 @@ zrok2 copy --sync https://glmv049c62p7.share.zrok.io https://glmv049c62p7.share.
 copy complete!
 ```
 
-Copy files between two virtual drives with a single command:
+You can copy files between two different virtual drives with a single command:
 
 ```bash
 zrok2 copy --sync https://glmv049c62p7.share.zrok.io zrok://hsml272j3xzf
@@ -225,9 +225,20 @@ zrok2 copy --sync https://glmv049c62p7.share.zrok.io zrok://hsml272j3xzf
 copy complete!
 ```
 
+Running the same command again does nothing, because they're now in sync:
+
+```bash
+zrok2 copy --sync https://glmv049c62p7.share.zrok.io zrok://hsml272j3xzf
+```
+
+```buttonless title="Output"
+copy complete!
+```
+
 ## Copy from drives to the local filesystem
 
-`zrok2 copy` always assumes the destination is a directory. There is no way to copy a file directly to a differently named file:
+`zrok2 copy` always assumes the destination is a directory. There's no way to copy a file directly to a differently
+named file. So, when using `zrok2 copy`, always take note of the destination:
 
 ```bash
 zrok2 copy somefile someotherfile
@@ -240,27 +251,69 @@ somefile
 someotherfile/somefile
 ```
 
-`zrok2 copy` defaults the destination to `file://.` (the current directory), so you can omit the destination:
+### Copy without specifying a destination
 
-```bash
-zrok2 copy https://azc47r3cwjds.share.zrok.io/LICENSE
-```
+`zrok2 copy` defaults the destination to `file://.` (the current directory), so you can omit the destination.
 
-```buttonless title="Output"
-[   0.260]    INFO zrok/drives/sync.OneWay: => /LICENSE
-copy complete!
-```
+1. Check what's in the drive:
 
-You can also specify a local folder as the destination:
+    ```bash
+    zrok2 ls https://azc47r3cwjds.share.zrok.io
+    ```
 
-```bash
-zrok2 copy https://azc47r3cwjds.share.zrok.io/LICENSE /tmp/inbox
-```
+    ```buttonless title="Output"
+    ┌──────┬─────────┬─────────┬───────────────────────────────┐
+    │ TYPE │ NAME    │ SIZE    │ MODIFIED                      │
+    ├──────┼─────────┼─────────┼───────────────────────────────┤
+    │      │ LICENSE │ 11.3 kB │ 2023-07-21 13:17:56 -0400 EST │
+    └──────┴─────────┴─────────┴───────────────────────────────┘
+    ```
 
-```buttonless title="Output"
-[   0.221]    INFO zrok/drives/sync.OneWay: => /LICENSE
-copy complete!
-```
+2. Copy a file without specifying a destination:
+
+    ```bash
+    zrok2 copy https://azc47r3cwjds.share.zrok.io/LICENSE
+    ```
+
+    ```buttonless title="Output"
+    [   0.260]    INFO zrok/drives/sync.OneWay: => /LICENSE
+    copy complete!
+    ```
+
+3. Verify the file landed in the current directory:
+
+    ```bash
+    ls -l
+    ```
+
+    ```buttonless title="Output"
+    total 12
+    -rw-rw-r-- 1 michael michael 11346 Jan 19 13:29 LICENSE
+    ```
+
+### Copy to a specific local folder
+
+1. Copy a file to a local directory:
+
+    ```bash
+    zrok2 copy https://azc47r3cwjds.share.zrok.io/LICENSE /tmp/inbox
+    ```
+
+    ```buttonless title="Output"
+    [   0.221]    INFO zrok/drives/sync.OneWay: => /LICENSE
+    copy complete!
+    ```
+
+2. Verify the file landed in the destination:
+
+    ```bash
+    ls -l /tmp/inbox
+    ```
+
+    ```buttonless title="Output"
+    total 12
+    -rw-rw-r-- 1 michael michael 11346 Jan 19 13:30 LICENSE
+    ```
 
 ## Use unique names and reserved shares
 
@@ -290,7 +343,7 @@ human-readable name instead of a share token.
     [   0.927]    INFO main.(*shareReservedCommand).run: use this command to access your zrok share: 'zrok access private mydrive'
     ```
 
-3. Use the unique name in `zrok://` URLs:
+3. Use the human-readable name in any `zrok://` URL instead of the generated share token:
 
     ```bash
     zrok2 ls zrok://mydrive
