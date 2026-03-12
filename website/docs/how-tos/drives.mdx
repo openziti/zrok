@@ -320,30 +320,19 @@ someotherfile/somefile
 Reserved private shares with unique names are particularly convenient with the drives CLI, since you can use a
 human-readable name instead of a share token.
 
-1. Reserve a private drive share with a unique name:
+1. Share the directory with a unique name:
 
     ```bash
-    zrok2 reserve private -b drive --unique-name mydrive /tmp/junk
+    zrok2 share private -b drive --share-token mydrive /tmp/junk
     ```
 
     ```buttonless title="Output"
-    [   0.315]    INFO main.(*reserveCommand).run: your reserved share token is 'mydrive'
-    ```
-
-2. Start sharing the reserved drive:
-
-    ```bash
-    zrok2 share reserved --headless mydrive
-    ```
-
-    ```buttonless title="Output"
-    [   0.289]    INFO main.(*shareReservedCommand).run: sharing target: '/tmp/junk'
-    [   0.289]    INFO main.(*shareReservedCommand).run: using existing backend target: /tmp/junk
+    [   0.289]    INFO main.(*sharePrivateCommand).run: sharing target: '/tmp/junk'
     [   0.767]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[d519a436-9fb5-4207-afd5-7cbc28fb779a]} new service session
-    [   0.927]    INFO main.(*shareReservedCommand).run: use this command to access your zrok share: 'zrok access private mydrive'
+    [   0.927]    INFO main.(*sharePrivateCommand).run: use this command to access your zrok share: 'zrok2 access private mydrive'
     ```
 
-3. Use the human-readable name in any `zrok://` URL instead of the generated share token:
+2. Use the human-readable name in any `zrok://` URL instead of the generated share token:
 
     ```bash
     zrok2 ls zrok://mydrive
