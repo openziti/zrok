@@ -5,8 +5,8 @@ sidebar_label: Set up the Windows agent service
 # Set up the Windows agent service
 
 Run the zrok agent as a Windows service so it starts automatically with your system. Service management is handled
-through [nssm](https://nssm.cc/download) (Non-Sucking Service Manager), a third-party utility. Review the
-[nssm documentation](https://nssm.cc/usage) before proceeding.
+through [nssm](https://nssm.cc/download) (Non-Sucking Service Manager), a third-party utility. Review the [nssm
+documentation](https://nssm.cc/usage) before proceeding.
 
 ## Prerequisites
 
@@ -22,8 +22,8 @@ through [nssm](https://nssm.cc/download) (Non-Sucking Service Manager), a third-
 
 ## Enable the service environment
 
-The Windows service runs as the `Local System` user, whose home directory is
-`C:\Windows\System32\config\systemprofile`. You need to enable a zrok environment there.
+The Windows service runs as the `Local System` user, whose home directory is `C:\Windows\System32\config\systemprofile`.
+You need to enable a zrok environment there.
 
 1. Set `USERPROFILE` to the `Local System` home directory:
 
@@ -65,8 +65,8 @@ The Windows service runs as the `Local System` user, whose home directory is
     - **Output (stdout)**: `C:\Windows\System32\config\systemprofile\.zrok2\agent-stdout.log`
     - **Error (stderr)**: `C:\Windows\System32\config\systemprofile\.zrok2\agent-stderr.log`
 
-    Setting up I/O redirection produces logs from the `zrok2 agent start` process that are useful for
-    troubleshooting. Optionally, configure log rotation on the **File rotation** tab if your setup requires it:
+    Setting up I/O redirection produces logs from the `zrok2 agent start` process that are useful for troubleshooting.
+    Optionally, configure log rotation on the **File rotation** tab if your setup requires it:
 
     ![File rotation](images/nssm-file-rotation.png)
 
@@ -76,14 +76,13 @@ The Windows service runs as the `Local System` user, whose home directory is
 
     ![Service Manager](images/services.png)
 
-6. Start the service by clicking the start button in the toolbar, or right-clicking the service and selecting
-   **Start**:
+6. Start the service by clicking the start button in the toolbar, or right-clicking the service and selecting **Start**:
 
     ![Service Running](images/services-running.png)
 
 7. Verify the service is working by opening a Windows Explorer window at
-   `C:\Windows\System32\config\systemprofile\.zrok2`. You should see the log files and the `agent.socket` file
-   used by the zrok CLI:
+   `C:\Windows\System32\config\systemprofile\.zrok2`. You should see the log files and the `agent.socket` file used by
+   the zrok CLI:
 
     ![zrokdir](images/zrokdir.png)
 
@@ -93,21 +92,20 @@ The Windows service runs as the `Local System` user, whose home directory is
     C:\Program Files\zrok2>zrok2 agent console
     ```
 
-    This opens a web interface for managing the agent. You can create shares and accesses from the console, or
-    continue using the zrok CLI.
+    This opens a web interface for managing the agent. You can create shares and accesses from the console, or continue
+    using the zrok CLI.
 
     ![zrok agent console](images/zrok-agent-console.png)
 
 :::note
 Whenever you interact with this service environment from a Command Prompt, set `USERPROFILE` to
-`C:\Windows\System32\config\systemprofile` first. Otherwise, zrok commands will use your default user profile
-directory instead.
+`C:\Windows\System32\config\systemprofile` first. Otherwise, zrok commands will use your default user profile directory
+instead.
 :::
 
 ## Non-interactive service installation
 
-`nssm` supports a command-line interface that bypasses the GUI. Run these commands from an Administrator Command
-Prompt:
+`nssm` supports a command-line interface that bypasses the GUI. Run these commands from an Administrator Command Prompt:
 
 1. Create the service:
 
@@ -155,8 +153,8 @@ Run the following commands from an Administrator Command Prompt:
     C:\>sc delete zrokAgent
     ```
 
-3. With `USERPROFILE` set to `C:\Windows\System32\config\systemprofile`, remove the zrok environment from your
-   system and from the zrok service:
+3. With `USERPROFILE` set to `C:\Windows\System32\config\systemprofile`, remove the zrok environment from your system
+   and from the zrok service:
 
     ```cmd
     C:\Program Files\zrok2>zrok2 disable
