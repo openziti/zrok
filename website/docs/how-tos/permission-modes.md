@@ -7,8 +7,8 @@ sidebar_label: Configure permission modes
 
 zrok shares support two permission modes that control who can access them:
 
-- **Closed** (default): only the account that created the share, and any explicitly granted accounts, can access it.
-- **Open**: any user of the zrok service instance can access the share if they know its share token.
+- **Closed** (default): Only the account that created the share, and any explicitly granted accounts, can access it.
+- **Open**: Any user of the zrok service instance can access the share if they know its share token.
 
 ## Closed permission mode (default)
 
@@ -117,7 +117,3 @@ To modify access grants after the fact, use the share token or custom share toke
 zrok2 modify share <currentShareToken> --add-access-grant user@example.com
 zrok2 modify share myapi --add-access-grant user@example.com
 ```
-
-:::note
-There is no way to list the access grants for a share.
-:::
