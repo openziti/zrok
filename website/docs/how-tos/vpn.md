@@ -95,12 +95,12 @@ share. Use this when you need to access multiple services on a remote network.
 
 ### When to use each mode
 
-| Use case | Recommended mode |
-|---|---|
-| Access a single TCP service (SSH, database, etc.) | `tcpTunnel` |
-| Access multiple services on a remote network | `socks` |
-| Web browsing through a remote network | `socks` |
-| Persistent service tunneling | `tcpTunnel` with reserved name |
+| Use case                                          | Recommended mode               |
+|---------------------------------------------------|--------------------------------|
+| Access a single TCP service (SSH, database, etc.) | `tcpTunnel`                    |
+| Access multiple services on a remote network      | `socks`                        |
+| Web browsing through a remote network             | `socks`                        |
+| Persistent service tunneling                      | `tcpTunnel` with reserved name |
 
 ## For network-level access
 
