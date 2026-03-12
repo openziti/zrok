@@ -2,23 +2,37 @@
 #
 # entrypoint-init.bash — Docker init container for zrok2 self-hosting
 #
-# Sources zrok2-bootstrap.bash for utility functions (info, warn, die,
-# retry, wait_for) and handles the complete init sequence:
+# Sources zrok2-bootstrap.bash for ALL function definitions (utilities AND
+# step_* functions), then calls the relevant steps directly. This avoids
+# duplicating the admin operations (frontend, namespace, mapping) that are
+# already implemented in the bootstrap script.
+#
+# Init sequence:
 #   1. Generate controller and frontend configuration
 #   2. Wait for Ziti controller and log in
 #   3. Run zrok2 admin bootstrap (creates Ziti identities/policies)
 #   4. Start a temporary controller to run admin commands
-#   5. Create the default public frontend, namespace, and mapping
+#   5. Create the default public frontend, namespace, and mapping (via step_*)
 #   6. Save identity files and fix permissions
-#
-# This replaces the previous zrok2-init and zrok2-post-init inline scripts
-# with a single init container.
 
 set -o errexit -o nounset -o pipefail
 
-# Source the bootstrap library for utility functions
+# Source the bootstrap library — loads ALL function definitions (info, warn,
+# die, retry, wait_for, step_create_frontend, step_create_namespace,
+# step_map_namespace_frontend, etc.) without executing the main() workflow.
 # shellcheck source=../../../nfpm/zrok2-bootstrap.bash
 source /bootstrap/zrok2-bootstrap.bash
+
+# ── Map Docker env vars to bootstrap env vars ────────────────────────────────
+#
+# The bootstrap step_* functions expect ZITI_ADMIN_PASSWORD, ZITI_ADMIN_USER,
+# and ZITI_API_ENDPOINT. Docker compose uses ZITI_PWD, ZITI_USER, and
+# constructs the endpoint from ZROK2_DNS_ZONE.
+
+export ZITI_ADMIN_PASSWORD="${ZITI_PWD}"
+export ZITI_ADMIN_USER="${ZITI_USER:-admin}"
+export ZITI_API_ENDPOINT="https://ziti.${ZROK2_DNS_ZONE}:${ZITI_CTRL_PORT:-1280}"
+export ZROK2_NAMESPACE_TOKEN="${ZROK2_NAMESPACE_TOKEN:-public}"
 
 # ── Docker-specific configuration ────────────────────────────────────────────
 
@@ -35,7 +49,6 @@ else
     STORE_PATH="/var/lib/zrok2/zrok2.sqlite3"
 fi
 
-ZITI_ENDPOINT="https://ziti.${ZROK2_DNS_ZONE}:${ZITI_CTRL_PORT:-1280}"
 ZROK2_PORT="${ZROK2_CTRL_PORT:-18080}"
 
 export ZROK2_API_ENDPOINT="http://localhost:${ZROK2_PORT}"
@@ -44,9 +57,9 @@ export ZROK2_ADMIN_TOKEN
 # ── Helper: commands wrapped for retry/wait_for ──────────────────────────────
 
 _ziti_login() {
-    ziti edge login "$ZITI_ENDPOINT" \
-        --username "${ZITI_USER:-admin}" \
-        --password "${ZITI_PWD}" \
+    ziti edge login "$ZITI_API_ENDPOINT" \
+        --username "${ZITI_ADMIN_USER}" \
+        --password "${ZITI_ADMIN_PASSWORD}" \
         --yes 2>/dev/null
 }
 
@@ -85,9 +98,9 @@ store:
   path: "${STORE_PATH}"
   type: "${STORE_TYPE}"
 ziti:
-  api_endpoint: "${ZITI_ENDPOINT}"
-  username: "${ZITI_USER:-admin}"
-  password: "${ZITI_PWD}"
+  api_endpoint: "${ZITI_API_ENDPOINT}"
+  username: "${ZITI_ADMIN_USER}"
+  password: "${ZITI_ADMIN_PASSWORD}"
 maintenance:
   registration:
     expiration_timeout: 24h
@@ -151,74 +164,19 @@ fi
 info "Temporary controller is healthy"
 
 # ── Step 6: Create frontend, namespace, and mapping ──────────────────────────
-
-# Get the Ziti identity ID for "public" (created during bootstrap)
-_get_public_zid() {
-    local zid
-    zid=$(ziti edge list identities 'name="public"' -j 2>/dev/null \
-        | jq -r '.data[0].id')
-    [[ -n "$zid" && "$zid" != "null" ]]
-}
-
-retry 5 3 "Ziti identity lookup for 'public'" _get_public_zid
-PUBLIC_ZID=$(ziti edge list identities 'name="public"' -j | jq -r '.data[0].id')
-info "Public identity Ziti ID = $PUBLIC_ZID"
-
-# Create the dynamic frontend (idempotent)
-_create_frontend() {
-    local existing
-    existing=$(zrok2 admin list frontends 2>/dev/null || true)
-    if echo "$existing" | grep -q 'public'; then
-        FRONTEND_TOKEN=$(echo "$existing" | awk '/public/ {print $1; exit}')
-        info "Frontend already exists: $FRONTEND_TOKEN"
-        return 0
-    fi
-
-    local output
-    output=$(zrok2 admin create frontend \
-        --dynamic "$PUBLIC_ZID" public \
-        "https://{token}.${ZROK2_DNS_ZONE}" 2>&1)
-    FRONTEND_TOKEN=$(echo "$output" \
-        | grep -oP "(?<=frontend ').*(?=')" || true)
-    if [[ -z "$FRONTEND_TOKEN" ]]; then
-        FRONTEND_TOKEN=$(zrok2 admin list frontends 2>/dev/null \
-            | awk '/public/ {print $1; exit}')
-    fi
-    [[ -n "$FRONTEND_TOKEN" ]]
-}
+#
+# These call the bootstrap's step_* functions directly — no duplication.
+# The functions are idempotent and use ZROK2_DNS_ZONE, ZROK2_NAMESPACE_TOKEN,
+# and FRONTEND_TOKEN (script-level var populated by step_create_frontend).
 
 FRONTEND_TOKEN=""
-retry 5 3 "create dynamic frontend" _create_frontend
+retry 5 3 "create dynamic frontend" step_create_frontend
 info "Frontend token: $FRONTEND_TOKEN"
 
-# Create the public namespace (idempotent)
-_create_namespace() {
-    local existing
-    existing=$(zrok2 admin list namespaces 2>/dev/null || true)
-    if echo "$existing" | grep -q 'public'; then
-        info "Namespace 'public' already exists"
-        return 0
-    fi
-    zrok2 admin create namespace \
-        --open --token public "${ZROK2_DNS_ZONE}"
-}
+retry 5 3 "create public namespace" step_create_namespace
+info "Namespace '${ZROK2_NAMESPACE_TOKEN}' ready"
 
-retry 5 3 "create public namespace" _create_namespace
-info "Namespace 'public' ready"
-
-# Map namespace to frontend (idempotent)
-_map_namespace_frontend() {
-    local existing
-    existing=$(zrok2 admin list namespace-frontend public 2>/dev/null || true)
-    if echo "$existing" | grep -q "$FRONTEND_TOKEN"; then
-        info "Namespace-frontend mapping already exists"
-        return 0
-    fi
-    zrok2 admin create namespace-frontend \
-        --default public "$FRONTEND_TOKEN"
-}
-
-retry 5 3 "map namespace to frontend" _map_namespace_frontend
+retry 5 3 "map namespace to frontend" step_map_namespace_frontend
 info "Namespace-frontend mapping ready"
 
 # ── Step 7: Save frontend identity ───────────────────────────────────────────
