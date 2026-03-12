@@ -717,8 +717,20 @@ step_create_frontend() {
     fi
 
     info "Creating dynamic frontend..."
+
+    # Look up the Ziti identity ID for the 'public' frontend identity
+    # (created by zrok2 admin bootstrap)
+    local public_ziti_id
+    public_ziti_id=$(ziti edge list identities 'name="public"' -j \
+        | jq -r '.[0].id' 2>/dev/null || true)
+    if [[ -z "$public_ziti_id" || "$public_ziti_id" == "null" ]]; then
+        error "Cannot find Ziti identity 'public'. Was 'zrok2 admin bootstrap' run?"
+        return 1
+    fi
+    info "Found public identity Ziti ID: $public_ziti_id"
+
     local output
-    output=$(zrok2 admin create frontend --dynamic public "https://{token}.${ZROK2_DNS_ZONE}" 2>&1)
+    output=$(zrok2 admin create frontend --dynamic "$public_ziti_id" public "https://{token}.${ZROK2_DNS_ZONE}" 2>&1)
     FRONTEND_TOKEN=$(echo "$output" | grep -oP "(?<=frontend ').*(?=')" || true)
 
     if [[ -z "$FRONTEND_TOKEN" ]]; then
