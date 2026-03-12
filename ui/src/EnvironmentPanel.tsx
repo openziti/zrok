@@ -51,6 +51,7 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
     }
 
     useEffect(() => {
+        if (!user) return;
         setLoading(true);
         const controller = new AbortController();
         getMetadataApi(user).getEnvironmentDetail({envZId: environment.data!.envZId! as string}, { signal: controller.signal })
@@ -67,6 +68,8 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
             })
         return () => controller.abort();
     }, [environment.data.envZId]);
+
+    if (!user) return null;
 
     return (
         <>

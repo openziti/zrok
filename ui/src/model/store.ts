@@ -6,14 +6,14 @@ import {User} from "./user.ts";
 import {MRT_PaginationState, MRT_SortingState} from "material-react-table";
 
 type StoreState = {
-    user: User;
+    user: User | null;
     limited: boolean;
     graph: Graph;
     environments: Array<Environment>;
     sparkdata: Map<string, number[]>;
     nodes: Node[];
     edges: Edge[];
-    selectedNode: Node;
+    selectedNode: Node | null;
     focusNodeId: string | null;
     viewport: Viewport;
     pagination: MRT_PaginationState;

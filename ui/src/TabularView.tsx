@@ -61,7 +61,7 @@ const TabularView = () => {
 
     useEffect(() => {
         let sn = nodes.find(node => Object.keys(rowSelection).includes(node.id));
-        updateSelectedNode(sn);
+        updateSelectedNode(sn ?? null);
         updateNodes(nodes.map(node => (sn && node.id === sn.id) ? { ...node, selected: true } : { ...node, selected: false }));
     }, [rowSelection]);
 

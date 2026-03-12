@@ -21,7 +21,7 @@ interface ApiConsoleProps {
 
 const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const user = useApiConsoleStore((state) => state.user);
-    const userRef = useRef<User>(user);
+    const userRef = useRef<User | null>(user);
     const updateLimited = useApiConsoleStore((state) => state.updateLimited);
     const graph = useApiConsoleStore((state) => state.graph);
     const updateGraph = useApiConsoleStore((state) => state.updateGraph);
@@ -36,7 +36,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const updateNodes = useApiConsoleStore((state) => state.updateNodes);
     const updateEdges = useApiConsoleStore((state) => state.updateEdges);
     const selectedNode = useApiConsoleStore((state) => state.selectedNode);
-    const selectedNodeRef = useRef<Node>(selectedNode);
+    const selectedNodeRef = useRef<Node | null>(selectedNode);
     selectedNodeRef.current = selectedNode;
     const focusNodeId = useApiConsoleStore((state) => state.focusNodeId);
     const focusNodeIdRef = useRef<string | null>(focusNodeId);
@@ -90,6 +90,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     }, []);
 
     const retrieveOverview = (signal?: AbortSignal) => {
+        if (!userRef.current) return Promise.resolve();
         return getMetadataApi(userRef.current).overview({ signal })
             .then(d => {
                 updateLimited(d.accountLimited!);
@@ -133,7 +134,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             });
         }
 
-        return getMetadataApi(user).getSparklines({body: {environments: environments, shares: shares}}, { signal })
+        return getMetadataApi(user!).getSparklines({body: {environments: environments, shares: shares}}, { signal })
             .then(d => {
                 if(d.sparklines) {
                     let sparkdataIn = new Map<string, Number[]>();

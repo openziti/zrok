@@ -41,6 +41,8 @@ const GettingStartedModal = ({ close, isOpen }: GettingStartedModalProps) => {
         inspectState();
     }, [nodes]);
 
+    if (!user) return null;
+
     return (
         <Modal open={isOpen} onClose={close} aria-labelledby="modal-title-getting-started">
             <Box sx={{ ...modalStyle }}>

@@ -81,6 +81,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
     }
 
     useEffect(() => {
+        if (!user) return;
         setLoading(true);
         const controller = new AbortController();
         getMetadataApi(user).getShareDetail({ shareToken: share.data!.shareToken! as string }, { signal: controller.signal })
@@ -102,6 +103,8 @@ const SharePanel = ({ share }: SharePanelProps) => {
             })
         return () => controller.abort();
     }, [share.id]);
+
+    if (!user) return null;
 
     return (
         <>

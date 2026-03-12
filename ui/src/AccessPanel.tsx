@@ -32,6 +32,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
     }
 
     useEffect(() => {
+        if (!user) return;
         setLoading(true);
         const controller = new AbortController();
         getMetadataApi(user).getFrontendDetail({frontendId: access.data.feId as number}, { signal: controller.signal })
@@ -48,6 +49,8 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
             })
         return () => controller.abort();
     }, [access.data.feId]);
+
+    if (!user) return null;
 
     const customProperties = {
         bindAddress: (row: PropertyRow) => <>

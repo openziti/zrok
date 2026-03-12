@@ -76,7 +76,7 @@ const Visualizer = () => {
         if(nodes.length > 0) {
             updateSelectedNode(nodes[0]);
         } else {
-            updateSelectedNode(null as Node);
+            updateSelectedNode(null);
         }
     };
 

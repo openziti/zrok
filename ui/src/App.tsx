@@ -35,7 +35,7 @@ const App = () => {
     }
 
     const logout = () => {
-        updateUser(null as User);
+        updateUser(null);
         localStorage.clear();
     }
 

@@ -43,6 +43,8 @@ const AccountPanel = ({ account }: AccountPanelProps) => {
         setRegenerateOpen(false);
     }
 
+    if (!user) return null;
+
     const customProperties = {
         token: row => <Grid2 container><SecretToggle secret={row.value} /><ClipboardText text={row.value} /></Grid2>
     }
