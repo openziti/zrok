@@ -291,13 +291,10 @@ total 12
 Private reserved shares with unque names can be particularly useful with the drives CLI:
 
 ```
-$ zrok2 reserve private -b drive --unique-name mydrive /tmp/junk
-[   0.315]    INFO main.(*reserveCommand).run: your reserved share token is 'mydrive'
-$ zrok2 share reserved --headless mydrive
-[   0.289]    INFO main.(*shareReservedCommand).run: sharing target: '/tmp/junk'
-[   0.289]    INFO main.(*shareReservedCommand).run: using existing backend target: /tmp/junk
+$ zrok2 share private -b drive --share-token mydrive /tmp/junk
+[   0.289]    INFO main.(*sharePrivateCommand).run: sharing target: '/tmp/junk'
 [   0.767]    INFO sdk-golang/ziti.(*listenerManager).createSessionWithBackoff: {session token=[d519a436-9fb5-4207-afd5-7cbc28fb779a]} new service session
-[   0.927]    INFO main.(*shareReservedCommand).run: use this command to access your zrok share: 'zrok access private mydrive'
+[   0.927]    INFO main.(*sharePrivateCommand).run: use this command to access your zrok share: 'zrok2 access private mydrive'
 ```
 
 This makes working with `zrok://` URLs particularly convenient:
