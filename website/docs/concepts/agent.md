@@ -22,10 +22,9 @@ access. When the agent is running:
 
 The agent distinguishes between reserved and ephemeral shares when it restarts:
 
-- **Reserved shares** started with `zrok2 share reserved` are automatically restarted by the agent.
+- **Named shares** started with `zrok2 share public -n <namespace>:<name>` or `zrok2 share private --share-token <name>` are automatically restarted by the agent.
 - **Private accesses** started with `zrok2 access private` are automatically restarted.
-- **Ephemeral shares** started with `zrok2 share public` or `zrok2 share private` are not restarted—they exist only
-  for the lifetime of the agent session.
+- **Ephemeral shares** started without a name are not restarted—they exist only for the lifetime of the agent session.
 
 ## Agent console
 
