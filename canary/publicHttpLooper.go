@@ -4,9 +4,11 @@ import (
 	"bytes"
 	cryptorand "crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/michaelquigley/df/dl"
@@ -96,6 +98,16 @@ func (l *PublicHttpLooper) startup() error {
 	l.shr = shr
 
 	dl.Infof("#%d allocated share '%v'", l.id, l.shr.Token)
+
+	// The controller returns frontend endpoints as bare name.namespace
+	// (e.g., "abc123.public"). Prefix with the URI scheme so HTTP clients
+	// can reach the frontend proxy.
+	for i, ep := range l.shr.FrontendEndpoints {
+		if !strings.Contains(ep, "://") {
+			l.shr.FrontendEndpoints[i] = fmt.Sprintf("%s://%s", l.opt.FrontendScheme, ep)
+			dl.Infof("#%d rewrote frontend endpoint: %v", l.id, l.shr.FrontendEndpoints[i])
+		}
+	}
 
 	return nil
 }
