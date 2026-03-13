@@ -730,7 +730,7 @@ step_create_frontend() {
     # (created by zrok2 admin bootstrap)
     local public_ziti_id
     public_ziti_id=$(ziti edge list identities 'name="public"' -j \
-        | jq -r '.[0].id' 2>/dev/null || true)
+        | jq -r '.data[0].id' 2>/dev/null || true)
     if [[ -z "$public_ziti_id" || "$public_ziti_id" == "null" ]]; then
         error "Cannot find Ziti identity 'public'. Was 'zrok2 admin bootstrap' run?"
         return 1
