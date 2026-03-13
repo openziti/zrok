@@ -1,5 +1,22 @@
-export const objectToRows = (obj) => {
-    let rows = [];
+import {Metrics, MetricsSample} from "../api";
+
+export interface PropertyRow {
+    id: number;
+    property: string;
+    value: unknown;
+}
+
+export interface MetricsResult {
+    data: MetricsSample[] | undefined;
+    rx: number;
+    tx: number;
+}
+
+export const objectToRows = (obj: Record<string, unknown> | null | undefined): PropertyRow[] => {
+    if (!obj) {
+        return [];
+    }
+    let rows: PropertyRow[] = [];
     let count = 0;
     for(const key in obj) {
         rows.push({
@@ -12,7 +29,7 @@ export const objectToRows = (obj) => {
     return rows;
 };
 
-export const camelToWords = (s) => s.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); });
+export const camelToWords = (s: string): string => s.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); });
 
 export const bytesToSize = (bytes: number): string => {
     let i = -1;
@@ -24,8 +41,8 @@ export const bytesToSize = (bytes: number): string => {
     return Math.max(bytes, 0.1).toFixed(1) + byteUnits[i];
 }
 
-export const buildMetrics = (m) => {
-    let metrics = {
+export const buildMetrics = (m: Metrics): MetricsResult => {
+    let metrics: MetricsResult = {
         data: m.samples,
         rx: 0,
         tx: 0

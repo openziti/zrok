@@ -7,6 +7,7 @@ import useApiConsoleStore from "./model/store.ts";
 import ForgotPassword from "./ForgotPassword.tsx";
 import Register from "./Register.tsx";
 import ResetPassword from "./ResetPassword.tsx";
+import ErrorBoundary from "./ErrorBoundary.tsx";
 
 const App = () => {
     const user = useApiConsoleStore((state) => state.user);
@@ -34,19 +35,21 @@ const App = () => {
     }
 
     const logout = () => {
-        updateUser(null as User);
+        updateUser(null);
         localStorage.clear();
     }
 
-    const consoleRoot = user ? <ApiConsole logout={logout}/> : <Login onLogin={login}/>
+    const consoleRoot = user
+        ? <ErrorBoundary><ApiConsole logout={logout}/></ErrorBoundary>
+        : <Login onLogin={login}/>
 
     return (
         <BrowserRouter>
             <Routes>
                 <Route index element={consoleRoot}/>
-                <Route path="/forgotPassword" element={<ForgotPassword />} />
-                <Route path="/register/:regToken" element={<Register />} />
-                <Route path="/resetPassword/:resetToken" element={<ResetPassword />} />
+                <Route path="/forgotPassword" element={<ErrorBoundary><ForgotPassword /></ErrorBoundary>} />
+                <Route path="/register/:regToken" element={<ErrorBoundary><Register /></ErrorBoundary>} />
+                <Route path="/resetPassword/:resetToken" element={<ErrorBoundary><ResetPassword /></ErrorBoundary>} />
             </Routes>
         </BrowserRouter>
     );

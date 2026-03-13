@@ -71,7 +71,7 @@ const ResetPasswordForm = ({ resetPassword }: ResetPasswordFormProps) => {
                 helperText={form.errors.confirm}
                 sx={{ mt: 2 }}
             />
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} style={{ color: "#9bf316" }}>
+            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2, color: 'secondary.main' }}>
                 Set New Password
             </Button>
         </form>
@@ -110,7 +110,7 @@ const ResetFailed = () => {
             <Container>
                 <Box sx={{ display: "flex", alignItems: "center" }} >
                     <Typography component="div">
-                        <h2 style={{ color: "red" }}>Password Reset Failed!</h2>
+                        <Box component="h2" sx={{ color: 'error.main' }}>Password Reset Failed!</Box>
                     </Typography>
                 </Box>
             </Container>
@@ -144,9 +144,8 @@ const ResetPassword = () => {
             .then(() => {
                 setComponent(<ResetComplete />);
             })
-            .catch(e => {
+            .catch(() => {
                 setComponent(<ResetFailed />);
-                console.log("doReset", e);
             });
     }
 
@@ -158,8 +157,8 @@ const ResetPassword = () => {
         <Typography component="div">
             <Container maxWidth="sm">
                 <Box sx={{marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
-                    <img src={zrokLogo} height="300"/>
-                    <h1 style={{ color: "#241775" }}>z r o k</h1>
+                    <img src={zrokLogo} height="300" alt="zrok logo"/>
+                    <Box component="h1" sx={{ color: 'primary.main' }}>z r o k</Box>
                     {component}
                 </Box>
             </Container>

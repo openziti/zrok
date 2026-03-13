@@ -1,4 +1,4 @@
-import {Box, Paper} from "@mui/material";
+import {Box} from "@mui/material";
 import useApiConsoleStore from "./model/store.ts";
 import {
     MaterialReactTable,
@@ -11,6 +11,7 @@ import {
 import {useEffect, useMemo, useRef, useState} from "react";
 import {Node} from "@xyflow/react";
 import {bytesToSize} from "./model/util.ts";
+import {COLORS} from "./styling/theme.ts";
 
 const TabularView = () => {
     const nodes = useApiConsoleStore((state) => state.nodes);
@@ -61,11 +62,11 @@ const TabularView = () => {
 
     useEffect(() => {
         let sn = nodes.find(node => Object.keys(rowSelection).includes(node.id));
-        updateSelectedNode(sn);
+        updateSelectedNode(sn ?? null);
         updateNodes(nodes.map(node => (sn && node.id === sn.id) ? { ...node, selected: true } : { ...node, selected: false }));
     }, [rowSelection]);
 
-    const sparkdataTip = (row) => {
+    const sparkdataTip = (row: Node): number => {
         if(row.data && row.data.activity) {
             // - 2; - 1 is sometimes undefined?
             return row.data.activity[row.data.activity.length - 2];
@@ -73,7 +74,7 @@ const TabularView = () => {
         return 0;
     }
 
-    const sparkdataTipFmt = (row) => {
+    const sparkdataTipFmt = (row: Node): string => {
         let tip = sparkdataTip(row);
         if(tip > 0) {
             return bytesToSize(tip);
@@ -81,7 +82,7 @@ const TabularView = () => {
         return "";
     };
 
-    const sparkdataAverage = (row) => {
+    const sparkdataAverage = (row: Node): number => {
         if(row.data && row.data.activity) {
             let average = row.data.activity.reduce((acc, curr) => { return acc + curr }, 0);
             average /= row.data.activity.length;
@@ -90,7 +91,7 @@ const TabularView = () => {
         return 0;
     }
 
-    const sparkdataAverageFmt = (row) => {
+    const sparkdataAverageFmt = (row: Node): string => {
         let average = sparkdataAverage(row);
         if(average > 0) {
             return bytesToSize(average);
@@ -135,6 +136,7 @@ const TabularView = () => {
     const table = useMaterialReactTable({
         columns: columns,
         data: combined,
+        enableStickyHeader: true,
         enableRowSelection: false,
         enableMultiRowSelection: false,
         getRowId: r => r.id,
@@ -158,21 +160,32 @@ const TabularView = () => {
         }),
         muiToolbarAlertBannerProps: {
             sx: {
-                color: "#241775",
-                backgroundColor: "#f5fde7",
+                color: COLORS.primary,
+                backgroundColor: COLORS.alertBannerBg,
+            }
+        },
+        muiTableContainerProps: {
+            sx: {
+                flex: 1,
+                minHeight: 0,
+            }
+        },
+        muiTablePaperProps: {
+            sx: {
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
             }
         },
         positionToolbarAlertBanner: "bottom",
         mrtTheme: (theme) => ({
-            matchHighlightColor: 'rgba(155, 243, 22, 1)'
+            matchHighlightColor: COLORS.secondary
         }),
     });
 
     return (
-        <Box sx={{ width: "100%", mt: 2 }} height={{ xs: 400, sm: 600, md: 800 }}>
-            <Paper>
-                <MaterialReactTable table={table} />
-            </Paper>
+        <Box sx={{ width: "100%", height: "100%", minHeight: 0 }}>
+            <MaterialReactTable table={table} />
         </Box>
     );
 };

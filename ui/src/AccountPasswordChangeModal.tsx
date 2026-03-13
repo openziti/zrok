@@ -5,6 +5,7 @@ import {Box, Button, Grid2, Modal, TextField, Typography} from "@mui/material";
 import {useFormik} from "formik";
 import * as Yup from 'yup';
 import {getAccountApi} from "./model/api.ts";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface AccountPasswordChangeModalProps {
     close: () => void;
@@ -23,7 +24,7 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
             newPassword: "",
             duplicateNewPassword: "",
         },
-        onSubmit: v => {
+        onSubmit: (v: typeof passwordChangeForm.initialValues) => {
             setErrorMessage(null);
             getAccountApi(user).changePassword({
                 body: {
@@ -36,8 +37,9 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
                     setBottomControl(<Typography>Your password has been changed!</Typography>);
                     setTimeout(() => { close() }, 3000);
                 })
-                .catch(e => {
-                    setErrorMessage(<Typography color="red">Password change failed! Check your current password!</Typography>);
+                .catch(async (e) => {
+                    const msg = await extractErrorMessage(e, "password change failed");
+                    setErrorMessage(<Typography color="red">{msg}</Typography>);
                 })
         },
         validationSchema: Yup.object({
@@ -66,18 +68,16 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
     });
 
     useEffect(() => {
-        passwordChangeForm.values.currentPassword = "";
-        passwordChangeForm.values.newPassword = "";
-        passwordChangeForm.values.duplicateNewPassword = "";
+        passwordChangeForm.resetForm();
         setErrorMessage(null);
         setBottomControl(submitButton);
     }, [isOpen]);
 
     return (
-        <Modal open={isOpen} onClose={close}>
+        <Modal open={isOpen} onClose={close} aria-labelledby="modal-title-change-password">
             <Box sx={{ ...modalStyle }}>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Typography variant="h5"><strong>Change Password</strong></Typography>
+                    <Typography variant="h5" id="modal-title-change-password"><strong>Change Password</strong></Typography>
                 </Grid2>
                 <form onSubmit={passwordChangeForm.handleSubmit}>
                     <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">

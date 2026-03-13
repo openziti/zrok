@@ -1,5 +1,5 @@
 import {Node} from "@xyflow/react";
-import {Button, Grid2, Tooltip, Typography} from "@mui/material";
+import {Box, Button, CircularProgress, Grid2, Tooltip, Typography} from "@mui/material";
 import EnvironmentIcon from "@mui/icons-material/Computer";
 import React, {useEffect, useState} from "react";
 import {Environment} from "./api";
@@ -12,6 +12,8 @@ import {getMetadataApi} from "./model/api.ts";
 import MetricsIcon from "@mui/icons-material/QueryStats";
 import EnvironmentMetricsModal from "./EnvironmentMetricsModal.tsx";
 import BandwidthLimitedWarning from "./BandwidthLimitedWarning.tsx";
+import {extractErrorMessage, isAbortError} from "./model/errors.ts";
+import {PropertyRow} from "./model/util.ts";
 
 interface EnvironmentPanelProps {
     environment: Node;
@@ -19,7 +21,10 @@ interface EnvironmentPanelProps {
 
 const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
     const user = useApiConsoleStore((state) => state.user);
+    const environmentId = environment.data?.envZId as string | undefined;
     const [detail, setDetail] = useState<Environment>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [errorMessage, setErrorMessage] = useState<string>("");
     const [environmentMetricsOpen, setEnvironmentMetricsOpen] = useState<boolean>(false);
     const openEnvironmentMetrics = () => {
         setEnvironmentMetricsOpen(true);
@@ -36,9 +41,9 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
     }
 
     const customProperties = {
-        zId: row => <SecretToggle secret={row.value} />,
-        createdAt: row => new Date(row.value).toLocaleString(),
-        updatedAt: row => new Date(row.value).toLocaleString()
+        zId: (row: PropertyRow) => <SecretToggle secret={row.value as string} />,
+        createdAt: (row: PropertyRow) => new Date(row.value as string).toLocaleString(),
+        updatedAt: (row: PropertyRow) => new Date(row.value as string).toLocaleString()
     }
 
     const labels = {
@@ -47,18 +52,29 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
     }
 
     useEffect(() => {
-        getMetadataApi(user).getEnvironmentDetail({envZId: environment.data!.envZId! as string})
+        if (!user || !environmentId) return;
+        setLoading(true);
+        setErrorMessage("");
+        const controller = new AbortController();
+        getMetadataApi(user).getEnvironmentDetail({envZId: environmentId}, { signal: controller.signal })
             .then(d => {
-                let env = d.environment!;
-                delete env.activity;
-                delete env.limited;
-                delete env.zId;
-                setDetail(env);
+                const nextDetail = {...d.environment!} as Partial<Environment> & Record<string, unknown>;
+                delete nextDetail.activity;
+                delete nextDetail.limited;
+                delete nextDetail.zId;
+                setDetail(nextDetail as Environment);
+                setLoading(false);
             })
-            .catch(e => {
-                console.log("EnvironmentPanel", e);
+            .catch(async (e) => {
+                if (isAbortError(e)) return;
+                const msg = await extractErrorMessage(e, "failed to load environment details");
+                setErrorMessage(msg);
+                setLoading(false);
             })
-    }, [environment]);
+        return () => controller.abort();
+    }, [environmentId, user]);
+
+    if (!user) return null;
 
     return (
         <>
@@ -67,23 +83,30 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
                     <Grid2 display="flex"><EnvironmentIcon sx={{ fontSize: 30, mr: 0.5 }}/></Grid2>
                     <Grid2 display="flex" component="h3">{String(environment.data.label)}</Grid2>
                 </Grid2>
-                <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2, p: 0 }} alignItems="center">
-                    <h5 style={{ margin: 0 }}>An environment on a host with address <code>{detail ? detail.address : ''}</code></h5>
-                </Grid2>
-                { environment.data.limited ? <BandwidthLimitedWarning /> : null }
-                <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
-                    <Tooltip title="Environment Metrics">
-                        <Button variant="contained" onClick={openEnvironmentMetrics}><MetricsIcon /></Button>
-                    </Tooltip>
-                    <Tooltip title="Release Environment" sx={{ ml: 1 }}>
-                        <Button variant="contained" color="error" onClick={openReleaseEnvironment}><DeleteIcon /></Button>
-                    </Tooltip>
-                </Grid2>
-                <Grid2 container sx={{ flexGrow: 1 }}>
-                    <Grid2 display="flex">
-                        <PropertyTable object={detail} custom={customProperties} labels={labels} />
-                    </Grid2>
-                </Grid2>
+                {loading ? (
+                    <Grid2 container justifyContent="center" sx={{ mt: 4 }}><CircularProgress /></Grid2>
+                ) : (
+                    <>
+                        <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2, p: 0 }} alignItems="center">
+                            <Box component="h5" sx={{ m: 0 }}>An environment on a host with address <code>{detail ? detail.address : ''}</code></Box>
+                        </Grid2>
+                        { errorMessage && <Typography color="error" sx={{ mb: 2 }}>{errorMessage}</Typography> }
+                        { environment.data.limited ? <BandwidthLimitedWarning /> : null }
+                        <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
+                            <Tooltip title="Environment Metrics">
+                                <Button variant="contained" aria-label="Environment Metrics" onClick={openEnvironmentMetrics}><MetricsIcon /></Button>
+                            </Tooltip>
+                            <Tooltip title="Release Environment" sx={{ ml: 1 }}>
+                                <Button variant="contained" color="error" aria-label="Release Environment" onClick={openReleaseEnvironment}><DeleteIcon /></Button>
+                            </Tooltip>
+                        </Grid2>
+                        <Grid2 container sx={{ flexGrow: 1 }}>
+                            <Grid2 display="flex">
+                                <PropertyTable object={detail} custom={customProperties} labels={labels} />
+                            </Grid2>
+                        </Grid2>
+                    </>
+                )}
             </Typography>
             <EnvironmentMetricsModal close={closeEnvironmentMetrics} isOpen={environmentMetricsOpen} user={user} environment={environment} />
             <ReleaseEnvironmentModal close={closeReleaseEnvironment} isOpen={releaseEnvironmentOpen} user={user} environment={environment} detail={detail} />

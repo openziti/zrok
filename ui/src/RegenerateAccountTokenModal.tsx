@@ -5,6 +5,7 @@ import {Box, Button, Checkbox, FormControlLabel, Grid2, Modal, Typography} from 
 import {getAccountApi} from "./model/api.ts";
 import useApiConsoleStore from "./model/store.ts";
 import ClipboardText from "./ClipboardText.tsx";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface RegenerateAccountTokenModalProps {
     close: () => void;
@@ -40,7 +41,6 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
                     email: user.email!,
                     token: d.accountToken!,
                 }
-                console.log(user, newUser);
                 updateUser(newUser);
                 localStorage.setItem("user", JSON.stringify(newUser));
                 document.dispatchEvent(new Event("userUpdated"));
@@ -51,13 +51,11 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
                     <Button type="primary" variant="contained" onClick={reload}>Reload API Console</Button>
                 </Grid2></>);
             })
-            .catch(e => {
-                e.response.json().then(ex => {
-                    setErrorMessage(<Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
-                        <Typography color="red">{ex.message}</Typography>
-                    </Grid2>);
-                    console.log("releaseAccess", ex.message);
-                });
+            .catch(async (e) => {
+                const msg = await extractErrorMessage(e, "failed to regenerate account token");
+                setErrorMessage(<Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
+                    <Typography color="red">{msg}</Typography>
+                </Grid2>);
             });
     }
 
@@ -71,10 +69,10 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
     </>;
 
     return (
-        <Modal open={isOpen} onClose={close}>
+        <Modal open={isOpen} onClose={close} aria-labelledby="modal-title-regenerate-token">
             <Box sx={{ ...modalStyle }}>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Typography variant="h5"><strong>Regenerate Account Token</strong></Typography>
+                    <Typography variant="h5" id="modal-title-regenerate-token"><strong>Regenerate Account Token</strong></Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography variant="h6" color="red">
