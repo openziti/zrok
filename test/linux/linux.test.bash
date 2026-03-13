@@ -250,9 +250,22 @@ build_packages() {
     fi
 
     log_info "running zrok-builder --packages (this may take a few minutes)"
+
+    # Build cache volume args — only mount if the host directory exists and is
+    # writable. On CI runners these dirs often don't exist (Docker creates them
+    # as root), making the cache useless and causing permission errors.
+    local -a _cache_vols=()
+    local _gocache="${GOCACHE:-${HOME}/.cache/go-build}"
+    local _gomodcache="${GOMODCACHE:-${HOME}/.cache/go-mod}"
+    if [[ -d "${_gocache}" && -w "${_gocache}" ]]; then
+        _cache_vols+=(--volume="${_gocache}:/usr/share/go_cache")
+    fi
+    if [[ -d "${_gomodcache}" && -w "${_gomodcache}" ]]; then
+        _cache_vols+=(--volume="${_gomodcache}:/usr/share/go/pkg/mod")
+    fi
+
     docker run --user "$(id -u)" --rm \
-        --volume="${GOCACHE:-${HOME}/.cache/go-build}:/usr/share/go_cache" \
-        --volume="${GOMODCACHE:-${HOME}/.cache/go-mod}:/usr/share/go/pkg/mod" \
+        "${_cache_vols[@]+"${_cache_vols[@]}"}" \
         --volume="${SOURCE_DIR}:/mnt" \
         "${_builder_image}" --packages
 
