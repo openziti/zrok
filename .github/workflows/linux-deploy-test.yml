@@ -1,0 +1,82 @@
+---
+name: Linux Deploy Test
+
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+    branches: [main]
+    paths:
+      - 'nfpm/**'
+      - 'test/linux/**'
+      - 'docker/images/cross-build/**'
+      - '.goreleaser-linux-amd64.yml'
+      - '.github/workflows/linux-deploy-test.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'nfpm/**'
+      - 'test/linux/**'
+      - 'docker/images/cross-build/**'
+      - '.goreleaser-linux-amd64.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux-deploy-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve Ziti version
+        id: ziti-version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ZITI_LINUX_VERSION: ${{ vars.ZITI_LINUX_VERSION }}
+        run: |
+          # Honor the repo variable ZITI_LINUX_VERSION if set
+          if [[ -n "${ZITI_LINUX_VERSION:-}" ]]; then
+            V="${ZITI_LINUX_VERSION}"
+            echo "Using pinned version: ${V}"
+          else
+            # Resolve the latest stable release
+            V=$(
+              gh api --method GET \
+                'repos/openziti/ziti/releases?per_page=100' \
+                --jq '
+                  [.[]
+                   | select(.prerelease == false
+                            and .draft == false)
+                  ] | first | .tag_name | ltrimstr("v")'
+            )
+            echo "Resolved latest stable: ${V}"
+          fi
+          # Normalize to bare semver for downstream scripts.
+          V="${V#v}"
+          if [[ -z "${V}" ]]; then
+            echo "ERROR: could not resolve Ziti version" >&2
+            exit 1
+          fi
+          echo "ZITI_VERSION=${V}" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Run Linux deployment test
+        env:
+          ZITIPAX_DEB: ${{ vars.ZITIPAX_DEB }}
+          ZITIPAX_RPM: ${{ vars.ZITIPAX_RPM }}
+        run: |
+          bash ./test/linux/linux.test.bash \
+            --ziti-version \
+              "${{ steps.ziti-version.outputs.ZITI_VERSION }}"
+
+      - name: Dump journals on failure
+        if: failure()
+        run: |
+          for svc in ziti-controller ziti-router \
+            zrok2-controller zrok2-frontend \
+            zrok2-metrics rabbitmq-server \
+            postgresql influxdb; do
+            echo "=== ${svc} ==="
+            sudo journalctl -u "${svc}" \
+              --no-pager -n 200 2>/dev/null || true
+          done
