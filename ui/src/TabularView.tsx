@@ -1,4 +1,4 @@
-import {Box, Paper} from "@mui/material";
+import {Box} from "@mui/material";
 import useApiConsoleStore from "./model/store.ts";
 import {
     MaterialReactTable,
@@ -136,6 +136,7 @@ const TabularView = () => {
     const table = useMaterialReactTable({
         columns: columns,
         data: combined,
+        enableStickyHeader: true,
         enableRowSelection: false,
         enableMultiRowSelection: false,
         getRowId: r => r.id,
@@ -163,6 +164,19 @@ const TabularView = () => {
                 backgroundColor: COLORS.alertBannerBg,
             }
         },
+        muiTableContainerProps: {
+            sx: {
+                flex: 1,
+                minHeight: 0,
+            }
+        },
+        muiTablePaperProps: {
+            sx: {
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+            }
+        },
         positionToolbarAlertBanner: "bottom",
         mrtTheme: (theme) => ({
             matchHighlightColor: COLORS.secondary
@@ -170,10 +184,8 @@ const TabularView = () => {
     });
 
     return (
-        <Box sx={{ width: "100%", mt: 2 }} height={{ xs: 400, sm: 600, md: 800 }}>
-            <Paper>
-                <MaterialReactTable table={table} />
-            </Paper>
+        <Box sx={{ width: "100%", height: "100%", minHeight: 0 }}>
+            <MaterialReactTable table={table} />
         </Box>
     );
 };

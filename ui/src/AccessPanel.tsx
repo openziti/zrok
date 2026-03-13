@@ -20,6 +20,7 @@ interface AccessPanelProps {
 const AccessPanel = ({ access }: AccessPanelProps) => {
     const user = useApiConsoleStore((state) => state.user);
     const limited = useApiConsoleStore((state) => state.limited);
+    const frontendId = access.data.feId as number | undefined;
     const [detail, setDetail] = useState<Frontend>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string>("");
@@ -32,13 +33,17 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
     }
 
     useEffect(() => {
-        if (!user) return;
+        if (!user || frontendId == null) return;
         setLoading(true);
+        setErrorMessage("");
         const controller = new AbortController();
-        getMetadataApi(user).getFrontendDetail({frontendId: access.data.feId as number}, { signal: controller.signal })
+        getMetadataApi(user).getFrontendDetail({frontendId: frontendId}, { signal: controller.signal })
             .then(d => {
-                const { id, zId, description, ...rest } = d;
-                setDetail(rest as Frontend);
+                const nextDetail = {...d} as Partial<Frontend> & Record<string, unknown>;
+                delete nextDetail.id;
+                delete nextDetail.zId;
+                delete nextDetail.description;
+                setDetail(nextDetail as Frontend);
                 setLoading(false);
             })
             .catch(async (e) => {
@@ -48,7 +53,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
                 setLoading(false);
             })
         return () => controller.abort();
-    }, [access.data.feId]);
+    }, [frontendId, user]);
 
     if (!user) return null;
 

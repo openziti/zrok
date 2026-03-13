@@ -16,6 +16,7 @@ interface EnvironmentMetricsModalProps {
 }
 
 const EnvironmentMetricsModal = ({ close, isOpen, user, environment }: EnvironmentMetricsModalProps) => {
+    const environmentId = environment.data?.envZId as string | undefined;
     const [metrics30, setMetrics30] = useState(buildMetrics({}));
     const [metrics7, setMetrics7] = useState(buildMetrics({}));
     const [metrics1, setMetrics1] = useState(buildMetrics({}));
@@ -23,12 +24,12 @@ const EnvironmentMetricsModal = ({ close, isOpen, user, environment }: Environme
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        if (!isOpen) return;
+        if (!isOpen || !user || !environmentId) return;
         const controller = new AbortController();
         setErrorMessage("");
         setLoading(true);
-        let metadataApi = getMetadataApi(user);
-        const p1 = metadataApi.getEnvironmentMetrics({envId: String(environment.data.envZId) }, { signal: controller.signal })
+        const metadataApi = getMetadataApi(user);
+        const p1 = metadataApi.getEnvironmentMetrics({envId: environmentId }, { signal: controller.signal })
             .then(d => {
                 setMetrics30(buildMetrics(d));
             })
@@ -37,7 +38,7 @@ const EnvironmentMetricsModal = ({ close, isOpen, user, environment }: Environme
                 const msg = await extractErrorMessage(e, "unable to load metrics");
                 setErrorMessage(msg);
             });
-        const p2 = metadataApi.getEnvironmentMetrics({envId: String(environment.data.envZId), duration: "168h"}, { signal: controller.signal })
+        const p2 = metadataApi.getEnvironmentMetrics({envId: environmentId, duration: "168h"}, { signal: controller.signal })
             .then(d => {
                 setMetrics7(buildMetrics(d));
             })
@@ -46,7 +47,7 @@ const EnvironmentMetricsModal = ({ close, isOpen, user, environment }: Environme
                 const msg = await extractErrorMessage(e, "unable to load metrics");
                 setErrorMessage(msg);
             });
-        const p3 = metadataApi.getEnvironmentMetrics({envId: String(environment.data.envZId), duration: "24h"}, { signal: controller.signal })
+        const p3 = metadataApi.getEnvironmentMetrics({envId: environmentId, duration: "24h"}, { signal: controller.signal })
             .then(d => {
                 setMetrics1(buildMetrics(d));
             })
@@ -55,9 +56,13 @@ const EnvironmentMetricsModal = ({ close, isOpen, user, environment }: Environme
                 const msg = await extractErrorMessage(e, "unable to load metrics");
                 setErrorMessage(msg);
             });
-        Promise.all([p1, p2, p3]).then(() => setLoading(false));
+        Promise.allSettled([p1, p2, p3]).then(() => {
+            if (!controller.signal.aborted) {
+                setLoading(false);
+            }
+        });
         return () => controller.abort();
-    }, [isOpen, environment]);
+    }, [environmentId, isOpen, user]);
 
     return (
         <Modal open={isOpen} onClose={close} aria-labelledby="modal-title-environment-metrics">

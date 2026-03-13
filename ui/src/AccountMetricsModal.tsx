@@ -21,11 +21,11 @@ const AccountMetricsModal = ({ close, isOpen, user }: AccountMetricsModalProps) 
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        if (!isOpen) return;
+        if (!isOpen || !user) return;
         const controller = new AbortController();
         setErrorMessage("");
         setLoading(true);
-        let metadataApi = getMetadataApi(user);
+        const metadataApi = getMetadataApi(user);
         const p1 = metadataApi.getAccountMetrics(undefined, { signal: controller.signal })
             .then(d => {
                 setMetrics30(buildMetrics(d));
@@ -53,9 +53,13 @@ const AccountMetricsModal = ({ close, isOpen, user }: AccountMetricsModalProps) 
                 const msg = await extractErrorMessage(e, "unable to load metrics");
                 setErrorMessage(msg);
             });
-        Promise.all([p1, p2, p3]).then(() => setLoading(false));
+        Promise.allSettled([p1, p2, p3]).then(() => {
+            if (!controller.signal.aborted) {
+                setLoading(false);
+            }
+        });
         return () => controller.abort();
-    }, [isOpen]);
+    }, [isOpen, user]);
 
     return (
         <Modal open={isOpen} onClose={close} aria-labelledby="modal-title-account-metrics">

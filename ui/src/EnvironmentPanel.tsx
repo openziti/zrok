@@ -21,6 +21,7 @@ interface EnvironmentPanelProps {
 
 const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
     const user = useApiConsoleStore((state) => state.user);
+    const environmentId = environment.data?.envZId as string | undefined;
     const [detail, setDetail] = useState<Environment>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string>("");
@@ -51,13 +52,17 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
     }
 
     useEffect(() => {
-        if (!user) return;
+        if (!user || !environmentId) return;
         setLoading(true);
+        setErrorMessage("");
         const controller = new AbortController();
-        getMetadataApi(user).getEnvironmentDetail({envZId: environment.data!.envZId! as string}, { signal: controller.signal })
+        getMetadataApi(user).getEnvironmentDetail({envZId: environmentId}, { signal: controller.signal })
             .then(d => {
-                const { activity, limited, zId, ...rest } = d.environment!;
-                setDetail(rest as Environment);
+                const nextDetail = {...d.environment!} as Partial<Environment> & Record<string, unknown>;
+                delete nextDetail.activity;
+                delete nextDetail.limited;
+                delete nextDetail.zId;
+                setDetail(nextDetail as Environment);
                 setLoading(false);
             })
             .catch(async (e) => {
@@ -67,7 +72,7 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
                 setLoading(false);
             })
         return () => controller.abort();
-    }, [environment.data.envZId]);
+    }, [environmentId, user]);
 
     if (!user) return null;
 

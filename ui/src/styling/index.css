@@ -3,6 +3,12 @@
     --zrok-secondary: #9bf316;
 }
 
+html,
+body,
+#root {
+  height: 100%;
+}
+
 body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
@@ -29,9 +35,7 @@ h1 {
 }
 
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  min-height: 100dvh;
 }
 
 #footer {

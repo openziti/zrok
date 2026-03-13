@@ -70,7 +70,7 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
 
     return (
         <>
-            <Box sx={{ flexGrow: 1 }}>
+            <Box sx={{ flexShrink: 0 }}>
                 <AppBar position="static">
                     <Toolbar>
                         <Typography variant="h6" sx={{ flexGrow: 1 }}>

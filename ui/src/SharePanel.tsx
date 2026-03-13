@@ -21,6 +21,7 @@ interface SharePanelProps {
 
 const SharePanel = ({ share }: SharePanelProps) => {
     const user = useApiConsoleStore((state) => state.user);
+    const shareToken = share.data?.shareToken as string | undefined;
     const [detail, setDetail] = useState<Share>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string>("");
@@ -81,18 +82,20 @@ const SharePanel = ({ share }: SharePanelProps) => {
     }
 
     useEffect(() => {
-        if (!user) return;
+        if (!user || !shareToken) return;
         setLoading(true);
+        setErrorMessage("");
         const controller = new AbortController();
-        getMetadataApi(user).getShareDetail({ shareToken: share.data!.shareToken! as string }, { signal: controller.signal })
+        getMetadataApi(user).getShareDetail({ shareToken }, { signal: controller.signal })
             .then(d => {
-                const { activity, limited, zId, ...rest } = d;
-                if(rest.shareMode === "private") {
-                    const { frontendEndpoints, ...withoutEndpoints } = rest;
-                    setDetail(withoutEndpoints as Share);
-                } else {
-                    setDetail(rest as Share);
+                const nextDetail = {...d} as Partial<Share> & Record<string, unknown>;
+                delete nextDetail.activity;
+                delete nextDetail.limited;
+                delete nextDetail.zId;
+                if (nextDetail.shareMode === "private") {
+                    delete nextDetail.frontendEndpoints;
                 }
+                setDetail(nextDetail as Share);
                 setLoading(false);
             })
             .catch(async (e) => {
@@ -102,7 +105,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
                 setLoading(false);
             })
         return () => controller.abort();
-    }, [share.id]);
+    }, [shareToken, user]);
 
     if (!user) return null;
 
@@ -118,7 +121,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
                 ) : (
                     <>
                         <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2 }} alignItems="center">
-                            <Box component="h5" sx={{ m: 0 }}>A {detail ? detail.shareMode : ''}{detail && detail.reserved ? ', reserved ' : ''} {detail?.backendMode} share with the share token <code>{share.id}</code></Box>
+                            <Box component="h5" sx={{ m: 0 }}>A {detail ? detail.shareMode : ''}{detail && detail.reserved ? ', reserved ' : ''} {detail?.backendMode} share with the share token <code>{shareToken}</code></Box>
                         </Grid2>
                         { errorMessage && <Typography color="error" sx={{ mb: 2 }}>{errorMessage}</Typography> }
                         { share.data.limited ? <BandwidthLimitedWarning /> : null }

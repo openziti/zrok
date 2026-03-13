@@ -140,7 +140,7 @@ const Visualizer = () => {
 
 export default () => {
     return (
-        <Box sx={{ width: "100%", mt: 2 }} height={{ xs: 400, sm: 600, md: 800 }}>
+        <Box sx={{ width: "100%", height: "100%", minHeight: 0 }}>
             <ReactFlowProvider>
                 <Visualizer />
             </ReactFlowProvider>

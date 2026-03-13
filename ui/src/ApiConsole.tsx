@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from "react";
 import {Graph, focusGraph, layout, mergeGraph, nodesEqual} from "./model/graph.ts";
-import {Box, Button, Grid2, IconButton, Typography} from "@mui/material";
+import {Box, Button, IconButton, Typography} from "@mui/material";
 import {alpha} from "@mui/material/styles";
 import {COLORS} from "./styling/theme.ts";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
@@ -259,11 +259,30 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     }, []);
 
     return (
-        <div>
+        <Box
+            sx={{
+                height: "100dvh",
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden",
+                boxSizing: "border-box",
+                py: "15px",
+                px: "15px",
+                gap: "15px",
+            }}
+        >
             <NavBar logout={logout} visualizer={visualizerEnabled} toggleMode={setVisualizerEnabled} />
-            <Box sx={{ position: "relative" }}>
-                <Grid2 container spacing={2} columns={{ xs: 4, sm: 10, md: 12 }}>
-                    <Grid2 size="grow">
+            <Box sx={{ position: "relative", flex: 1, minHeight: 0, overflow: "hidden" }}>
+                <Box
+                    sx={{
+                        display: "grid",
+                        gridTemplateColumns: selectedNode && !panelMinimized ? "minmax(0, 1fr) 360px" : "minmax(0, 1fr)",
+                        gap: "15px",
+                        height: "100%",
+                        minHeight: 0,
+                    }}
+                >
+                    <Box sx={{ minWidth: 0, minHeight: 0, overflow: "hidden" }}>
                         <ErrorBoundary fallback={({ reset }) => (
                             <Box sx={{ p: 3, textAlign: "center" }}>
                                 <Typography color="error">The view encountered an error.</Typography>
@@ -272,9 +291,19 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                         )}>
                             {visualizerEnabled ? <Visualizer /> : <TabularView />}
                         </ErrorBoundary>
-                    </Grid2>
-                    {selectedNode && !panelMinimized ? <Grid2 container size={4}><Grid2><ErrorBoundary key={selectedNode?.id}>{renderSidePanel()}</ErrorBoundary></Grid2></Grid2> : null}
-                </Grid2>
+                    </Box>
+                    {selectedNode && !panelMinimized ? (
+                        <Box
+                            sx={{
+                                minHeight: 0,
+                                minWidth: 0,
+                                overflow: "auto",
+                            }}
+                        >
+                            <ErrorBoundary key={selectedNode?.id}>{renderSidePanel()}</ErrorBoundary>
+                        </Box>
+                    ) : null}
+                </Box>
                 {selectedNode && panelMinimized ? (
                     <Box sx={{ position: "absolute", top: 16, right: 16, zIndex: 5, display: "flex", alignItems: "center", gap: 4, background: alpha(COLORS.primary, 0.85), borderRadius: 8, padding: "4px 12px" }}>
                         <Typography variant="body2" sx={{ color: 'common.white', whiteSpace: "nowrap" }}>
@@ -286,7 +315,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                     </Box>
                 ) : null}
             </Box>
-        </div>
+        </Box>
     );
 }
 
