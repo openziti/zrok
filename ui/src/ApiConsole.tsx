@@ -16,6 +16,7 @@ import TabularView from "./TabularView.tsx";
 import {Node} from "@xyflow/react";
 import {getMetadataApi} from "./model/api.ts";
 import {User} from "./model/user.ts";
+import {isAbortError} from "./model/errors.ts";
 
 interface ApiConsoleProps {
     logout: () => void;
@@ -118,8 +119,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                     updateNodes(selected);
                     updateEdges(laidOut.edges);
                 }
-            })
-            .catch(() => {});
+            });
     }
 
     const retrieveSparklines = (signal?: AbortSignal) => {
@@ -156,8 +156,6 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                 } else {
                     updateSparkdata(new Map<string, Number[]>());
                 }
-            })
-            .catch(() => {
             });
     }
 
@@ -185,32 +183,66 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         let sparkTimeout: ReturnType<typeof setTimeout>;
         let overviewDelay = 5000;
         let sparkDelay = 15000;
+        let disposed = false;
 
         const pollOverview = () => {
             retrieveOverview(controller.signal)
                 .then(() => { overviewDelay = 5000; })
-                .catch(() => { overviewDelay = Math.min(overviewDelay * 2, 30000); })
-                .finally(() => { overviewTimeout = setTimeout(pollOverview, overviewDelay); });
+                .catch((e) => {
+                    if (isAbortError(e)) {
+                        return;
+                    }
+                    overviewDelay = Math.min(overviewDelay * 2, 30000);
+                })
+                .finally(() => {
+                    if (!disposed && !controller.signal.aborted) {
+                        overviewTimeout = setTimeout(pollOverview, overviewDelay);
+                    }
+                });
         };
 
         const pollSparklines = () => {
             retrieveSparklines(controller.signal)
                 .then(() => { sparkDelay = 15000; })
-                .catch(() => { sparkDelay = Math.min(sparkDelay * 2, 30000); })
-                .finally(() => { sparkTimeout = setTimeout(pollSparklines, sparkDelay); });
+                .catch((e) => {
+                    if (isAbortError(e)) {
+                        return;
+                    }
+                    sparkDelay = Math.min(sparkDelay * 2, 30000);
+                })
+                .finally(() => {
+                    if (!disposed && !controller.signal.aborted) {
+                        sparkTimeout = setTimeout(pollSparklines, sparkDelay);
+                    }
+                });
         };
 
         // initial load: overview first, then sparklines once nodes are populated
         retrieveOverview(controller.signal)
             .then(() => { overviewDelay = 5000; })
-            .catch(() => { overviewDelay = Math.min(overviewDelay * 2, 30000); })
-            .then(() => retrieveSparklines(controller.signal).catch(() => {}))
+            .catch((e) => {
+                if (isAbortError(e)) {
+                    return;
+                }
+                overviewDelay = Math.min(overviewDelay * 2, 30000);
+            })
+            .then(() => retrieveSparklines(controller.signal)
+                .then(() => { sparkDelay = 15000; })
+                .catch((e) => {
+                    if (isAbortError(e)) {
+                        return;
+                    }
+                    sparkDelay = Math.min(sparkDelay * 2, 30000);
+                }))
             .finally(() => {
-                overviewTimeout = setTimeout(pollOverview, overviewDelay);
-                sparkTimeout = setTimeout(pollSparklines, sparkDelay);
+                if (!disposed && !controller.signal.aborted) {
+                    overviewTimeout = setTimeout(pollOverview, overviewDelay);
+                    sparkTimeout = setTimeout(pollSparklines, sparkDelay);
+                }
             });
 
         return () => {
+            disposed = true;
             controller.abort();
             clearTimeout(overviewTimeout);
             clearTimeout(sparkTimeout);
