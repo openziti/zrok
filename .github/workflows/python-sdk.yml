@@ -61,6 +61,11 @@ jobs:
         env:
           ZROK2_API_ENDPOINT: http://localhost:18080
           ZROK2_ADMIN_TOKEN: ${{ env.ZROK2_ADMIN_TOKEN }}
+      - name: Dump container logs on failure
+        if: failure()
+        run: |
+          cd docker/compose/zrok2-instance
+          docker compose logs --tail=200 || true
       - name: Tear down
         if: always()
         run: |

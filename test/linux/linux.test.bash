@@ -178,6 +178,10 @@ trap '_err_handler' ERR
 cleanup_all() {
     # Disable errexit in cleanup — every command is best-effort
     set +o errexit
+    if [[ -t 0 ]]; then
+        echo "Purging zrok2 and ziti packages in 30s. Re-run with </dev/null to skip this delay." >&2
+        sleep 30
+    fi
     log_section "Cleanup"
     for _svc in zrok2-metrics zrok2-frontend zrok2-controller ziti-router ziti-controller \
                 rabbitmq-server postgresql influxdb; do
