@@ -10,9 +10,9 @@ This page describes the v2.0 namespace and name system. If you're migrating from
 workflow.
 :::
 
-By default, when you create a public or private share using `zrok2 share`, zrok assigns it a randomly generated
-_share token_. When you terminate the `zrok2 share` command, the share is deleted and the token is no longer valid.
-If you run `zrok2 share` again, you'll receive a brand new share token.
+By default, when you create a public or private share using `zrok2 share`, zrok assigns it a randomly generated _share
+token_. When you terminate the `zrok2 share` command, the share is deleted and the token is no longer valid. If you run
+`zrok2 share` again, you'll receive a brand new share token.
 
 In v2.0, zrok introduces a more powerful system for creating persistent shares through **namespaces** and **names**.
 
@@ -22,8 +22,8 @@ To create and manage reserved names, see [Manage reserved names](../how-tos/mana
 
 ### Namespaces
 
-A **namespace** is a logical grouping for names, similar to how a DNS zone works. Think of it as a container that
-holds related names. For example:
+A **namespace** is a logical grouping for names, similar to how a DNS zone works. Think of it as a container that holds
+related names. For example:
 
 - A `public` namespace might correspond to `share.zrok.io`
 - A custom namespace might correspond to your own domain like `example.com`
