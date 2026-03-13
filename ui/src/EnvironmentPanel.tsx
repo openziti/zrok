@@ -1,5 +1,5 @@
 import {Node} from "@xyflow/react";
-import {Button, CircularProgress, Grid2, Tooltip, Typography} from "@mui/material";
+import {Box, Button, CircularProgress, Grid2, Tooltip, Typography} from "@mui/material";
 import EnvironmentIcon from "@mui/icons-material/Computer";
 import React, {useEffect, useState} from "react";
 import {Environment} from "./api";
@@ -83,7 +83,7 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
                 ) : (
                     <>
                         <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2, p: 0 }} alignItems="center">
-                            <h5 style={{ margin: 0 }}>An environment on a host with address <code>{detail ? detail.address : ''}</code></h5>
+                            <Box component="h5" sx={{ m: 0 }}>An environment on a host with address <code>{detail ? detail.address : ''}</code></Box>
                         </Grid2>
                         { errorMessage && <Typography color="error" sx={{ mb: 2 }}>{errorMessage}</Typography> }
                         { environment.data.limited ? <BandwidthLimitedWarning /> : null }

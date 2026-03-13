@@ -5,6 +5,7 @@ import useApiConsoleStore from "./model/store.ts";
 import {SparkLineChart} from "@mui/x-charts";
 import {useEffect, useState} from "react";
 import {AccountNodeData} from "./model/graph.ts";
+import {COLORS} from "./styling/theme.ts";
 
 const AccountNode = ({ data }: NodeProps<Node<AccountNodeData>>) => {
     const environments = useApiConsoleStore((state) => state.environments);
@@ -12,7 +13,7 @@ const AccountNode = ({ data }: NodeProps<Node<AccountNodeData>>) => {
     const hiddenSparkline = <></>;
     const visibleSparkline = (
         <Grid2 container sx={{ flexGrow: 1, p: 0.5 }}>
-            <SparkLineChart data={sparkData} height={30} width={100} colors={['#04adef']}  />
+            <SparkLineChart data={sparkData} height={30} width={100} colors={[COLORS.metrics]}  />
         </Grid2>
     );
 

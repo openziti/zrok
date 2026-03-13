@@ -4,6 +4,7 @@ import ShareIcon from "@mui/icons-material/Share";
 import useApiConsoleStore from "./model/store.ts";
 import {SparkLineChart} from "@mui/x-charts";
 import {ShareNodeData} from "./model/graph.ts";
+import {COLORS} from "./styling/theme.ts";
 
 const ShareNode = ({ data }: NodeProps<Node<ShareNodeData>>) => {
     const sparkdata = useApiConsoleStore((state) => state.sparkdata);
@@ -18,7 +19,7 @@ const ShareNode = ({ data }: NodeProps<Node<ShareNodeData>>) => {
     const hiddenSparkline = <></>;
     const visibleSparkline = (
         <Grid2 container sx={{ flexGrow: 1, p: 0.5 }}>
-            <SparkLineChart data={sparkdata.get(data.shareToken) ? sparkdata.get(data.shareToken)! : []} height={30} width={100} colors={['#04adef']}  />
+            <SparkLineChart data={sparkdata.get(data.shareToken) ? sparkdata.get(data.shareToken)! : []} height={30} width={100} colors={[COLORS.metrics]}  />
         </Grid2>
     );
 

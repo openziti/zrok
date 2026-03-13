@@ -1,5 +1,5 @@
 import {Node} from "@xyflow/react";
-import {Button, CircularProgress, Grid2, Tooltip, Typography} from "@mui/material";
+import {Box, Button, CircularProgress, Grid2, Tooltip, Typography} from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import {Share} from "./api";
 import React, {useEffect, useState} from "react";
@@ -58,7 +58,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
                 return <span>None</span>;
             }
             return (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     {row.value.map((endpoint, index) => (
                         <Grid2 key={index} container sx={{ flexGrow: 1 }} alignItems="center">
                             <Grid2 display="flex" justifyContent="left">
@@ -69,7 +69,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
                             </Grid2>
                         </Grid2>
                     ))}
-                </div>
+                </Box>
             );
         }
     }
@@ -118,7 +118,7 @@ const SharePanel = ({ share }: SharePanelProps) => {
                 ) : (
                     <>
                         <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2 }} alignItems="center">
-                            <h5 style={{ margin: 0 }}>A {detail ? detail.shareMode : ''}{detail && detail.reserved ? ', reserved ' : ''} {detail?.backendMode} share with the share token <code>{share.id}</code></h5>
+                            <Box component="h5" sx={{ m: 0 }}>A {detail ? detail.shareMode : ''}{detail && detail.reserved ? ', reserved ' : ''} {detail?.backendMode} share with the share token <code>{share.id}</code></Box>
                         </Grid2>
                         { errorMessage && <Typography color="error" sx={{ mb: 2 }}>{errorMessage}</Typography> }
                         { share.data.limited ? <BandwidthLimitedWarning /> : null }

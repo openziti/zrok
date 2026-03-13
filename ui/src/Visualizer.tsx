@@ -18,6 +18,8 @@ import EnvironmentNode from "./EnvironmentNode.tsx";
 import AccountNode from "./AccountNode.tsx";
 import AccessNode from "./AccessNode.tsx";
 import {Box} from "@mui/material";
+import {alpha} from "@mui/material/styles";
+import {COLORS} from "./styling/theme.ts";
 import {useEffect, useRef} from "react";
 import useApiConsoleStore from "./model/store.ts";
 import {layout} from "./model/graph.ts";
@@ -82,9 +84,9 @@ const Visualizer = () => {
 
     const nodeColor = (node: Node) => {
         if(node.selected) {
-            return "#9bf316";
+            return COLORS.secondary;
         }
-        return "#241775";
+        return COLORS.primary;
     }
 
     let fitView = false;
@@ -106,13 +108,13 @@ const Visualizer = () => {
             fitView={fitView}
         >
             {focusNodeId && (
-                <div style={{
+                <Box sx={{
                     position: "absolute",
                     top: 10,
                     left: "50%",
                     transform: "translateX(-50%)",
-                    background: "rgba(36, 23, 117, 0.85)",
-                    color: "#fff",
+                    background: alpha(COLORS.primary, 0.85),
+                    color: 'common.white',
                     padding: "4px 14px",
                     borderRadius: 6,
                     fontFamily: "Poppins",
@@ -122,13 +124,13 @@ const Visualizer = () => {
                     whiteSpace: "nowrap",
                 }}>
                     Focus mode — press f or Esc to exit
-                </div>
+                </Box>
             )}
             <Background  />
             <Controls position="bottom-left" orientation="horizontal" showInteractive={false} />
             <MiniMap
                 nodeColor={nodeColor}
-                maskColor="rgb(36, 23, 117, 0.5)"
+                maskColor={alpha(COLORS.primary, 0.5)}
                 pannable={true}
                 position="bottom-right"
             />

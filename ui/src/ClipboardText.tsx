@@ -27,7 +27,7 @@ const ClipboardText = ({ text }: ClipboardTextProps) => {
 
     return (
         <>
-            <Button onClick={copy} sx={{ minWidth: "30px" }} style={{ color: "black" }}>{control}</Button>
+            <Button onClick={copy} sx={{ minWidth: "30px", color: 'common.black' }}>{control}</Button>
             <Popover anchorOrigin={{ vertical: "top", horizontal: "right" }} open={copied}><Typography sx={{ p: 2 }}>Copied!</Typography></Popover>
         </>
     );

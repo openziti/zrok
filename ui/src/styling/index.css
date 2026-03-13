@@ -1,3 +1,8 @@
+:root {
+    --zrok-primary: #241775;
+    --zrok-secondary: #9bf316;
+}
+
 body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
@@ -11,11 +16,11 @@ code {
 
 a {
   font-weight: 500;
-  color: #241775;
+  color: var(--zrok-primary);
   text-decoration: inherit;
 }
 a:hover {
-  color: #9bf316;
+  color: var(--zrok-secondary);
 }
 
 h1 {

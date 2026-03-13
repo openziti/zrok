@@ -11,6 +11,7 @@ import {
 import {useEffect, useMemo, useRef, useState} from "react";
 import {Node} from "@xyflow/react";
 import {bytesToSize} from "./model/util.ts";
+import {COLORS} from "./styling/theme.ts";
 
 const TabularView = () => {
     const nodes = useApiConsoleStore((state) => state.nodes);
@@ -158,13 +159,13 @@ const TabularView = () => {
         }),
         muiToolbarAlertBannerProps: {
             sx: {
-                color: "#241775",
-                backgroundColor: "#f5fde7",
+                color: COLORS.primary,
+                backgroundColor: COLORS.alertBannerBg,
             }
         },
         positionToolbarAlertBanner: "bottom",
         mrtTheme: (theme) => ({
-            matchHighlightColor: 'rgba(155, 243, 22, 1)'
+            matchHighlightColor: COLORS.secondary
         }),
     });
 

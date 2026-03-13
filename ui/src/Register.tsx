@@ -88,7 +88,7 @@ const SetPasswordForm = ({ email, touLink, register }: SetPasswordFormProps) => 
                 sx={{ mt: 2 }}
             />
             <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I accept the <span dangerouslySetInnerHTML={{__html: sanitizeHtml(touLink ?? "")}}></span></p>} sx={{ mt: 2 }} />
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} style={{ color: "#9bf316" }} disabled={!checked}>
+            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2, color: 'secondary.main' }} disabled={!checked}>
                 Register Account
             </Button>
         </Box>
@@ -164,7 +164,7 @@ const InvalidToken = () => {
             <Box component="div">
                 <Container>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography component="div"><h2 style={{ color: "red" }} align="center">Invalid registration token?!</h2></Typography>
+                        <Typography component="div"><Box component="h2" sx={{ color: 'error.main', textAlign: 'center' }}>Invalid registration token?!</Box></Typography>
                     </Box>
                 </Container>
                 <Container>
@@ -248,7 +248,7 @@ const Register = () => {
             <Container maxWidth="sm">
                 <Box sx={{marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
                     <img src={zrokLogo} height="300" alt="zrok logo"/>
-                    <h1 style={{ color: "#241775" }}>z r o k</h1>
+                    <Box component="h1" sx={{ color: 'primary.main' }}>z r o k</Box>
                     { errorMessage && <Typography color="error">{errorMessage}</Typography> }
                     {view === "loading" && <Grid2 container sx={{ justifyContent: "center", mt: 4 }}><CircularProgress /></Grid2>}
                     {view === "form" && <SetPasswordForm email={email!} touLink={touLink!} register={doRegistration} />}

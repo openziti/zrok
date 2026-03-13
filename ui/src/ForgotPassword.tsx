@@ -39,10 +39,10 @@ const ForgotPasswordForm = ({ doRequest }: ForgotPasswordFormProps) => {
                 error={form.errors.email !== undefined}
                 helperText={form.errors.email}
             />
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} style={{ color: "#9bf316" }}>
+            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2, color: 'secondary.main' }}>
                 Send Password Reset Email
             </Button>
-            <Box component="div" style={{ textAlign: "center" }}>
+            <Box component="div" sx={{ textAlign: "center" }}>
                 <Link to="/">Return to Login</Link>
             </Box>
         </form>
@@ -64,7 +64,7 @@ const RequestSubmittedMessage = () => {
                         <strong>Please check your "spam" folder for this email if you do not receive it after a few minutes!</strong>
                     </p>
                 </Typography>
-                <Box component="div" style={{ textAlign: "center" }}>
+                <Box component="div" sx={{ textAlign: "center" }}>
                     <Link to="/">Return to Login</Link>
                 </Box>
             </Box>
@@ -87,7 +87,7 @@ const ForgotPassword = () => {
                             <Typography component="div" color="error" align="center">
                                 <p>{msg}</p>
                             </Typography>
-                            <Box component="div" style={{ textAlign: "center" }}>
+                            <Box component="div" sx={{ textAlign: "center" }}>
                                 <Link to="/">Return to Login</Link>
                             </Box>
                         </Box>
@@ -103,7 +103,7 @@ const ForgotPassword = () => {
             <Container maxWidth="xs">
                 <Box sx={{marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
                     <img src={zrokLogo} height={300} alt="zrok logo" />
-                    <h1 style={{ color: "#241775" }}>z r o k</h1>
+                    <Box component="h1" sx={{ color: 'primary.main' }}>z r o k</Box>
                     {control}
                 </Box>
             </Container>

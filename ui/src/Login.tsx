@@ -54,7 +54,7 @@ const Login = ({ onLogin }: LoginProps) => {
             <Container maxWidth="xs">
                 <Box sx={{marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
                     <img src={zroket} height="300" alt="zrok logo"/>
-                    <h1 style={{ color: "#241775" }}>z r o k</h1>
+                    <Box component="h1" sx={{ color: 'primary.main' }}>z r o k</Box>
                     <Box component="form" noValidate onSubmit={login}>
                         <TextField
                             margin="normal"
@@ -86,19 +86,19 @@ const Login = ({ onLogin }: LoginProps) => {
                                 setPassword(v.target.value)
                             }}
                         />
-                        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} style={{ color: "#9bf316" }} disabled={loading}>
-                            {loading ? <CircularProgress size={24} sx={{ color: "#9bf316" }} /> : "Log In"}
+                        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2, color: 'secondary.main' }} disabled={loading}>
+                            {loading ? <CircularProgress size={24} sx={{ color: 'secondary.main' }} /> : "Log In"}
                         </Button>
-                        <Box component="div" style={{ textAlign: "center" }}>
-                            <Box component="h3" style={{ color: "red" }}>{message}</Box>
+                        <Box component="div" sx={{ textAlign: "center" }}>
+                            <Box component="h3" sx={{ color: 'error.main' }}>{message}</Box>
                         </Box>
-                        <Box component="div" style={{ textAlign: "center" }}>
+                        <Box component="div" sx={{ textAlign: "center" }}>
                             <Link to="/forgotPassword">Forgot Password?</Link>
                         </Box>
-                        <Box component="div" style={{ textAlign: "center" }}>
+                        <Box component="div" sx={{ textAlign: "center" }}>
                             <div dangerouslySetInnerHTML={{__html: sanitizeHtml(newAccountLink)}}></div>
                         </Box>
-                        <Box component="div" style={{ textAlign: "center" }}>
+                        <Box component="div" sx={{ textAlign: "center" }}>
                             <div dangerouslySetInnerHTML={{__html: sanitizeHtml(tou)}}></div>
                         </Box>
                     </Box>

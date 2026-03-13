@@ -51,7 +51,7 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
     const gettingStartedButton = (
         <Grid2 display="flex" justifyContent="right">
             <Tooltip title="Getting Started Wizard">
-                <Button style={{ backgroundColor: "#9bf316", color: "black" }} onClick={openGettingStarted}>CLICK HERE TO GET STARTED!</Button>
+                <Button sx={{ backgroundColor: 'secondary.main', color: 'common.black' }} onClick={openGettingStarted}>CLICK HERE TO GET STARTED!</Button>
             </Tooltip>
         </Grid2>
     );
@@ -59,7 +59,7 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
     const helpButton = (
         <Grid2 display="flex" justifyContent="right">
             <Tooltip title="Getting Started Wizard">
-                <Button style={{ color: "#9bf316" }} aria-label="Getting Started Wizard" onClick={openGettingStarted}><HelpIcon /></Button>
+                <Button sx={{ color: 'secondary.main' }} aria-label="Getting Started Wizard" onClick={openGettingStarted}><HelpIcon /></Button>
             </Tooltip>
         </Grid2>
     );
@@ -78,7 +78,7 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
                                 <Grid2 display="flex" justifyContent="left">
                                     <img src={zrokLogo} height="30" alt="zrok logo" />
                                 </Grid2>
-                                <Grid2 display="flex" justifyContent="left" size="grow" sx={{ ml: 3 }} color="#9bf316">
+                                <Grid2 display="flex" justifyContent="left" size="grow" sx={{ ml: 3, color: 'secondary.main' }}>
                                     <strong>z r o k</strong>
                                 </Grid2>
                             </Grid2>

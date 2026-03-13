@@ -1,6 +1,8 @@
 import {useCallback, useEffect, useRef, useState} from "react";
 import {Graph, focusGraph, layout, mergeGraph, nodesEqual} from "./model/graph.ts";
 import {Box, Button, Grid2, IconButton, Typography} from "@mui/material";
+import {alpha} from "@mui/material/styles";
+import {COLORS} from "./styling/theme.ts";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import ErrorBoundary from "./ErrorBoundary.tsx";
 import NavBar from "./NavBar.tsx";
@@ -218,7 +220,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     return (
         <div>
             <NavBar logout={logout} visualizer={visualizerEnabled} toggleMode={setVisualizerEnabled} />
-            <div style={{ position: "relative" }}>
+            <Box sx={{ position: "relative" }}>
                 <Grid2 container spacing={2} columns={{ xs: 4, sm: 10, md: 12 }}>
                     <Grid2 size="grow">
                         <ErrorBoundary fallback={({ reset }) => (
@@ -233,16 +235,16 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                     {selectedNode && !panelMinimized ? <Grid2 container size={4}><Grid2><ErrorBoundary key={selectedNode?.id}>{renderSidePanel()}</ErrorBoundary></Grid2></Grid2> : null}
                 </Grid2>
                 {selectedNode && panelMinimized ? (
-                    <div style={{ position: "absolute", top: 16, right: 16, zIndex: 5, display: "flex", alignItems: "center", gap: 4, background: "rgba(36, 23, 117, 0.85)", borderRadius: 8, padding: "4px 12px" }}>
-                        <Typography variant="body2" sx={{ color: "#fff", whiteSpace: "nowrap" }}>
+                    <Box sx={{ position: "absolute", top: 16, right: 16, zIndex: 5, display: "flex", alignItems: "center", gap: 4, background: alpha(COLORS.primary, 0.85), borderRadius: 8, padding: "4px 12px" }}>
+                        <Typography variant="body2" sx={{ color: 'common.white', whiteSpace: "nowrap" }}>
                             {selectedNode?.type}
                         </Typography>
-                        <IconButton size="small" aria-label="Expand panel" onClick={() => setPanelMinimized(false)} sx={{ color: "#fff", p: 0.25 }}>
+                        <IconButton size="small" aria-label="Expand panel" onClick={() => setPanelMinimized(false)} sx={{ color: 'common.white', p: 0.25 }}>
                             <OpenInFullIcon sx={{ fontSize: 16 }} />
                         </IconButton>
-                    </div>
+                    </Box>
                 ) : null}
-            </div>
+            </Box>
         </div>
     );
 }

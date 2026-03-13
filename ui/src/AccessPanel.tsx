@@ -1,5 +1,5 @@
 import {Node} from "@xyflow/react";
-import {Button, CircularProgress, Grid2, Tooltip, Typography} from "@mui/material";
+import {Box, Button, CircularProgress, Grid2, Tooltip, Typography} from "@mui/material";
 import AccessIcon from "@mui/icons-material/Lan";
 import useApiConsoleStore from "./model/store.ts";
 import React, {useEffect, useState} from "react";
@@ -106,7 +106,7 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
                         ) : (
                             <>
                                 <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2, p: 0 }} alignItems="center">
-                                    <h5 style={{ margin: 0 }}>A private access frontend {detail && detail.bindAddress ? <span>at <code>{detail.bindAddress}</code></span> : <span>with frontend token <code>{detail?.frontendToken}</code></span>}</h5>
+                                    <Box component="h5" sx={{ m: 0 }}>A private access frontend {detail && detail.bindAddress ? <span>at <code>{detail.bindAddress}</code></span> : <span>with frontend token <code>{detail?.frontendToken}</code></span>}</Box>
                                 </Grid2>
                                 { errorMessage && <Typography color="error" sx={{ mb: 2 }}>{errorMessage}</Typography> }
                                 { limited ? <BandwidthLimitedWarning /> : null }
