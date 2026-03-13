@@ -160,6 +160,7 @@ install_openziti() {
 # Error handling and cleanup
 # ============================================================
 
+NO_DESTROY=0
 _exit_code=0
 _err_handler() {
     _exit_code=$?
@@ -178,6 +179,10 @@ trap '_err_handler' ERR
 cleanup_all() {
     # Disable errexit in cleanup — every command is best-effort
     set +o errexit
+    if (( NO_DESTROY )); then
+        log_info "cleanup skipped (--no-destroy)"
+        return 0
+    fi
     if [[ -t 0 ]]; then
         echo "Purging zrok2 and ziti packages in 30s. Re-run with </dev/null to skip this delay." >&2
         sleep 30
@@ -203,10 +208,11 @@ trap 'cleanup_all; exit $_exit_code' EXIT
 
 usage() {
     cat >&2 <<'EOF'
-Usage: linux.test.bash --ziti-version <version> [--source-dir <dir>]
+Usage: linux.test.bash --ziti-version <version> [--source-dir <dir>] [--no-destroy]
 
   --ziti-version <version>  Ziti package version to install from APT (e.g., 2.0.0)
   --source-dir <dir>        zrok source tree (default: auto-detected)
+  --no-destroy              skip cleanup on exit (for post-mortem inspection)
 EOF
     exit 1
 }
@@ -217,6 +223,7 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --ziti-version) ZITI_VERSION="$2"; shift 2 ;;
         --source-dir)   SOURCE_DIR="$2"; shift 2 ;;
+        --no-destroy)   NO_DESTROY=1; shift ;;
         *)              usage ;;
     esac
 done
