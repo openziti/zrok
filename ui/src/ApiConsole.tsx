@@ -4,6 +4,7 @@ import {Box, Button, IconButton, Typography} from "@mui/material";
 import {alpha} from "@mui/material/styles";
 import {COLORS} from "./styling/theme.ts";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
+import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 import ErrorBoundary from "./ErrorBoundary.tsx";
 import NavBar from "./NavBar.tsx";
 import Visualizer from "./Visualizer.tsx";
@@ -276,7 +277,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                 <Box
                     sx={{
                         display: "grid",
-                        gridTemplateColumns: selectedNode && !panelMinimized ? "minmax(0, 1fr) 360px" : "minmax(0, 1fr)",
+                        gridTemplateColumns: !visualizerEnabled && selectedNode && !panelMinimized ? "minmax(0, 1fr) 360px" : "minmax(0, 1fr)",
                         gap: "15px",
                         height: "100%",
                         minHeight: 0,
@@ -292,7 +293,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                             {visualizerEnabled ? <Visualizer /> : <TabularView />}
                         </ErrorBoundary>
                     </Box>
-                    {selectedNode && !panelMinimized ? (
+                    {!visualizerEnabled && selectedNode && !panelMinimized ? (
                         <Box
                             sx={{
                                 minHeight: 0,
@@ -304,6 +305,37 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                         </Box>
                     ) : null}
                 </Box>
+                {visualizerEnabled && selectedNode && !panelMinimized ? (
+                    <Box
+                        sx={{
+                            position: "absolute",
+                            top: 0,
+                            right: 0,
+                            bottom: 0,
+                            width: "min(360px, calc(100vw - 30px))",
+                            minWidth: 0,
+                            overflow: "auto",
+                            zIndex: 5,
+                            bgcolor: "background.paper",
+                            borderRadius: 2,
+                            borderTopRightRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderBottomRightRadius: 0,
+                            boxShadow: 6,
+                            p: 2,
+                        }}
+                    >
+                        <IconButton
+                            size="small"
+                            aria-label="Minimize panel"
+                            onClick={() => setPanelMinimized(true)}
+                            sx={{ position: "absolute", top: 8, right: 8, zIndex: 1, color: "text.primary" }}
+                        >
+                            <CloseFullscreenIcon fontSize="small" />
+                        </IconButton>
+                        <ErrorBoundary key={selectedNode?.id}>{renderSidePanel()}</ErrorBoundary>
+                    </Box>
+                ) : null}
                 {selectedNode && panelMinimized ? (
                     <Box sx={{ position: "absolute", top: 16, right: 16, zIndex: 5, display: "flex", alignItems: "center", gap: 4, background: alpha(COLORS.primary, 0.85), borderRadius: 8, padding: "4px 12px" }}>
                         <Typography variant="body2" sx={{ color: 'common.white', whiteSpace: "nowrap" }}>
