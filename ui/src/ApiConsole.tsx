@@ -26,6 +26,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const user = useApiConsoleStore((state) => state.user);
     const userRef = useRef<User | null>(user);
     const updateLimited = useApiConsoleStore((state) => state.updateLimited);
+    const updateEnvironments = useApiConsoleStore((state) => state.updateEnvironments);
     const graph = useApiConsoleStore((state) => state.graph);
     const updateGraph = useApiConsoleStore((state) => state.updateGraph);
     const oldGraph = useRef<Graph>(graph);
@@ -94,7 +95,15 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
 
     const retrieveOverview = (signal?: AbortSignal) => {
         if (!userRef.current) return Promise.resolve();
-        return getMetadataApi(userRef.current).overview({ signal })
+        const metadataApi = getMetadataApi(userRef.current);
+        return Promise.all([
+            metadataApi.overview({ signal }),
+            metadataApi.getAccountDetail({ signal }),
+        ])
+            .then(([d, accountDetail]) => {
+                updateEnvironments(accountDetail);
+                return d;
+            })
             .then(d => {
                 updateLimited(d.accountLimited!);
                 let newVov = mergeGraph(oldGraph.current, user, d.accountLimited!, d);
