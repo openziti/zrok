@@ -12,7 +12,10 @@ export interface MetricsResult {
     tx: number;
 }
 
-export const objectToRows = (obj: Record<string, unknown>): PropertyRow[] => {
+export const objectToRows = (obj: Record<string, unknown> | null | undefined): PropertyRow[] => {
+    if (!obj) {
+        return [];
+    }
     let rows: PropertyRow[] = [];
     let count = 0;
     for(const key in obj) {

@@ -3,7 +3,7 @@ import {camelToWords, objectToRows, PropertyRow} from "./model/util.ts";
 import {Paper, Table, TableBody, TableCell, TableRow} from "@mui/material";
 
 type PropertyTableProps = {
-    object: Record<string, unknown> | null;
+    object: Record<string, unknown> | null | undefined;
     custom?: Record<string, (row: PropertyRow) => React.ReactNode>;
     labels?: Record<string, string>;
 }
