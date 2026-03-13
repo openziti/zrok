@@ -8,6 +8,7 @@ import {AccountApi, MetadataApi} from "./api";
 import ClipboardText from "./ClipboardText.tsx";
 import {sanitizeHtml} from "./model/html.ts";
 import {extractErrorMessage} from "./model/errors.ts";
+import {isAbortError} from "./model/errors.ts";
 
 interface SetPasswordValues {
     password: string;
@@ -24,6 +25,7 @@ const SetPasswordForm = ({ email, touLink, register }: SetPasswordFormProps) => 
     const [checked, setChecked] = useState<boolean>(false);
     const checkedRef = useRef<boolean>();
     checkedRef.current = checked;
+    const requiresTouAcceptance = (touLink ?? "").trim() !== "";
     const toggleChecked = () => { setChecked(!checkedRef.current) }
 
     const form = useFormik({
@@ -87,8 +89,20 @@ const SetPasswordForm = ({ email, touLink, register }: SetPasswordFormProps) => 
                 helperText={form.errors.confirm}
                 sx={{ mt: 2 }}
             />
-            <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I accept the <span dangerouslySetInnerHTML={{__html: sanitizeHtml(touLink ?? "")}}></span></p>} sx={{ mt: 2 }} />
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2, color: 'secondary.main' }} disabled={!checked}>
+            {requiresTouAcceptance ? (
+                <FormControlLabel
+                    control={<Checkbox checked={checked} onChange={toggleChecked} />}
+                    label={<p>I accept the <span dangerouslySetInnerHTML={{__html: sanitizeHtml(touLink ?? "")}}></span></p>}
+                    sx={{ mt: 2 }}
+                />
+            ) : null}
+            <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2, color: 'secondary.main' }}
+                disabled={requiresTouAcceptance && !checked}
+            >
                 Register Account
             </Button>
         </Box>
@@ -192,7 +206,7 @@ const Register = () => {
     const [error, setError] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [email, setEmail] = useState<string>();
-    const [touLink, setTouLink] = useState<string>();
+    const [touLink, setTouLink] = useState<string | null>(null);
 
     const doRegistration = (v: SetPasswordValues) => {
         setErrorMessage("");
@@ -214,7 +228,10 @@ const Register = () => {
                 .then((d) => {
                     setEmail(d.email);
                 })
-                .catch(() => {
+                .catch((e) => {
+                    if (isAbortError(e)) {
+                        return;
+                    }
                     setError(true);
                 });
             return () => controller.abort();
@@ -226,7 +243,7 @@ const Register = () => {
             const controller = new AbortController();
             new MetadataApi()._configuration({ signal: controller.signal })
                 .then(d => {
-                    setTouLink(d.touLink);
+                    setTouLink(d.touLink ?? "");
                 })
                 .catch(() => {});
             return () => controller.abort();
@@ -234,14 +251,14 @@ const Register = () => {
     }, [email]);
 
     useEffect(() => {
-        if(!error && email && touLink) {
+        if(!error && email && touLink !== null) {
             setView("form");
         } else {
             if(error) {
                 setView("invalidToken");
             }
         }
-    }, [touLink, error]);
+    }, [email, touLink, error]);
 
     return (
         <Typography component="div">
