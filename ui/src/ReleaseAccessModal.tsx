@@ -1,5 +1,5 @@
 import {Frontend} from "./api";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {Box, Button, Checkbox, FormControlLabel, Grid2, Modal, Typography} from "@mui/material";
 import {modalStyle} from "./styling/theme.ts";
 import {User} from "./model/user.ts";
@@ -19,10 +19,9 @@ const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAcce
     const [errorMessage, setErrorMessage] = useState<React.JSX.Element>(null);
     const [frontendToken, setFrontendToken] = useState<String>("");
     const [checked, setChecked] = useState<boolean>(false);
-    const checkedRef = useRef<boolean>(checked);
 
     const toggleChecked = () => {
-        setChecked(!checkedRef.current);
+        setChecked((prev) => !prev);
     }
 
     useEffect(() => {
