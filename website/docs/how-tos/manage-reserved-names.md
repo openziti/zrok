@@ -4,8 +4,8 @@ sidebar_label: Manage reserved names
 
 # Manage reserved names
 
-Reserved [names](../concepts/sharing-reserved.md) give your shares a persistent, human-readable identifier that survives
-across share sessions. [Namespaces](../concepts/sharing-reserved.md) are the containers that organize names. This how-to
+Reserved [names](../concepts/namespaces.md) give your shares a persistent, human-readable identifier that survives
+across share sessions. [Namespaces](../concepts/namespaces.md) are the containers that organize names. This how-to
 covers the full lifecycle: creating names, using them with shares, managing them, and configuring a default namespace.
 
 ## Create a reserved name
@@ -47,7 +47,7 @@ zrok2 share public localhost:8080 -n <namespaceToken>:api
 ```
 
 The name can be either reserved (created with `zrok2 create name`) or ephemeral (created on-the-fly when the share
-starts). See [Reserved names and namespaces](../concepts/sharing-reserved.md) for a full explanation of the difference.
+starts). See [Reserved names and namespaces](../concepts/namespaces.md) for a full explanation of the difference.
 
 ### Private shares with custom tokens
 

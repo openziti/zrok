@@ -26,7 +26,7 @@ zrok2 share public --backend-mode web .
 
 Then the files can be access with a `private` or `public` share, for example as shown:
 
-![zrok_share_web_files](../images/zrok_share_web_files.png)
+![zrok_share_web_files](../../images/zrok_share_web_files.png)
 
 `zrok` will automatically provide a stock website, which will allow the accessing user to browse and navigate the file tree. Clicking the files allows the user to download them.
 
@@ -47,6 +47,6 @@ If `index.html` contains valid HTML, like this:
 
 Sharing the directory will result in the following when you access the share in a web browser:
 
-![zrok_share_web_website](../images/zrok_share_web_website.png)
+![zrok_share_web_website](../../images/zrok_share_web_website.png)
 
 `zrok` contains a built-in web server, which you can use to serve static websites as a share.

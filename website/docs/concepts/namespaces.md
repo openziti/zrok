@@ -6,7 +6,7 @@ sidebar_position: 10
 
 :::info v2.0 feature
 This page describes the v2.0 namespace and name system. If you're migrating from v1.x, see the
-[v2 migration guide](/how-tos/v2-migration-guide.md) for details on how this replaces the old `zrok reserve`
+[v2 migration guide](/how-tos/migrate-v1-to-v2.md) for details on how this replaces the old `zrok reserve`
 workflow.
 :::
 
@@ -59,7 +59,7 @@ If you're coming from zrok v1.x, here's the mapping:
 | `zrok2 release <token>` | `zrok2 delete name <name>` |
 | `zrok2 reserve private <target>` | `zrok2 share private <target> --share-token <name>` |
 
-See the [v2 migration guide](/how-tos/v2-migration-guide.md) for comprehensive migration instructions.
+See the [v2 migration guide](/how-tos/migrate-v1-to-v2.md) for comprehensive migration instructions.
 
 ## Benefits of the namespace/name system
 
