@@ -8,7 +8,7 @@ import {useState} from "react";
 import {extractErrorMessage} from "./model/errors.ts";
 
 interface ForgotPasswordFormProps {
-    doRequest: ({ email: string }) => void;
+    doRequest: (email: string) => void;
 }
 
 const ForgotPasswordForm = ({ doRequest }: ForgotPasswordFormProps) => {
@@ -72,31 +72,44 @@ const RequestSubmittedMessage = () => {
     );
 }
 
+interface RequestFailedMessageProps {
+    errorMessage: string;
+}
+
+const RequestFailedMessage = ({ errorMessage }: RequestFailedMessageProps) => {
+    return (
+        <Paper sx={{ p: 5 }}>
+            <Box component="div">
+                <Typography component="div" align="center"><h2>Request Failed</h2></Typography>
+                <Typography component="div" color="error" align="center">
+                    <p>{errorMessage}</p>
+                </Typography>
+                <Box component="div" sx={{ textAlign: "center" }}>
+                    <Link to="/">Return to Login</Link>
+                </Box>
+            </Box>
+        </Paper>
+    );
+}
+
+type ForgotPasswordStatus = "form" | "submitted" | "failed";
+
 const ForgotPassword = () => {
-    const requestResetPassword = (email) => {
+    const [status, setStatus] = useState<ForgotPasswordStatus>("form");
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    const requestResetPassword = (email: string) => {
         new AccountApi().resetPasswordRequest({body: {emailAddress: email}})
             .then(() => {
-                setControl(<RequestSubmittedMessage />);
+                setErrorMessage(null);
+                setStatus("submitted");
             })
             .catch(async (e) => {
                 const msg = await extractErrorMessage(e, "password reset request failed");
-                setControl(
-                    <Paper sx={{ p: 5 }}>
-                        <Box component="div">
-                            <Typography component="div" align="center"><h2>Request Failed</h2></Typography>
-                            <Typography component="div" color="error" align="center">
-                                <p>{msg}</p>
-                            </Typography>
-                            <Box component="div" sx={{ textAlign: "center" }}>
-                                <Link to="/">Return to Login</Link>
-                            </Box>
-                        </Box>
-                    </Paper>
-                );
+                setErrorMessage(msg);
+                setStatus("failed");
             })
     }
-
-    const [control, setControl] = useState<React.JSX.Element>(<ForgotPasswordForm doRequest={requestResetPassword} />);
 
     return (
         <Typography component="div">
@@ -104,7 +117,9 @@ const ForgotPassword = () => {
                 <Box sx={{marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
                     <img src={zrokLogo} height={300} alt="zrok logo" />
                     <Box component="h1" sx={{ color: 'primary.main' }}>z r o k</Box>
-                    {control}
+                    {status === "form" && <ForgotPasswordForm doRequest={requestResetPassword} />}
+                    {status === "submitted" && <RequestSubmittedMessage />}
+                    {status === "failed" && errorMessage && <RequestFailedMessage errorMessage={errorMessage} />}
                 </Box>
             </Container>
         </Typography>

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {camelToWords, objectToRows, PropertyRow} from "./model/util.ts";
 import {Paper, Table, TableBody, TableCell, TableRow} from "@mui/material";
 
@@ -9,11 +9,7 @@ type PropertyTableProps = {
 }
 
 const PropertyTable = ({ object, custom, labels }: PropertyTableProps) => {
-    const [data, setData] = useState<PropertyRow[]>([]);
-
-    useEffect(() => {
-        setData(objectToRows(object));
-    }, [object]);
+    const data = objectToRows(object);
 
     const value = (row: PropertyRow) => {
         if(custom) {
