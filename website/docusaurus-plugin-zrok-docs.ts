@@ -29,12 +29,12 @@ export function zrokRedirects(routeBasePath: string = 'docs/zrok'): PluginConfig
                 { to: `${p}/how-tos/configure-permission-modes`, from: [`${p}/guides/permission-modes`, `${p}/how-tos/permission-modes`] },
                 { to: `${p}/how-tos/migrate-v1-to-v2`, from: [`${p}/guides/v2-migration-guide`, `${p}/how-tos/v2-migration-guide`] },
                 { to: `${p}/how-tos/migrate-from-vpn`, from: [`${p}/guides/vpn`, `${p}/how-tos/vpn`] },
-                // concepts/* → concepts/shares/*
-                { to: `${p}/concepts/shares/private`, from: [`${p}/concepts/sharing-private`] },
-                { to: `${p}/concepts/shares/public`, from: [`${p}/concepts/sharing-public`] },
-                { to: `${p}/concepts/shares/http`, from: [`${p}/concepts/http`] },
+                // concepts/* → concepts/*
+                { to: `${p}/concepts/private`, from: [`${p}/concepts/sharing-private`, `${p}/concepts/shares/private`] },
+                { to: `${p}/concepts/public`, from: [`${p}/concepts/sharing-public`, `${p}/concepts/shares/public`] },
+                { to: `${p}/concepts/backend-modes/http`, from: [`${p}/concepts/http`, `${p}/concepts/shares/http`] },
                 { to: `${p}/how-tos/share-tcp-udp`, from: [`${p}/concepts/tunnels`, `${p}/concepts/shares/tunnels`] },
-                { to: `${p}/concepts/shares/files`, from: [`${p}/concepts/files`] },
+                { to: `${p}/concepts/backend-modes/files`, from: [`${p}/concepts/files`, `${p}/concepts/shares/files`] },
                 { to: `${p}/concepts/namespaces`, from: [`${p}/concepts/sharing-reserved`] },
                 // guides/self-hosting/* → self-hosting/*
                 { to: `${p}/self-hosting/deployment/docker`, from: [`${p}/guides/self-hosting/docker`, `${p}/self-hosting/docker`] },
