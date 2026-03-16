@@ -48,19 +48,6 @@ A **name** is a unique identifier within a namespace. Names can be:
 Think of names as similar to DNS A records within a zone. For example, if you create a name `api` in the `public`
 namespace (corresponding to `share.zrok.io`), your share is accessible at `https://api.share.zrok.io`.
 
-## Migration from v1.x
-
-If you're coming from zrok v1.x, here's the mapping:
-
-| v1.x command                     | v2.0 equivalent                                                                  |
-|----------------------------------|----------------------------------------------------------------------------------|
-| `zrok2 reserve public <target>`  | `zrok2 create name <name>` + `zrok2 share public <target> -n <namespace>:<name>` |
-| `zrok2 share reserved <token>`   | `zrok2 share public <target> -n <namespace>:<name>`                              |
-| `zrok2 release <token>`          | `zrok2 delete name <name>`                                                       |
-| `zrok2 reserve private <target>` | `zrok2 share private <target> --share-token <name>`                              |
-
-See the [v2 migration guide](/how-tos/migrate-v1-to-v2.md) for comprehensive migration instructions.
-
 ## Benefits of the namespace/name system
 
 The v2.0 namespace and name system provides several advantages over v1.x reserved shares:

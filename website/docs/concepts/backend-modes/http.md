@@ -14,4 +14,10 @@ showing the URL, share type, and a live feed of incoming requests:
 
 The share is active as long as the command is running. Press `Ctrl+C` or `q` to exit and tear down the share.
 
-To create and manage public shares, see [Manage shares with the agent](../../how-tos/agent/manage-shares.mdx).
+To disable the terminal UI and send output to stdout, pass the `--headless` flag:
+
+```bash
+zrok2 share public --headless 8080
+```
+
+To create public shares with the agent, see [Manage shares with the agent](../../how-tos/agent/manage-shares.mdx).
