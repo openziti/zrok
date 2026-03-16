@@ -96,6 +96,7 @@ zrok2 list names
 ```
 
 This shows a table with:
+
 - URL (the full public URL if applicable)
 - Name
 - Namespace

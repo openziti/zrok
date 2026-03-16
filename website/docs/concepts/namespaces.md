@@ -5,9 +5,8 @@ sidebar_position: 10
 # Reserved names and namespaces
 
 :::info v2.0 feature
-This page describes the v2.0 namespace and name system. If you're migrating from v1.x, see the
-[v2 migration guide](/how-tos/migrate-v1-to-v2.md) for details on how this replaces the old `zrok reserve`
-workflow.
+This page describes the v2.0 namespace and name system. If you're migrating from v1.x, see the [v2 migration
+guide](/how-tos/migrate-v1-to-v2.md) for details on how this replaces the old `zrok reserve` workflow.
 :::
 
 By default, when you create a public or private share using `zrok2 share`, zrok assigns it a randomly generated _share
@@ -29,6 +28,7 @@ related names. For example:
 - A custom namespace might correspond to your own domain like `example.com`
 
 Namespaces can be:
+
 - **Open**: accessible to all users of the zrok service instance
 - **Closed**: requiring explicit grants for access
 
@@ -52,12 +52,12 @@ namespace (corresponding to `share.zrok.io`), your share is accessible at `https
 
 If you're coming from zrok v1.x, here's the mapping:
 
-| v1.x command | v2.0 equivalent |
-|---|---|
-| `zrok2 reserve public <target>` | `zrok2 create name <name>` + `zrok2 share public <target> -n <namespace>:<name>` |
-| `zrok2 share reserved <token>` | `zrok2 share public <target> -n <namespace>:<name>` |
-| `zrok2 release <token>` | `zrok2 delete name <name>` |
-| `zrok2 reserve private <target>` | `zrok2 share private <target> --share-token <name>` |
+| v1.x command                     | v2.0 equivalent                                                                  |
+|----------------------------------|----------------------------------------------------------------------------------|
+| `zrok2 reserve public <target>`  | `zrok2 create name <name>` + `zrok2 share public <target> -n <namespace>:<name>` |
+| `zrok2 share reserved <token>`   | `zrok2 share public <target> -n <namespace>:<name>`                              |
+| `zrok2 release <token>`          | `zrok2 delete name <name>`                                                       |
+| `zrok2 reserve private <target>` | `zrok2 share private <target> --share-token <name>`                              |
 
 See the [v2 migration guide](/how-tos/migrate-v1-to-v2.md) for comprehensive migration instructions.
 
