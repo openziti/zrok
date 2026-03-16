@@ -1,6 +1,6 @@
 ---
 sidebar_label: Accounts and environments
-sidebar_position: 2
+sidebar_position: 4
 ---
 
 # Accounts and environments

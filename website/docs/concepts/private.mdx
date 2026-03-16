@@ -17,7 +17,7 @@ accessible over HTTP or HTTPS. Private sharing works with all resource types tha
 
 ## Peer-to-peer
 
-![zrok private share](../../images/zrok_private_share.png)
+![zrok private share](../images/zrok_private_share.png)
 
 Private shares are accessed using the `zrok2 access` command, and require the accessing user to have an account on the
 same service instance that they've already enabled with `zrok2 enable`.
@@ -37,7 +37,7 @@ The peer-to-peer capabilities of zrok are an important property of the underlyin
 [OpenZiti](https://docs.openziti.io/docs/learn/introduction/) network that zrok uses to provide connectivity between
 users and resources.
 
-To create and manage private shares, see [Manage shares with the agent](../../how-tos/agent/manage-shares.mdx).
+To create and manage private shares, see [Manage shares with the agent](../how-tos/agent/manage-shares.mdx).
 
 ## Private backend modes
 
@@ -48,6 +48,6 @@ zrok2 share private 80
 ```
 
 <BackendHttp/>
-- `tcpTunnel`, `udpTunnel` modes forward the data payload to the target server ([more](../../how-tos/share-tcp-udp.mdx))
+- `tcpTunnel`, `udpTunnel` modes forward the data payload to the target server ([more](../how-tos/share-tcp-udp.mdx))
 - `socks` mode provides a SOCKS5 dynamic proxy on the private access bind port that tunnels TCP payloads to the share
   backend where they are forwarded to their destinations ([blog](https://blog.openziti.io/the-zrok-socks-backend))
