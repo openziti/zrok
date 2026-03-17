@@ -2,10 +2,10 @@
 sidebar_position: 22
 ---
 
-# HTTP shares
+# HTTP proxy mode
 
-zrok shares HTTP and HTTPS resources natively using the `proxy` backend mode. The `proxy` mode is the default, so you
-don't need to specify `--backend-mode` explicitly unless you're switching to a different mode.
+The `proxy` backend mode forwards incoming requests to an HTTP or HTTPS server running on your machine. It's the
+default backend mode, so you don't need to specify `--backend-mode` unless you're switching to a different mode.
 
 When you run `zrok2 share public` in the foreground, zrok assigns a public URL and opens a full-screen terminal display
 showing the URL, share type, and a live feed of incoming requests:
