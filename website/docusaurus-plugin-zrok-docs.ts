@@ -32,7 +32,7 @@ export function zrokRedirects(routeBasePath: string = 'docs/zrok'): PluginConfig
                 // concepts/* → concepts/*
                 { to: `${p}/concepts/private-shares`, from: [`${p}/concepts/private`, `${p}/concepts/sharing-private`, `${p}/concepts/shares/private`] },
                 { to: `${p}/concepts/public-shares`, from: [`${p}/concepts/public`, `${p}/concepts/sharing-public`, `${p}/concepts/shares/public`] },
-                { to: `${p}/concepts/backend-modes/http`, from: [`${p}/concepts/http`, `${p}/concepts/shares/http`] },
+                { to: `${p}/how-tos/shares/share-http-proxy`, from: [`${p}/concepts/backend-modes/http`, `${p}/concepts/http`, `${p}/concepts/shares/http`] },
                 { to: `${p}/how-tos/shares/share-tcp-udp`, from: [`${p}/how-tos/share-tcp-udp`, `${p}/concepts/tunnels`, `${p}/concepts/shares/tunnels`] },
                 { to: `${p}/how-tos/shares/share-websites-and-files`, from: [`${p}/concepts/backend-modes/files`, `${p}/concepts/files`, `${p}/concepts/shares/files`] },
                 { to: `${p}/concepts/namespaces`, from: [`${p}/concepts/sharing-reserved`] },
