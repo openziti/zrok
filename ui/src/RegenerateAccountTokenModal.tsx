@@ -1,4 +1,4 @@
-import {User} from "./model/user.ts";
+import {saveStoredUser, User} from "./model/user.ts";
 import {useEffect, useState} from "react";
 import {modalStyle} from "./styling/theme.ts";
 import {Box, Button, Checkbox, FormControlLabel, Grid2, Modal, Typography} from "@mui/material";
@@ -41,7 +41,7 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
                     token: d.accountToken!,
                 }
                 updateUser(newUser);
-                localStorage.setItem("user", JSON.stringify(newUser));
+                saveStoredUser(newUser);
                 document.dispatchEvent(new Event("userUpdated"));
                 setErrorMessage(null);
                 setNewToken(d.accountToken ?? null);
@@ -116,6 +116,6 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
             </Box>
         </Modal>
     );
-}
+};
 
 export default RegenerateAccountTokenModal;

@@ -2,7 +2,7 @@ import {BrowserRouter, Route, Routes} from "react-router";
 import ApiConsole from "./ApiConsole.tsx";
 import Login from "./Login.tsx";
 import {useEffect} from "react";
-import {User} from "./model/user.ts";
+import {clearStoredUser, loadStoredUser, saveStoredUser, User} from "./model/user.ts";
 import useApiConsoleStore from "./model/store.ts";
 import ForgotPassword from "./ForgotPassword.tsx";
 import Register from "./Register.tsx";
@@ -15,29 +15,26 @@ const App = () => {
 
     useEffect(() => {
         const checkUser = () => {
-            const user = localStorage.getItem("user");
-            if (user) {
-                updateUser(JSON.parse(user));
-            }
-        }
+            updateUser(loadStoredUser());
+        };
         checkUser();
 
         document.addEventListener("userUpdated", checkUser);
 
         return () => {
             document.removeEventListener("userUpdated", checkUser);
-        }
-    }, []);
+        };
+    }, [updateUser]);
 
     const login = (user: User) => {
         updateUser(user);
-        localStorage.setItem("user", JSON.stringify(user));
-    }
+        saveStoredUser(user);
+    };
 
     const logout = () => {
         updateUser(null);
-        localStorage.clear();
-    }
+        clearStoredUser();
+    };
 
     const consoleRoot = user
         ? <ErrorBoundary><ApiConsole logout={logout}/></ErrorBoundary>
@@ -53,6 +50,6 @@ const App = () => {
             </Routes>
         </BrowserRouter>
     );
-}
+};
 
 export default App;
