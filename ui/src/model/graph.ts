@@ -38,6 +38,10 @@ export interface AccessNodeData {
     ownedShare?: boolean;
 }
 
+const warnSkippedOverviewRecord = (kind: "environment" | "share" | "frontend", context: Record<string, unknown>) => {
+    console.warn(`skipping malformed overview '${kind}' record`, context);
+};
+
 export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Overview): Graph => {
     const newVov = new Graph();
 
@@ -54,14 +58,24 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
     newVov.edges = [];
 
     if(newOv) {
-        const allShares = {};
-        const allFrontends = [];
+        const allShares: Record<string, Node> = {};
+        const allFrontends: Node[] = [];
         newOv.environments?.forEach(env => {
+            const environmentId = env.environment?.zId;
+            if(!environmentId) {
+                warnSkippedOverviewRecord("environment", {
+                    description: env.environment?.description,
+                    shareCount: env.shares?.length,
+                    frontendCount: env.frontends?.length,
+                });
+                return;
+            }
+
             const envNode = {
-                id: env.environment?.zId!,
+                id: environmentId,
                 data: {
-                    label: env.environment?.description,
-                    envZId: env.environment?.zId!,
+                    label: env.environment?.description ?? environmentId,
+                    envZId: environmentId,
                     limited: limited,
                     empty: true
                 },
@@ -78,23 +92,34 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
             if(env.shares) {
                 envNode.data.empty = false;
                 env.shares.forEach(shr => {
-                    let shrLabel = shr.shareToken!;
-                    if(shr.target) {
-                        shrLabel = shr.target!;
+                    const shareToken = shr.shareToken;
+                    if(!shareToken) {
+                        warnSkippedOverviewRecord("share", {
+                            environmentId,
+                            target: shr.target,
+                            backendMode: shr.backendMode,
+                        });
+                        return;
                     }
+
+                    let shrLabel = shareToken;
+                    if(shr.target) {
+                        shrLabel = shr.target;
+                    }
+
                     const shrNode = {
-                        id: shr.shareToken!,
+                        id: shareToken,
                         data: {
                             label: shrLabel,
-                            shareToken: shr.shareToken!,
-                            envZId: env.environment?.zId!,
+                            shareToken: shareToken,
+                            envZId: environmentId,
                             limited: limited,
                             accessed: false,
                         },
                         type: "share",
                         position: { x: 0, y: 0 }
                     }
-                    allShares[shr.shareToken!] = shrNode;
+                    allShares[shareToken] = shrNode;
                     newVov.nodes.push(shrNode);
                     newVov.edges.push({
                         id: envNode.id + "-" + shrNode.id,
@@ -107,15 +132,26 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
             if(env.frontends) {
                 envNode.data.empty = false;
                 env.frontends.forEach(fe => {
+                    const frontendToken = fe.frontendToken;
+                    if(!frontendToken) {
+                        warnSkippedOverviewRecord("frontend", {
+                            environmentId,
+                            frontendId: fe.id,
+                            shareToken: fe.shareToken,
+                            bindAddress: fe.bindAddress,
+                        });
+                        return;
+                    }
+
                     const feNode = {
-                        id: fe.frontendToken!,
+                        id: frontendToken,
                         data: {
-                            label: fe.bindAddress ? fe.bindAddress : fe.frontendToken!,
+                            label: fe.bindAddress ? fe.bindAddress : frontendToken,
                             feId: fe.id,
                             target: fe.shareToken,
                             bindAddress: fe.bindAddress,
-                            backendMode: fe.backendMode,
-                            envZId: fe.zId,
+                            backendMode: fe.backendMode ?? "",
+                            envZId: environmentId,
                         },
                         type: "access",
                         position: { x: 0, y: 0 }
@@ -138,9 +174,9 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                 fe.data.ownedShare = true;
                 const edge: Edge = {
                     id: target.id + "-" + fe.id,
-                    source: fe.id!,
+                    source: fe.id,
                     sourceHandle: "share",
-                    target: target.id!,
+                    target: target.id,
                     targetHandle: "access",
                     type: "access",
                     animated: true
