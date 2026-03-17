@@ -8,15 +8,19 @@ import {
     MRT_SortingState,
     useMaterialReactTable
 } from "material-react-table";
-import {useEffect, useMemo, useRef, useState} from "react";
-import {Node} from "@xyflow/react";
+import {useEffect, useMemo, useState} from "react";
 import {bytesToSize} from "./model/util.ts";
 import {COLORS} from "./styling/theme.ts";
 
+interface TableRow {
+    id: string;
+    label: string;
+    type: string;
+    activity?: number[];
+}
+
 const TabularView = () => {
     const nodes = useApiConsoleStore((state) => state.nodes);
-    const nodesRef = useRef<Node[]>();
-    nodesRef.current = nodes;
     const updateNodes = useApiConsoleStore((state) => state.updateNodes);
     const selectedNode = useApiConsoleStore((state) => state.selectedNode);
     const updateSelectedNode = useApiConsoleStore((state) => state.updateSelectedNode);
@@ -28,18 +32,14 @@ const TabularView = () => {
     const [pagination, setPagination] = useState<MRT_PaginationState>({} as MRT_PaginationState);
     const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
     const [sorting, setSorting] = useState<MRT_SortingState>([{id: "data.label", desc: false}] as MRT_SortingState);
-    const [combined, setCombined] = useState<Node[]>([]);
 
-    useEffect(() => {
-        const outNodes = new Array<Node>();
-        nodesRef.current.forEach(node => {
-            const outNode = {
-                ...node
-            };
-            outNode.data.activity = sparkdata.get(node.id);
-            outNodes.push(outNode);
-        });
-        setCombined(outNodes);
+    const rows = useMemo<TableRow[]>(() => {
+        return nodes.map(node => ({
+            id: node.id,
+            label: String(node.data.label ?? node.id),
+            type: node.type ?? "",
+            activity: sparkdata.get(node.id),
+        }));
     }, [nodes, sparkdata]);
 
     useEffect(() => {
@@ -66,15 +66,15 @@ const TabularView = () => {
         updateNodes(nodes.map(node => (sn && node.id === sn.id) ? { ...node, selected: true } : { ...node, selected: false }));
     }, [rowSelection]);
 
-    const sparkdataTip = (row: Node): number => {
-        if(row.data && row.data.activity) {
+    const sparkdataTip = (row: TableRow): number => {
+        if(row.activity) {
             // - 2; - 1 is sometimes undefined?
-            return row.data.activity[row.data.activity.length - 2];
+            return row.activity[row.activity.length - 2];
         }
         return 0;
-    }
+    };
 
-    const sparkdataTipFmt = (row: Node): string => {
+    const sparkdataTipFmt = (row: TableRow): string => {
         const tip = sparkdataTip(row);
         if(tip > 0) {
             return bytesToSize(tip);
@@ -82,16 +82,16 @@ const TabularView = () => {
         return "";
     };
 
-    const sparkdataAverage = (row: Node): number => {
-        if(row.data && row.data.activity) {
-            let average = row.data.activity.reduce((acc, curr) => { return acc + curr }, 0);
-            average /= row.data.activity.length;
+    const sparkdataAverage = (row: TableRow): number => {
+        if(row.activity) {
+            let average = row.activity.reduce((acc, curr) => { return acc + curr }, 0);
+            average /= row.activity.length;
             return average;
         }
         return 0;
-    }
+    };
 
-    const sparkdataAverageFmt = (row: Node): string => {
+    const sparkdataAverageFmt = (row: TableRow): string => {
         const average = sparkdataAverage(row);
         if(average > 0) {
             return bytesToSize(average);
@@ -99,10 +99,11 @@ const TabularView = () => {
         return "";
     }
 
-    const columns = useMemo<MRT_ColumnDef<Node>[]>(
+    const columns = useMemo<MRT_ColumnDef<TableRow>[]>(
         () => [
             {
-                accessorKey: 'data.label',
+                id: "data.label",
+                accessorFn: row => row.label,
                 header: 'Label'
             },
             {
@@ -135,7 +136,7 @@ const TabularView = () => {
 
     const table = useMaterialReactTable({
         columns: columns,
-        data: combined,
+        data: rows,
         enableStickyHeader: true,
         enableRowSelection: false,
         enableMultiRowSelection: false,
@@ -178,7 +179,7 @@ const TabularView = () => {
             }
         },
         positionToolbarAlertBanner: "bottom",
-        mrtTheme: (theme) => ({
+        mrtTheme: () => ({
             matchHighlightColor: COLORS.secondary
         }),
     });
