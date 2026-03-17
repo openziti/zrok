@@ -25,7 +25,6 @@ interface ApiConsoleProps {
 
 const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const user = useApiConsoleStore((state) => state.user);
-    const userRef = useRef<User | null>(user);
     const updateLimited = useApiConsoleStore((state) => state.updateLimited);
     const updateEnvironments = useApiConsoleStore((state) => state.updateEnvironments);
     const graph = useApiConsoleStore((state) => state.graph);
@@ -54,7 +53,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const visualizerRef = useRef<boolean>(true);
     visualizerRef.current = visualizerEnabled;
 
-    const applyFocusAndLayout = (graph: Graph, newFocusId: string | null) => {
+    const applyFocusAndLayout = useCallback((graph: Graph, newFocusId: string | null) => {
         updateFocusNodeId(newFocusId);
         let graphToLayout = graph;
         if(newFocusId) {
@@ -67,7 +66,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         }));
         updateNodes(selected);
         updateEdges(laidOut.edges);
-    };
+    }, [updateEdges, updateFocusNodeId, updateNodes]);
 
     const handleKeyPress = useCallback((event) => {
         if(event.ctrlKey === true && event.key === '`') {
@@ -92,11 +91,10 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             applyFocusAndLayout(oldGraph.current, null);
             return;
         }
-    }, []);
+    }, [applyFocusAndLayout]);
 
-    const retrieveOverview = (signal?: AbortSignal) => {
-        if (!userRef.current) return Promise.resolve();
-        const metadataApi = getMetadataApi(userRef.current);
+    const retrieveOverview = useCallback((currentUser: User, signal?: AbortSignal) => {
+        const metadataApi = getMetadataApi(currentUser);
         return Promise.all([
             metadataApi.overview({ signal }),
             metadataApi.getAccountDetail({ signal }),
@@ -107,7 +105,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             })
             .then(d => {
                 updateLimited(d.accountLimited!);
-                let newVov = mergeGraph(oldGraph.current, user, d.accountLimited!, d);
+                let newVov = mergeGraph(oldGraph.current, currentUser, d.accountLimited!, d);
                 if(!nodesEqual(oldGraph.current.nodes, newVov.nodes)) {
                     updateGraph(newVov);
                     oldGraph.current = newVov;
@@ -124,15 +122,15 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                     let laidOut = layout(graphToLayout.nodes, graphToLayout.edges);
                     let selected = laidOut.nodes.map((n) => ({
                         ...n,
-                        selected: selectedNode ? selectedNode.id === n.id : false,
+                        selected: selectedNodeRef.current ? selectedNodeRef.current.id === n.id : false,
                     }));
                     updateNodes(selected);
                     updateEdges(laidOut.edges);
                 }
             });
-    }
+    }, [updateEdges, updateEnvironments, updateFocusNodeId, updateGraph, updateLimited, updateNodes]);
 
-    const retrieveSparklines = (signal?: AbortSignal) => {
+    const retrieveSparklines = useCallback((currentUser: User, signal?: AbortSignal) => {
         let environments: string[] = [];
         let shares: string[] = [];
         if(nodesRef.current) {
@@ -146,7 +144,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             });
         }
 
-        return getMetadataApi(user!).getSparklines({body: {environments: environments, shares: shares}}, { signal })
+        return getMetadataApi(currentUser).getSparklines({body: {environments: environments, shares: shares}}, { signal })
             .then(d => {
                 if(d.sparklines) {
                     let sparkdataIn = new Map<string, Number[]>();
@@ -167,7 +165,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                     updateSparkdata(new Map<string, Number[]>());
                 }
             });
-    }
+    }, [updateSparkdata]);
 
     const renderSidePanel = () => {
         if (!selectedNode) return null;
@@ -188,6 +186,9 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     }, [handleKeyPress]);
 
     useEffect(() => {
+        if (!user) {
+            return;
+        }
         const controller = new AbortController();
         let overviewTimeout: ReturnType<typeof setTimeout>;
         let sparkTimeout: ReturnType<typeof setTimeout>;
@@ -196,7 +197,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         let disposed = false;
 
         const pollOverview = () => {
-            retrieveOverview(controller.signal)
+            retrieveOverview(user, controller.signal)
                 .then(() => { overviewDelay = 5000; })
                 .catch((e) => {
                     if (isAbortError(e)) {
@@ -212,7 +213,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         };
 
         const pollSparklines = () => {
-            retrieveSparklines(controller.signal)
+            retrieveSparklines(user, controller.signal)
                 .then(() => { sparkDelay = 15000; })
                 .catch((e) => {
                     if (isAbortError(e)) {
@@ -228,7 +229,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         };
 
         // initial load: overview first, then sparklines once nodes are populated
-        retrieveOverview(controller.signal)
+        retrieveOverview(user, controller.signal)
             .then(() => { overviewDelay = 5000; })
             .catch((e) => {
                 if (isAbortError(e)) {
@@ -236,7 +237,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                 }
                 overviewDelay = Math.min(overviewDelay * 2, 30000);
             })
-            .then(() => retrieveSparklines(controller.signal)
+            .then(() => retrieveSparklines(user, controller.signal)
                 .then(() => { sparkDelay = 15000; })
                 .catch((e) => {
                     if (isAbortError(e)) {
@@ -257,7 +258,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             clearTimeout(overviewTimeout);
             clearTimeout(sparkTimeout);
         };
-    }, []);
+    }, [retrieveOverview, retrieveSparklines, user]);
 
     return (
         <Box
