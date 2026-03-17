@@ -30,11 +30,11 @@ export function zrokRedirects(routeBasePath: string = 'docs/zrok'): PluginConfig
                 { to: `${p}/how-tos/migrate-v1-to-v2`, from: [`${p}/guides/v2-migration-guide`, `${p}/how-tos/v2-migration-guide`] },
                 { to: `${p}/how-tos/migrate-from-vpn`, from: [`${p}/guides/vpn`, `${p}/how-tos/vpn`] },
                 // concepts/* → concepts/*
-                { to: `${p}/concepts/private`, from: [`${p}/concepts/sharing-private`, `${p}/concepts/shares/private`] },
-                { to: `${p}/concepts/public`, from: [`${p}/concepts/sharing-public`, `${p}/concepts/shares/public`] },
+                { to: `${p}/concepts/private-shares`, from: [`${p}/concepts/private`, `${p}/concepts/sharing-private`, `${p}/concepts/shares/private`] },
+                { to: `${p}/concepts/public-shares`, from: [`${p}/concepts/public`, `${p}/concepts/sharing-public`, `${p}/concepts/shares/public`] },
                 { to: `${p}/concepts/backend-modes/http`, from: [`${p}/concepts/http`, `${p}/concepts/shares/http`] },
                 { to: `${p}/how-tos/share-tcp-udp`, from: [`${p}/concepts/tunnels`, `${p}/concepts/shares/tunnels`] },
-                { to: `${p}/concepts/backend-modes/files`, from: [`${p}/concepts/files`, `${p}/concepts/shares/files`] },
+                { to: `${p}/how-tos/shares/share-websites-and-files`, from: [`${p}/concepts/backend-modes/files`, `${p}/concepts/files`, `${p}/concepts/shares/files`] },
                 { to: `${p}/concepts/namespaces`, from: [`${p}/concepts/sharing-reserved`] },
                 // guides/self-hosting/* → self-hosting/*
                 { to: `${p}/self-hosting/deployment/docker`, from: [`${p}/guides/self-hosting/docker`, `${p}/self-hosting/docker`] },

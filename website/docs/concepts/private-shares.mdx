@@ -2,8 +2,6 @@
 sidebar_position: 0
 ---
 
-import BackendHttp from './_backend_http.mdx'
-
 # Private shares
 
 zrok was built to share and access digital resources. A private share allows a resource to be accessed on another user's
@@ -39,15 +37,19 @@ users and resources.
 
 To create and manage private shares, see [Manage shares with the agent](../how-tos/agent/manage-shares.mdx).
 
-## Private backend modes
+## Backend modes
 
-The default backend mode is `proxy`, which targets an HTTP URL that must be reachable by the backend.
+Private shares support all backend modes. Public shares are limited to HTTP-based modes only. The modes exclusive to
+private shares are:
+
+- `tcpTunnel`: Forwards raw TCP traffic to a target server
+- `udpTunnel`: Forwards raw UDP traffic to a target server
+- `socks`: Provides a SOCKS5 proxy, tunneling TCP traffic to its destination through the share
+
+The default mode is `proxy`, which forwards requests to an HTTP server on your machine:
 
 ```bash title="proxy example"
 zrok2 share private 80
 ```
 
-<BackendHttp/>
-- `tcpTunnel`, `udpTunnel` modes forward the data payload to the target server ([more](../how-tos/share-tcp-udp.mdx))
-- `socks` mode provides a SOCKS5 dynamic proxy on the private access bind port that tunnels TCP payloads to the share
-  backend where they are forwarded to their destinations ([blog](https://blog.openziti.io/the-zrok-socks-backend))
+See [Backend modes](./backend-modes/index.mdx) for the full list.

@@ -10,8 +10,8 @@ The `vpn` backend mode was removed in `v1.1.11` due to dependency conflicts with
 
 If you were using the VPN backend mode, consider these alternatives depending on your use case:
 
-- [Share TCP and UDP services](./share-tcp-udp.mdx): Use `tcpTunnel` to forward a specific TCP or UDP port
-- [Use SOCKS proxy mode](./socks-proxy-mode.mdx): Use `socks` for dynamic forwarding to multiple services
+- [Share TCP and UDP services](./shares/share-tcp-udp.mdx): Use `tcpTunnel` to forward a specific TCP or UDP port
+- [Use SOCKS proxy mode](./shares/socks-proxy-mode.mdx): Use `socks` for dynamic forwarding to multiple services
 
 ## When to use each mode
 
