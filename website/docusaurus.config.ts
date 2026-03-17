@@ -107,7 +107,13 @@ const config: Config = {
                 },
             };
         },
-        zrokDocsPluginConfig(ZROK_ROOT, [{ from: '@zrokdocs', to: `/docs/zrok` }]),
+        zrokDocsPluginConfig(ZROK_ROOT, [
+            { from: '@zrokdocs',       to: '/docs/zrok' },
+            { from: '@selfhosteddocs', to: 'https://netfoundry.io/docs/selfhosted' },
+            { from: '@openzitidocs',   to: 'https://netfoundry.io/docs/openziti' },
+            { from: '@frontdoordocs',  to: 'https://netfoundry.io/docs/frontdoor' },
+            { from: '@zlandocs',       to: 'https://netfoundry.io/docs/zlan' },
+        ]),
         [
             '@docusaurus/plugin-content-pages',
             {
