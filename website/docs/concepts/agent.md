@@ -1,6 +1,6 @@
 ---
 sidebar_label: zrok agent overview
-sidebar_position: 40
+sidebar_position: 3
 ---
 
 # zrok agent overview

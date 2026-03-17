@@ -32,12 +32,12 @@ The `defaultFrontend` configuration option has been replaced with `defaultNamesp
 
 ## Concept mapping: v1 → v2
 
-| v1.x concept | v2.0 equivalent | description |
-|--------------|----------------|-------------|
-| reserved share | reserved name in a namespace | A persistent external name for your share |
-| `zrok reserve` | `zrok2 create name` | Create a reserved name |
-| `zrok share reserved <token>` | `zrok2 share public/private -n <namespaceToken>:<name>` | Share using a name (`-n` selects a name in a namespace) |
-| `zrok release <token>` | `zrok2 delete name <name>` | Remove a reserved name |
+| v1.x command                      | v2.0 equivalent                                                                   | description                              |
+|-----------------------------------|-----------------------------------------------------------------------------------|------------------------------------------|
+| `zrok reserve public <target>`    | `zrok2 create name <name>` + `zrok2 share public <target> -n <namespace>:<name>`  | Create and use a reserved public name    |
+| `zrok share reserved <token>`     | `zrok2 share public <target> -n <namespace>:<name>`                               | Share using a reserved name              |
+| `zrok release <token>`            | `zrok2 delete name <name>`                                                        | Remove a reserved name                   |
+| `zrok reserve private <target>`   | `zrok2 share private <target> --share-token <name>`                               | Create a private share with a fixed token |
 
 ---
 
@@ -306,6 +306,6 @@ If you run into issues during migration:
 3. Use `zrok2 list names` to see your current names
 4. Review the error messages - v2.0 has improved error reporting
 5. Consult the [self-hosting guides](@zrokdocs/category/self-hosting/) if you manage your own instance
-6. Check the [concepts documentation](/concepts/index.md) for deeper understanding
+6. Check the [concepts documentation](/concepts/index.mdx) for deeper understanding
 7. Reach out on the [OpenZiti Discourse](https://openziti.discourse.group) for help
 

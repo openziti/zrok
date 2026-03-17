@@ -1,0 +1,58 @@
+---
+sidebar_label: Share TCP and UDP services
+---
+
+# Share TCP and UDP services
+
+zrok supports sharing raw TCP and UDP network resources using the `tcpTunnel` and `udpTunnel` backend modes. Unlike
+the `proxy` mode, which targets HTTP endpoints, tunnel modes forward the data payload directly to the target address,
+making them suitable for any TCP or UDP service: SSH, databases, custom protocols, and more.
+
+Tunnel shares are private only. There is no public frontend for raw TCP or UDP traffic; access requires another zrok
+user running `zrok2 access private` on their end.
+
+## SSH access to a remote machine
+
+1. On the machine you want to access, create a private share of the SSH port:
+
+    ```bash
+    zrok2 share private --backend-mode tcpTunnel localhost:22
+    ```
+
+    This creates a private share and outputs a share token (e.g., `abc123`).
+
+2. On your local machine, bind the share to a local port:
+
+    ```bash
+    zrok2 access private --bind 127.0.0.1:2222 <share-token>
+    ```
+
+3. Connect via SSH through the tunnel:
+
+    ```bash
+    ssh -p 2222 user@127.0.0.1
+    ```
+
+## Database on a remote server
+
+1. On the remote machine, create a private share of the database port:
+
+    ```bash
+    zrok2 share private --backend-mode tcpTunnel localhost:5432
+    ```
+
+2. On your local machine, bind the share to a local port:
+
+    ```bash
+    zrok2 access private --bind 127.0.0.1:5432 <share-token>
+    ```
+
+3. Connect with your database client:
+
+    ```bash
+    psql -h 127.0.0.1 -p 5432 -U myuser mydatabase
+    ```
+
+## UDP services
+
+For UDP resources, use `--backend-mode udpTunnel` in place of `tcpTunnel`. The steps are the same.
