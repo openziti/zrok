@@ -31,9 +31,9 @@ const TabularView = () => {
     const [combined, setCombined] = useState<Node[]>([]);
 
     useEffect(() => {
-        let outNodes = new Array<Node>();
+        const outNodes = new Array<Node>();
         nodesRef.current.forEach(node => {
-            let outNode = {
+            const outNode = {
                 ...node
             };
             outNode.data.activity = sparkdata.get(node.id);
@@ -44,7 +44,7 @@ const TabularView = () => {
 
     useEffect(() => {
         if(selectedNode) {
-            let selection = {};
+            const selection = {};
             selection[selectedNode.id] = true;
             setRowSelection(selection);
         }
@@ -61,7 +61,7 @@ const TabularView = () => {
     }, [sorting]);
 
     useEffect(() => {
-        let sn = nodes.find(node => Object.keys(rowSelection).includes(node.id));
+        const sn = nodes.find(node => Object.keys(rowSelection).includes(node.id));
         updateSelectedNode(sn ?? null);
         updateNodes(nodes.map(node => (sn && node.id === sn.id) ? { ...node, selected: true } : { ...node, selected: false }));
     }, [rowSelection]);
@@ -75,7 +75,7 @@ const TabularView = () => {
     }
 
     const sparkdataTipFmt = (row: Node): string => {
-        let tip = sparkdataTip(row);
+        const tip = sparkdataTip(row);
         if(tip > 0) {
             return bytesToSize(tip);
         }
@@ -92,7 +92,7 @@ const TabularView = () => {
     }
 
     const sparkdataAverageFmt = (row: Node): string => {
-        let average = sparkdataAverage(row);
+        const average = sparkdataAverage(row);
         if(average > 0) {
             return bytesToSize(average);
         }
@@ -113,8 +113,8 @@ const TabularView = () => {
                 accessorFn: sparkdataTipFmt,
                 header: 'Activity',
                 sortingFn: (rowA, rowB) => {
-                    let tipA = sparkdataTip(rowA.original);
-                    let tipB = sparkdataTip(rowB.original);
+                    const tipA = sparkdataTip(rowA.original);
+                    const tipB = sparkdataTip(rowB.original);
                     return tipA > tipB ? 1 : tipA < tipB ? -1 : 0;
                 },
                 sortDescFirst: true
@@ -123,8 +123,8 @@ const TabularView = () => {
                 accessorFn: sparkdataAverageFmt,
                 header: 'Activity 5m',
                 sortingFn: (rowA, rowB) => {
-                    let avgA = sparkdataAverage(rowA.original);
-                    let avgB = sparkdataAverage(rowB.original);
+                    const avgA = sparkdataAverage(rowA.original);
+                    const avgB = sparkdataAverage(rowB.original);
                     return avgA > avgB ? 1 : avgA < avgB ? -1 : 0;
                 },
                 sortDescFirst: true

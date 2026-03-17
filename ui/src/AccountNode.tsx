@@ -18,7 +18,7 @@ const AccountNode = ({ data }: NodeProps<Node<AccountNodeData>>) => {
     );
 
     useEffect(() => {
-        let s = new Array<number>(31);
+        const s = new Array<number>(31);
         if(environments) {
             environments.forEach(env => {
                 if(env.activity) {

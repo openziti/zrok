@@ -59,8 +59,8 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         if(newFocusId) {
             graphToLayout = focusGraph(graph, newFocusId);
         }
-        let laidOut = layout(graphToLayout.nodes, graphToLayout.edges);
-        let selected = laidOut.nodes.map((n) => ({
+        const laidOut = layout(graphToLayout.nodes, graphToLayout.edges);
+        const selected = laidOut.nodes.map((n) => ({
             ...n,
             selected: selectedNodeRef.current ? selectedNodeRef.current.id === n.id : false,
         }));
@@ -73,7 +73,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             setVisualizerEnabled(!visualizerRef.current);
             return;
         }
-        let tag = (event.target as HTMLElement)?.tagName?.toLowerCase();
+        const tag = (event.target as HTMLElement)?.tagName?.toLowerCase();
         if(tag === "input" || tag === "textarea") return;
         if(event.key === 'f') {
             if(focusNodeIdRef.current) {
@@ -105,7 +105,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             })
             .then(d => {
                 updateLimited(d.accountLimited!);
-                let newVov = mergeGraph(oldGraph.current, currentUser, d.accountLimited!, d);
+                const newVov = mergeGraph(oldGraph.current, currentUser, d.accountLimited!, d);
                 if(!nodesEqual(oldGraph.current.nodes, newVov.nodes)) {
                     updateGraph(newVov);
                     oldGraph.current = newVov;
@@ -119,8 +119,8 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                         }
                     }
 
-                    let laidOut = layout(graphToLayout.nodes, graphToLayout.edges);
-                    let selected = laidOut.nodes.map((n) => ({
+                    const laidOut = layout(graphToLayout.nodes, graphToLayout.edges);
+                    const selected = laidOut.nodes.map((n) => ({
                         ...n,
                         selected: selectedNodeRef.current ? selectedNodeRef.current.id === n.id : false,
                     }));
@@ -131,8 +131,8 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     }, [updateEdges, updateEnvironments, updateFocusNodeId, updateGraph, updateLimited, updateNodes]);
 
     const retrieveSparklines = useCallback((currentUser: User, signal?: AbortSignal) => {
-        let environments: string[] = [];
-        let shares: string[] = [];
+        const environments: string[] = [];
+        const shares: string[] = [];
         if(nodesRef.current) {
             nodesRef.current.map(node => {
                 if(node.type === "environment") {
@@ -147,9 +147,9 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         return getMetadataApi(currentUser).getSparklines({body: {environments: environments, shares: shares}}, { signal })
             .then(d => {
                 if(d.sparklines) {
-                    let sparkdataIn = new Map<string, Number[]>();
+                    const sparkdataIn = new Map<string, Number[]>();
                     d.sparklines!.forEach(s => {
-                        let activity = new Array<Number>(31);
+                        const activity = new Array<Number>(31);
                         if(s.samples) {
                             s.samples?.forEach((sample, i) => {
                                 let v = 0;

@@ -16,7 +16,7 @@ export const objectToRows = (obj: Record<string, unknown> | null | undefined): P
     if (!obj) {
         return [];
     }
-    let rows: PropertyRow[] = [];
+    const rows: PropertyRow[] = [];
     let count = 0;
     for(const key in obj) {
         rows.push({
@@ -42,7 +42,7 @@ export const bytesToSize = (bytes: number): string => {
 }
 
 export const buildMetrics = (m: Metrics): MetricsResult => {
-    let metrics: MetricsResult = {
+    const metrics: MetricsResult = {
         data: m.samples,
         rx: 0,
         tx: 0

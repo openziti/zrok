@@ -39,9 +39,9 @@ export interface AccessNodeData {
 }
 
 export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Overview): Graph => {
-    let newVov = new Graph();
+    const newVov = new Graph();
 
-    let accountNode = {
+    const accountNode = {
         id: u.email,
         data: {
             label: u.email,
@@ -54,10 +54,10 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
     newVov.edges = [];
 
     if(newOv) {
-        let allShares = {};
-        let allFrontends = [];
+        const allShares = {};
+        const allFrontends = [];
         newOv.environments?.forEach(env => {
-            let envNode = {
+            const envNode = {
                 id: env.environment?.zId!,
                 data: {
                     label: env.environment?.description,
@@ -82,7 +82,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                     if(shr.target) {
                         shrLabel = shr.target!;
                     }
-                    let shrNode = {
+                    const shrNode = {
                         id: shr.shareToken!,
                         data: {
                             label: shrLabel,
@@ -107,7 +107,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
             if(env.frontends) {
                 envNode.data.empty = false;
                 env.frontends.forEach(fe => {
-                    let feNode = {
+                    const feNode = {
                         id: fe.frontendToken!,
                         data: {
                             label: fe.bindAddress ? fe.bindAddress : fe.frontendToken!,
@@ -132,11 +132,11 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
             }
         });
         allFrontends.forEach(fe => {
-            let target = allShares[fe.data.target];
+            const target = allShares[fe.data.target];
             if(target) {
                 target.data.accessed = true;
                 fe.data.ownedShare = true;
-                let edge: Edge = {
+                const edge: Edge = {
                     id: target.id + "-" + fe.id,
                     source: fe.id!,
                     sourceHandle: "share",
@@ -210,33 +210,33 @@ export const nodesEqual = (a: Node[], b: Node[]) => {
 }
 
 export const focusGraph = (graph: Graph, focusNodeId: string): Graph => {
-    let nodeMap = new Map<string, Node>();
-    for(let n of graph.nodes) {
+    const nodeMap = new Map<string, Node>();
+    for(const n of graph.nodes) {
         nodeMap.set(n.id, n);
     }
 
-    let parentOf = new Map<string, string>();
-    for(let e of graph.edges) {
+    const parentOf = new Map<string, string>();
+    for(const e of graph.edges) {
         if(e.type === "hierarchy") {
             parentOf.set(e.target, e.source);
         }
     }
 
-    let childrenOf = new Map<string, string[]>();
-    for(let e of graph.edges) {
+    const childrenOf = new Map<string, string[]>();
+    for(const e of graph.edges) {
         if(e.type === "hierarchy") {
-            let list = childrenOf.get(e.source) || [];
+            const list = childrenOf.get(e.source) || [];
             list.push(e.target);
             childrenOf.set(e.source, list);
         }
     }
 
-    let focusNode = nodeMap.get(focusNodeId);
+    const focusNode = nodeMap.get(focusNodeId);
     if(!focusNode) return graph;
 
-    let included = new Set<string>();
+    const included = new Set<string>();
 
-    let addWithParents = (id: string) => {
+    const addWithParents = (id: string) => {
         let cur = id;
         while(cur) {
             included.add(cur);
@@ -248,12 +248,12 @@ export const focusGraph = (graph: Graph, focusNodeId: string): Graph => {
         return graph;
     } else if(focusNode.type === "environment") {
         addWithParents(focusNodeId);
-        let children = childrenOf.get(focusNodeId) || [];
-        for(let childId of children) {
+        const children = childrenOf.get(focusNodeId) || [];
+        for(const childId of children) {
             included.add(childId);
-            let child = nodeMap.get(childId);
+            const child = nodeMap.get(childId);
             if(child?.type === "access") {
-                for(let e of graph.edges) {
+                for(const e of graph.edges) {
                     if(e.type === "access" && e.source === childId) {
                         included.add(e.target);
                         addWithParents(e.target);
@@ -263,7 +263,7 @@ export const focusGraph = (graph: Graph, focusNodeId: string): Graph => {
         }
     } else if(focusNode.type === "share") {
         addWithParents(focusNodeId);
-        for(let e of graph.edges) {
+        for(const e of graph.edges) {
             if(e.type === "access" && e.target === focusNodeId) {
                 included.add(e.source);
                 addWithParents(e.source);
@@ -271,7 +271,7 @@ export const focusGraph = (graph: Graph, focusNodeId: string): Graph => {
         }
     } else if(focusNode.type === "access") {
         addWithParents(focusNodeId);
-        for(let e of graph.edges) {
+        for(const e of graph.edges) {
             if(e.type === "access" && e.source === focusNodeId) {
                 included.add(e.target);
                 addWithParents(e.target);
@@ -279,7 +279,7 @@ export const focusGraph = (graph: Graph, focusNodeId: string): Graph => {
         }
     }
 
-    let out = new Graph();
+    const out = new Graph();
     out.nodes = graph.nodes.filter(n => included.has(n.id));
     out.edges = graph.edges.filter(e => included.has(e.source) && included.has(e.target));
     return out;
