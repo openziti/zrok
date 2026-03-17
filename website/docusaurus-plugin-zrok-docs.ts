@@ -21,7 +21,7 @@ export function zrokRedirects(routeBasePath: string = 'docs/zrok'): PluginConfig
                 { to: `${p}/how-tos/agent/run-docker-agent`, from: [`${p}/guides/docker-share/`, `${p}/how-tos/docker-share/`, `${p}/how-tos/docker-agent/`, `${p}/how-tos/agent/docker-agent`] },
                 { to: `${p}/how-tos/agent/run-docker-agent`, from: [`${p}/guides/docker-share/docker_private_share_guide`, `${p}/how-tos/docker-share/private-share`] },
                 { to: `${p}/how-tos/agent/run-docker-agent`, from: [`${p}/guides/docker-share/docker_public_share_guide`, `${p}/how-tos/docker-share/public-share`] },
-                { to: `${p}/how-tos/share-sync-drives`, from: [`${p}/guides/drives`, `${p}/how-tos/drives`] },
+                { to: `${p}/how-tos/shares/share-sync-drives`, from: [`${p}/how-tos/share-sync-drives`, `${p}/guides/drives`, `${p}/how-tos/drives`] },
                 { to: `${p}/how-tos/install/`, from: [`${p}/guides/install/`] },
                 { to: `${p}/how-tos/install/linux`, from: [`${p}/guides/install/linux`] },
                 { to: `${p}/how-tos/install/macos`, from: [`${p}/guides/install/macos`] },
@@ -33,7 +33,7 @@ export function zrokRedirects(routeBasePath: string = 'docs/zrok'): PluginConfig
                 { to: `${p}/concepts/private-shares`, from: [`${p}/concepts/private`, `${p}/concepts/sharing-private`, `${p}/concepts/shares/private`] },
                 { to: `${p}/concepts/public-shares`, from: [`${p}/concepts/public`, `${p}/concepts/sharing-public`, `${p}/concepts/shares/public`] },
                 { to: `${p}/concepts/backend-modes/http`, from: [`${p}/concepts/http`, `${p}/concepts/shares/http`] },
-                { to: `${p}/how-tos/share-tcp-udp`, from: [`${p}/concepts/tunnels`, `${p}/concepts/shares/tunnels`] },
+                { to: `${p}/how-tos/shares/share-tcp-udp`, from: [`${p}/how-tos/share-tcp-udp`, `${p}/concepts/tunnels`, `${p}/concepts/shares/tunnels`] },
                 { to: `${p}/how-tos/shares/share-websites-and-files`, from: [`${p}/concepts/backend-modes/files`, `${p}/concepts/files`, `${p}/concepts/shares/files`] },
                 { to: `${p}/concepts/namespaces`, from: [`${p}/concepts/sharing-reserved`] },
                 // guides/self-hosting/* → self-hosting/*
