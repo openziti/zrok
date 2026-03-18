@@ -26,4 +26,4 @@ backend mode, so you don't need to specify `--backend-mode` unless you're switch
     zrok2 share public --headless 8080
     ```
 
-To create public shares with the agent, see [Manage shares with the agent](../../how-tos/agent/manage-shares.mdx).
+To create public shares with the agent, see [Manage shares with the agent](@zrokdocs/how-tos/agent/manage-shares).
