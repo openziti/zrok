@@ -35,7 +35,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api/v2': {
-        target: 'https://api-v2.zrok.io',
+        target: 'http://localhost:18080',
         changeOrigin: true,
       }
     },
