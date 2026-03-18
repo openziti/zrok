@@ -1,9 +1,11 @@
-import {Box, Button, Container, TextField, Typography} from "@mui/material";
+import {Box, Button, CircularProgress, Container, TextField, Typography} from "@mui/material";
 import {User} from "./model/user.ts";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {AccountApi, MetadataApi} from "./api";
 import {Link} from "react-router";
 import zroket from "./assets/zrok-1.0.0-rocket-purple.svg";
+import {sanitizeHtml} from "./model/html.ts";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface LoginProps {
     onLogin: (user: User) => void;
@@ -13,13 +15,14 @@ const Login = ({ onLogin }: LoginProps) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
     const [tou, setTou] = useState<string>("");
     const [newAccountLink, setNewAccountLink] = useState<string>("");
 
     useEffect(() => {
-        new MetadataApi()._configuration()
+        const controller = new AbortController();
+        new MetadataApi()._configuration({ signal: controller.signal })
             .then(d => {
-                console.log("d", d);
                 if(d.touLink && d.touLink.trim() !== "") {
                     setTou(d.touLink);
                 }
@@ -27,21 +30,22 @@ const Login = ({ onLogin }: LoginProps) => {
                     setNewAccountLink(d.newAccountLink)
                 }
             })
-            .catch(e => {
-                console.log(e);
-            });
+            .catch(() => {});
+        return () => controller.abort();
     }, []);
 
-    const login = async e => {
+    const login = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        setLoading(true);
         new AccountApi().login({body: {"email": email, "password": password}})
             .then(d => {
                 onLogin({email: email, token: d.toString()});
             })
-            .catch(e => {
-                console.log(e);
-                setMessage("login failed!")
+            .catch(async (e) => {
+                const msg = await extractErrorMessage(e, "login failed");
+                setMessage(msg);
+                setLoading(false);
             });
     }
 
@@ -49,8 +53,8 @@ const Login = ({ onLogin }: LoginProps) => {
         <Typography component="div">
             <Container maxWidth="xs">
                 <Box sx={{marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
-                    <img src={zroket} height="300"/>
-                    <h1 style={{ color: "#241775" }}>z r o k</h1>
+                    <img src={zroket} height="300" alt="zrok logo"/>
+                    <Box component="h1" sx={{ color: 'primary.main' }}>z r o k</Box>
                     <Box component="form" noValidate onSubmit={login}>
                         <TextField
                             margin="normal"
@@ -82,20 +86,20 @@ const Login = ({ onLogin }: LoginProps) => {
                                 setPassword(v.target.value)
                             }}
                         />
-                        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} style={{ color: "#9bf316" }}>
-                            Log In
+                        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2, color: 'secondary.main' }} disabled={loading}>
+                            {loading ? <CircularProgress size={24} sx={{ color: 'secondary.main' }} /> : "Log In"}
                         </Button>
-                        <Box component="div" style={{ textAlign: "center" }}>
-                            <Box component="h3" style={{ color: "red" }}>{message}</Box>
+                        <Box component="div" sx={{ textAlign: "center" }}>
+                            <Box component="h3" sx={{ color: 'error.main' }}>{message}</Box>
                         </Box>
-                        <Box component="div" style={{ textAlign: "center" }}>
+                        <Box component="div" sx={{ textAlign: "center" }}>
                             <Link to="/forgotPassword">Forgot Password?</Link>
                         </Box>
-                        <Box component="div" style={{ textAlign: "center" }}>
-                            <div dangerouslySetInnerHTML={{__html: newAccountLink}}></div>
+                        <Box component="div" sx={{ textAlign: "center" }}>
+                            <div dangerouslySetInnerHTML={{__html: sanitizeHtml(newAccountLink)}}></div>
                         </Box>
-                        <Box component="div" style={{ textAlign: "center" }}>
-                            <div dangerouslySetInnerHTML={{__html: tou}}></div>
+                        <Box component="div" sx={{ textAlign: "center" }}>
+                            <div dangerouslySetInnerHTML={{__html: sanitizeHtml(tou)}}></div>
                         </Box>
                     </Box>
                 </Box>

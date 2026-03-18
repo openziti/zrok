@@ -5,6 +5,7 @@ import {modalStyle} from "./styling/theme.ts";
 import {User} from "./model/user.ts";
 import {Node} from "@xyflow/react";
 import {getEnvironmentApi} from "./model/api.ts";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface ReleaseEnvironmentProps {
     close: () => void;
@@ -46,11 +47,9 @@ const ReleaseEnvironmentModal = ({ close, isOpen, user, environment, detail }: R
                 .then(() => {
                     close();
                 })
-                .catch(e => {
-                    e.response.json().then(ex => {
-                        console.log("releaseEnvironment", ex.message);
-                    });
-                    setErrorMessage(<Typography color="red">An error occurred releasing your environment <code>{environment.id}</code>!</Typography>);
+                .catch(async (e) => {
+                    const msg = await extractErrorMessage(e, "an error occurred releasing your environment");
+                    setErrorMessage(<Typography color="red">{msg}</Typography>);
                     setTimeout(() => {
                         setErrorMessage(null);
                         setChecked(false);
@@ -60,10 +59,10 @@ const ReleaseEnvironmentModal = ({ close, isOpen, user, environment, detail }: R
     }
 
     return (
-        <Modal open={isOpen} onClose={close}>
+        <Modal open={isOpen} onClose={close} aria-labelledby="modal-title-release-environment">
             <Box sx={{ ...modalStyle }}>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Typography variant="h5"><strong>Release Environment</strong></Typography>
+                    <Typography variant="h5" id="modal-title-release-environment"><strong>Release Environment</strong></Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography variant="body1">Would you like to release the environment <code>{description}</code> ?</Typography>

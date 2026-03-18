@@ -5,6 +5,7 @@
 .contexts
 CLAUDE.md
 /.claude/
+AGENTS.md
 *.db
 /automated-release-build/
 etc/dev*
