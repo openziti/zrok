@@ -7,6 +7,8 @@ package share
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -23,7 +25,7 @@ type CreateShareNameReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *CreateShareNameReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *CreateShareNameReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 201:
 		result := NewCreateShareNameCreated()
@@ -104,11 +106,11 @@ func (o *CreateShareNameCreated) Code() int {
 }
 
 func (o *CreateShareNameCreated) Error() string {
-	return fmt.Sprintf("[POST /share/name][%d] createShareNameCreated ", 201)
+	return fmt.Sprintf("[POST /share/name][%d] createShareNameCreated", 201)
 }
 
 func (o *CreateShareNameCreated) String() string {
-	return fmt.Sprintf("[POST /share/name][%d] createShareNameCreated ", 201)
+	return fmt.Sprintf("[POST /share/name][%d] createShareNameCreated", 201)
 }
 
 func (o *CreateShareNameCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -160,11 +162,11 @@ func (o *CreateShareNameUnauthorized) Code() int {
 }
 
 func (o *CreateShareNameUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /share/name][%d] createShareNameUnauthorized ", 401)
+	return fmt.Sprintf("[POST /share/name][%d] createShareNameUnauthorized", 401)
 }
 
 func (o *CreateShareNameUnauthorized) String() string {
-	return fmt.Sprintf("[POST /share/name][%d] createShareNameUnauthorized ", 401)
+	return fmt.Sprintf("[POST /share/name][%d] createShareNameUnauthorized", 401)
 }
 
 func (o *CreateShareNameUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -216,11 +218,11 @@ func (o *CreateShareNameNotFound) Code() int {
 }
 
 func (o *CreateShareNameNotFound) Error() string {
-	return fmt.Sprintf("[POST /share/name][%d] createShareNameNotFound ", 404)
+	return fmt.Sprintf("[POST /share/name][%d] createShareNameNotFound", 404)
 }
 
 func (o *CreateShareNameNotFound) String() string {
-	return fmt.Sprintf("[POST /share/name][%d] createShareNameNotFound ", 404)
+	return fmt.Sprintf("[POST /share/name][%d] createShareNameNotFound", 404)
 }
 
 func (o *CreateShareNameNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -273,11 +275,13 @@ func (o *CreateShareNameConflict) Code() int {
 }
 
 func (o *CreateShareNameConflict) Error() string {
-	return fmt.Sprintf("[POST /share/name][%d] createShareNameConflict  %+v", 409, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /share/name][%d] createShareNameConflict %s", 409, payload)
 }
 
 func (o *CreateShareNameConflict) String() string {
-	return fmt.Sprintf("[POST /share/name][%d] createShareNameConflict  %+v", 409, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /share/name][%d] createShareNameConflict %s", 409, payload)
 }
 
 func (o *CreateShareNameConflict) GetPayload() rest_model_zrok.ErrorMessage {
@@ -287,7 +291,7 @@ func (o *CreateShareNameConflict) GetPayload() rest_model_zrok.ErrorMessage {
 func (o *CreateShareNameConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -338,11 +342,11 @@ func (o *CreateShareNameInternalServerError) Code() int {
 }
 
 func (o *CreateShareNameInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /share/name][%d] createShareNameInternalServerError ", 500)
+	return fmt.Sprintf("[POST /share/name][%d] createShareNameInternalServerError", 500)
 }
 
 func (o *CreateShareNameInternalServerError) String() string {
-	return fmt.Sprintf("[POST /share/name][%d] createShareNameInternalServerError ", 500)
+	return fmt.Sprintf("[POST /share/name][%d] createShareNameInternalServerError", 500)
 }
 
 func (o *CreateShareNameInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -27,7 +27,6 @@ func NewGetAccountMetricsParams() GetAccountMetricsParams {
 //
 // swagger:parameters getAccountMetrics
 type GetAccountMetricsParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -45,7 +44,6 @@ func (o *GetAccountMetricsParams) BindRequest(r *http.Request, route *middleware
 	var res []error
 
 	o.HTTPRequest = r
-
 	qs := runtime.Values(r.URL.Query())
 
 	qDuration, qhkDuration, _ := qs.GetOK("duration")

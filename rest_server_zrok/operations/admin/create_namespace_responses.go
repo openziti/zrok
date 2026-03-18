@@ -76,7 +76,7 @@ func NewCreateNamespaceUnauthorized() *CreateNamespaceUnauthorized {
 // WriteResponse to the client
 func (o *CreateNamespaceUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -101,7 +101,7 @@ func NewCreateNamespaceConflict() *CreateNamespaceConflict {
 // WriteResponse to the client
 func (o *CreateNamespaceConflict) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(409)
 }
@@ -126,7 +126,7 @@ func NewCreateNamespaceInternalServerError() *CreateNamespaceInternalServerError
 // WriteResponse to the client
 func (o *CreateNamespaceInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

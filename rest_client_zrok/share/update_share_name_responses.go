@@ -7,6 +7,8 @@ package share
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -23,7 +25,7 @@ type UpdateShareNameReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *UpdateShareNameReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *UpdateShareNameReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewUpdateShareNameOK()
@@ -104,11 +106,11 @@ func (o *UpdateShareNameOK) Code() int {
 }
 
 func (o *UpdateShareNameOK) Error() string {
-	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameOK ", 200)
+	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameOK", 200)
 }
 
 func (o *UpdateShareNameOK) String() string {
-	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameOK ", 200)
+	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameOK", 200)
 }
 
 func (o *UpdateShareNameOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -160,11 +162,11 @@ func (o *UpdateShareNameUnauthorized) Code() int {
 }
 
 func (o *UpdateShareNameUnauthorized) Error() string {
-	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameUnauthorized ", 401)
+	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameUnauthorized", 401)
 }
 
 func (o *UpdateShareNameUnauthorized) String() string {
-	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameUnauthorized ", 401)
+	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameUnauthorized", 401)
 }
 
 func (o *UpdateShareNameUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -216,11 +218,11 @@ func (o *UpdateShareNameNotFound) Code() int {
 }
 
 func (o *UpdateShareNameNotFound) Error() string {
-	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameNotFound ", 404)
+	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameNotFound", 404)
 }
 
 func (o *UpdateShareNameNotFound) String() string {
-	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameNotFound ", 404)
+	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameNotFound", 404)
 }
 
 func (o *UpdateShareNameNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -273,11 +275,13 @@ func (o *UpdateShareNameConflict) Code() int {
 }
 
 func (o *UpdateShareNameConflict) Error() string {
-	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameConflict  %+v", 409, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameConflict %s", 409, payload)
 }
 
 func (o *UpdateShareNameConflict) String() string {
-	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameConflict  %+v", 409, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameConflict %s", 409, payload)
 }
 
 func (o *UpdateShareNameConflict) GetPayload() rest_model_zrok.ErrorMessage {
@@ -287,7 +291,7 @@ func (o *UpdateShareNameConflict) GetPayload() rest_model_zrok.ErrorMessage {
 func (o *UpdateShareNameConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -338,11 +342,11 @@ func (o *UpdateShareNameInternalServerError) Code() int {
 }
 
 func (o *UpdateShareNameInternalServerError) Error() string {
-	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameInternalServerError ", 500)
+	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameInternalServerError", 500)
 }
 
 func (o *UpdateShareNameInternalServerError) String() string {
-	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameInternalServerError ", 500)
+	return fmt.Sprintf("[PATCH /share/name][%d] updateShareNameInternalServerError", 500)
 }
 
 func (o *UpdateShareNameInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

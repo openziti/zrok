@@ -6,6 +6,8 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type ListEnvironmentsReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *ListEnvironmentsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *ListEnvironmentsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewListEnvironmentsOK()
@@ -97,11 +99,13 @@ func (o *ListEnvironmentsOK) Code() int {
 }
 
 func (o *ListEnvironmentsOK) Error() string {
-	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsOK %s", 200, payload)
 }
 
 func (o *ListEnvironmentsOK) String() string {
-	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsOK %s", 200, payload)
 }
 
 func (o *ListEnvironmentsOK) GetPayload() *rest_model_zrok.EnvironmentsList {
@@ -113,7 +117,7 @@ func (o *ListEnvironmentsOK) readResponse(response runtime.ClientResponse, consu
 	o.Payload = new(rest_model_zrok.EnvironmentsList)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -165,11 +169,13 @@ func (o *ListEnvironmentsBadRequest) Code() int {
 }
 
 func (o *ListEnvironmentsBadRequest) Error() string {
-	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsBadRequest %s", 400, payload)
 }
 
 func (o *ListEnvironmentsBadRequest) String() string {
-	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsBadRequest  %+v", 400, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsBadRequest %s", 400, payload)
 }
 
 func (o *ListEnvironmentsBadRequest) GetPayload() rest_model_zrok.ErrorMessage {
@@ -179,7 +185,7 @@ func (o *ListEnvironmentsBadRequest) GetPayload() rest_model_zrok.ErrorMessage {
 func (o *ListEnvironmentsBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -230,11 +236,11 @@ func (o *ListEnvironmentsUnauthorized) Code() int {
 }
 
 func (o *ListEnvironmentsUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsUnauthorized ", 401)
+	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsUnauthorized", 401)
 }
 
 func (o *ListEnvironmentsUnauthorized) String() string {
-	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsUnauthorized ", 401)
+	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsUnauthorized", 401)
 }
 
 func (o *ListEnvironmentsUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -287,11 +293,13 @@ func (o *ListEnvironmentsInternalServerError) Code() int {
 }
 
 func (o *ListEnvironmentsInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsInternalServerError  %+v", 500, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsInternalServerError %s", 500, payload)
 }
 
 func (o *ListEnvironmentsInternalServerError) String() string {
-	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsInternalServerError  %+v", 500, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /environments][%d] listEnvironmentsInternalServerError %s", 500, payload)
 }
 
 func (o *ListEnvironmentsInternalServerError) GetPayload() rest_model_zrok.ErrorMessage {
@@ -301,7 +309,7 @@ func (o *ListEnvironmentsInternalServerError) GetPayload() rest_model_zrok.Error
 func (o *ListEnvironmentsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 

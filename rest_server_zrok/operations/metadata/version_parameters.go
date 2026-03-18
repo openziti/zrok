@@ -25,7 +25,6 @@ func NewVersionParams() VersionParams {
 //
 // swagger:parameters version
 type VersionParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 }

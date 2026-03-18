@@ -7,6 +7,8 @@ package agent
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type ShareHTTPHealthcheckReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *ShareHTTPHealthcheckReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *ShareHTTPHealthcheckReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewShareHTTPHealthcheckOK()
@@ -97,11 +99,13 @@ func (o *ShareHTTPHealthcheckOK) Code() int {
 }
 
 func (o *ShareHTTPHealthcheckOK) Error() string {
-	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckOK %s", 200, payload)
 }
 
 func (o *ShareHTTPHealthcheckOK) String() string {
-	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckOK %s", 200, payload)
 }
 
 func (o *ShareHTTPHealthcheckOK) GetPayload() *ShareHTTPHealthcheckOKBody {
@@ -113,7 +117,7 @@ func (o *ShareHTTPHealthcheckOK) readResponse(response runtime.ClientResponse, c
 	o.Payload = new(ShareHTTPHealthcheckOKBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -164,11 +168,11 @@ func (o *ShareHTTPHealthcheckUnauthorized) Code() int {
 }
 
 func (o *ShareHTTPHealthcheckUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckUnauthorized ", 401)
+	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckUnauthorized", 401)
 }
 
 func (o *ShareHTTPHealthcheckUnauthorized) String() string {
-	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckUnauthorized ", 401)
+	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckUnauthorized", 401)
 }
 
 func (o *ShareHTTPHealthcheckUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -220,11 +224,11 @@ func (o *ShareHTTPHealthcheckInternalServerError) Code() int {
 }
 
 func (o *ShareHTTPHealthcheckInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckInternalServerError ", 500)
+	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckInternalServerError", 500)
 }
 
 func (o *ShareHTTPHealthcheckInternalServerError) String() string {
-	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckInternalServerError ", 500)
+	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckInternalServerError", 500)
 }
 
 func (o *ShareHTTPHealthcheckInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -276,11 +280,11 @@ func (o *ShareHTTPHealthcheckBadGateway) Code() int {
 }
 
 func (o *ShareHTTPHealthcheckBadGateway) Error() string {
-	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckBadGateway ", 502)
+	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckBadGateway", 502)
 }
 
 func (o *ShareHTTPHealthcheckBadGateway) String() string {
-	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckBadGateway ", 502)
+	return fmt.Sprintf("[POST /agent/share/http-healthcheck][%d] shareHttpHealthcheckBadGateway", 502)
 }
 
 func (o *ShareHTTPHealthcheckBadGateway) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

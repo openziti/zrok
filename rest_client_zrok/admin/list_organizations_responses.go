@@ -7,6 +7,8 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -23,7 +25,7 @@ type ListOrganizationsReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *ListOrganizationsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *ListOrganizationsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewListOrganizationsOK()
@@ -93,11 +95,13 @@ func (o *ListOrganizationsOK) Code() int {
 }
 
 func (o *ListOrganizationsOK) Error() string {
-	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsOK %s", 200, payload)
 }
 
 func (o *ListOrganizationsOK) String() string {
-	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsOK %s", 200, payload)
 }
 
 func (o *ListOrganizationsOK) GetPayload() *ListOrganizationsOKBody {
@@ -109,7 +113,7 @@ func (o *ListOrganizationsOK) readResponse(response runtime.ClientResponse, cons
 	o.Payload = new(ListOrganizationsOKBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -160,11 +164,11 @@ func (o *ListOrganizationsUnauthorized) Code() int {
 }
 
 func (o *ListOrganizationsUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsUnauthorized ", 401)
+	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsUnauthorized", 401)
 }
 
 func (o *ListOrganizationsUnauthorized) String() string {
-	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsUnauthorized ", 401)
+	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsUnauthorized", 401)
 }
 
 func (o *ListOrganizationsUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -216,11 +220,11 @@ func (o *ListOrganizationsInternalServerError) Code() int {
 }
 
 func (o *ListOrganizationsInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsInternalServerError", 500)
 }
 
 func (o *ListOrganizationsInternalServerError) String() string {
-	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /organizations][%d] listOrganizationsInternalServerError", 500)
 }
 
 func (o *ListOrganizationsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -264,11 +268,15 @@ func (o *ListOrganizationsOKBody) validateOrganizations(formats strfmt.Registry)
 
 		if o.Organizations[i] != nil {
 			if err := o.Organizations[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("listOrganizationsOK" + "." + "organizations" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("listOrganizationsOK" + "." + "organizations" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -303,11 +311,15 @@ func (o *ListOrganizationsOKBody) contextValidateOrganizations(ctx context.Conte
 			}
 
 			if err := o.Organizations[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("listOrganizationsOK" + "." + "organizations" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("listOrganizationsOK" + "." + "organizations" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
