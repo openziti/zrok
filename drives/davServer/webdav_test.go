@@ -95,7 +95,7 @@ func TestPrefix(t *testing.T) {
 
 		wantA := map[string]int{
 			"/":       http.StatusCreated,
-			"/a/":     http.StatusMovedPermanently,
+			"/a/":     http.StatusTemporaryRedirect,
 			"/a/b/":   http.StatusNotFound,
 			"/a/b/c/": http.StatusNotFound,
 		}[prefix]
@@ -107,7 +107,7 @@ func TestPrefix(t *testing.T) {
 		wantB := map[string]int{
 			"/":       http.StatusCreated,
 			"/a/":     http.StatusCreated,
-			"/a/b/":   http.StatusMovedPermanently,
+			"/a/b/":   http.StatusTemporaryRedirect,
 			"/a/b/c/": http.StatusNotFound,
 		}[prefix]
 		if _, err := do("MKCOL", srv.URL+"/a/b", "", wantB); err != nil {
@@ -119,7 +119,7 @@ func TestPrefix(t *testing.T) {
 			"/":       http.StatusCreated,
 			"/a/":     http.StatusCreated,
 			"/a/b/":   http.StatusCreated,
-			"/a/b/c/": http.StatusMovedPermanently,
+			"/a/b/c/": http.StatusTemporaryRedirect,
 		}[prefix]
 		if _, err := do("PUT", srv.URL+"/a/b/c", blah, wantC); err != nil {
 			t.Errorf("prefix=%-9q PUT /a/b/c: %v", prefix, err)
@@ -130,7 +130,7 @@ func TestPrefix(t *testing.T) {
 			"/":       http.StatusCreated,
 			"/a/":     http.StatusCreated,
 			"/a/b/":   http.StatusCreated,
-			"/a/b/c/": http.StatusMovedPermanently,
+			"/a/b/c/": http.StatusTemporaryRedirect,
 		}[prefix]
 		if _, err := do("COPY", srv.URL+"/a/b/c", "", wantD, dst, srv.URL+"/a/b/d"); err != nil {
 			t.Errorf("prefix=%-9q COPY /a/b/c /a/b/d: %v", prefix, err)
