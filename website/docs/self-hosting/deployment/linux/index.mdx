@@ -247,10 +247,10 @@ sudo systemctl enable --now zrok2-controller
 
 ### Step 6: Create a dynamic frontend
 
-With `ZROK2_ADMIN_TOKEN` and `ZROK2_API_ENDPOINT` set, create a dynamic frontend:
+With `ZROK2_ADMIN_TOKEN` and `ZROK2_API_ENDPOINT` set, create a dynamic frontend. Use the Ziti ID of the `public` identity created by `zrok2 admin bootstrap` (shown in its output):
 
 ```bash
-zrok2 admin create frontend --dynamic public "https://{token}.zrok.example.com"
+zrok2 admin create frontend --dynamic <public-ziti-id> public
 ```
 
 This outputs a frontend token (e.g., `zEjQqHliYXF6`). Save it — you'll need it for the frontend configuration and namespace mapping.

@@ -113,7 +113,13 @@ teardown() {
 }
 
 cleanup_on_exit() {
+    local _real_exit=$?
     set +o errexit
+    # Catch nounset/syntax errors that bypass the ERR trap.
+    if (( _real_exit != 0 && _exit_code == 0 )); then
+        _exit_code="${_real_exit}"
+        _fail_summary="exited with status ${_real_exit} (may be nounset or syntax error)"
+    fi
     if (( KEEP )); then
         log_info "keeping stack (--keep); run with --only-clean to tear down"
     else
@@ -266,3 +272,70 @@ _version=$(curl -sf -H "${ZROK2_ACCEPT}" \
 log_pass "API responded: controllerVersion=${_version}"
 
 log_pass "stack verified — ZROK2_API_ENDPOINT=${ZROK2_API_ENDPOINT} ZROK2_ADMIN_TOKEN=${ZROK2_ADMIN_TOKEN}"
+
+# ============================================================
+# Phase 4: Canary looper (exercise shares through the public frontend)
+# ============================================================
+
+log_section "Phase 4: Canary public-proxy looper"
+
+# Create a test account and enable an environment inside the controller container.
+# The canary runs inside the container where the zrok2 binary and Ziti overlay are available.
+_canary_token=$(docker compose -f "${COMPOSE_PROJECT_DIR}/compose.yml" \
+    exec -T -e ZROK2_ADMIN_TOKEN="${ZROK2_ADMIN_TOKEN}" \
+    zrok2-controller zrok2 admin create account \
+    "canary-$(date +%s)@zrok.internal" "canarypass" 2>/dev/null)
+
+if [[ -n "${_canary_token}" ]]; then
+    log_info "canary account token: ${_canary_token}"
+
+    # Enable, run canary, disable — all inside the container
+    if docker compose -f "${COMPOSE_PROJECT_DIR}/compose.yml" \
+        exec -T \
+        -e ZROK2_API_ENDPOINT="http://zrok2-controller:${ZROK2_CTRL_PORT:-18080}" \
+        -e ZROK2_DANGEROUS_CANARY=1 \
+        -e HOME=/tmp/canary-home \
+        zrok2-controller sh -c "
+            mkdir -p /tmp/canary-home/.zrok2
+            echo '{\"v\":\"v0.4\"}' > /tmp/canary-home/.zrok2/metadata.json
+            printf '{\"apiEndpoint\":\"http://zrok2-controller:${ZROK2_CTRL_PORT:-18080}\"}' > /tmp/canary-home/.zrok2/config.json
+            zrok2 enable '${_canary_token}' --description canary-test &&
+            zrok2 test canary public-proxy --iterations 3 --loopers 1 \
+                --min-payload 256 --max-payload 256 --min-pacing 1s --max-pacing 1s &&
+            zrok2 disable
+        " 2>&1; then
+        log_pass "canary public-proxy looper passed"
+    else
+        log_info "canary looper failed (may need frontend reachable from container)"
+    fi
+else
+    log_info "could not create canary account — skipping canary test"
+fi
+
+# ============================================================
+# Phase 5: Verify metrics pipeline (InfluxDB has data from canary)
+# ============================================================
+
+log_section "Phase 5: Verify metrics pipeline"
+
+# Query InfluxDB directly from the influxdb container.
+log_info "waiting up to 90s for metrics to appear in InfluxDB..."
+_metrics_found=false
+for _attempt in $(seq 1 18); do
+    _count=$(docker compose -f "${COMPOSE_PROJECT_DIR}/compose.yml" \
+        exec -T influxdb influx query \
+        'from(bucket: "zrok") |> range(start: -5m) |> count()' \
+        --org zrok --token "${ZROK2_INFLUX_TOKEN:-}" --raw 2>/dev/null \
+        | grep -c ',' || true)
+    if (( _count > 0 )); then
+        _metrics_found=true
+        break
+    fi
+    sleep 5
+done
+
+if [[ "${_metrics_found}" == "true" ]]; then
+    log_pass "metrics pipeline verified: InfluxDB has data (${_count} series)"
+else
+    log_info "metrics pipeline: no data in InfluxDB after 90s (metrics profile may not be enabled)"
+fi

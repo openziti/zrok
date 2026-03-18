@@ -266,7 +266,14 @@ cleanup() {
 
 # Exit cleanup: best-effort — don't mask the real exit code.
 cleanup_on_exit() {
+    local _real_exit=$?
     set +o errexit
+    # Catch nounset/syntax errors that bypass the ERR trap (exit != 0 but
+    # _exit_code was never updated).
+    if (( _real_exit != 0 && _exit_code == 0 )); then
+        _exit_code="${_real_exit}"
+        _fail_summary="exited with status ${_real_exit} (may be nounset or syntax error)"
+    fi
     if (( KEEP )); then
         log_info "keeping test instance (--keep); run with --only-clean to tear down"
     else
@@ -711,6 +718,79 @@ else
         log_error "Ziti data plane traffic verification failed"
         log_info "continuing despite traffic verification failure"
     fi
+fi
+
+# ============================================================
+# Phase 10: Canary looper (exercise shares through the public frontend)
+# ============================================================
+log_section "Phase 10: Canary public-proxy looper"
+
+# Create a fresh account for the canary via the REST API (avoids CLI endpoint
+# precedence issues with the operator's enabled environment).
+CANARY_HOME="$(mktemp -d)"
+mkdir -p "${CANARY_HOME}/.zrok2"
+echo '{"v":"v0.4"}' > "${CANARY_HOME}/.zrok2/metadata.json"
+printf '{"apiEndpoint":"%s"}' "${ZROK2_API_ENDPOINT}" > "${CANARY_HOME}/.zrok2/config.json"
+
+_canary_token=$(curl -sf \
+    -H "X-TOKEN: ${ZROK2_ADMIN_TOKEN}" \
+    -H "Content-Type: application/zrok.v1+json" \
+    -d "{\"email\":\"canary-$(date +%s)@zrok.internal\",\"password\":\"canarypass\"}" \
+    "${ZROK2_API_ENDPOINT}/api/v2/account" | python3 -c "import sys,json; print(json.load(sys.stdin)['accountToken'])")
+log_info "canary account token: ${_canary_token}"
+
+HOME="${CANARY_HOME}" "${ZROK2_BIN}" enable "${_canary_token}" --description "canary-test"
+
+# Determine the frontend port from the installed frontend config.
+_frontend_port=$(grep 'bind_address:' /etc/zrok2/frontend.yml 2>/dev/null | grep -oP ':\K[0-9]+$' || echo "8080")
+_canary_flags=(--iterations 3 --loopers 1 --min-payload 256 --max-payload 256 --min-pacing 1s --max-pacing 1s)
+if [[ "${_frontend_port}" != "443" ]]; then
+    _canary_flags+=(--http --frontend-port "${_frontend_port}")
+fi
+
+if HOME="${CANARY_HOME}" ZROK2_DANGEROUS_CANARY=1 \
+    "${ZROK2_BIN}" test canary public-proxy "${_canary_flags[@]}"; then
+    log_pass "canary public-proxy looper passed"
+else
+    log_error "canary public-proxy looper failed"
+    log_info "continuing despite canary failure"
+fi
+
+# Disable the canary environment
+HOME="${CANARY_HOME}" "${ZROK2_BIN}" disable 2>/dev/null || true
+
+# ============================================================
+# Phase 11: Verify metrics pipeline (InfluxDB has data from canary)
+# ============================================================
+log_section "Phase 11: Verify metrics pipeline"
+
+_influx_token=$(grep -A5 'influx:' /etc/zrok2/ctrl.yml | grep 'token:' | head -1 | awk -F'"' '{print $2}')
+if [[ -n "${_influx_token}" ]]; then
+    # Wait for metrics to propagate through the pipeline (bridge → RabbitMQ → controller → InfluxDB).
+    # The default metricsReportInterval is 60s, so we may need to wait.
+    log_info "waiting up to 90s for metrics to appear in InfluxDB..."
+    _metrics_found=false
+    for _attempt in $(seq 1 18); do
+        _count=$(influx query \
+            'from(bucket: "zrok") |> range(start: -5m) |> count()' \
+            --org zrok --token "${_influx_token}" --raw 2>/dev/null \
+            | grep -c ',' || true)
+        if (( _count > 0 )); then
+            _metrics_found=true
+            break
+        fi
+        sleep 5
+    done
+
+    if [[ "${_metrics_found}" == "true" ]]; then
+        log_pass "metrics pipeline verified: InfluxDB has data (${_count} series)"
+    else
+        log_error "metrics pipeline: no data in InfluxDB after 90s"
+        log_info "check: systemctl status zrok2-metrics-bridge, rabbitmqctl list_queues"
+        log_info "continuing despite metrics verification failure"
+    fi
+else
+    log_info "could not extract InfluxDB token from ctrl.yml — skipping metrics check"
 fi
 
 # ============================================================

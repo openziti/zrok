@@ -104,7 +104,11 @@ func (l *PublicHttpLooper) startup() error {
 	// can reach the frontend proxy.
 	for i, ep := range l.shr.FrontendEndpoints {
 		if !strings.Contains(ep, "://") {
-			l.shr.FrontendEndpoints[i] = fmt.Sprintf("%s://%s", l.opt.FrontendScheme, ep)
+			if l.opt.FrontendPort != 0 {
+				l.shr.FrontendEndpoints[i] = fmt.Sprintf("%s://%s:%d", l.opt.FrontendScheme, ep, l.opt.FrontendPort)
+			} else {
+				l.shr.FrontendEndpoints[i] = fmt.Sprintf("%s://%s", l.opt.FrontendScheme, ep)
+			}
 			dl.Infof("#%d rewrote frontend endpoint: %v", l.id, l.shr.FrontendEndpoints[i])
 		}
 	}

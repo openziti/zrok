@@ -21,9 +21,9 @@ type adminCreateFrontendCommand struct {
 
 func newAdminCreateFrontendCommand() *adminCreateFrontendCommand {
 	cmd := &cobra.Command{
-		Use:   "frontend <zitiId> <publicName> <urlTemplate>",
+		Use:   "frontend <zitiId> <publicName> [urlTemplate]",
 		Short: "Create a global public frontend",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.RangeArgs(2, 3),
 	}
 	command := &adminCreateFrontendCommand{cmd: cmd}
 	cmd.Flags().BoolVar(&command.closed, "closed", false, "Enabled closed permission mode")
@@ -35,7 +35,10 @@ func newAdminCreateFrontendCommand() *adminCreateFrontendCommand {
 func (cmd *adminCreateFrontendCommand) run(_ *cobra.Command, args []string) {
 	zId := args[0]
 	publicName := args[1]
-	urlTemplate := args[2]
+	urlTemplate := ""
+	if len(args) > 2 {
+		urlTemplate = args[2]
+	}
 
 	root, err := environment.LoadRoot()
 	if err != nil {

@@ -130,9 +130,19 @@ func newServiceProxy(cfg *config, ctx ziti.Context, mappings *mappings) (*httput
 	return proxy, nil
 }
 
+// hostOnly strips the port from a Host header value (e.g. "foo.example.com:8080" → "foo.example.com").
+// Mapping keys are stored without ports, but HTTP clients include the port in the Host header
+// when the port is non-standard.
+func hostOnly(host string) string {
+	if h, _, err := net.SplitHostPort(host); err == nil {
+		return h
+	}
+	return host
+}
+
 func hostTargetReverseProxy(cfg *config, ctx ziti.Context, mappings *mappings) *httputil.ReverseProxy {
 	director := func(req *http.Request) {
-		targetMapping, found := mappings.getMapping(req.Host)
+		targetMapping, found := mappings.getMapping(hostOnly(req.Host))
 		if found {
 			if svc, found := endpoints.GetRefreshedService(targetMapping.ShareToken, ctx); found {
 				if cfg, found := svc.Config[sdk.ZrokProxyConfig]; found {
@@ -169,7 +179,7 @@ func shareHandler(handler http.Handler, cfg *config, signingKey []byte, ctx ziti
 	auth := newAuthHandler(cfg, signingKey)
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		mapping, found := mappings.getMapping(r.Host)
+		mapping, found := mappings.getMapping(hostOnly(r.Host))
 		if !found {
 			dl.Debugf("mapping not found for '%v'", r.Host)
 			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(r.Host))
