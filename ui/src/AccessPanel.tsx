@@ -2,7 +2,7 @@ import {Node} from "@xyflow/react";
 import {Box, Button, CircularProgress, Grid2, Tooltip, Typography} from "@mui/material";
 import AccessIcon from "@mui/icons-material/Lan";
 import useApiConsoleStore from "./model/store.ts";
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Frontend} from "./api";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PropertyTable from "./PropertyTable.tsx";
@@ -30,14 +30,17 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
     }
     const closeReleaseAccess = () => {
         setReleaseAccessOpen(false);
-    }
+    };
 
-    useEffect(() => {
-        if (!user || frontendId == null) return;
+    const loadDetail = useCallback((signal?: AbortSignal) => {
+        if (!user || frontendId == null) {
+            return Promise.resolve();
+        }
+
         setLoading(true);
         setErrorMessage("");
-        const controller = new AbortController();
-        getMetadataApi(user).getFrontendDetail({frontendId: frontendId}, { signal: controller.signal })
+        setDetail(null);
+        return getMetadataApi(user).getFrontendDetail({frontendId: frontendId}, { signal })
             .then(d => {
                 const nextDetail = {...d} as Partial<Frontend> & Record<string, unknown>;
                 delete nextDetail.id;
@@ -51,9 +54,15 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
                 const msg = await extractErrorMessage(e, "failed to load access details");
                 setErrorMessage(msg);
                 setLoading(false);
-            })
-        return () => controller.abort();
+            });
     }, [frontendId, user]);
+
+    useEffect(() => {
+        if (!user || frontendId == null) return;
+        const controller = new AbortController();
+        void loadDetail(controller.signal);
+        return () => controller.abort();
+    }, [frontendId, loadDetail, user]);
 
     if (!user) return null;
 
@@ -95,7 +104,9 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
     const labels = {
         createdAt: "Created",
         updatedAt: "Updated",
-    }
+    };
+
+    const actionsDisabled = detail == null;
 
     return (
         <>
@@ -110,21 +121,28 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
                             <Grid2 container justifyContent="center" sx={{ mt: 4 }}><CircularProgress /></Grid2>
                         ) : (
                             <>
-                                <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2, p: 0 }} alignItems="center">
-                                    <Box component="h5" sx={{ m: 0 }}>A private access frontend {detail && detail.bindAddress ? <span>at <code>{detail.bindAddress}</code></span> : <span>with frontend token <code>{detail?.frontendToken}</code></span>}</Box>
-                                </Grid2>
                                 { errorMessage && <Typography color="error" sx={{ mb: 2 }}>{errorMessage}</Typography> }
                                 { limited ? <BandwidthLimitedWarning /> : null }
                                 <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                                     <Tooltip title="Release Access">
-                                        <Button variant="contained" color="error" aria-label="Release Access" onClick={openReleaseAccess}><DeleteIcon /></Button>
+                                        <span>
+                                            <Button variant="contained" color="error" aria-label="Release Access" onClick={openReleaseAccess} disabled={actionsDisabled}><DeleteIcon /></Button>
+                                        </span>
                                     </Tooltip>
+                                    {actionsDisabled ? <Button variant="outlined" sx={{ ml: 1 }} onClick={() => void loadDetail()}>Retry</Button> : null}
                                 </Grid2>
-                                <Grid2 container sx={{ flexGrow: 1 }}>
-                                    <Grid2 display="flex">
-                                        <PropertyTable object={detail} custom={customProperties} labels={labels} />
-                                    </Grid2>
-                                </Grid2>
+                                {detail ? (
+                                    <>
+                                        <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2, p: 0 }} alignItems="center">
+                                            <Box component="h5" sx={{ m: 0 }}>A private access frontend {detail.bindAddress ? <span>at <code>{detail.bindAddress}</code></span> : <span>with frontend token <code>{detail.frontendToken}</code></span>}</Box>
+                                        </Grid2>
+                                        <Grid2 container sx={{ flexGrow: 1 }}>
+                                            <Grid2 display="flex">
+                                                <PropertyTable object={detail} custom={customProperties} labels={labels} />
+                                            </Grid2>
+                                        </Grid2>
+                                    </>
+                                ) : null}
                             </>
                         )}
                     </Grid2>
@@ -133,6 +151,6 @@ const AccessPanel = ({ access }: AccessPanelProps) => {
             <ReleaseAccessModal close={closeReleaseAccess} isOpen={releaseAccessOpen} user={user} access={access} detail={detail} />
         </>
     );
-}
+};
 
 export default AccessPanel;

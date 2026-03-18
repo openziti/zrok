@@ -1,7 +1,7 @@
 import {Node} from "@xyflow/react";
 import {Box, Button, CircularProgress, Grid2, Tooltip, Typography} from "@mui/material";
 import EnvironmentIcon from "@mui/icons-material/Computer";
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Environment} from "./api";
 import PropertyTable from "./PropertyTable.tsx";
 import SecretToggle from "./SecretToggle.tsx";
@@ -49,14 +49,17 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
     const labels = {
         createdAt: "Created",
         updatedAt: "Updated"
-    }
+    };
 
-    useEffect(() => {
-        if (!user || !environmentId) return;
+    const loadDetail = useCallback((signal?: AbortSignal) => {
+        if (!user || !environmentId) {
+            return Promise.resolve();
+        }
+
         setLoading(true);
         setErrorMessage("");
-        const controller = new AbortController();
-        getMetadataApi(user).getEnvironmentDetail({envZId: environmentId}, { signal: controller.signal })
+        setDetail(null);
+        return getMetadataApi(user).getEnvironmentDetail({envZId: environmentId}, { signal })
             .then(d => {
                 const nextDetail = {...d.environment!} as Partial<Environment> & Record<string, unknown>;
                 delete nextDetail.activity;
@@ -70,11 +73,19 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
                 const msg = await extractErrorMessage(e, "failed to load environment details");
                 setErrorMessage(msg);
                 setLoading(false);
-            })
-        return () => controller.abort();
+            });
     }, [environmentId, user]);
 
+    useEffect(() => {
+        if (!user || !environmentId) return;
+        const controller = new AbortController();
+        void loadDetail(controller.signal);
+        return () => controller.abort();
+    }, [environmentId, loadDetail, user]);
+
     if (!user) return null;
+
+    const actionsDisabled = detail == null;
 
     return (
         <>
@@ -87,24 +98,35 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
                     <Grid2 container justifyContent="center" sx={{ mt: 4 }}><CircularProgress /></Grid2>
                 ) : (
                     <>
-                        <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2, p: 0 }} alignItems="center">
-                            <Box component="h5" sx={{ m: 0 }}>An environment on a host with address <code>{detail ? detail.address : ''}</code></Box>
-                        </Grid2>
                         { errorMessage && <Typography color="error" sx={{ mb: 2 }}>{errorMessage}</Typography> }
                         { environment.data.limited ? <BandwidthLimitedWarning /> : null }
                         <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                             <Tooltip title="Environment Metrics">
-                                <Button variant="contained" aria-label="Environment Metrics" onClick={openEnvironmentMetrics}><MetricsIcon /></Button>
+                                <span>
+                                    <Button variant="contained" aria-label="Environment Metrics" onClick={openEnvironmentMetrics} disabled={actionsDisabled}><MetricsIcon /></Button>
+                                </span>
                             </Tooltip>
-                            <Tooltip title="Release Environment" sx={{ ml: 1 }}>
-                                <Button variant="contained" color="error" aria-label="Release Environment" onClick={openReleaseEnvironment}><DeleteIcon /></Button>
-                            </Tooltip>
+                            <Box sx={{ ml: 1, display: "inline-flex" }}>
+                                <Tooltip title="Release Environment">
+                                    <span>
+                                        <Button variant="contained" color="error" aria-label="Release Environment" onClick={openReleaseEnvironment} disabled={actionsDisabled}><DeleteIcon /></Button>
+                                    </span>
+                                </Tooltip>
+                            </Box>
+                            {actionsDisabled ? <Button variant="outlined" sx={{ ml: 1 }} onClick={() => void loadDetail()}>Retry</Button> : null}
                         </Grid2>
-                        <Grid2 container sx={{ flexGrow: 1 }}>
-                            <Grid2 display="flex">
-                                <PropertyTable object={detail} custom={customProperties} labels={labels} />
-                            </Grid2>
-                        </Grid2>
+                        {detail ? (
+                            <>
+                                <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2, p: 0 }} alignItems="center">
+                                    <Box component="h5" sx={{ m: 0 }}>An environment on a host with address <code>{detail.address}</code></Box>
+                                </Grid2>
+                                <Grid2 container sx={{ flexGrow: 1 }}>
+                                    <Grid2 display="flex">
+                                        <PropertyTable object={detail} custom={customProperties} labels={labels} />
+                                    </Grid2>
+                                </Grid2>
+                            </>
+                        ) : null}
                     </>
                 )}
             </Typography>
@@ -112,6 +134,6 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
             <ReleaseEnvironmentModal close={closeReleaseEnvironment} isOpen={releaseEnvironmentOpen} user={user} environment={environment} detail={detail} />
         </>
     );
-}
+};
 
 export default EnvironmentPanel;

@@ -2,7 +2,7 @@ import {Node} from "@xyflow/react";
 import {Box, Button, CircularProgress, Grid2, Tooltip, Typography} from "@mui/material";
 import ShareIcon from "@mui/icons-material/Share";
 import {Share} from "./api";
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import PropertyTable from "./PropertyTable.tsx";
 import useApiConsoleStore from "./model/store.ts";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -79,14 +79,17 @@ const SharePanel = ({ share }: SharePanelProps) => {
         createdAt: "Created",
         token: "Share Token",
         updatedAt: "Updated"
-    }
+    };
 
-    useEffect(() => {
-        if (!user || !shareToken) return;
+    const loadDetail = useCallback((signal?: AbortSignal) => {
+        if (!user || !shareToken) {
+            return Promise.resolve();
+        }
+
         setLoading(true);
         setErrorMessage("");
-        const controller = new AbortController();
-        getMetadataApi(user).getShareDetail({ shareToken }, { signal: controller.signal })
+        setDetail(null);
+        return getMetadataApi(user).getShareDetail({ shareToken }, { signal })
             .then(d => {
                 const nextDetail = {...d} as Partial<Share> & Record<string, unknown>;
                 delete nextDetail.activity;
@@ -103,11 +106,19 @@ const SharePanel = ({ share }: SharePanelProps) => {
                 const msg = await extractErrorMessage(e, "failed to load share details");
                 setErrorMessage(msg);
                 setLoading(false);
-            })
-        return () => controller.abort();
+            });
     }, [shareToken, user]);
 
+    useEffect(() => {
+        if (!user || !shareToken) return;
+        const controller = new AbortController();
+        void loadDetail(controller.signal);
+        return () => controller.abort();
+    }, [loadDetail, shareToken, user]);
+
     if (!user) return null;
+
+    const actionsDisabled = detail == null;
 
     return (
         <>
@@ -120,24 +131,35 @@ const SharePanel = ({ share }: SharePanelProps) => {
                     <Grid2 container justifyContent="center" sx={{ mt: 4 }}><CircularProgress /></Grid2>
                 ) : (
                     <>
-                        <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2 }} alignItems="center">
-                            <Box component="h5" sx={{ m: 0 }}>A {detail ? detail.shareMode : ''}{detail && detail.reserved ? ', reserved ' : ''} {detail?.backendMode} share with the share token <code>{shareToken}</code></Box>
-                        </Grid2>
                         { errorMessage && <Typography color="error" sx={{ mb: 2 }}>{errorMessage}</Typography> }
                         { share.data.limited ? <BandwidthLimitedWarning /> : null }
                         <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                             <Tooltip title="Share Metrics">
-                                <Button variant="contained" aria-label="Share Metrics" onClick={openShareMetrics}><MetricsIcon /></Button>
+                                <span>
+                                    <Button variant="contained" aria-label="Share Metrics" onClick={openShareMetrics} disabled={actionsDisabled}><MetricsIcon /></Button>
+                                </span>
                             </Tooltip>
-                            <Tooltip title="Release Share" sx={{ ml: 1 }}>
-                                <Button variant="contained" color="error" aria-label="Release Share" onClick={openReleaseShare}><DeleteIcon /></Button>
-                            </Tooltip>
+                            <Box sx={{ ml: 1, display: "inline-flex" }}>
+                                <Tooltip title="Release Share">
+                                    <span>
+                                        <Button variant="contained" color="error" aria-label="Release Share" onClick={openReleaseShare} disabled={actionsDisabled}><DeleteIcon /></Button>
+                                    </span>
+                                </Tooltip>
+                            </Box>
+                            {actionsDisabled ? <Button variant="outlined" sx={{ ml: 1 }} onClick={() => void loadDetail()}>Retry</Button> : null}
                         </Grid2>
-                        <Grid2 container sx={{ flexGrow: 1 }}>
-                            <Grid2 display="flex">
-                                <PropertyTable object={detail} custom={customProperties} labels={labels} />
-                            </Grid2>
-                        </Grid2>
+                        {detail ? (
+                            <>
+                                <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2 }} alignItems="center">
+                                    <Box component="h5" sx={{ m: 0 }}>A {detail.shareMode}{detail.reserved ? ', reserved ' : ''} {detail.backendMode} share with the share token <code>{shareToken}</code></Box>
+                                </Grid2>
+                                <Grid2 container sx={{ flexGrow: 1 }}>
+                                    <Grid2 display="flex">
+                                        <PropertyTable object={detail} custom={customProperties} labels={labels} />
+                                    </Grid2>
+                                </Grid2>
+                            </>
+                        ) : null}
                     </>
                 )}
             </Typography>
@@ -145,6 +167,6 @@ const SharePanel = ({ share }: SharePanelProps) => {
             <ReleaseShareModal close={closeReleaseShare} isOpen={releaseShareOpen} user={user} share={share} detail={detail} />
         </>
     );
-}
+};
 
 export default SharePanel;
