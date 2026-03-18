@@ -199,8 +199,6 @@ github.com/crewjam/httperr v0.2.0 h1:b2BfXR8U3AlIHwNeFFvZ+BV1LFvKLlzMjzaTnZMybNo
 github.com/crewjam/httperr v0.2.0/go.mod h1:Jlz+Sg/XqBQhyMjdDiC+GNNRzZTD7x39Gu3pglZ5oH4=
 github.com/crewjam/saml v0.4.14 h1:g9FBNx62osKusnFzs3QTN5L9CVA/Egfgm+stJShzw/c=
 github.com/crewjam/saml v0.4.14/go.mod h1:UVSZCf18jJkk6GpWNVqcyQJMD5HsRugBPf4I1nl2mME=
-github.com/cx-constantino-antunes/sdk-golang v1.2.2-0.20251106091504-eff6762b5973 h1:yqCNmbCglduoV9VjXHc/B11gjEmeP2Ojr20BAEmYW6A=
-github.com/cx-constantino-antunes/sdk-golang v1.2.2-0.20251106091504-eff6762b5973/go.mod h1:L7lFJs8DI6qk2h2i3pow5HSPGfDxKilg4cxKd2LOieE=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -755,6 +753,8 @@ github.com/openziti/identity v1.0.109 h1:FFMbcdbD0igP6fygpbqsix6BuRLlIzoTX9qp3BU
 github.com/openziti/identity v1.0.109/go.mod h1:kN2Cij5BjTg74UXKJ66v2R0U1IquXI56gSLLBkWm8uE=
 github.com/openziti/metrics v1.4.2 h1:zaBj5DrvRGPWPhS1w7XNkTPyX4KUYwToNGMCtJrkCv8=
 github.com/openziti/metrics v1.4.2/go.mod h1:MOLcoTxhPNla6+NWUCMVTnl1PNqTU40qrbKVa/lVVgg=
+github.com/openziti/sdk-golang v1.2.1 h1:tjaXHAVGolcR5gQORfWtArvQ+wyByglPso6OWqp1NFs=
+github.com/openziti/sdk-golang v1.2.1/go.mod h1:L7lFJs8DI6qk2h2i3pow5HSPGfDxKilg4cxKd2LOieE=
 github.com/openziti/secretstream v0.1.37 h1:ZiI4fIA09JO9IegwrLcUUJ5nkjFYtpeap/+UFHb4Tic=
 github.com/openziti/secretstream v0.1.37/go.mod h1:yj3n6atdVIr0AE7+/I05yl3aJR8H6BPDSJBqAbhPsYE=
 github.com/openziti/storage v0.4.7 h1:3phONUaSrcH2m6D6eQT4DG6b7eZEW9IuewfG2RaUCtA=

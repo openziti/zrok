@@ -1,10 +1,6 @@
 module github.com/openziti/zrok
 
-go 1.24.0
-
-toolchain go1.24.2
-
-replace github.com/openziti/sdk-golang => github.com/cx-constantino-antunes/sdk-golang v1.2.2-0.20251106091504-eff6762b5973
+go 1.24.13
 
 require (
 	github.com/TwiN/go-away v1.6.12
