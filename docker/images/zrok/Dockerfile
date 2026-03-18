@@ -28,6 +28,8 @@ COPY --chmod=0755 ${ARTIFACTS_DIR}/${TARGETARCH}/${TARGETOS}/zrok2 \
       /usr/local/bin/
 COPY --chmod=0755 ./nfpm/zrok2-enable.bash \
       /usr/local/bin/zrok2-enable
+COPY --chmod=0755 ./nfpm/zrok2-bootstrap.bash \
+      /usr/local/bin/zrok2-bootstrap
 
 USER ziggy
 ENTRYPOINT [ "zrok2" ]

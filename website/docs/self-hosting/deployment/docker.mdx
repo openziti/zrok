@@ -4,8 +4,275 @@ sidebar_label: Docker
 sidebar_position: 45
 ---
 
-This guide walks you through deploying a self-hosted zrok instance using Docker Compose.
+This guide walks you through deploying a self-hosted zrok2 instance using Docker
+Compose. The stack runs the same components as the
+[Linux self-hosting guide](/docs/zrok/self-hosting/deployment/linux/) — Ziti overlay, zrok2
+controller, frontend, and PostgreSQL — using official container images with
+runtime configuration via environment variables.
 
-import DockerInstance from '@zrokroot/../docker/compose/zrok-instance/README.md'
+## Prerequisites
 
-<DockerInstance />
+- Docker Engine 24+ with the Compose plugin (`docker compose`)
+- A DNS zone with a wildcard `*` A record resolving to the host
+  (e.g., `*.share.example.com` → your server IP)
+- Ports reachable from the internet:
+  - **3022** — Ziti router data plane (always required; direct TLS, not proxied)
+  - **1280** — Ziti controller control plane (required for routers not co-located; uses mTLS and must be directly exposed — Caddy cannot proxy this port)
+  - **443** — HTTPS for the zrok2 controller and frontend via Caddy (recommended for production)
+
+:::tip Use Caddy for TLS
+Use the [Caddy TLS overlay](#optional-enable-tls-with-caddy) for production deployments.
+Caddy terminates TLS for the zrok2 controller API and the wildcard share frontend on port 443,
+routing by subdomain. This avoids exposing the insecure ports 18080 (controller) and 8080
+(frontend) directly to the internet.
+:::
+
+For local testing only (no TLS), 18080 and 8080 also need to be reachable.
+
+## Download the Compose Project
+
+```bash
+curl -sSfL https://get.zrok.io/docker | tar -xz -C zrok2-instance
+cd zrok2-instance
+```
+
+Or clone the repository:
+
+```bash
+git clone https://github.com/openziti/zrok.git
+cd zrok/docker/compose/zrok2-instance
+```
+
+## Configure Environment Variables
+
+Copy the example environment file and edit it:
+
+```bash
+cp .env.example .env
+```
+
+At minimum, set these three values:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `ZROK2_DNS_ZONE` | DNS zone with wildcard A record | `share.example.com` |
+| `ZROK2_ADMIN_TOKEN` | zrok2 admin token (≥32 chars) | `myadmintokenoflength32ormore...` |
+| `ZITI_PWD` | Ziti controller admin password | `mysecurepassword` |
+
+These match the same variable names used in the
+[Linux guide](/docs/zrok/self-hosting/deployment/linux/).
+
+### Optional Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `ZROK2_STORE_TYPE` | `postgres` | Database backend (`postgres` or `sqlite3`) |
+| `ZROK2_DB_PASSWORD` | `zrok2defaultpw` | PostgreSQL password |
+| `ZITI_USER` | `admin` | Ziti admin username |
+| `ZROK2_CTRL_PORT` | `18080` | zrok2 controller API port |
+| `ZROK2_FRONTEND_PORT` | `8080` | zrok2 frontend port |
+| `ZITI_CTRL_PORT` | `1280` | Ziti control plane port |
+| `ZITI_ROUTER_PORT` | `3022` | Ziti data plane port |
+| `ZROK2_INSECURE_INTERFACE` | `127.0.0.1` | Bind address for non-TLS ports |
+| `ZROK2_IMAGE` | `docker.io/openziti/zrok2` | zrok2 container image |
+| `ZROK2_TAG` | `latest` | zrok2 image tag — set to a specific version for reproducible deployments |
+
+## Start the Stack
+
+```bash
+docker compose up -d
+```
+
+On first start, two init services run before the main services:
+
+- **`ziti-router-init`** — creates the edge router in the Ziti controller and saves its enrollment token for the router service to consume
+- **`zrok2-init`** — bootstraps the full zrok2 stack:
+  1. Generates `ctrl.yaml` and `frontend.yaml` from environment variables
+  2. Waits for the Ziti controller to be healthy
+  3. Waits for PostgreSQL to be ready
+  4. Runs `zrok2 admin bootstrap` to initialize the database and create Ziti identities
+  5. Creates the dynamic frontend and public namespace
+  6. Saves the public frontend identity for the frontend container
+
+This takes 1–2 minutes. Monitor progress:
+
+```bash
+docker compose logs -f zrok2-init
+```
+
+Once `zrok2-init` exits successfully, the controller and frontend start
+automatically.
+
+## Verify the Stack
+
+Check that all services are running:
+
+```bash
+docker compose ps
+```
+
+The zrok2 controller API should respond:
+
+```bash
+curl -sf -H 'Accept: application/zrok.v1+json' \
+  http://127.0.0.1:18080/api/v2/versions
+```
+
+## Create Your First Account
+
+```bash
+docker compose exec zrok2-controller \
+  zrok2 admin create account you@example.com yourpassword
+```
+
+The command prints an **enable token**. Save it — you'll need it to enable
+your environment.
+
+## Enable a Client Environment
+
+On your workstation (not the server), install the zrok2 CLI and point it at
+your instance:
+
+```bash
+export ZROK2_API_ENDPOINT=http://your-server:18080
+zrok2 enable <token>
+```
+
+Replace `<token>` with the enable token from the previous step.
+
+## Optional: Enable TLS with Caddy
+
+For production deployments, enable TLS using the Caddy overlay. Caddy
+acquires a wildcard certificate via DNS challenge.
+
+1. Set the Caddy variables in `.env`:
+
+   ```bash
+   CADDY_DNS_PLUGIN=cloudflare
+   CADDY_DNS_PLUGIN_TOKEN=your-api-token
+   ```
+
+2. Start with the Caddy overlay:
+
+   ```bash
+   COMPOSE_FILE=compose.yml:compose.caddy.yml docker compose up -d
+   ```
+
+Caddy builds itself with the DNS plugin on first start (takes a few minutes),
+then handles TLS termination for all services:
+
+- `https://zrok2.share.example.com` → zrok2 controller API
+- `https://*.share.example.com` → zrok2 public frontend
+- `https://ziti.share.example.com` → Ziti management API
+
+With TLS enabled, update your client:
+
+```bash
+export ZROK2_API_ENDPOINT=https://zrok2.share.example.com
+```
+
+## Optional: Enable Metrics Pipeline
+
+To collect usage metrics, enable the metrics profile:
+
+```bash
+docker compose --profile metrics up -d
+```
+
+This adds RabbitMQ and InfluxDB. The `zrok2-init` service generates a minimal
+`ctrl.yaml` without the metrics bridge configuration. To enable metrics, add
+the `bridge` and `metrics` sections to `ctrl.yaml` and restart the controller
+(see the [Linux guide](/docs/zrok/self-hosting/deployment/linux/) for the full
+configuration reference).
+
+## Optional: Building from Source
+
+For development or CI, you can build the zrok2 image from source instead of
+pulling a published image. This uses the `compose.build.yml` overlay, which
+adds a multi-stage Docker build (Go compilation + UI assets) to each zrok2
+service.
+
+```bash
+COMPOSE_FILE=compose.yml:compose.build.yml docker compose up -d --build --wait
+```
+
+The build context is the repository root, so run this from a cloned
+repository:
+
+```bash
+git clone https://github.com/openziti/zrok.git
+cd zrok/docker/compose/zrok2-instance
+cp .env.example .env
+# edit .env with your values...
+COMPOSE_FILE=compose.yml:compose.build.yml docker compose up -d --build --wait
+```
+
+The first build takes several minutes (Go module download + compilation). The
+build overlay can be combined with other overlays:
+
+```bash
+COMPOSE_FILE=compose.yml:compose.build.yml:compose.caddy.yml \
+  docker compose up -d --build --wait
+```
+
+## Troubleshooting
+
+### Bootstrap fails with "connection refused"
+
+The `zrok2-init` service waits for the Ziti controller health check. If the
+controller fails to start, check its logs:
+
+```bash
+docker compose logs ziti-controller
+```
+
+Common causes: incorrect `ZITI_PWD`, port conflicts, DNS resolution issues.
+
+### Frontend returns 502
+
+The frontend needs the public identity created during bootstrap. Verify the
+init completed:
+
+```bash
+docker compose logs zrok2-init
+```
+
+If it failed, restart it:
+
+```bash
+docker compose up -d zrok2-init
+```
+
+### Reset everything
+
+To start fresh, remove all volumes:
+
+```bash
+docker compose down -v
+```
+
+## Architecture
+
+```text
+┌──────────────────────────────────────────────────────┐
+│                Docker Compose Network                │
+├──────────────────────────────────────────────────────┤
+│                                                      │
+│  ziti-controller ──── Ziti control plane (PKI, etc.) │
+│       │                                              │
+│  ziti-router ──────── Ziti data plane (SDK traffic)  │
+│       │                                              │
+│  postgresql ───────── zrok2 database                 │
+│       │                                              │
+│  zrok2-init ───────── one-shot bootstrap             │
+│       │                                              │
+│  zrok2-controller ─── zrok2 API and admin            │
+│       │                                              │
+│  zrok2-frontend ───── public share proxy             │
+│                                                      │
+│  Optional:                                           │
+│  caddy ────────────── TLS termination                │
+│  rabbitmq ─────────── metrics queue                  │
+│  influxdb ─────────── metrics storage                │
+└──────────────────────────────────────────────────────┘
+```

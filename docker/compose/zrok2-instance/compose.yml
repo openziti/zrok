@@ -1,0 +1,301 @@
+# zrok2 Docker Compose — self-hosting stack
+#
+# Usage:
+#   cp .env.example .env   # edit required values
+#   docker compose up -d
+#
+# Optional TLS with Caddy:
+#   COMPOSE_FILE=compose.yml:compose.caddy.yml docker compose up -d
+#
+# See https://docs.zrok.io/docs/self-hosting/docker/ for the full guide.
+
+x-zrok2-image: &zrok2-image
+  image: ${ZROK2_IMAGE:-docker.io/openziti/zrok2}:${ZROK2_TAG:-latest}
+
+services:
+
+  # ── Ziti Overlay Network ──────────────────────────────────────────────────
+
+  ziti-controller:
+    image: ${ZITI_CONTROLLER_IMAGE:-docker.io/openziti/ziti-controller}:${ZITI_CONTROLLER_TAG:-latest}
+    environment:
+      ZITI_BOOTSTRAP: "true"
+      ZITI_BOOTSTRAP_CLUSTER: "true"
+      ZITI_CTRL_ADVERTISED_ADDRESS: ziti.${ZROK2_DNS_ZONE:?err}
+      ZITI_CTRL_ADVERTISED_PORT: ${ZITI_CTRL_PORT:-1280}
+      ZITI_USER: ${ZITI_USER:-admin}
+      ZITI_PWD: ${ZITI_PWD:?err}
+      ZITI_CLUSTER_TRUST_DOMAIN: ${ZROK2_DNS_ZONE}
+      ZITI_CLUSTER_NODE_NAME: ziti-ctrl
+      PFXLOG_NO_JSON: "true"
+    volumes:
+      - ziti-ctrl-data:/home/ziggy
+    ports:
+      - "${ZROK2_INSECURE_INTERFACE:-127.0.0.1}:${ZITI_CTRL_PORT:-1280}:${ZITI_CTRL_PORT:-1280}"
+    networks:
+      zrok2:
+        aliases:
+          - ziti.${ZROK2_DNS_ZONE}
+    healthcheck:
+      test: ["CMD", "ziti", "agent", "stats"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+  # One-shot: create the edge router on the controller and save the JWT for
+  # enrollment by the ziti-router service. Idempotent — skips creation if the
+  # router already exists.
+  ziti-router-init:
+    image: ${ZITI_CONTROLLER_IMAGE:-docker.io/openziti/ziti-controller}:${ZITI_CONTROLLER_TAG:-latest}
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        set -o errexit -o nounset -o pipefail
+
+        # Retry helper (self-contained — no external dependencies)
+        retry() {
+          local max="$$1" delay="$$2" desc="$$3"; shift 3
+          local n=1
+          while true; do
+            if "$$@"; then return 0; fi
+            if (( n >= max )); then
+              echo "ERROR: $$desc failed after $$max attempts" >&2; exit 1
+            fi
+            echo "WARN: $$desc failed (attempt $$n/$$max), retrying in $${delay}s..."
+            sleep "$$delay"; (( n++ ))
+          done
+        }
+
+        ROUTER_NAME="$${ZITI_ROUTER_NAME:-zrok2-router}"
+        JWT_FILE="/ziti-router/$${ROUTER_NAME}.jwt"
+        ZITI_ENDPOINT="https://ziti.$${ZROK2_DNS_ZONE}:$${ZITI_CTRL_PORT:-1280}"
+
+        echo "INFO: logging into Ziti controller..."
+        retry 60 5 "Ziti controller login" \
+          ziti edge login "$$ZITI_ENDPOINT" \
+            --username "$${ZITI_USER:-admin}" \
+            --password "$${ZITI_PWD}" \
+            --yes
+        echo "INFO: logged into Ziti controller"
+
+        # skip if router already enrolled (identity cert exists)
+        if [[ -f "/ziti-router/$${ROUTER_NAME}.cert.pem" \
+           || -f "/ziti-router/certs/cert.pem" ]]; then
+          echo "INFO: router identity already exists, skipping creation"
+          exit 0
+        fi
+
+        # create the edge router (idempotent check via list)
+        _create_router() {
+          if ziti edge list edge-routers "name=\"$${ROUTER_NAME}\"" 2>/dev/null \
+             | grep -q "$${ROUTER_NAME}"; then
+            echo "INFO: edge router '$${ROUTER_NAME}' already exists"
+            return 0
+          fi
+          echo "INFO: creating edge router '$${ROUTER_NAME}'..."
+          ziti edge create edge-router "$${ROUTER_NAME}" \
+            --jwt-output-file "$$JWT_FILE" \
+            --tunneler-enabled
+          echo "INFO: edge router created, JWT saved to $$JWT_FILE"
+        }
+        retry 5 3 "create edge router" _create_router
+    environment:
+      ZROK2_DNS_ZONE: ${ZROK2_DNS_ZONE:?err}
+      ZITI_PWD: ${ZITI_PWD:?err}
+      ZITI_USER: ${ZITI_USER:-admin}
+      ZITI_CTRL_PORT: ${ZITI_CTRL_PORT:-1280}
+      ZITI_ROUTER_NAME: ${ZITI_ROUTER_NAME:-zrok2-router}
+    depends_on:
+      ziti-controller:
+        condition: service_healthy
+    volumes:
+      - ziti-router-data:/ziti-router
+    networks:
+      - zrok2
+
+  ziti-router:
+    image: ${ZITI_ROUTER_IMAGE:-docker.io/openziti/ziti-router}:${ZITI_ROUTER_TAG:-latest}
+    environment:
+      ZITI_BOOTSTRAP: "true"
+      ZITI_BOOTSTRAP_ENROLLMENT: "true"
+      ZITI_BOOTSTRAP_CONFIG: "true"
+      ZITI_AUTO_RENEW_CERTS: "true"
+      ZITI_CTRL_ADVERTISED_ADDRESS: ziti.${ZROK2_DNS_ZONE}
+      ZITI_CTRL_ADVERTISED_PORT: ${ZITI_CTRL_PORT:-1280}
+      ZITI_ROUTER_ADVERTISED_ADDRESS: router.${ZROK2_DNS_ZONE}
+      ZITI_ROUTER_PORT: ${ZITI_ROUTER_PORT:-3022}
+      ZITI_ROUTER_NAME: ${ZITI_ROUTER_NAME:-zrok2-router}
+      ZITI_ENROLL_TOKEN: /ziti-router/${ZITI_ROUTER_NAME:-zrok2-router}.jwt
+      PFXLOG_NO_JSON: "true"
+    depends_on:
+      ziti-router-init:
+        condition: service_completed_successfully
+    volumes:
+      - ziti-router-data:/ziti-router
+    ports:
+      - "0.0.0.0:${ZITI_ROUTER_PORT:-3022}:${ZITI_ROUTER_PORT:-3022}"
+    networks:
+      zrok2:
+        aliases:
+          - router.${ZROK2_DNS_ZONE}
+    healthcheck:
+      test: ["CMD", "ziti", "agent", "stats"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+  # ── Database ──────────────────────────────────────────────────────────────
+
+  postgresql:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: zrok2
+      POSTGRES_PASSWORD: ${ZROK2_DB_PASSWORD:-zrok2defaultpw}
+      POSTGRES_DB: zrok2
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    networks:
+      - zrok2
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zrok2"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  # ── zrok2 Bootstrap (one-shot) ────────────────────────────────────────────
+  #
+  # Sources nfpm/zrok2-bootstrap.bash (the same library used for Linux
+  # self-hosting) and calls its functions to generate configs, run
+  # "zrok2 admin bootstrap", and create the default public frontend +
+  # namespace.  All post-bootstrap admin commands run against a temporary
+  # controller process inside this container, so no separate post-init
+  # service is needed.  Idempotent — safe to re-run.
+
+  zrok2-init:
+    <<: *zrok2-image
+    user: "0:0"
+    entrypoint: ["/bin/bash", "/bootstrap/entrypoint-init.bash"]
+    environment:
+      ZROK2_DNS_ZONE: ${ZROK2_DNS_ZONE:?err}
+      ZROK2_ADMIN_TOKEN: ${ZROK2_ADMIN_TOKEN:?err}
+      ZITI_PWD: ${ZITI_PWD:?err}
+      ZITI_USER: ${ZITI_USER:-admin}
+      ZITI_CTRL_PORT: ${ZITI_CTRL_PORT:-1280}
+      ZROK2_CTRL_PORT: ${ZROK2_CTRL_PORT:-18080}
+      ZROK2_FRONTEND_PORT: ${ZROK2_FRONTEND_PORT:-8080}
+      ZROK2_STORE_TYPE: ${ZROK2_STORE_TYPE:-postgres}
+      ZROK2_DB_PASSWORD: ${ZROK2_DB_PASSWORD:-zrok2defaultpw}
+      HOME: /var/lib/zrok2
+    depends_on:
+      ziti-controller:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+    volumes:
+      - zrok2-config:/var/lib/zrok2
+      - ./entrypoint-init.bash:/bootstrap/entrypoint-init.bash:ro
+      - ../../../nfpm/zrok2-bootstrap.bash:/bootstrap/zrok2-bootstrap.bash:ro
+    networks:
+      - zrok2
+
+  # ── zrok2 Controller ──────────────────────────────────────────────────────
+
+  zrok2-controller:
+    <<: *zrok2-image
+    command: ["controller", "/var/lib/zrok2/config/ctrl.yaml"]
+    environment:
+      ZROK2_ADMIN_TOKEN: ${ZROK2_ADMIN_TOKEN:?err}
+      ZROK2_API_ENDPOINT: http://127.0.0.1:${ZROK2_CTRL_PORT:-18080}
+      HOME: /var/lib/zrok2
+    depends_on:
+      zrok2-init:
+        condition: service_completed_successfully
+    volumes:
+      - zrok2-config:/var/lib/zrok2
+    ports:
+      - "${ZROK2_INSECURE_INTERFACE:-127.0.0.1}:${ZROK2_CTRL_PORT:-18080}:${ZROK2_CTRL_PORT:-18080}"
+    networks:
+      zrok2:
+        aliases:
+          - zrok2.${ZROK2_DNS_ZONE}
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:${ZROK2_CTRL_PORT:-18080}/api/v1/version"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 15s
+    restart: unless-stopped
+
+  # ── zrok2 Frontend ────────────────────────────────────────────────────────
+
+  zrok2-frontend:
+    <<: *zrok2-image
+    command: ["access", "public", "/var/lib/zrok2/config/frontend.yaml"]
+    environment:
+      ZROK2_API_ENDPOINT: http://zrok2-controller:${ZROK2_CTRL_PORT:-18080}
+      HOME: /var/lib/zrok2
+    depends_on:
+      zrok2-controller:
+        condition: service_healthy
+    volumes:
+      - zrok2-config:/var/lib/zrok2:ro
+    ports:
+      - "${ZROK2_INSECURE_INTERFACE:-127.0.0.1}:${ZROK2_FRONTEND_PORT:-8080}:${ZROK2_FRONTEND_PORT:-8080}"
+    networks:
+      - zrok2
+    restart: unless-stopped
+
+  # ── Metrics Pipeline (optional) ──────────────────────────────────────────
+  # To enable: set ZROK2_METRICS_ENABLED=true in .env
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    profiles: ["metrics"]
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - zrok2
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  influxdb:
+    image: influxdb:2-alpine
+    profiles: ["metrics"]
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: zrok2
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${ZROK2_INFLUX_PASSWORD:-zrok2defaultpw}
+      DOCKER_INFLUXDB_INIT_ORG: zrok2
+      DOCKER_INFLUXDB_INIT_BUCKET: zrok2
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${ZROK2_INFLUX_TOKEN:-zrok2defaulttoken}
+    volumes:
+      - influx-data:/var/lib/influxdb2
+    networks:
+      - zrok2
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+networks:
+  zrok2:
+    driver: bridge
+
+volumes:
+  ziti-ctrl-data:
+  ziti-router-data:
+  zrok2-config:
+  pg-data:
+  rabbitmq-data:
+  influx-data:

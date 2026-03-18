@@ -1,0 +1,79 @@
+# Dockerfile.build — build openziti/zrok2 from source
+#
+# Multi-stage build: compile UI assets (two Vite apps) and Go binary, then
+# copy into the same openziti/ziti-cli base image used by the published image.
+#
+# Usage (standalone):
+#   docker build -f docker/compose/zrok2-instance/Dockerfile.build -t openziti/zrok2:local .
+#
+# Usage (compose overlay):
+#   COMPOSE_FILE=compose.yml:compose.build.yml docker compose up -d --build
+
+# ── Stage 1a: Build main UI assets ───────────────────────────────────────────
+
+FROM node:20-bookworm-slim AS ui-builder
+WORKDIR /src/ui
+COPY ui/package.json ui/package-lock.json* ./
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --ignore-scripts 2>/dev/null || npm install
+COPY ui/ ./
+RUN npx vite build
+
+# ── Stage 1b: Build agent UI assets ──────────────────────────────────────────
+
+FROM node:20-bookworm-slim AS agent-ui-builder
+WORKDIR /src/agent/agentUi
+COPY agent/agentUi/package.json agent/agentUi/package-lock.json* ./
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --ignore-scripts 2>/dev/null || npm install
+COPY agent/agentUi/ ./
+RUN npx vite build
+
+# ── Stage 2: Build the Go binary ─────────────────────────────────────────────
+
+FROM golang:1.26-bookworm AS go-builder
+WORKDIR /src
+# Cache Go module downloads across builds
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
+# Copy built UI assets into the embed directories
+COPY --from=ui-builder /src/ui/dist ui/dist/
+COPY --from=agent-ui-builder /src/agent/agentUi/dist agent/agentUi/dist/
+# Copy the rest of the source
+COPY . .
+# Mount both the module cache and the Go build cache so incremental
+# recompilation reuses object files from prior builds on this host.
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=1 go build \
+      -ldflags="-s -w" \
+      -o /zrok2 \
+      ./cmd/zrok2
+
+# ── Stage 3: Final image (matches published openziti/zrok2 layout) ───────────
+
+FROM docker.io/openziti/ziti-cli:1.6.13
+
+LABEL name="openziti/zrok2" \
+      maintainer="support@zrok.io" \
+      vendor="NetFoundry" \
+      summary="Run the zrok2 CLI (built from source)" \
+      description="Run the zrok2 CLI (built from source)" \
+      org.opencontainers.image.description="Run the zrok2 CLI (built from source)" \
+      org.opencontainers.image.source="https://github.com/openziti/zrok"
+
+USER root
+
+RUN mkdir -p -m0755 /licenses
+COPY ./LICENSE /licenses/apache.txt
+
+COPY --from=go-builder /zrok2 /usr/local/bin/zrok2
+COPY ./nfpm/zrok2-enable.bash /usr/local/bin/zrok2-enable
+COPY ./nfpm/zrok2-bootstrap.bash /usr/local/bin/zrok2-bootstrap
+RUN chmod 0755 /usr/local/bin/zrok2 \
+                /usr/local/bin/zrok2-enable \
+                /usr/local/bin/zrok2-bootstrap
+
+USER ziggy
+ENTRYPOINT [ "zrok2" ]

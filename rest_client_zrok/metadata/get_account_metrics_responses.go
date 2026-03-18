@@ -6,6 +6,8 @@ package metadata
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type GetAccountMetricsReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *GetAccountMetricsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *GetAccountMetricsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewGetAccountMetricsOK()
@@ -91,11 +93,13 @@ func (o *GetAccountMetricsOK) Code() int {
 }
 
 func (o *GetAccountMetricsOK) Error() string {
-	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsOK %s", 200, payload)
 }
 
 func (o *GetAccountMetricsOK) String() string {
-	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsOK %s", 200, payload)
 }
 
 func (o *GetAccountMetricsOK) GetPayload() *rest_model_zrok.Metrics {
@@ -107,7 +111,7 @@ func (o *GetAccountMetricsOK) readResponse(response runtime.ClientResponse, cons
 	o.Payload = new(rest_model_zrok.Metrics)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -158,11 +162,11 @@ func (o *GetAccountMetricsBadRequest) Code() int {
 }
 
 func (o *GetAccountMetricsBadRequest) Error() string {
-	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsBadRequest ", 400)
+	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsBadRequest", 400)
 }
 
 func (o *GetAccountMetricsBadRequest) String() string {
-	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsBadRequest ", 400)
+	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsBadRequest", 400)
 }
 
 func (o *GetAccountMetricsBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -214,11 +218,11 @@ func (o *GetAccountMetricsInternalServerError) Code() int {
 }
 
 func (o *GetAccountMetricsInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsInternalServerError", 500)
 }
 
 func (o *GetAccountMetricsInternalServerError) String() string {
-	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsInternalServerError ", 500)
+	return fmt.Sprintf("[GET /metrics/account][%d] getAccountMetricsInternalServerError", 500)
 }
 
 func (o *GetAccountMetricsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -31,7 +31,7 @@ func NewAddNamespaceFrontendMappingOK() *AddNamespaceFrontendMappingOK {
 // WriteResponse to the client
 func (o *AddNamespaceFrontendMappingOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(200)
 }
@@ -56,7 +56,7 @@ func NewAddNamespaceFrontendMappingUnauthorized() *AddNamespaceFrontendMappingUn
 // WriteResponse to the client
 func (o *AddNamespaceFrontendMappingUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -81,7 +81,7 @@ func NewAddNamespaceFrontendMappingNotFound() *AddNamespaceFrontendMappingNotFou
 // WriteResponse to the client
 func (o *AddNamespaceFrontendMappingNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -106,7 +106,7 @@ func NewAddNamespaceFrontendMappingInternalServerError() *AddNamespaceFrontendMa
 // WriteResponse to the client
 func (o *AddNamespaceFrontendMappingInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

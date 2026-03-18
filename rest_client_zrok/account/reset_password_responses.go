@@ -7,6 +7,8 @@ package account
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -23,7 +25,7 @@ type ResetPasswordReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *ResetPasswordReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *ResetPasswordReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewResetPasswordOK()
@@ -98,11 +100,11 @@ func (o *ResetPasswordOK) Code() int {
 }
 
 func (o *ResetPasswordOK) Error() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordOK ", 200)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordOK", 200)
 }
 
 func (o *ResetPasswordOK) String() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordOK ", 200)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordOK", 200)
 }
 
 func (o *ResetPasswordOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -154,11 +156,11 @@ func (o *ResetPasswordNotFound) Code() int {
 }
 
 func (o *ResetPasswordNotFound) Error() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordNotFound ", 404)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordNotFound", 404)
 }
 
 func (o *ResetPasswordNotFound) String() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordNotFound ", 404)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordNotFound", 404)
 }
 
 func (o *ResetPasswordNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -211,11 +213,13 @@ func (o *ResetPasswordUnprocessableEntity) Code() int {
 }
 
 func (o *ResetPasswordUnprocessableEntity) Error() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordUnprocessableEntity  %+v", 422, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordUnprocessableEntity %s", 422, payload)
 }
 
 func (o *ResetPasswordUnprocessableEntity) String() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordUnprocessableEntity  %+v", 422, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordUnprocessableEntity %s", 422, payload)
 }
 
 func (o *ResetPasswordUnprocessableEntity) GetPayload() rest_model_zrok.ErrorMessage {
@@ -225,7 +229,7 @@ func (o *ResetPasswordUnprocessableEntity) GetPayload() rest_model_zrok.ErrorMes
 func (o *ResetPasswordUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -276,11 +280,11 @@ func (o *ResetPasswordInternalServerError) Code() int {
 }
 
 func (o *ResetPasswordInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordInternalServerError ", 500)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordInternalServerError", 500)
 }
 
 func (o *ResetPasswordInternalServerError) String() string {
-	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordInternalServerError ", 500)
+	return fmt.Sprintf("[POST /resetPassword][%d] resetPasswordInternalServerError", 500)
 }
 
 func (o *ResetPasswordInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -27,7 +27,6 @@ func NewListAccessesParams() ListAccessesParams {
 //
 // swagger:parameters listAccesses
 type ListAccessesParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -35,30 +34,37 @@ type ListAccessesParams struct {
 	  In: query
 	*/
 	BindAddress *string
+
 	/*filter by created date (RFC3339 format)
 	  In: query
 	*/
 	CreatedAfter *string
+
 	/*filter by created date (RFC3339 format)
 	  In: query
 	*/
 	CreatedBefore *string
+
 	/*filter by description (substring match)
 	  In: query
 	*/
 	Description *string
+
 	/*filter by environment ziti identity
 	  In: query
 	*/
 	EnvZID *string
+
 	/*filter by associated share token
 	  In: query
 	*/
 	ShareToken *string
+
 	/*filter by updated date (RFC3339 format)
 	  In: query
 	*/
 	UpdatedAfter *string
+
 	/*filter by updated date (RFC3339 format)
 	  In: query
 	*/
@@ -73,7 +79,6 @@ func (o *ListAccessesParams) BindRequest(r *http.Request, route *middleware.Matc
 	var res []error
 
 	o.HTTPRequest = r
-
 	qs := runtime.Values(r.URL.Query())
 
 	qBindAddress, qhkBindAddress, _ := qs.GetOK("bindAddress")

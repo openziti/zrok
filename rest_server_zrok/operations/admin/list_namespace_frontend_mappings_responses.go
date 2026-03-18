@@ -79,7 +79,7 @@ func NewListNamespaceFrontendMappingsUnauthorized() *ListNamespaceFrontendMappin
 // WriteResponse to the client
 func (o *ListNamespaceFrontendMappingsUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -104,7 +104,7 @@ func NewListNamespaceFrontendMappingsNotFound() *ListNamespaceFrontendMappingsNo
 // WriteResponse to the client
 func (o *ListNamespaceFrontendMappingsNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -129,7 +129,7 @@ func NewListNamespaceFrontendMappingsInternalServerError() *ListNamespaceFronten
 // WriteResponse to the client
 func (o *ListNamespaceFrontendMappingsInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

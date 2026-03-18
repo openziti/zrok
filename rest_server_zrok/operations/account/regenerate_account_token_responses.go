@@ -76,7 +76,7 @@ func NewRegenerateAccountTokenNotFound() *RegenerateAccountTokenNotFound {
 // WriteResponse to the client
 func (o *RegenerateAccountTokenNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -101,7 +101,7 @@ func NewRegenerateAccountTokenInternalServerError() *RegenerateAccountTokenInter
 // WriteResponse to the client
 func (o *RegenerateAccountTokenInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

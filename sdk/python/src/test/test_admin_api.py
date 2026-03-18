@@ -182,6 +182,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_update_account_password(self) -> None:
+        """Test case for update_account_password
+
+        """
+        pass
+
     def test_update_frontend(self) -> None:
         """Test case for update_frontend
 

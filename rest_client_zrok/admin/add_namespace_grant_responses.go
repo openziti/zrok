@@ -20,7 +20,7 @@ type AddNamespaceGrantReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *AddNamespaceGrantReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *AddNamespaceGrantReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewAddNamespaceGrantOK()
@@ -95,11 +95,11 @@ func (o *AddNamespaceGrantOK) Code() int {
 }
 
 func (o *AddNamespaceGrantOK) Error() string {
-	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantOK ", 200)
+	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantOK", 200)
 }
 
 func (o *AddNamespaceGrantOK) String() string {
-	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantOK ", 200)
+	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantOK", 200)
 }
 
 func (o *AddNamespaceGrantOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *AddNamespaceGrantUnauthorized) Code() int {
 }
 
 func (o *AddNamespaceGrantUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantUnauthorized ", 401)
+	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantUnauthorized", 401)
 }
 
 func (o *AddNamespaceGrantUnauthorized) String() string {
-	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantUnauthorized ", 401)
+	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantUnauthorized", 401)
 }
 
 func (o *AddNamespaceGrantUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *AddNamespaceGrantNotFound) Code() int {
 }
 
 func (o *AddNamespaceGrantNotFound) Error() string {
-	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantNotFound ", 404)
+	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantNotFound", 404)
 }
 
 func (o *AddNamespaceGrantNotFound) String() string {
-	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantNotFound ", 404)
+	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantNotFound", 404)
 }
 
 func (o *AddNamespaceGrantNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *AddNamespaceGrantInternalServerError) Code() int {
 }
 
 func (o *AddNamespaceGrantInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantInternalServerError ", 500)
+	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantInternalServerError", 500)
 }
 
 func (o *AddNamespaceGrantInternalServerError) String() string {
-	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantInternalServerError ", 500)
+	return fmt.Sprintf("[POST /namespace/grant][%d] addNamespaceGrantInternalServerError", 500)
 }
 
 func (o *AddNamespaceGrantInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -31,7 +31,7 @@ func NewRemoteUnaccessOK() *RemoteUnaccessOK {
 // WriteResponse to the client
 func (o *RemoteUnaccessOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(200)
 }
@@ -56,7 +56,7 @@ func NewRemoteUnaccessUnauthorized() *RemoteUnaccessUnauthorized {
 // WriteResponse to the client
 func (o *RemoteUnaccessUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -81,7 +81,7 @@ func NewRemoteUnaccessInternalServerError() *RemoteUnaccessInternalServerError {
 // WriteResponse to the client
 func (o *RemoteUnaccessInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }
@@ -106,7 +106,7 @@ func NewRemoteUnaccessBadGateway() *RemoteUnaccessBadGateway {
 // WriteResponse to the client
 func (o *RemoteUnaccessBadGateway) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(502)
 }

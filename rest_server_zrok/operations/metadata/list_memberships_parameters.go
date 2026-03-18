@@ -25,7 +25,6 @@ func NewListMembershipsParams() ListMembershipsParams {
 //
 // swagger:parameters listMemberships
 type ListMembershipsParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 }

@@ -79,7 +79,7 @@ func NewListNamespacesUnauthorized() *ListNamespacesUnauthorized {
 // WriteResponse to the client
 func (o *ListNamespacesUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -104,7 +104,7 @@ func NewListNamespacesInternalServerError() *ListNamespacesInternalServerError {
 // WriteResponse to the client
 func (o *ListNamespacesInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

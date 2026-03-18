@@ -27,7 +27,6 @@ func NewRemoteAccessParams() RemoteAccessParams {
 //
 // swagger:parameters remoteAccess
 type RemoteAccessParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *RemoteAccessParams) BindRequest(r *http.Request, route *middleware.Matc
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body RemoteAccessBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

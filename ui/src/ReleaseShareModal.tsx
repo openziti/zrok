@@ -5,6 +5,7 @@ import {modalStyle} from "./styling/theme.ts";
 import {User} from "./model/user.ts";
 import {Node} from "@xyflow/react";
 import {getShareApi} from "./model/api.ts";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface ReleaseShareProps {
     close: () => void;
@@ -45,14 +46,12 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
                     reserved: detail.reserved
                 }
             })
-                .then(d => {
+                .then(() => {
                     close();
                 })
-                .catch(e => {
-                    e.response.json().then(ex => {
-                        console.log("releaseShare", ex.message);
-                    });
-                    setErrorMessage(<Typography color="red">An error occurred releasing your share <code>{detail.shareToken}</code>!</Typography>);
+                .catch(async (e) => {
+                    const msg = await extractErrorMessage(e, "an error occurred releasing your share");
+                    setErrorMessage(<Typography color="red">{msg}</Typography>);
                     setTimeout(() => {
                         setErrorMessage(null);
                         setChecked(false);
@@ -62,10 +61,10 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
     }
 
     return (
-        <Modal open={isOpen} onClose={close}>
+        <Modal open={isOpen} onClose={close} aria-labelledby="modal-title-release-share">
             <Box sx={{ ...modalStyle }}>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Typography variant="h5"><strong>Release Share</strong></Typography>
+                    <Typography variant="h5" id="modal-title-release-share"><strong>Release Share</strong></Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography variant="body1">Would you like to release the share <code>{shareToken}</code> ?</Typography>

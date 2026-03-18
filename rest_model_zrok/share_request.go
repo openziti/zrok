@@ -8,6 +8,7 @@ package rest_model_zrok
 import (
 	"context"
 	"encoding/json"
+	stderrors "errors"
 	"strconv"
 
 	"github.com/go-openapi/errors"
@@ -28,7 +29,7 @@ type ShareRequest struct {
 	AuthScheme string `json:"authScheme,omitempty"`
 
 	// backend mode
-	// Enum: [proxy web tcpTunnel udpTunnel caddy drive socks]
+	// Enum: ["proxy","web","tcpTunnel","udpTunnel","caddy","drive","socks"]
 	BackendMode string `json:"backendMode,omitempty"`
 
 	// basic auth users
@@ -50,14 +51,14 @@ type ShareRequest struct {
 	OauthRefreshInterval string `json:"oauthRefreshInterval,omitempty"`
 
 	// permission mode
-	// Enum: [open closed]
+	// Enum: ["open","closed"]
 	PermissionMode string `json:"permissionMode,omitempty"`
 
 	// private share token
 	PrivateShareToken string `json:"privateShareToken,omitempty"`
 
 	// share mode
-	// Enum: [public private]
+	// Enum: ["public","private"]
 	ShareMode string `json:"shareMode,omitempty"`
 
 	// target
@@ -94,7 +95,7 @@ func (m *ShareRequest) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-var shareRequestTypeBackendModePropEnum []interface{}
+var shareRequestTypeBackendModePropEnum []any
 
 func init() {
 	var res []string
@@ -163,11 +164,15 @@ func (m *ShareRequest) validateBasicAuthUsers(formats strfmt.Registry) error {
 
 		if m.BasicAuthUsers[i] != nil {
 			if err := m.BasicAuthUsers[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("basicAuthUsers" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("basicAuthUsers" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -189,11 +194,15 @@ func (m *ShareRequest) validateNameSelections(formats strfmt.Registry) error {
 
 		if m.NameSelections[i] != nil {
 			if err := m.NameSelections[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("nameSelections" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("nameSelections" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -203,7 +212,7 @@ func (m *ShareRequest) validateNameSelections(formats strfmt.Registry) error {
 	return nil
 }
 
-var shareRequestTypePermissionModePropEnum []interface{}
+var shareRequestTypePermissionModePropEnum []any
 
 func init() {
 	var res []string
@@ -245,7 +254,7 @@ func (m *ShareRequest) validatePermissionMode(formats strfmt.Registry) error {
 	return nil
 }
 
-var shareRequestTypeShareModePropEnum []interface{}
+var shareRequestTypeShareModePropEnum []any
 
 func init() {
 	var res []string
@@ -316,11 +325,15 @@ func (m *ShareRequest) contextValidateBasicAuthUsers(ctx context.Context, format
 			}
 
 			if err := m.BasicAuthUsers[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("basicAuthUsers" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("basicAuthUsers" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -341,11 +354,15 @@ func (m *ShareRequest) contextValidateNameSelections(ctx context.Context, format
 			}
 
 			if err := m.NameSelections[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("nameSelections" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("nameSelections" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}

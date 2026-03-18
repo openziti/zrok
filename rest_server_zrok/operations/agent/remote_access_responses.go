@@ -76,7 +76,7 @@ func NewRemoteAccessUnauthorized() *RemoteAccessUnauthorized {
 // WriteResponse to the client
 func (o *RemoteAccessUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -101,7 +101,7 @@ func NewRemoteAccessInternalServerError() *RemoteAccessInternalServerError {
 // WriteResponse to the client
 func (o *RemoteAccessInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }
@@ -126,7 +126,7 @@ func NewRemoteAccessBadGateway() *RemoteAccessBadGateway {
 // WriteResponse to the client
 func (o *RemoteAccessBadGateway) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(502)
 }

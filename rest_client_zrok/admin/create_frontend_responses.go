@@ -8,6 +8,7 @@ package admin
 import (
 	"context"
 	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -24,7 +25,7 @@ type CreateFrontendReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *CreateFrontendReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *CreateFrontendReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 201:
 		result := NewCreateFrontendCreated()
@@ -106,11 +107,13 @@ func (o *CreateFrontendCreated) Code() int {
 }
 
 func (o *CreateFrontendCreated) Error() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendCreated %s", 201, payload)
 }
 
 func (o *CreateFrontendCreated) String() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendCreated %s", 201, payload)
 }
 
 func (o *CreateFrontendCreated) GetPayload() *CreateFrontendCreatedBody {
@@ -122,7 +125,7 @@ func (o *CreateFrontendCreated) readResponse(response runtime.ClientResponse, co
 	o.Payload = new(CreateFrontendCreatedBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -173,11 +176,11 @@ func (o *CreateFrontendBadRequest) Code() int {
 }
 
 func (o *CreateFrontendBadRequest) Error() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendBadRequest ", 400)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendBadRequest", 400)
 }
 
 func (o *CreateFrontendBadRequest) String() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendBadRequest ", 400)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendBadRequest", 400)
 }
 
 func (o *CreateFrontendBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -229,11 +232,11 @@ func (o *CreateFrontendUnauthorized) Code() int {
 }
 
 func (o *CreateFrontendUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendUnauthorized ", 401)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendUnauthorized", 401)
 }
 
 func (o *CreateFrontendUnauthorized) String() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendUnauthorized ", 401)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendUnauthorized", 401)
 }
 
 func (o *CreateFrontendUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -285,11 +288,11 @@ func (o *CreateFrontendNotFound) Code() int {
 }
 
 func (o *CreateFrontendNotFound) Error() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendNotFound ", 404)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendNotFound", 404)
 }
 
 func (o *CreateFrontendNotFound) String() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendNotFound ", 404)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendNotFound", 404)
 }
 
 func (o *CreateFrontendNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -341,11 +344,11 @@ func (o *CreateFrontendInternalServerError) Code() int {
 }
 
 func (o *CreateFrontendInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendInternalServerError ", 500)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendInternalServerError", 500)
 }
 
 func (o *CreateFrontendInternalServerError) String() string {
-	return fmt.Sprintf("[POST /frontend][%d] createFrontendInternalServerError ", 500)
+	return fmt.Sprintf("[POST /frontend][%d] createFrontendInternalServerError", 500)
 }
 
 func (o *CreateFrontendInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -363,7 +366,7 @@ type CreateFrontendBody struct {
 	Dynamic bool `json:"dynamic,omitempty"`
 
 	// permission mode
-	// Enum: [open closed]
+	// Enum: ["open","closed"]
 	PermissionMode string `json:"permissionMode,omitempty"`
 
 	// public name
@@ -390,7 +393,7 @@ func (o *CreateFrontendBody) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-var createFrontendBodyTypePermissionModePropEnum []interface{}
+var createFrontendBodyTypePermissionModePropEnum []any
 
 func init() {
 	var res []string

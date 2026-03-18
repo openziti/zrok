@@ -7,6 +7,8 @@ package share
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type AccessReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *AccessReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *AccessReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 201:
 		result := NewAccessCreated()
@@ -97,11 +99,13 @@ func (o *AccessCreated) Code() int {
 }
 
 func (o *AccessCreated) Error() string {
-	return fmt.Sprintf("[POST /access][%d] accessCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /access][%d] accessCreated %s", 201, payload)
 }
 
 func (o *AccessCreated) String() string {
-	return fmt.Sprintf("[POST /access][%d] accessCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /access][%d] accessCreated %s", 201, payload)
 }
 
 func (o *AccessCreated) GetPayload() *AccessCreatedBody {
@@ -113,7 +117,7 @@ func (o *AccessCreated) readResponse(response runtime.ClientResponse, consumer r
 	o.Payload = new(AccessCreatedBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -164,11 +168,11 @@ func (o *AccessUnauthorized) Code() int {
 }
 
 func (o *AccessUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /access][%d] accessUnauthorized ", 401)
+	return fmt.Sprintf("[POST /access][%d] accessUnauthorized", 401)
 }
 
 func (o *AccessUnauthorized) String() string {
-	return fmt.Sprintf("[POST /access][%d] accessUnauthorized ", 401)
+	return fmt.Sprintf("[POST /access][%d] accessUnauthorized", 401)
 }
 
 func (o *AccessUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -220,11 +224,11 @@ func (o *AccessNotFound) Code() int {
 }
 
 func (o *AccessNotFound) Error() string {
-	return fmt.Sprintf("[POST /access][%d] accessNotFound ", 404)
+	return fmt.Sprintf("[POST /access][%d] accessNotFound", 404)
 }
 
 func (o *AccessNotFound) String() string {
-	return fmt.Sprintf("[POST /access][%d] accessNotFound ", 404)
+	return fmt.Sprintf("[POST /access][%d] accessNotFound", 404)
 }
 
 func (o *AccessNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -276,11 +280,11 @@ func (o *AccessInternalServerError) Code() int {
 }
 
 func (o *AccessInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /access][%d] accessInternalServerError ", 500)
+	return fmt.Sprintf("[POST /access][%d] accessInternalServerError", 500)
 }
 
 func (o *AccessInternalServerError) String() string {
-	return fmt.Sprintf("[POST /access][%d] accessInternalServerError ", 500)
+	return fmt.Sprintf("[POST /access][%d] accessInternalServerError", 500)
 }
 
 func (o *AccessInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

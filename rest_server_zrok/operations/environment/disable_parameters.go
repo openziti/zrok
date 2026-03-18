@@ -27,7 +27,6 @@ func NewDisableParams() DisableParams {
 //
 // swagger:parameters disable
 type DisableParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *DisableParams) BindRequest(r *http.Request, route *middleware.MatchedRo
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body DisableBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
