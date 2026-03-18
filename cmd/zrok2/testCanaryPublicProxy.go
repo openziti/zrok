@@ -43,6 +43,7 @@ type testCanaryPublicProxy struct {
 	targetName        string
 	frontendSelection string
 	http              bool
+	frontendPort      uint16
 	canaryConfig      string
 }
 
@@ -77,6 +78,7 @@ func newTestCanaryPublicProxy() *testCanaryPublicProxy {
 	cmd.Flags().StringVar(&command.targetName, "target-name", "", "Metadata describing the virtual target")
 	cmd.Flags().StringVar(&command.frontendSelection, "frontend-selection", "public", "Select frontend selection")
 	cmd.Flags().BoolVar(&command.http, "http", false, "Use http:// scheme for frontend endpoints (default: https://)")
+	cmd.Flags().Uint16Var(&command.frontendPort, "frontend-port", 0, "Port to append to frontend endpoints (0 = omit port)")
 	cmd.Flags().StringVar(&command.canaryConfig, "canary-config", "", "Path to canary configuration file")
 	return command
 }
@@ -144,6 +146,7 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 			MaxBatchPacing: cmd.maxBatchPacing,
 			TargetName:     cmd.targetName,
 			FrontendScheme: frontendScheme,
+			FrontendPort:   cmd.frontendPort,
 		}
 		if cmd.payload > 0 {
 			looperOpts.MinPayload = cmd.payload

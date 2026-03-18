@@ -266,7 +266,14 @@ cleanup() {
 
 # Exit cleanup: best-effort — don't mask the real exit code.
 cleanup_on_exit() {
+    local _real_exit=$?
     set +o errexit
+    # Catch nounset/syntax errors that bypass the ERR trap (exit != 0 but
+    # _exit_code was never updated).
+    if (( _real_exit != 0 && _exit_code == 0 )); then
+        _exit_code="${_real_exit}"
+        _fail_summary="exited with status ${_real_exit} (may be nounset or syntax error)"
+    fi
     if (( KEEP )); then
         log_info "keeping test instance (--keep); run with --only-clean to tear down"
     else
@@ -711,6 +718,130 @@ else
         log_error "Ziti data plane traffic verification failed"
         log_info "continuing despite traffic verification failure"
     fi
+fi
+
+# ============================================================
+# Phase 10: Canary looper (exercise shares through the public frontend)
+# ============================================================
+log_section "Phase 10: Canary public-proxy looper"
+
+# Create a fresh canary account and enable an environment.  Use an isolated
+# HOME so the operator's enabled environment doesn't interfere.  The zrok2
+# admin CLI uses ZROK2_ADMIN_TOKEN + ZROK2_API_ENDPOINT from the environment.
+# zrok2 enable bootstraps the environment in one shot when ZROK2_API_ENDPOINT
+# is set.
+CANARY_HOME="$(mktemp -d)"
+
+_canary_token=$(HOME="${CANARY_HOME}" "${ZROK2_BIN}" admin create account \
+    "canary-$(date +%s)@zrok.internal" "canarypass")
+log_info "canary account token: ${_canary_token}"
+
+HOME="${CANARY_HOME}" "${ZROK2_BIN}" enable "${_canary_token}" --description "canary-test"
+
+# Determine the frontend port from the installed frontend config.
+_frontend_port=$(grep 'bind_address:' /etc/zrok2/frontend.yml 2>/dev/null | grep -oP ':\K[0-9]+$' || echo "8080")
+_canary_flags=(--iterations 3 --loopers 1 --min-payload 256 --max-payload 256 --min-pacing 1s --max-pacing 1s)
+if [[ "${_frontend_port}" != "443" ]]; then
+    _canary_flags+=(--http --frontend-port "${_frontend_port}")
+fi
+
+HOME="${CANARY_HOME}" ZROK2_DANGEROUS_CANARY=1 \
+    "${ZROK2_BIN}" test canary public-proxy "${_canary_flags[@]}"
+log_pass "canary public-proxy looper passed"
+
+# ── Named share test ─────────────────────────────────────────────────────────
+# Create a share with an explicit name (--name-selection) and verify the
+# AMQP-backed dynamic frontend serves it at the expected URL.
+log_info "testing named share via dynamic frontend..."
+_share_name="citest-$(date +%s)"
+_scheme="http"
+if [[ "${_frontend_port}" == "443" ]]; then _scheme="https"; fi
+_share_url="${_scheme}://${_share_name}.${ZROK2_DNS_ZONE}:${_frontend_port}/"
+
+# Start zrok2's built-in test endpoint as a backend.
+"${ZROK2_BIN}" test endpoint --port 19999 &>/dev/null &
+_http_pid=$!
+
+# Pre-create the name (v2 equivalent of "zrok reserve").
+HOME="${CANARY_HOME}" "${ZROK2_BIN}" create name "${_share_name}"
+
+# Create the named share in the background (long-running).  Keep stderr
+# visible so share creation errors appear in the log.
+HOME="${CANARY_HOME}" "${ZROK2_BIN}" share public http://127.0.0.1:19999 \
+    --name-selection "public:${_share_name}" --backend-mode proxy --headless >/dev/null &
+_share_pid=$!
+
+# Give the share time to register with the controller and propagate via AMQP.
+sleep 5
+
+# Verify the share process is still alive (didn't exit with an error).
+if ! kill -0 "${_share_pid}" 2>/dev/null; then
+    log_error "named share process exited prematurely"
+    wait "${_share_pid}" 2>/dev/null || true
+    kill "${_http_pid}" 2>/dev/null || true
+    exit 1
+fi
+
+# Wait for the share to propagate to the dynamic frontend.
+log_info "waiting for named share at ${_share_url} ..."
+# Poll until the frontend routes the named share and the content matches.
+_attempts=30
+while (( _attempts-- > 0 )); do
+    if curl -sf "${_share_url}" 2>/dev/null | grep -qi "zrok"; then
+        break
+    fi
+    sleep 2
+done
+if (( _attempts < 0 )); then
+    log_error "named share '${_share_name}' not reachable or content mismatch after 60s"
+    kill "${_share_pid}" "${_http_pid}" 2>/dev/null || true
+    exit 1
+fi
+log_pass "named share '${_share_name}' content verified on the dynamic frontend"
+
+# Clean up share and backend.
+kill "${_share_pid}" "${_http_pid}" 2>/dev/null || true
+wait "${_share_pid}" 2>/dev/null || true
+wait "${_http_pid}" 2>/dev/null || true
+
+# Disable the canary environment
+HOME="${CANARY_HOME}" "${ZROK2_BIN}" disable 2>/dev/null || true
+
+# ============================================================
+# Phase 11: Verify metrics pipeline (InfluxDB has data from canary)
+# ============================================================
+log_section "Phase 11: Verify metrics pipeline"
+
+_influx_token=$(sudo grep -A5 'influx:' /etc/zrok2/ctrl.yml | grep 'token:' | head -1 | awk -F'"' '{print $2}' || true)
+if [[ -n "${_influx_token}" ]]; then
+    # Wait for metrics to propagate through the pipeline (bridge → RabbitMQ → controller → InfluxDB).
+    # The default metricsReportInterval is 60s, so we may need to wait.
+    log_info "waiting up to 90s for metrics to appear in InfluxDB..."
+    _metrics_found=false
+    for _attempt in $(seq 1 18); do
+        _count=$(influx query \
+            'from(bucket: "zrok") |> range(start: -5m) |> count()' \
+            --org zrok --token "${_influx_token}" --raw 2>/dev/null \
+            | grep -c ',' || true)
+        if (( _count > 0 )); then
+            _metrics_found=true
+            break
+        fi
+        sleep 5
+    done
+
+    if [[ "${_metrics_found}" == "true" ]]; then
+        log_pass "metrics pipeline verified: InfluxDB has data (${_count} series)"
+    else
+        log_error "metrics pipeline: no data in InfluxDB after 90s"
+        sudo systemctl status zrok2-metrics-bridge --no-pager 2>&1 | head -5 || true
+        sudo rabbitmqctl list_queues 2>&1 || true
+        sudo journalctl -u zrok2-metrics-bridge --no-pager -n 10 2>&1 || true
+        exit 1
+    fi
+else
+    log_error "could not extract InfluxDB token from ctrl.yml"
+    exit 1
 fi
 
 # ============================================================

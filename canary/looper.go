@@ -23,6 +23,7 @@ type LooperOptions struct {
 	TargetName     string
 	BindAddress    string
 	FrontendScheme string
+	FrontendPort   uint16
 	SnapshotQueue  chan *Snapshot
 }
 

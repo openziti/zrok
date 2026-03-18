@@ -29,7 +29,7 @@ services:
       ZITI_CLUSTER_NODE_NAME: ziti-ctrl
       PFXLOG_NO_JSON: "true"
     volumes:
-      - ziti-ctrl-data:/home/ziggy
+      - ziti-ctrl-data:/ziti-controller
     ports:
       - "${ZROK2_INSECURE_INTERFACE:-127.0.0.1}:${ZITI_CTRL_PORT:-1280}:${ZITI_CTRL_PORT:-1280}"
     networks:
@@ -190,11 +190,15 @@ services:
       ZROK2_FRONTEND_PORT: ${ZROK2_FRONTEND_PORT:-8080}
       ZROK2_STORE_TYPE: ${ZROK2_STORE_TYPE:-postgres}
       ZROK2_DB_PASSWORD: ${ZROK2_DB_PASSWORD:-zrok2defaultpw}
+      ZROK2_METRICS_ENABLED: ${ZROK2_METRICS_ENABLED:-false}
+      ZROK2_INFLUX_TOKEN: ${ZROK2_INFLUX_TOKEN:-}
       HOME: /var/lib/zrok2
     depends_on:
       ziti-controller:
         condition: service_healthy
       postgresql:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     volumes:
       - zrok2-config:/var/lib/zrok2
@@ -235,7 +239,7 @@ services:
 
   zrok2-frontend:
     <<: *zrok2-image
-    command: ["access", "public", "/var/lib/zrok2/config/frontend.yaml"]
+    command: ["access", "dynamicProxy", "/var/lib/zrok2/config/frontend.yaml"]
     environment:
       ZROK2_API_ENDPOINT: http://zrok2-controller:${ZROK2_CTRL_PORT:-18080}
       HOME: /var/lib/zrok2
@@ -251,11 +255,34 @@ services:
     restart: unless-stopped
 
   # ── Metrics Pipeline (optional) ──────────────────────────────────────────
-  # To enable: set ZROK2_METRICS_ENABLED=true in .env
+  # To enable: set ZROK2_METRICS_ENABLED=true in .env and run with
+  #   docker compose --profile metrics up -d
 
+  # Metrics bridge: reads fabric-usage.json from the Ziti controller data
+  # volume and publishes events to RabbitMQ for the zrok2 controller to
+  # consume and write to InfluxDB.
+  zrok2-metrics-bridge:
+    <<: *zrok2-image
+    command: ["controller", "metrics", "bridge", "/var/lib/zrok2/config/ctrl.yaml"]
+    profiles: ["metrics"]
+    environment:
+      HOME: /var/lib/zrok2
+    depends_on:
+      zrok2-controller:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - zrok2-config:/var/lib/zrok2:ro
+      - ziti-ctrl-data:/ziti-data
+    networks:
+      - zrok2
+    restart: unless-stopped
+
+  # RabbitMQ is required by the dynamic frontend for real-time mapping updates
+  # (AMQP-backed share name resolution).  It is NOT optional.
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    profiles: ["metrics"]
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     networks:

@@ -805,7 +805,7 @@ step_create_frontend() {
     info "Found public identity Ziti ID: $public_ziti_id"
 
     local output
-    if ! output=$(zrok2_admin create frontend --dynamic "$public_ziti_id" public "https://{token}.${ZROK2_DNS_ZONE}" 2>&1); then
+    if ! output=$(zrok2_admin create frontend --dynamic "$public_ziti_id" public 2>&1); then
         error "zrok2 admin create frontend failed: $output"
         return 1
     fi
@@ -899,20 +899,27 @@ step_dynamic_proxy_controller() {
         info "Dial policy ${SERVICE_NAME}-dial already exists"
     fi
 
-    # Add the dynamic_proxy_controller block to ctrl.yml now that the identity exists.
-    # The controller will be restarted in step_start_services to pick this up.
+    # Insert the dynamic_proxy_controller block into ctrl.yml now that the
+    # identity file exists.  We use sed to insert BEFORE the 'endpoint:' line
+    # rather than appending to the end — the Go YAML parser reliably reads
+    # content that's part of the original file structure but may ignore
+    # content appended after the initial write.
     if ! grep -q 'dynamic_proxy_controller:' "$CTRL_CONFIG" 2>/dev/null; then
-        info "Adding dynamic_proxy_controller to $CTRL_CONFIG..."
-        cat >> "$CTRL_CONFIG" <<DPCEOF
-
-dynamic_proxy_controller:
-  identity_path: ${CONTROLLER_HOME}/.zrok2/identities/dynamicProxyController.json
-  service_name: dynamicProxyController
-  amqp_publisher:
-    url: ${ZROK2_AMQP_URL}
-    exchange_name: dynamicProxy
-DPCEOF
-        info "dynamic_proxy_controller block added to config"
+        info "Inserting dynamic_proxy_controller into $CTRL_CONFIG..."
+        sed -i "/^endpoint:/i\\
+\\
+dynamic_proxy_controller:\\
+  identity_path: ${CONTROLLER_HOME}/.zrok2/identities/dynamicProxyController.json\\
+  service_name: dynamicProxyController\\
+  amqp_publisher:\\
+    url: ${ZROK2_AMQP_URL}\\
+    exchange_name: dynamicProxy\\
+" "$CTRL_CONFIG"
+        # Verify the block was written correctly.
+        if ! grep -q 'dynamic_proxy_controller:' "$CTRL_CONFIG"; then
+            die "Failed to write dynamic_proxy_controller to $CTRL_CONFIG"
+        fi
+        info "dynamic_proxy_controller inserted into config"
     fi
 
     info "dynamicProxyController Ziti resources are configured"
@@ -1192,13 +1199,68 @@ step_start_services() {
         sleep 2
     fi
 
-    # Restart controller to pick up dynamic_proxy_controller config, metrics, and new overrides
+    # Restart controller to pick up dynamic_proxy_controller config, metrics, and new overrides.
+    # The frontend fatally exits if the dynamicProxyController gRPC service is
+    # unreachable, so we must wait for the controller to fully initialize its
+    # Ziti identity and register a terminator before starting the frontend.
     info "Restarting zrok2-controller to apply full configuration..."
-    systemctl restart zrok2-controller
-    sleep 2
+    if ! grep -q 'dynamic_proxy_controller:' "$CTRL_CONFIG"; then
+        warn "dynamic_proxy_controller not found in $CTRL_CONFIG — frontend may crash-loop"
+    fi
+    sync
+    systemctl stop zrok2-controller
+    # Ensure the old process is fully dead and the port is released.
+    sleep 3
+    # Drop the kernel's page cache to force the new process to read from disk.
+    # This works around a persistent issue where the Go YAML parser in the new
+    # process reads stale file content despite sed -i having atomically replaced
+    # the file (the old inode's cached pages may still be served to new readers
+    # of the same path before the dentry cache updates).
+    echo 1 > /proc/sys/vm/drop_caches 2>/dev/null || true
+    systemctl start zrok2-controller
+
+    # Wait for the HTTP API to respond (confirms the process is alive).
+    wait_for 60 2 "zrok2-controller API after restart" \
+        curl -sf -H "Accept: application/zrok.v1+json" \
+            "http://127.0.0.1:${ZROK2_CTRL_PORT}/api/v1/version" -o /dev/null
+
+    # Verify the running controller loaded the dynamic_proxy_controller section.
+    # If it didn't (stale file read), restart once more.
+    _dpc_loaded() {
+        journalctl -u zrok2-controller --no-pager -n 1 -o cat 2>/dev/null \
+            | grep -q 'dynamic_proxy_controller.*Config'
+    }
+    if ! _dpc_loaded; then
+        warn "controller loaded stale config (dynamic_proxy_controller: nil) — restarting again"
+        systemctl restart zrok2-controller
+        wait_for 60 2 "zrok2-controller API after second restart" \
+            curl -sf -H "Accept: application/zrok.v1+json" \
+                "http://127.0.0.1:${ZROK2_CTRL_PORT}/api/v1/version" -o /dev/null
+    fi
+
+    # Wait for the dynamicProxyController Ziti service to have at least one
+    # terminator — this means the controller has connected its Ziti identity
+    # and is ready to serve gRPC requests from the frontend.
+    _dpc_ready() {
+        ziti edge list terminators 'service.name="dynamicProxyController"' -j 2>/dev/null \
+            | jq -e '.data | length > 0' &>/dev/null
+    }
+    wait_for 60 3 "dynamicProxyController terminator" _dpc_ready
+    info "dynamicProxyController is bound and ready"
+
+    # Re-apply g+w on the fabric-usage.json directory — systemd's
+    # StateDirectory= resets /var/lib/ziti-controller to 755 on every
+    # controller restart, undoing the chmod from step 16.
+    local usage_dir
+    usage_dir="$(dirname "$FABRIC_USAGE_PATH")"
+    chmod g+w "$usage_dir"
 
     systemctl enable --now zrok2-frontend
     info "zrok2-frontend started"
+
+    # Restart the metrics bridge — it may have been crash-looping while
+    # waiting for the directory permissions to be fixed.
+    systemctl restart zrok2-metrics-bridge 2>/dev/null || true
 }
 
 # ── Main ─────────────────────────────────────────────────────────────────────

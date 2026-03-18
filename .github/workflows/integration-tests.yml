@@ -45,8 +45,41 @@ jobs:
           python3 -m venv sdk/python/.venv
           sdk/python/.venv/bin/pip install -e 'sdk/python/src/[test]' flask waitress requests
 
+      - name: Resolve Ziti version for Docker images
+        id: ziti-docker-version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ZITI_TEST_VERSION: ${{ vars.ZITI_TEST_VERSION }}
+        run: |
+          if [[ -n "${ZITI_TEST_VERSION:-}" ]]; then
+            V="${ZITI_TEST_VERSION}"
+            echo "Using pinned version: ${V}"
+          else
+            V=$(
+              gh api --method GET \
+                'repos/openziti/ziti/releases?per_page=100' \
+                --jq '
+                  [.[]
+                   | select(.prerelease == false
+                            and .draft == false)
+                  ] | first | .tag_name | ltrimstr("v")'
+            )
+            echo "Resolved latest stable: ${V}"
+          fi
+          V="${V#v}"
+          if [[ -z "${V}" ]]; then
+            echo "ERROR: could not resolve Ziti version" >&2
+            exit 1
+          fi
+          echo "ZITI_TEST_VERSION=${V}" | tee -a "$GITHUB_OUTPUT"
+
       - name: Start zrok2 instance (built from source)
-        run: bash docker/compose/zrok2-instance/dangerous.docker.test.bash --keep
+        run: |
+          ARGS=(--keep --ziti-tag "${{ steps.ziti-docker-version.outputs.ZITI_TEST_VERSION }}")
+          if [[ -n "${{ vars.ZITI_TEST_REPO }}" ]]; then
+            ARGS+=(--ziti-repo "${{ vars.ZITI_TEST_REPO }}")
+          fi
+          bash docker/compose/zrok2-instance/dangerous.docker.test.bash "${ARGS[@]}"
         timeout-minutes: 13
 
       - name: Run Python SDK integration tests
@@ -102,10 +135,10 @@ jobs:
         id: ziti-version
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ZITI_LINUX_VERSION: ${{ vars.ZITI_LINUX_VERSION }}
+          ZITI_TEST_VERSION: ${{ vars.ZITI_TEST_VERSION }}
         run: |
-          if [[ -n "${ZITI_LINUX_VERSION:-}" ]]; then
-            V="${ZITI_LINUX_VERSION}"
+          if [[ -n "${ZITI_TEST_VERSION:-}" ]]; then
+            V="${ZITI_TEST_VERSION}"
             echo "Using pinned version: ${V}"
           else
             V=$(
@@ -124,7 +157,7 @@ jobs:
             echo "ERROR: could not resolve Ziti version" >&2
             exit 1
           fi
-          echo "ZITI_VERSION=${V}" | tee -a "$GITHUB_OUTPUT"
+          echo "ZITI_TEST_VERSION=${V}" | tee -a "$GITHUB_OUTPUT"
 
       - name: Run Linux deployment test (keep instance)
         env:
@@ -133,7 +166,7 @@ jobs:
         run: |
           bash ./nfpm/dangerous.linux.test.bash \
             --keep \
-            --ziti-version "${{ steps.ziti-version.outputs.ZITI_VERSION }}"
+            --ziti-version "${{ steps.ziti-version.outputs.ZITI_TEST_VERSION }}"
 
       - name: Run Go SDK integration tests
         run: |
