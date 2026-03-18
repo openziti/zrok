@@ -42,3 +42,4 @@ sdk/nodejs/sdk/dist
 /sdk/python/src/**/__pycache__/
 /.coverage
 /sdk/python/src/dist/
+ui/build

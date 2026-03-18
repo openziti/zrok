@@ -1,108 +1,108 @@
-name: Publish Python Distributions
-
-on:
-  release:
-    types: [released]
-
-jobs:
-  enforce_stable_semver:
-    name: Require Stable Release Semver
-    runs-on: ubuntu-24.04
-    outputs:
-      version: ${{ steps.parse.outputs.version }}
-    steps:
-      - name: Parse Release Version
-        id: parse
-        shell: bash
-        run: |
-          if [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is a stable release semver ref"
-            echo "version=${GITHUB_REF_NAME#v}" | tee -a $GITHUB_OUTPUT
-          else
-            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is not a stable release semver ref" >&2
-            exit 1
-          fi
-
-  build_distributions:
-    name: Building Python Distributions
-    needs: enforce_stable_semver
-    runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: sdk/python/src
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-          cache: 'pip'
-
-      - name: Build Python distributions
-        env:
-          ZROK_VERSION: ${{ github.event.release.tag_name }}
-          ZROK_PY_NAME: ${{ vars.ZROK_PY_NAME || null }}
-        shell: bash
-        run: |
-
-          set -o pipefail 
-          set -o xtrace
-
-          # Install build requirements
-          pip install --upgrade pip
-          pip install -r build-requirements.txt
-          
-          # Build source distribution and wheel
-          python -m build
-          
-          # List built distributions
-          ls -lAR ./dist
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: zrok_sdk_distributions
-          path: sdk/python/src/dist/*
-
-  publish_testpypi:
-    name: Publish TestPyPI
-    runs-on: ubuntu-24.04
-    needs: [ build_distributions ]
-    permissions:
-      id-token: write
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: sdk/python/src/dist
-          merge-multiple: true
-          pattern: zrok_sdk_distributions
-
-      - name: Publish Distributions to TestPyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          packages-dir: sdk/python/src/dist
-          skip-existing: true
-          verbose: true
-
-  publish_pypi:
-    name: Publish PyPI
-    runs-on: ubuntu-24.04
-    needs: [ publish_testpypi ]
-    permissions:
-      id-token: write
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: sdk/python/src/dist
-          merge-multiple: true
-          pattern: zrok_sdk_distributions
-
-      - name: Publish Distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: sdk/python/src/dist
-          verbose: true
+#name: Publish Python Distributions
+#
+#on:
+#  release:
+#    types: [released]
+#
+#jobs:
+#  enforce_stable_semver:
+#    name: Require Stable Release Semver
+#    runs-on: ubuntu-24.04
+#    outputs:
+#      version: ${{ steps.parse.outputs.version }}
+#    steps:
+#      - name: Parse Release Version
+#        id: parse
+#        shell: bash
+#        run: |
+#          if [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+#            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is a stable release semver ref"
+#            echo "version=${GITHUB_REF_NAME#v}" | tee -a $GITHUB_OUTPUT
+#          else
+#            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is not a stable release semver ref" >&2
+#            exit 1
+#          fi
+#
+#  build_distributions:
+#    name: Building Python Distributions
+#    needs: enforce_stable_semver
+#    runs-on: ubuntu-24.04
+#    defaults:
+#      run:
+#        working-directory: sdk/python/src
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#
+#      - name: Set up Python
+#        uses: actions/setup-python@v5
+#        with:
+#          python-version: '3.13'
+#          cache: 'pip'
+#
+#      - name: Build Python distributions
+#        env:
+#          ZROK_VERSION: ${{ github.event.release.tag_name }}
+#          ZROK_PY_NAME: ${{ vars.ZROK_PY_NAME || null }}
+#        shell: bash
+#        run: |
+#
+#          set -o pipefail
+#          set -o xtrace
+#
+#          # Install build requirements
+#          pip install --upgrade pip
+#          pip install -r build-requirements.txt
+#
+#          # Build source distribution and wheel
+#          python -m build
+#
+#          # List built distributions
+#          ls -lAR ./dist
+#
+#      - uses: actions/upload-artifact@v4
+#        with:
+#          name: zrok_sdk_distributions
+#          path: sdk/python/src/dist/*
+#
+#  publish_testpypi:
+#    name: Publish TestPyPI
+#    runs-on: ubuntu-24.04
+#    needs: [ build_distributions ]
+#    permissions:
+#      id-token: write
+#    steps:
+#      - name: Download artifacts
+#        uses: actions/download-artifact@v4
+#        with:
+#          path: sdk/python/src/dist
+#          merge-multiple: true
+#          pattern: zrok_sdk_distributions
+#
+#      - name: Publish Distributions to TestPyPI
+#        uses: pypa/gh-action-pypi-publish@release/v1
+#        with:
+#          repository-url: https://test.pypi.org/legacy/
+#          packages-dir: sdk/python/src/dist
+#          skip-existing: true
+#          verbose: true
+#
+#  publish_pypi:
+#    name: Publish PyPI
+#    runs-on: ubuntu-24.04
+#    needs: [ publish_testpypi ]
+#    permissions:
+#      id-token: write
+#    steps:
+#      - name: Download artifacts
+#        uses: actions/download-artifact@v4
+#        with:
+#          path: sdk/python/src/dist
+#          merge-multiple: true
+#          pattern: zrok_sdk_distributions
+#
+#      - name: Publish Distributions to PyPI
+#        uses: pypa/gh-action-pypi-publish@release/v1
+#        with:
+#          packages-dir: sdk/python/src/dist
+#          verbose: true

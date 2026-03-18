@@ -1,100 +1,100 @@
-name: Build/Release Node SDK
-
-on:
-  release:
-    types: [ released ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-
-  enforce_stable_semver:
-    name: Require Stable Release Semver
-    if: github.event.action == 'released'
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Parse Release Version
-        id: parse
-        shell: bash
-        run: |
-          if [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is a stable release semver ref"
-            echo "version=${GITHUB_REF_NAME#v}" | tee -a $GITHUB_OUTPUT
-          else
-            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is not a stable release semver ref" >&2
-            exit 1
-          fi
-
-  build:
-    needs: enforce_stable_semver
-    if: always()
-    name: Build for Node-${{ matrix.node_ver }} ${{ matrix.config.target }}/${{ matrix.config.arch }}
-    runs-on: ${{ matrix.config.os }}
-    env:
-      BUILD_NUMBER: ${{ github.run_number }}
-      AWS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-
-    strategy:
-      matrix:
-        config:
-          - { os: ubuntu-24.04, target: "linux", arch: "x64" }
-        node_ver: [ 20 ]
-      fail-fast: false
-
-    steps:
-
-    - name: Node Version
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node_ver }}
-
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Get current zrok repo tag
-      if: github.event.action == 'released'
-      id: tag
-      shell: bash
-      run: echo "TAG=$(git describe --tags --always)" | tee -a $GITHUB_OUTPUT
-
-    - name: Update zrok NodeJS-SDK's package.json version based on current zrok repo git tag
-      if: github.event.action == 'released'
-      shell: bash
-      run: |
-        cd sdk/nodejs/sdk
-        npm version ${{ steps.tag.outputs.TAG }} --no-git-tag-version --allow-same-version
-
-    - name: Setup .npmrc
-      if: github.event.action == 'released'
-      # Setup .npmrc file to prepare for possible publish to npm
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        registry-url: https://registry.npmjs.org
-
-    - name: Build the zrok NodeJS-SDK
-      shell: bash
-      run: |
-        cd sdk/nodejs/sdk
-        npm install
-        npm run build
-      env:
-        BUILD_DATE: ${{ steps.date.outputs.date }}
-
-    - name: NPM Publish
-      if: github.event.action == 'released'
-      shell: bash
-      run: |
-        cd sdk/nodejs/sdk
-        # Check if this is the official repository
-        if [[ "${{ github.repository_owner }}" == "openziti" ]]; then
-          echo "Publishing from official repository with @latest tag"
-          npm publish --access public
-        else
-          echo "Publishing from fork/test repository with @canary tag"
-          npm publish --access public --tag canary
-        fi
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+#name: Build/Release Node SDK
+#
+#on:
+#  release:
+#    types: [ released ]
+#  pull_request:
+#    branches: [ main ]
+#
+#jobs:
+#
+#  enforce_stable_semver:
+#    name: Require Stable Release Semver
+#    if: github.event.action == 'released'
+#    runs-on: ubuntu-24.04
+#    steps:
+#      - name: Parse Release Version
+#        id: parse
+#        shell: bash
+#        run: |
+#          if [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+#            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is a stable release semver ref"
+#            echo "version=${GITHUB_REF_NAME#v}" | tee -a $GITHUB_OUTPUT
+#          else
+#            echo "GITHUB_REF_NAME=${GITHUB_REF_NAME} is not a stable release semver ref" >&2
+#            exit 1
+#          fi
+#
+#  build:
+#    needs: enforce_stable_semver
+#    if: always()
+#    name: Build for Node-${{ matrix.node_ver }} ${{ matrix.config.target }}/${{ matrix.config.arch }}
+#    runs-on: ${{ matrix.config.os }}
+#    env:
+#      BUILD_NUMBER: ${{ github.run_number }}
+#      AWS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#
+#    strategy:
+#      matrix:
+#        config:
+#          - { os: ubuntu-24.04, target: "linux", arch: "x64" }
+#        node_ver: [ 20 ]
+#      fail-fast: false
+#
+#    steps:
+#
+#    - name: Node Version
+#      uses: actions/setup-node@v4
+#      with:
+#        node-version: ${{ matrix.node_ver }}
+#
+#    - name: Checkout
+#      uses: actions/checkout@v4
+#      with:
+#        fetch-depth: 0
+#
+#    - name: Get current zrok repo tag
+#      if: github.event.action == 'released'
+#      id: tag
+#      shell: bash
+#      run: echo "TAG=$(git describe --tags --always)" | tee -a $GITHUB_OUTPUT
+#
+#    - name: Update zrok NodeJS-SDK's package.json version based on current zrok repo git tag
+#      if: github.event.action == 'released'
+#      shell: bash
+#      run: |
+#        cd sdk/nodejs/sdk
+#        npm version ${{ steps.tag.outputs.TAG }} --no-git-tag-version --allow-same-version
+#
+#    - name: Setup .npmrc
+#      if: github.event.action == 'released'
+#      # Setup .npmrc file to prepare for possible publish to npm
+#      uses: actions/setup-node@v4
+#      with:
+#        node-version: ${{ matrix.node-version }}
+#        registry-url: https://registry.npmjs.org
+#
+#    - name: Build the zrok NodeJS-SDK
+#      shell: bash
+#      run: |
+#        cd sdk/nodejs/sdk
+#        npm install
+#        npm run build
+#      env:
+#        BUILD_DATE: ${{ steps.date.outputs.date }}
+#
+#    - name: NPM Publish
+#      if: github.event.action == 'released'
+#      shell: bash
+#      run: |
+#        cd sdk/nodejs/sdk
+#        # Check if this is the official repository
+#        if [[ "${{ github.repository_owner }}" == "openziti" ]]; then
+#          echo "Publishing from official repository with @latest tag"
+#          npm publish --access public
+#        else
+#          echo "Publishing from fork/test repository with @canary tag"
+#          npm publish --access public --tag canary
+#        fi
+#      env:
+#        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
