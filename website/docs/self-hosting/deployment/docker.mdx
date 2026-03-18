@@ -6,14 +6,14 @@ sidebar_position: 45
 
 This guide walks through deploying a self-hosted zrok2 instance using Docker
 Compose. The stack runs the same components as the
-[Linux self-hosting guide](/docs/zrok/self-hosting/deployment/linux/) — Ziti overlay, zrok2
+[Linux self-hosting guide](@zrokdocs/self-hosting/deployment/linux) — OpenZiti overlay, zrok2
 controller, frontend, and PostgreSQL — using official container images with
 runtime configuration via environment variables.
 
 :::info Single-host deployment
 This compose stack runs one frontend instance. For higher throughput or availability, run multiple
 frontend instances behind a reverse proxy (e.g., Caddy or Traefik). See
-[Scaling zrok frontends](/docs/zrok/self-hosting/scaling-frontends/) for details.
+[Scaling frontends](@zrokdocs/self-hosting/scaling-frontends) for details.
 :::
 
 ## Prerequisites
@@ -35,7 +35,7 @@ routing by subdomain. This avoids exposing the insecure ports 18080 (controller)
 
 For local testing only (no TLS), 18080 and 8080 also need to be reachable.
 
-## Download the Compose Project
+## Step 1: Download the Compose project
 
 ```bash
 curl -sSfL https://get.zrok.io/docker | tar -xz -C zrok2-instance
@@ -49,7 +49,7 @@ git clone https://github.com/openziti/zrok.git
 cd zrok/docker/compose/zrok2-instance
 ```
 
-## Configure Environment Variables
+## Step 2: Configure environment variables
 
 Copy the example environment file and edit it:
 
@@ -66,7 +66,7 @@ At minimum, set these three values:
 | `ZITI_PWD` | Ziti controller admin password | `mysecurepassword` |
 
 These match the same variable names used in the
-[Linux guide](/docs/zrok/self-hosting/deployment/linux/).
+[Linux self-hosting guide](@zrokdocs/self-hosting/deployment/linux).
 
 ### Optional Variables
 
@@ -83,7 +83,7 @@ These match the same variable names used in the
 | `ZROK2_IMAGE` | `docker.io/openziti/zrok2` | zrok2 container image |
 | `ZROK2_TAG` | `latest` | zrok2 image tag — set to a specific version for reproducible deployments |
 
-## Start the Stack
+## Step 3: Start the stack
 
 ```bash
 docker compose up -d
@@ -99,7 +99,7 @@ docker compose logs -f zrok2-init
 Once `zrok2-init` exits successfully, the controller and frontend start
 automatically.
 
-## Verify the Stack
+## Step 4: Verify the stack
 
 Check that all services are running:
 
@@ -114,7 +114,7 @@ curl -sf -H 'Accept: application/zrok.v1+json' \
   http://127.0.0.1:18080/api/v2/versions
 ```
 
-## Create Your First Account
+## Step 5: Create your first account
 
 ```bash
 docker compose exec zrok2-controller \
@@ -124,7 +124,7 @@ docker compose exec zrok2-controller \
 The command prints an **enable token**. Save it — you'll need it to enable
 your environment.
 
-## Enable a Client Environment
+## Step 6: Enable a client environment
 
 On your workstation (not the server), install the zrok2 CLI and point it at
 your instance:
@@ -136,7 +136,7 @@ zrok2 enable <token>
 
 Replace `<token>` with the enable token from the previous step.
 
-## Verify Named Shares Work
+## Step 7: Verify named shares work
 
 After enabling your environment, verify that the dynamic frontend serves named
 shares:
@@ -150,7 +150,7 @@ zrok2 share public http://127.0.0.1:8080 --name-selection public:mytest
 curl -sf http://mytest.share.example.com:8080/
 ```
 
-## Making the Frontend Publicly Accessible
+## Make the frontend publicly accessible
 
 By default, the zrok2 controller and frontend ports bind to `127.0.0.1` (localhost only) for
 safety. To make the frontend reachable from the internet without TLS, set `ZROK2_INSECURE_INTERFACE`
@@ -207,7 +207,7 @@ With TLS enabled, update your client:
 export ZROK2_API_ENDPOINT=https://zrok2.share.example.com
 ```
 
-## Optional: Enable Metrics Pipeline
+## Optional: Enable metrics pipeline
 
 To collect usage metrics, enable the metrics profile:
 
@@ -217,7 +217,7 @@ docker compose --profile metrics up -d
 
 This adds InfluxDB and a metrics bridge service. You also need to configure the
 Ziti controller to emit `fabric.usage` events — see the
-[Linux guide's metrics section](/docs/zrok/self-hosting/deployment/linux/#step-12-configure-openziti-metrics-events)
+[Linux self-hosting guide](@zrokdocs/self-hosting/deployment/linux#step-12-configure-openziti-metrics-events)
 for the configuration reference.
 
 ### Verify InfluxDB has data
@@ -238,7 +238,7 @@ docker compose logs zrok2-metrics-bridge --tail=50
 docker compose exec rabbitmq rabbitmqctl list_queues
 ```
 
-## Optional: Building from Source
+## Optional: Build from source
 
 For development or CI, you can build the zrok2 image from source instead of
 pulling a published image. This uses the `compose.build.yml` overlay, which
@@ -308,7 +308,7 @@ docker compose --profile metrics down -v --remove-orphans
 
 For details on what each service does, how the dynamic frontend's AMQP-based
 mapping updates work, and the full manual setup procedure, see the
-[Linux self-hosting guide](/docs/zrok/self-hosting/deployment/linux/).
+[Linux self-hosting guide](@zrokdocs/self-hosting/deployment/linux).
 
 ```text
 ┌──────────────────────────────────────────────────────┐
