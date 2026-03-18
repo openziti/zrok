@@ -27,7 +27,7 @@ If your directory contains files without an `index.html`, zrok serves a browsabl
 
 3. Access the share. zrok provides a browsable file index where visitors can navigate the file tree and download files.
 
-    ![zrok_share_web_files](../../images/zrok_share_web_files.png)
+    ![zrok file index](../../images/zrok_share_web_files.png)
 
 ## Share a static website
 
@@ -56,4 +56,4 @@ Where `index.html` contains valid HTML:
 
 3. Access the share. zrok renders the HTML directly in the browser:
 
-    ![zrok_share_web_website](../../images/zrok_share_web_website.png)
+    ![zrok static website](../../images/zrok_share_web_website.png)
