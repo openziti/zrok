@@ -10,6 +10,12 @@ Compose. The stack runs the same components as the
 controller, frontend, and PostgreSQL — using official container images with
 runtime configuration via environment variables.
 
+:::info Single-host deployment
+This compose stack runs one frontend instance. For higher throughput or availability, run multiple
+frontend instances behind a reverse proxy (e.g., Caddy or Traefik). See
+[Scaling zrok frontends](/docs/zrok/self-hosting/scaling-frontends/) for details.
+:::
+
 ## Prerequisites
 
 - Docker Engine 24+ with the Compose plugin (`docker compose`)
@@ -83,16 +89,26 @@ These match the same variable names used in the
 docker compose up -d
 ```
 
-On first start, two init services run before the main services:
+On first start, init services run before the main services to bootstrap the stack. The
+`zrok2-init` container performs the same steps as the
+[Linux manual setup](/docs/zrok/self-hosting/deployment/linux/#manual-setup) — automated
+end-to-end:
 
-- **`ziti-router-init`** — creates the edge router in the Ziti controller and saves its enrollment token for the router service to consume
+- **`ziti-router-init`** — creates the edge router in the Ziti controller and saves its enrollment
+  token for the router service to consume
 - **`zrok2-init`** — bootstraps the full zrok2 stack:
   1. Generates `ctrl.yaml` and `frontend.yaml` from environment variables
-  2. Waits for the Ziti controller to be healthy
-  3. Waits for PostgreSQL to be ready
-  4. Runs `zrok2 admin bootstrap` to initialize the database and create Ziti identities
-  5. Creates the dynamic frontend and public namespace
-  6. Saves the public frontend identity for the frontend container
+  2. Waits for the Ziti controller, PostgreSQL, and RabbitMQ to be healthy
+  3. Runs `zrok2 admin bootstrap` to initialize the database and create Ziti identities
+  4. Starts a temporary controller to run admin commands
+  5. Creates the dynamic frontend and public namespace with namespace-frontend mapping
+  6. Creates the `dynamicProxyController` identity, Ziti service, and routing policies — this is the
+     gRPC service that pushes real-time share mapping updates to the frontend via AMQP (required for
+     [named shares](#verify-named-shares-work))
+  7. Appends the `dynamic_proxy_controller` section to `ctrl.yaml`
+  8. Generates the full AMQP-backed `frontend.yaml` (v1 format with `amqp_subscriber` and
+     `controller` sections)
+  9. Saves identity files and fixes ownership for the non-root service containers
 
 This takes 1–2 minutes. Monitor progress:
 
@@ -100,8 +116,9 @@ This takes 1–2 minutes. Monitor progress:
 docker compose logs -f zrok2-init
 ```
 
-Once `zrok2-init` exits successfully, the controller and frontend start
-automatically.
+Once `zrok2-init` exits successfully, the controller and frontend start automatically. The controller
+reads the complete `ctrl.yaml` (including `dynamic_proxy_controller`) and binds the gRPC service on
+the Ziti overlay. The frontend connects to it for real-time mapping updates.
 
 ## Verify the Stack
 
@@ -139,6 +156,48 @@ zrok2 enable <token>
 ```
 
 Replace `<token>` with the enable token from the previous step.
+
+## Verify Named Shares Work
+
+After enabling your environment, verify that the AMQP-backed dynamic frontend serves named shares:
+
+```bash
+# Create a named share (runs in foreground — use a separate terminal)
+zrok2 share public http://127.0.0.1:8080 --name-selection public:mytest
+
+# From another terminal, verify the frontend routes it
+curl -sf http://mytest.share.example.com:8080/
+```
+
+Named shares use the `dynamicProxyController` gRPC service to push mapping updates to the frontend
+in real time via AMQP. This is set up automatically by `zrok2-init` during the initial bootstrap
+(see [Start the Stack](#start-the-stack) for details).
+
+## Making the Frontend Publicly Accessible
+
+By default, the zrok2 controller and frontend ports bind to `127.0.0.1` (localhost only) for
+safety. To make the frontend reachable from the internet without TLS, set `ZROK2_INSECURE_INTERFACE`
+in your `.env`:
+
+```bash
+ZROK2_INSECURE_INTERFACE=0.0.0.0
+```
+
+This publishes ports 18080 (controller API) and 8080 (frontend) insecurely on all interfaces. For production, use the
+[Caddy TLS overlay](#optional-enable-tls-with-caddy) instead.
+
+Alternatively, publish only the frontend port by overriding the port mapping in a
+`compose.override.yml`:
+
+```yaml
+services:
+  zrok2-frontend:
+    ports:
+      - "0.0.0.0:8080:8080"
+```
+
+The Ziti router data-plane port (3022) already binds to `0.0.0.0` because SDK clients must reach it
+from outside the Docker network and Ziti uses TLS for security.
 
 ## Optional: Enable TLS with Caddy
 
@@ -184,6 +243,24 @@ This adds RabbitMQ and InfluxDB. The `zrok2-init` service generates a minimal
 the `bridge` and `metrics` sections to `ctrl.yaml` and restart the controller
 (see the [Linux guide](/docs/zrok/self-hosting/deployment/linux/) for the full
 configuration reference).
+
+### Verify InfluxDB has data
+
+After creating a share and sending some traffic through it, verify metrics arrived in InfluxDB:
+
+```bash
+docker compose exec influxdb influx query \
+  'from(bucket: "zrok2") |> range(start: -5m) |> count()' \
+  --org zrok2 --token "${ZROK2_INFLUX_TOKEN}" --raw
+```
+
+A successful result contains CSV rows with count values. If no data appears, check the metrics
+bridge logs and RabbitMQ:
+
+```bash
+docker compose logs zrok2-metrics-bridge --tail=50
+docker compose exec rabbitmq rabbitmqctl list_queues
+```
 
 ## Optional: Building from Source
 

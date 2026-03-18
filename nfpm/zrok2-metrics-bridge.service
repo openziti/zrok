@@ -11,7 +11,7 @@ User=zrok2-metrics-bridge
 Group=zrok2-metrics-bridge
 WorkingDirectory=/var/lib/zrok2-metrics-bridge
 UMask=0007
-ExecStart=/usr/bin/zrok2-metrics-bridge-bridge.bash /etc/zrok2/ctrl.yml
+ExecStart=/usr/bin/zrok2-metrics-bridge.bash /etc/zrok2/ctrl.yml
 Restart=always
 RestartSec=3
 
