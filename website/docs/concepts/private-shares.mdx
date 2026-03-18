@@ -46,7 +46,7 @@ private shares are:
 - `udpTunnel`: Forwards raw UDP traffic to a target server
 - `socks`: Provides a SOCKS5 proxy, tunneling TCP traffic to its destination through the share
 
-The default mode is `proxy`, which forwards requests to an HTTP server on your machine:
+The default mode is `proxy`, which forwards requests to any HTTP or HTTPS URL reachable from your machine:
 
 ```bash title="proxy example"
 zrok2 share private 80

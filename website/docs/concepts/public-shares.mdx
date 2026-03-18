@@ -25,12 +25,12 @@ persistent public shares with a stable URL, see [Reserved names and namespaces](
 
 Public shares support HTTP-based backend modes only:
 
-- `proxy`: Forwards incoming requests to an HTTP or HTTPS server on your machine
+- `proxy`: Forwards incoming requests to any HTTP or HTTPS URL reachable from your machine
 - `web`: Serves a local directory as a browsable file index or static website
 - `drive`: Exposes a local directory over WebDAV for mounting as a network drive
 - `caddy`: Runs the built-in Caddy server using a Caddyfile you provide
 
-The default mode is `proxy`, which forwards requests to an HTTP server on your machine:
+The default mode is `proxy`, which forwards requests to any HTTP or HTTPS URL reachable from your machine:
 
 ```bash title="proxy example"
 zrok2 share public 80
