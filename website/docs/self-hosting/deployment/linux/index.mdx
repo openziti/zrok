@@ -440,6 +440,9 @@ After creating a user account and enabling an environment (see below), test that
 serves named shares:
 
 ```bash
+# Pre-create the name in the public namespace
+zrok2 create name mytest
+
 # Create a named share (runs in foreground — use a separate terminal)
 zrok2 share public http://127.0.0.1:8080 --name-selection public:mytest
 
@@ -448,7 +451,8 @@ curl -sf https://mytest.zrok.example.com/
 ```
 
 If the share is reachable at `mytest.zrok.example.com`, the AMQP-backed dynamic frontend is working
-correctly.
+correctly. The `zrok2 create name` step registers the name in the namespace — this is the v2
+equivalent of `zrok reserve` in v1.
 
 ### Step 12: Configure OpenZiti metrics events
 

@@ -49,10 +49,10 @@ jobs:
         id: ziti-docker-version
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ZITI_VERSION: ${{ vars.ZITI_TEST_VERSION }}
+          ZITI_TEST_VERSION: ${{ vars.ZITI_TEST_VERSION }}
         run: |
-          if [[ -n "${ZITI_VERSION:-}" ]]; then
-            V="${ZITI_VERSION}"
+          if [[ -n "${ZITI_TEST_VERSION:-}" ]]; then
+            V="${ZITI_TEST_VERSION}"
             echo "Using pinned version: ${V}"
           else
             V=$(
@@ -71,11 +71,11 @@ jobs:
             echo "ERROR: could not resolve Ziti version" >&2
             exit 1
           fi
-          echo "ZITI_VERSION=${V}" | tee -a "$GITHUB_OUTPUT"
+          echo "ZITI_TEST_VERSION=${V}" | tee -a "$GITHUB_OUTPUT"
 
       - name: Start zrok2 instance (built from source)
         run: |
-          ARGS=(--keep --ziti-tag "${{ steps.ziti-docker-version.outputs.ZITI_VERSION }}")
+          ARGS=(--keep --ziti-tag "${{ steps.ziti-docker-version.outputs.ZITI_TEST_VERSION }}")
           if [[ -n "${{ vars.ZITI_TEST_REPO }}" ]]; then
             ARGS+=(--ziti-repo "${{ vars.ZITI_TEST_REPO }}")
           fi
@@ -135,10 +135,10 @@ jobs:
         id: ziti-version
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ZITI_VERSION: ${{ vars.ZITI_TEST_VERSION }}
+          ZITI_TEST_VERSION: ${{ vars.ZITI_TEST_VERSION }}
         run: |
-          if [[ -n "${ZITI_VERSION:-}" ]]; then
-            V="${ZITI_VERSION}"
+          if [[ -n "${ZITI_TEST_VERSION:-}" ]]; then
+            V="${ZITI_TEST_VERSION}"
             echo "Using pinned version: ${V}"
           else
             V=$(
@@ -157,7 +157,7 @@ jobs:
             echo "ERROR: could not resolve Ziti version" >&2
             exit 1
           fi
-          echo "ZITI_VERSION=${V}" | tee -a "$GITHUB_OUTPUT"
+          echo "ZITI_TEST_VERSION=${V}" | tee -a "$GITHUB_OUTPUT"
 
       - name: Run Linux deployment test (keep instance)
         env:
@@ -166,7 +166,7 @@ jobs:
         run: |
           bash ./nfpm/dangerous.linux.test.bash \
             --keep \
-            --ziti-version "${{ steps.ziti-version.outputs.ZITI_VERSION }}"
+            --ziti-version "${{ steps.ziti-version.outputs.ZITI_TEST_VERSION }}"
 
       - name: Run Go SDK integration tests
         run: |

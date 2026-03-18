@@ -130,9 +130,17 @@ func newServiceProxy(cfg *config, ctx ziti.Context, mappings *mappings) (*httput
 	return proxy, nil
 }
 
-// hostOnly strips the port from a Host header value (e.g. "foo.example.com:8080" → "foo.example.com").
-// Mapping keys are stored without ports, but HTTP clients include the port in the Host header
-// when the port is non-standard.
+// hostOnly strips the port suffix from a Host header value
+// (e.g., "myshare.zrok.example.com:8080" → "myshare.zrok.example.com").
+//
+// Share-to-frontend mapping keys are bare hostnames without a port (e.g.,
+// "myshare.zrok.example.com"), but HTTP/1.1 clients include the port in the
+// Host header when the request targets a non-standard port (RFC 7230 §5.4).
+// Without this normalization, a frontend listening on port 8080 would fail to
+// match any mapping because the Host header contains "myshare.example.com:8080"
+// while the mapping key is "myshare.example.com".  When the frontend listens on
+// port 443 (standard HTTPS), browsers omit the port from Host and the mapping
+// matches without normalization.
 func hostOnly(host string) string {
 	if h, _, err := net.SplitHostPort(host); err == nil {
 		return h

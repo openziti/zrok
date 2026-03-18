@@ -89,36 +89,15 @@ These match the same variable names used in the
 docker compose up -d
 ```
 
-On first start, init services run before the main services to bootstrap the stack. The
-`zrok2-init` container performs the same steps as the
-[Linux manual setup](/docs/zrok/self-hosting/deployment/linux/#manual-setup) — automated
-end-to-end:
-
-- **`ziti-router-init`** — creates the edge router in the Ziti controller and saves its enrollment
-  token for the router service to consume
-- **`zrok2-init`** — bootstraps the full zrok2 stack:
-  1. Generates `ctrl.yaml` and `frontend.yaml` from environment variables
-  2. Waits for the Ziti controller, PostgreSQL, and RabbitMQ to be healthy
-  3. Runs `zrok2 admin bootstrap` to initialize the database and create Ziti identities
-  4. Starts a temporary controller to run admin commands
-  5. Creates the dynamic frontend and public namespace with namespace-frontend mapping
-  6. Creates the `dynamicProxyController` identity, Ziti service, and routing policies — this is the
-     gRPC service that pushes real-time share mapping updates to the frontend via AMQP (required for
-     [named shares](#verify-named-shares-work))
-  7. Appends the `dynamic_proxy_controller` section to `ctrl.yaml`
-  8. Generates the full AMQP-backed `frontend.yaml` (v1 format with `amqp_subscriber` and
-     `controller` sections)
-  9. Saves identity files and fixes ownership for the non-root service containers
-
-This takes 1–2 minutes. Monitor progress:
+On first start, one-shot init services bootstrap the Ziti overlay and zrok2
+stack before the main services begin. This takes 1–2 minutes. Monitor progress:
 
 ```bash
 docker compose logs -f zrok2-init
 ```
 
-Once `zrok2-init` exits successfully, the controller and frontend start automatically. The controller
-reads the complete `ctrl.yaml` (including `dynamic_proxy_controller`) and binds the gRPC service on
-the Ziti overlay. The frontend connects to it for real-time mapping updates.
+Once `zrok2-init` exits successfully, the controller and frontend start
+automatically.
 
 ## Verify the Stack
 
@@ -159,19 +138,17 @@ Replace `<token>` with the enable token from the previous step.
 
 ## Verify Named Shares Work
 
-After enabling your environment, verify that the AMQP-backed dynamic frontend serves named shares:
+After enabling your environment, verify that the dynamic frontend serves named
+shares:
 
 ```bash
 # Create a named share (runs in foreground — use a separate terminal)
+zrok2 create name mytest
 zrok2 share public http://127.0.0.1:8080 --name-selection public:mytest
 
 # From another terminal, verify the frontend routes it
 curl -sf http://mytest.share.example.com:8080/
 ```
-
-Named shares use the `dynamicProxyController` gRPC service to push mapping updates to the frontend
-in real time via AMQP. This is set up automatically by `zrok2-init` during the initial bootstrap
-(see [Start the Stack](#start-the-stack) for details).
 
 ## Making the Frontend Publicly Accessible
 
@@ -183,8 +160,8 @@ in your `.env`:
 ZROK2_INSECURE_INTERFACE=0.0.0.0
 ```
 
-This publishes ports 18080 (controller API) and 8080 (frontend) insecurely on all interfaces. For production, use the
-[Caddy TLS overlay](#optional-enable-tls-with-caddy) instead.
+This publishes ports 18080 (controller API) and 8080 (frontend) insecurely on all interfaces. For
+production, use the [Caddy TLS overlay](#optional-enable-tls-with-caddy) instead.
 
 Alternatively, publish only the frontend port by overriding the port mapping in a
 `compose.override.yml`:
@@ -238,11 +215,10 @@ To collect usage metrics, enable the metrics profile:
 docker compose --profile metrics up -d
 ```
 
-This adds RabbitMQ and InfluxDB. The `zrok2-init` service generates a minimal
-`ctrl.yaml` without the metrics bridge configuration. To enable metrics, add
-the `bridge` and `metrics` sections to `ctrl.yaml` and restart the controller
-(see the [Linux guide](/docs/zrok/self-hosting/deployment/linux/) for the full
-configuration reference).
+This adds InfluxDB and a metrics bridge service. You also need to configure the
+Ziti controller to emit `fabric.usage` events — see the
+[Linux guide's metrics section](/docs/zrok/self-hosting/deployment/linux/#step-12-configure-openziti-metrics-events)
+for the configuration reference.
 
 ### Verify InfluxDB has data
 
@@ -322,13 +298,17 @@ docker compose up -d zrok2-init
 
 ### Reset everything
 
-To start fresh, remove all volumes:
+To start fresh, remove all containers, volumes, and orphans:
 
 ```bash
-docker compose down -v
+docker compose --profile metrics down -v --remove-orphans
 ```
 
 ## Architecture
+
+For details on what each service does, how the dynamic frontend's AMQP-based
+mapping updates work, and the full manual setup procedure, see the
+[Linux self-hosting guide](/docs/zrok/self-hosting/deployment/linux/).
 
 ```text
 ┌──────────────────────────────────────────────────────┐
@@ -341,6 +321,8 @@ docker compose down -v
 │       │                                              │
 │  postgresql ───────── zrok2 database                 │
 │       │                                              │
+│  rabbitmq ───────────  AMQP for frontend mappings    │
+│       │                                              │
 │  zrok2-init ───────── one-shot bootstrap             │
 │       │                                              │
 │  zrok2-controller ─── zrok2 API and admin            │
@@ -349,7 +331,7 @@ docker compose down -v
 │                                                      │
 │  Optional:                                           │
 │  caddy ────────────── TLS termination                │
-│  rabbitmq ─────────── metrics queue                  │
 │  influxdb ─────────── metrics storage                │
+│  zrok2-metrics-bridge  metrics pipeline              │
 └──────────────────────────────────────────────────────┘
 ```
