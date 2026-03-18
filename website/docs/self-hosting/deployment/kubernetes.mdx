@@ -1,9 +1,287 @@
 ---
-title: Self-host a zrok instance in Kubernetes
+title: Self-host a zrok2 instance in Kubernetes
 sidebar_label: Kubernetes
 sidebar_position: 55
 ---
 
-The Helm chart for zrok is available from the main OpenZiti charts repo.
+This guide deploys a self-hosted zrok2 instance in Kubernetes using the
+`zrok2` Helm chart. The chart creates a controller, frontend, and bootstrap
+job that connect to an existing Ziti overlay network.
 
-[Link to README in GitHub](https://github.com/openziti/helm-charts/tree/main/charts/zrok#readme)
+## Prerequisites
+
+- A Kubernetes cluster (1.23+)
+- `kubectl` configured for your cluster
+- `helm` 3.x installed
+- An OpenZiti controller already deployed (e.g., via the
+  [`ziti-controller` Helm chart](https://github.com/openziti/helm-charts/tree/main/charts/ziti-controller))
+- [Traefik](https://doc.traefik.io/traefik/getting-started/install-traefik/) ingress controller (recommended; ingress-nginx is sunset/EOL)
+- A DNS zone with a wildcard `*` A record pointing to your ingress controller
+  (e.g., `*.share.example.com`)
+
+## Add the Helm Repository
+
+```bash
+helm repo add openziti https://openziti.github.io/helm-charts/
+helm repo update
+```
+
+## Configure `values.yaml`
+
+Create a values file for your deployment:
+
+```yaml title="my-values.yaml"
+# DNS zone with wildcard record
+dnsZone: "share.example.com"
+
+# Ziti controller connection.
+# When using Traefik ingress with TLS, set advertisedPort to 443 so
+# zrok2 connects to the Ziti management API via the ingress endpoint.
+ziti:
+  advertisedHost: ziti-controller.ziti.share.example.com
+  advertisedPort: "443"
+  username: admin
+  password: ""  # set via --set or existingSecret
+  # Name of the ConfigMap containing Ziti's CA trust bundle.
+  # Must match the name used by your ziti-controller deployment.
+  caSecretName: ziti-controller-ctrl-plane-cas
+
+# Controller ingress
+controller:
+  ingress:
+    enabled: true
+    scheme: https
+    className: traefik
+    hosts:
+      - zrok2.share.example.com
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-dns
+    tls:
+      - secretName: zrok2-api-tls
+        hosts:
+          - zrok2.share.example.com
+
+# Frontend ingress (wildcard)
+frontend:
+  ingress:
+    enabled: true
+    scheme: https
+    className: traefik
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-dns
+    tls:
+      - secretName: zrok2-wildcard-tls
+        hosts:
+          - "*.share.example.com"
+```
+
+### Key Configuration Options
+
+| Value | Default | Description |
+|-------|---------|-------------|
+| `dnsZone` | `zrok.example.com` | DNS zone for public share URLs |
+| `ziti.advertisedHost` | `ziti-controller.ziti.svc.cluster.local` | Ziti management API host; use the ingress hostname when connecting via ingress |
+| `ziti.advertisedPort` | `1280` | Ziti management API port; use `443` when connecting via HTTPS ingress |
+| `ziti.password` | (required) | Ziti admin password |
+| `ziti.caSecretName` | `ziti-controller-ctrl-plane-cas` | Name of the ConfigMap containing the Ziti CA bundle — must match the name produced by your Ziti controller deployment |
+| `controller.service.containerPort` | `18080` | Controller API port |
+| `frontend.service.containerPort` | `8080` | Frontend port |
+| `controller.persistence.enabled` | `true` | Enable PVC for SQLite3 |
+| `controller.persistence.size` | `2Gi` | PVC size |
+
+### Database Configuration
+
+By default, the chart uses SQLite3 with a PersistentVolumeClaim. For
+production, configure an external PostgreSQL database:
+
+```yaml
+postgresql:
+  host: "postgresql.database.svc.cluster.local"
+  port: 5432
+  database: zrok2
+  username: zrok2
+  existingSecret: zrok2-db-credentials  # Secret with key "password"
+```
+
+When `postgresql.host` is set, the chart uses PostgreSQL and the SQLite3 PVC
+is not created.
+
+### Metrics Pipeline (Optional)
+
+To enable usage metrics, configure external RabbitMQ and InfluxDB:
+
+```yaml
+rabbitmq:
+  url: "amqp://guest:guest@rabbitmq.messaging.svc.cluster.local:5672"
+
+influxdb:
+  url: "http://influxdb.monitoring.svc.cluster.local:8086"
+  org: zrok2
+  bucket: zrok2
+  existingSecret: zrok2-influx-token  # Secret with key "token"
+```
+
+The chart deploys a metrics bridge only when `rabbitmq.url` is set.
+
+## Install the Chart
+
+```bash
+helm install zrok2 openziti/zrok2 \
+  --namespace zrok2 --create-namespace \
+  --values my-values.yaml \
+  --set ziti.password="your-ziti-admin-password"
+```
+
+The release creates:
+
+1. A **controller deployment** with an init container that runs
+   `zrok2 admin bootstrap`
+2. A **frontend deployment** with an init container that creates the
+   default "public" frontend in Ziti and zrok2
+3. A default **"ziggy" user account** whose enable token is saved in a
+   Kubernetes Secret
+
+## Create Your First Account
+
+After the bootstrap completes, retrieve the default account's enable token:
+
+```bash
+kubectl -n zrok2 get secret zrok2-ziggy-account-token \
+  -o jsonpath='{.data.token}' | base64 -d
+```
+
+Or create a new account:
+
+```bash
+kubectl -n zrok2 exec deploy/zrok2 -c zrok2 -- \
+  zrok2 admin create account you@example.com yourpassword
+```
+
+## Enable a Client Environment
+
+On your workstation, point the zrok2 CLI at your instance and enable:
+
+```bash
+export ZROK2_API_ENDPOINT=https://zrok2.share.example.com
+zrok2 enable <token>
+```
+
+## Ingress and TLS
+
+The chart creates Ingress resources for the controller and frontend when
+enabled. [Traefik](https://doc.traefik.io/traefik/) is the recommended
+ingress controller (ingress-nginx is sunset/EOL). For TLS, use
+[cert-manager](https://cert-manager.io/) with a ClusterIssuer that supports
+DNS-01 challenges (required for wildcard certificates).
+
+### Controller ingress
+
+Serves the zrok2 API at `https://zrok2.share.example.com`.
+
+### Frontend ingress
+
+Serves public shares at `https://<token>.share.example.com`. The chart
+automatically creates a wildcard ingress rule for `*.{dnsZone}`.
+
+### Example with Traefik and cert-manager
+
+```yaml
+controller:
+  ingress:
+    enabled: true
+    className: traefik
+    hosts:
+      - zrok2.share.example.com
+    tls:
+      - secretName: zrok2-api-tls
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-dns
+
+frontend:
+  ingress:
+    enabled: true
+    className: traefik
+    tls:
+      - secretName: zrok2-wildcard-tls
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-dns
+```
+
+## Scaling Frontends
+
+The frontend deployment can be scaled independently:
+
+```bash
+kubectl -n zrok2 scale deploy/zrok2-frontend --replicas=3
+```
+
+Or enable the HorizontalPodAutoscaler:
+
+```yaml
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+```
+
+## Uninstalling
+
+```bash
+helm uninstall zrok2 -n zrok2
+```
+
+The chart includes a pre-delete hook that cleans up Ziti identities and
+secrets created during bootstrap.
+
+To also remove the PVC and namespace:
+
+```bash
+kubectl -n zrok2 delete pvc --all
+kubectl delete namespace zrok2
+```
+
+## Troubleshooting
+
+### Controller pod stuck in Init
+
+The bootstrap init container waits for the Ziti controller CA ConfigMap
+to exist in the zrok2 namespace. If you're using the `ziti-controller`
+chart with trust-manager, the CA bundle is propagated automatically to
+all namespaces. Verify:
+
+```bash
+kubectl -n zrok2 get configmap ziti-controller-ctrl-plane-cas
+```
+
+If missing, check that trust-manager is running and the Bundle resource
+has `namespaceSelector: {}` (all namespaces).
+
+If you see a ConfigMap with a different name (e.g., `ziti-controller1-ctrl-plane-cas`),
+update `ziti.caSecretName` in your values to match.
+
+### Frontend pod stuck in ContainerCreating
+
+The frontend needs the `zrok2-frontend-identity` Secret, which is created
+by the controller's init container. Wait for the controller pod to
+complete its init phase:
+
+```bash
+kubectl -n zrok2 logs deploy/zrok2 -c zrok2-bootstrap
+```
+
+### Bootstrap fails with database errors
+
+If using PostgreSQL, verify the database is reachable:
+
+```bash
+kubectl -n zrok2 exec deploy/zrok2 -c zrok2 -- \
+  zrok2 admin bootstrap /etc/zrok2/ctrl.yaml --check
+```
+
+For SQLite3, ensure the PVC is bound and writable.
+
+## Chart Source
+
+The chart source and full values reference are at:
+[github.com/openziti/helm-charts/tree/main/charts/zrok2](https://github.com/openziti/helm-charts/tree/main/charts/zrok2)
