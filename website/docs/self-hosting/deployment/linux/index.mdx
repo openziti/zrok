@@ -4,21 +4,13 @@ title: Self-hosting guide for Linux
 sidebar_label: Linux
 ---
 
-:::info Single-host deployment
-This guide deploys all zrok components — controller, frontend, and metrics bridge — on a single
-Linux server. This is the simplest production-ready configuration. To scale the frontend for higher
-throughput or availability, see [Scaling zrok frontends](../../scaling-frontends.md).
-:::
-
 ## Before you begin
 
-## Prerequisites
+This will get you up and running with a self-hosted instance of zrok. I'll assume you have the following:
 
-Before you begin, make sure you have:
-
-- a Linux server with a public IP
-- a wildcard DNS record like `*.zrok.example.com` that resolves to the server IP
-- a wildcard TLS certificate for `*.zrok.example.com` (e.g., from [Let's Encrypt](https://letsencrypt.org/))
+* a Linux server with a public IP
+* a wildcard DNS record like `*.zrok.example.com` that resolves to the server IP
+* a wildcard TLS certificate for `*.zrok.example.com` (e.g., from [Let's Encrypt](https://letsencrypt.org/))
 
 ## OpenZiti
 
@@ -35,7 +27,7 @@ ziti edge list edge-routers
 Follow [the Linux installation guide](../../../how-tos/install/linux.mdx) to install the `zrok2` package from the repository or manually install the binary for your platform.
 
 ```bash
-sudo apt install zrok2 zrok2-controller zrok2-frontend zrok2-metrics-bridge
+sudo apt install zrok2 zrok2-controller zrok2-frontend zrok2-metrics
 ```
 
 ## Automated bootstrap
@@ -44,7 +36,7 @@ A bootstrap script is provided that automates the full deployment: PostgreSQL, R
 
 ```bash
 export ZROK2_DNS_ZONE="zrok.example.com"
-export ZROK2_ADMIN_TOKEN="$(head -c24 /dev/urandom | base64 -w0)"
+export ZROK2_ADMIN_TOKEN="$(LC_ALL=C tr -dc _A-Z-a-z-0-9 < /dev/urandom | head -c32)"
 export ZITI_API_ENDPOINT="https://127.0.0.1:1280"
 export ZITI_ADMIN_PASSWORD="<your-ziti-admin-password>"
 export ZROK2_TLS_CERT="/etc/letsencrypt/live/zrok.example.com/fullchain.pem"
@@ -72,7 +64,7 @@ sudo apt install rabbitmq-server postgresql
 For InfluxDB, add the InfluxData repository and install:
 
 ```bash
-curl -fsSL https://repos.influxdata.com/influxdata-archive.key \
+curl -fsSL https://repos.influxdata.com/influxdata-archive_compat.key \
   | sudo gpg --dearmor -o /usr/share/keyrings/influxdata-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/influxdata-archive-keyring.gpg] https://repos.influxdata.com/debian stable main" \
   | sudo tee /etc/apt/sources.list.d/influxdata.list
@@ -103,7 +95,7 @@ sudo -u postgres psql -c "CREATE USER zrok2 WITH PASSWORD '<your-db-password>';"
 sudo -u postgres psql -c "CREATE DATABASE zrok2 OWNER zrok2;"
 ```
 
-:::tip SQLite3 alternative
+:::tip SQLite3 Alternative
 For single-controller deployments, you can use SQLite3 instead of PostgreSQL. Replace the `store` section in `ctrl.yml` with:
 ```yaml
 store:
@@ -122,7 +114,7 @@ influx setup \
   --org zrok \
   --bucket zrok \
   --username admin \
-  --password "$(head -c24 /dev/urandom | base64 -w0)" \
+  --password "$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c32)" \
   --token "<your-influx-token>" \
   --retention 0 \
   --force
@@ -139,7 +131,7 @@ v: 4
 
 admin:
   # generate from a source of randomness, e.g.
-  #  head -c24 /dev/urandom | base64 -w0
+  #  LC_ALL=C tr -dc _A-Z-a-z-0-9 < /dev/urandom | head -c32
   secrets:
     - <your-admin-token>
 
@@ -228,22 +220,13 @@ export ZROK2_ADMIN_TOKEN=<your-admin-token>
 
 ### Step 4: Bootstrap OpenZiti for zrok
 
-Before running the zrok bootstrap, ensure the default Ziti traffic policies exist. These allow all identities to use all edge routers, which is required for shares to work:
-
-```bash
-ziti edge create edge-router-policy default \
-  --edge-router-roles '#all' --identity-roles '#all'
-ziti edge create service-edge-router-policy default \
-  --edge-router-roles '#all' --service-roles '#all'
-```
-
 With your OpenZiti network running and your controller config at `/etc/zrok2/ctrl.yml`, bootstrap the Ziti network:
 
 ```bash
 zrok2 admin bootstrap /etc/zrok2/ctrl.yml
 ```
 
-This creates the zrok database, Ziti identities for the controller (`ctrl`) and frontend (`public`), and the dynamicProxyController Ziti policies. Note the frontend identity Ziti ID in the output — you'll use it when creating the frontend.
+This creates the zrok database, Ziti identities for the controller (`ctrl`) and frontend (`public`), and the necessary Ziti policies. Note the frontend identity Ziti ID in the output — you'll use it when creating the frontend.
 
 If you need to re-run bootstrap, add `--skip-frontend` to avoid re-creating the frontend identity.
 
@@ -255,43 +238,36 @@ sudo systemctl enable --now zrok2-controller
 
 ### Step 6: Create a dynamic frontend
 
-With `ZROK2_ADMIN_TOKEN` and `ZROK2_API_ENDPOINT` set, create a dynamic frontend. Use the Ziti ID of the
-`public` identity created by `zrok2 admin bootstrap` (shown in its output):
+With `ZROK2_ADMIN_TOKEN` and `ZROK2_API_ENDPOINT` set, create a dynamic frontend:
 
 ```bash
-zrok2 admin create frontend --dynamic <public-ziti-id> public
+zrok2 admin create frontend --dynamic public "https://{token}.zrok.example.com"
 ```
 
-This outputs a **frontend token** (e.g., `zEjQqHliYXF6`). Save it — you'll need it for the frontend
-configuration and namespace mapping.
+This outputs a frontend token (e.g., `zEjQqHliYXF6`). Save it — you'll need it for the frontend configuration and namespace mapping.
 
-### Step 7: Create the dynamicProxyController
+The `--dynamic` flag enables the v2.0 dynamicProxy mode with namespace-based naming.
 
-The dynamic proxy controller is a gRPC service that pushes real-time share mapping updates to the
-frontend over the Ziti overlay via AMQP. Without it, the frontend cannot route named shares (e.g.,
-`myapp.zrok.example.com`) — only random-token shares would work with polling.
+### Step 7: Create dynamicProxyController identity and Ziti resources
 
-**Create the Ziti identity:**
+Create a Ziti identity for the dynamicProxyController gRPC service:
 
 ```bash
 zrok2 admin create identity dynamicProxyController
 ```
 
-**Create the Ziti service and routing policies.** Log in to Ziti first:
+Then create the Ziti service and policies. Log in to Ziti first, then find the Ziti ID of the new identity:
 
 ```bash
 ziti edge login <your-ziti-controller>:<port> -y -u admin -p <password>
 ```
 
-Then find the Ziti ID of the new identity and create the service + policies:
-
 ```bash
-# Look up the Ziti ID from the identity you just created
-CONTROLLER_ZID=$(ziti edge list identities 'name="dynamicProxyController"' -j \
-  | jq -r '.data[0].id')
+# Set the Ziti ID from the identity you just created
+CONTROLLER_ZID="<ziti-id-from-above>"
 SERVICE_NAME="dynamicProxyController"
 
-# Create the Ziti service
+# Create the service
 ziti edge create service "$SERVICE_NAME"
 
 # Allow edge routers to host the service
@@ -310,46 +286,29 @@ ziti edge create sp "${SERVICE_NAME}-dial" Dial \
   --service-roles "@${SERVICE_NAME}"
 ```
 
-**Place the identity files** where the systemd service users can read them:
+Copy the identity file to the `zrok2-controller` service user's directory:
 
 ```bash
-# dynamicProxyController identity → zrok2-controller service user
 sudo mkdir -p /var/lib/zrok2-controller/.zrok2/identities
 sudo cp ~/.zrok2/identities/dynamicProxyController.json \
   /var/lib/zrok2-controller/.zrok2/identities/
 sudo chown -R zrok2-controller:zrok2-controller /var/lib/zrok2-controller/.zrok2
+```
 
-# public frontend identity → zrok2-frontend service user
+Also copy the `public` frontend identity to the `zrok2-frontend` service user:
+
+```bash
 sudo mkdir -p /var/lib/zrok2-frontend/.zrok2/identities
 sudo cp ~/.zrok2/identities/public.json \
   /var/lib/zrok2-frontend/.zrok2/identities/
 sudo chown -R zrok2-frontend:zrok2-frontend /var/lib/zrok2-frontend/.zrok2
 ```
 
-**Add the `dynamic_proxy_controller` section** to `/etc/zrok2/ctrl.yml`:
-
-```yaml
-dynamic_proxy_controller:
-  identity_path: /var/lib/zrok2-controller/.zrok2/identities/dynamicProxyController.json
-  service_name: dynamicProxyController
-  amqp_publisher:
-    url: amqp://guest:guest@127.0.0.1:5672
-    exchange_name: dynamicProxy
-```
-
-Restart the controller to activate it:
+Restart the controller to activate the dynamicProxyController:
 
 ```bash
 sudo systemctl restart zrok2-controller
 ```
-
-:::tip Why is this needed?
-When a user creates a named share (`zrok2 share public --name-selection public:myapp ...`), the
-controller publishes a mapping update to the `dynamicProxy` AMQP exchange. The frontend subscribes to
-this exchange and immediately starts routing `myapp.zrok.example.com` to the share's backend — no
-polling delay. The `dynamicProxyController` Ziti service is the gRPC channel over the Ziti overlay
-that delivers these mapping updates securely.
-:::
 
 ### Step 8: Create a namespace
 
@@ -359,8 +318,7 @@ Namespaces organize share names (similar to DNS zones). Create a public namespac
 zrok2 admin create namespace --token public --open zrok.example.com
 ```
 
-The `--open` flag allows any account to create names in this namespace. Without it, users need
-explicit grants.
+The `--open` flag allows any account to create names in this namespace. Without it, users need explicit grants.
 
 ### Step 9: Map namespace to frontend
 
@@ -369,8 +327,6 @@ Link the namespace to the dynamic frontend so shares are served by this frontend
 ```bash
 zrok2 admin create namespace-frontend public <frontend-token> --default
 ```
-
-Replace `<frontend-token>` with the token from Step 6.
 
 ### Step 10: Configure the dynamic frontend
 
@@ -382,7 +338,6 @@ v: 1
 frontend_token: <frontend-token-from-step-6>
 identity: public
 bind_address: 0.0.0.0:443
-host_match: zrok.example.com
 mapping_refresh_interval: 1m
 
 amqp_subscriber:
@@ -393,14 +348,12 @@ controller:
   identity_path: /var/lib/zrok2-frontend/.zrok2/identities/public.json
   service_name: dynamicProxyController
 
+host_match: zrok.example.com
+
 tls:
   cert_path: /etc/letsencrypt/live/zrok.example.com/fullchain.pem
   key_path:  /etc/letsencrypt/live/zrok.example.com/privkey.pem
 ```
-
-The `amqp_subscriber` and `controller` sections connect the frontend to the dynamicProxyController
-gRPC service (Step 7) for real-time mapping updates. The `host_match` value must match the namespace
-name (Step 8).
 
 Set file ownership:
 
@@ -409,8 +362,7 @@ sudo chown zrok2-frontend:zrok2-frontend /etc/zrok2/frontend.yml
 sudo chmod 640 /etc/zrok2/frontend.yml
 ```
 
-If the TLS certificate files are only readable by root (common with Let's Encrypt), grant read access
-to the service users:
+If the TLS certificate files are only readable by root (common with Let's Encrypt), grant read access to the service users:
 
 ```bash
 sudo groupadd --system zrok2-tls 2>/dev/null || true
@@ -421,8 +373,7 @@ sudo chmod g+r /etc/letsencrypt/archive/zrok.example.com/*
 sudo chmod o+x /etc/letsencrypt /etc/letsencrypt/live /etc/letsencrypt/archive
 ```
 
-For a complete reference of all frontend options including OAuth, see the
-[Dynamic Proxy Frontend Guide](../../dynamic-proxy.md).
+For a complete reference of all frontend options including OAuth, see the [Dynamic Proxy Frontend Guide](../../dynamic-proxy.md).
 
 ### Step 11: Start the frontend
 
@@ -435,26 +386,6 @@ Verify it's running:
 ```bash
 sudo journalctl -u zrok2-frontend -f
 ```
-
-### Verify named shares work
-
-After creating a user account and enabling an environment (see below), test that the dynamic frontend
-serves named shares:
-
-```bash
-# Pre-create the name in the public namespace
-zrok2 create name mytest
-
-# Create a named share (runs in foreground — use a separate terminal)
-zrok2 share public http://127.0.0.1:8080 --name-selection public:mytest
-
-# From another terminal, verify the frontend routes it
-curl -sf https://mytest.zrok.example.com/
-```
-
-If the share is reachable at `mytest.zrok.example.com`, the AMQP-backed dynamic frontend is working
-correctly. The `zrok2 create name` step registers the name in the namespace — this is the v2
-equivalent of `zrok reserve` in v1.
 
 ### Step 12: Configure OpenZiti metrics events
 
@@ -494,52 +425,28 @@ For more details, see [Configuring Metrics](../../metrics-and-limits/configuring
 
 ### Step 13: Start the metrics bridge
 
-The `zrok2-metrics-bridge` service runs the metrics bridge as a separate process. It reads the `bridge` section from `/etc/zrok2/ctrl.yml` to consume `fabric.usage` events and publish them to the AMQP queue, where the controller's metrics agent picks them up and writes them to InfluxDB.
+The `zrok2-metrics` service runs the metrics bridge as a separate process. It reads the `bridge` section from `/etc/zrok2/ctrl.yml` to consume `fabric.usage` events and publish them to the AMQP queue, where the controller's metrics agent picks them up and writes them to InfluxDB.
 
-Ensure the `zrok2-metrics-bridge` user can read the fabric-usage.json file and write its position pointer alongside it. Add the service user to the `ziti-controller` group and grant group write access to the directory:
+Ensure the fabric-usage.json file is readable by the metrics bridge:
 
 ```bash
 sudo touch /var/lib/ziti-controller/fabric-usage.json
-sudo chown ziti-controller:ziti-controller /var/lib/ziti-controller/fabric-usage.json
-sudo chmod 0640 /var/lib/ziti-controller/fabric-usage.json
-sudo chown ziti-controller:ziti-controller /var/lib/ziti-controller
-sudo chmod g+w /var/lib/ziti-controller
-sudo usermod -aG ziti-controller zrok2-metrics-bridge
+sudo chmod o+r /var/lib/ziti-controller/fabric-usage.json
 ```
 
 Start the metrics bridge:
 
 ```bash
-sudo systemctl enable --now zrok2-metrics-bridge
+sudo systemctl enable --now zrok2-metrics
 ```
 
 Verify it's processing events:
 
 ```bash
-sudo journalctl -u zrok2-metrics-bridge -f
+sudo journalctl -u zrok2-metrics -f
 ```
 
-Once traffic flows through shares, you should see log output from the controller confirming metrics are being written to InfluxDB.
-
-### Verify InfluxDB has data
-
-After creating a share and sending some traffic through it, verify metrics arrived in InfluxDB:
-
-```bash
-influx query \
-  'from(bucket: "zrok") |> range(start: -5m) |> count()' \
-  --org zrok --token "<your-influx-token>" --raw
-```
-
-A successful result contains CSV rows with count values. If no data appears after 90 seconds, check the metrics bridge and RabbitMQ:
-
-```bash
-sudo systemctl status zrok2-metrics-bridge
-sudo rabbitmqctl list_queues
-sudo journalctl -u zrok2-metrics-bridge --no-pager -n 50
-```
-
-See [Configuring Limits](../../metrics-and-limits/configuring-limits.md) to enforce bandwidth and resource limits based on these metrics.
+Once traffic flows through shares, you should see log output from the controller confirming metrics are being written to InfluxDB. See [Configuring Limits](../../metrics-and-limits/configuring-limits.md) to enforce bandwidth and resource limits based on these metrics.
 
 ## Create a user account
 
@@ -576,11 +483,11 @@ zrok2 status
 
 Congratulations. You have a working zrok environment!
 
-## Run as systemd services
+## Running as systemd services
 
-The `zrok2-controller`, `zrok2-frontend`, and `zrok2-metrics-bridge` packages install systemd service units for production deployments. The `zrok2-agent` package installs a systemd user service for the client side.
+The `zrok2-controller`, `zrok2-frontend`, and `zrok2-metrics` packages install systemd service units for production deployments. The `zrok2-agent` package installs a systemd user service for the client side.
 
-### zrok controller
+### zrok Controller
 
 ```bash
 # ensure /etc/zrok2/ctrl.yml is configured, then:
@@ -588,7 +495,7 @@ sudo systemctl enable --now zrok2-controller
 sudo journalctl -u zrok2-controller -f
 ```
 
-### zrok frontend
+### zrok Frontend
 
 ```bash
 # ensure /etc/zrok2/frontend.yml is configured, then:
@@ -596,15 +503,15 @@ sudo systemctl enable --now zrok2-frontend
 sudo journalctl -u zrok2-frontend -f
 ```
 
-### zrok metrics bridge
+### zrok Metrics Bridge
 
 ```bash
 # reads the bridge section from /etc/zrok2/ctrl.yml:
-sudo systemctl enable --now zrok2-metrics-bridge
-sudo journalctl -u zrok2-metrics-bridge -f
+sudo systemctl enable --now zrok2-metrics
+sudo journalctl -u zrok2-metrics -f
 ```
 
-### zrok agent (user service)
+### zrok Agent (user service)
 
 The agent runs as a user service. Enable your zrok environment first with `zrok2 enable`, then:
 
