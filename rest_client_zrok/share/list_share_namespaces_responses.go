@@ -7,6 +7,8 @@ package share
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type ListShareNamespacesReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *ListShareNamespacesReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *ListShareNamespacesReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewListShareNamespacesOK()
@@ -91,11 +93,13 @@ func (o *ListShareNamespacesOK) Code() int {
 }
 
 func (o *ListShareNamespacesOK) Error() string {
-	return fmt.Sprintf("[GET /share/namespaces][%d] listShareNamespacesOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /share/namespaces][%d] listShareNamespacesOK %s", 200, payload)
 }
 
 func (o *ListShareNamespacesOK) String() string {
-	return fmt.Sprintf("[GET /share/namespaces][%d] listShareNamespacesOK  %+v", 200, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[GET /share/namespaces][%d] listShareNamespacesOK %s", 200, payload)
 }
 
 func (o *ListShareNamespacesOK) GetPayload() []*ListShareNamespacesOKBodyItems0 {
@@ -105,7 +109,7 @@ func (o *ListShareNamespacesOK) GetPayload() []*ListShareNamespacesOKBodyItems0 
 func (o *ListShareNamespacesOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
-	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -156,11 +160,11 @@ func (o *ListShareNamespacesUnauthorized) Code() int {
 }
 
 func (o *ListShareNamespacesUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /share/namespaces][%d] listShareNamespacesUnauthorized ", 401)
+	return fmt.Sprintf("[GET /share/namespaces][%d] listShareNamespacesUnauthorized", 401)
 }
 
 func (o *ListShareNamespacesUnauthorized) String() string {
-	return fmt.Sprintf("[GET /share/namespaces][%d] listShareNamespacesUnauthorized ", 401)
+	return fmt.Sprintf("[GET /share/namespaces][%d] listShareNamespacesUnauthorized", 401)
 }
 
 func (o *ListShareNamespacesUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -212,11 +216,11 @@ func (o *ListShareNamespacesInternalServerError) Code() int {
 }
 
 func (o *ListShareNamespacesInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /share/namespaces][%d] listShareNamespacesInternalServerError ", 500)
+	return fmt.Sprintf("[GET /share/namespaces][%d] listShareNamespacesInternalServerError", 500)
 }
 
 func (o *ListShareNamespacesInternalServerError) String() string {
-	return fmt.Sprintf("[GET /share/namespaces][%d] listShareNamespacesInternalServerError ", 500)
+	return fmt.Sprintf("[GET /share/namespaces][%d] listShareNamespacesInternalServerError", 500)
 }
 
 func (o *ListShareNamespacesInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

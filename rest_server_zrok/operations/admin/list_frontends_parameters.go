@@ -25,7 +25,6 @@ func NewListFrontendsParams() ListFrontendsParams {
 //
 // swagger:parameters listFrontends
 type ListFrontendsParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 }

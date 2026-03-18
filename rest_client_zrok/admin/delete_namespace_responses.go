@@ -20,7 +20,7 @@ type DeleteNamespaceReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *DeleteNamespaceReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *DeleteNamespaceReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewDeleteNamespaceOK()
@@ -95,11 +95,11 @@ func (o *DeleteNamespaceOK) Code() int {
 }
 
 func (o *DeleteNamespaceOK) Error() string {
-	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceOK ", 200)
+	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceOK", 200)
 }
 
 func (o *DeleteNamespaceOK) String() string {
-	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceOK ", 200)
+	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceOK", 200)
 }
 
 func (o *DeleteNamespaceOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *DeleteNamespaceUnauthorized) Code() int {
 }
 
 func (o *DeleteNamespaceUnauthorized) Error() string {
-	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceUnauthorized ", 401)
+	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceUnauthorized", 401)
 }
 
 func (o *DeleteNamespaceUnauthorized) String() string {
-	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceUnauthorized ", 401)
+	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceUnauthorized", 401)
 }
 
 func (o *DeleteNamespaceUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *DeleteNamespaceNotFound) Code() int {
 }
 
 func (o *DeleteNamespaceNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceNotFound ", 404)
+	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceNotFound", 404)
 }
 
 func (o *DeleteNamespaceNotFound) String() string {
-	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceNotFound ", 404)
+	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceNotFound", 404)
 }
 
 func (o *DeleteNamespaceNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *DeleteNamespaceInternalServerError) Code() int {
 }
 
 func (o *DeleteNamespaceInternalServerError) Error() string {
-	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceInternalServerError ", 500)
+	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceInternalServerError", 500)
 }
 
 func (o *DeleteNamespaceInternalServerError) String() string {
-	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceInternalServerError ", 500)
+	return fmt.Sprintf("[DELETE /namespace][%d] deleteNamespaceInternalServerError", 500)
 }
 
 func (o *DeleteNamespaceInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

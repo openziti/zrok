@@ -7,6 +7,7 @@ package rest_model_zrok
 
 import (
 	"context"
+	stderrors "errors"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -57,11 +58,15 @@ func (m *EnvironmentAndResources) validateEnvironment(formats strfmt.Registry) e
 
 	if m.Environment != nil {
 		if err := m.Environment.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("environment")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("environment")
 			}
+
 			return err
 		}
 	}
@@ -75,11 +80,15 @@ func (m *EnvironmentAndResources) validateFrontends(formats strfmt.Registry) err
 	}
 
 	if err := m.Frontends.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
+		ve := new(errors.Validation)
+		if stderrors.As(err, &ve) {
 			return ve.ValidateName("frontends")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
+		}
+		ce := new(errors.CompositeError)
+		if stderrors.As(err, &ce) {
 			return ce.ValidateName("frontends")
 		}
+
 		return err
 	}
 
@@ -92,11 +101,15 @@ func (m *EnvironmentAndResources) validateShares(formats strfmt.Registry) error 
 	}
 
 	if err := m.Shares.Validate(formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
+		ve := new(errors.Validation)
+		if stderrors.As(err, &ve) {
 			return ve.ValidateName("shares")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
+		}
+		ce := new(errors.CompositeError)
+		if stderrors.As(err, &ce) {
 			return ce.ValidateName("shares")
 		}
+
 		return err
 	}
 
@@ -134,11 +147,15 @@ func (m *EnvironmentAndResources) contextValidateEnvironment(ctx context.Context
 		}
 
 		if err := m.Environment.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
+			ve := new(errors.Validation)
+			if stderrors.As(err, &ve) {
 				return ve.ValidateName("environment")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
+			}
+			ce := new(errors.CompositeError)
+			if stderrors.As(err, &ce) {
 				return ce.ValidateName("environment")
 			}
+
 			return err
 		}
 	}
@@ -149,11 +166,15 @@ func (m *EnvironmentAndResources) contextValidateEnvironment(ctx context.Context
 func (m *EnvironmentAndResources) contextValidateFrontends(ctx context.Context, formats strfmt.Registry) error {
 
 	if err := m.Frontends.ContextValidate(ctx, formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
+		ve := new(errors.Validation)
+		if stderrors.As(err, &ve) {
 			return ve.ValidateName("frontends")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
+		}
+		ce := new(errors.CompositeError)
+		if stderrors.As(err, &ce) {
 			return ce.ValidateName("frontends")
 		}
+
 		return err
 	}
 
@@ -163,11 +184,15 @@ func (m *EnvironmentAndResources) contextValidateFrontends(ctx context.Context, 
 func (m *EnvironmentAndResources) contextValidateShares(ctx context.Context, formats strfmt.Registry) error {
 
 	if err := m.Shares.ContextValidate(ctx, formats); err != nil {
-		if ve, ok := err.(*errors.Validation); ok {
+		ve := new(errors.Validation)
+		if stderrors.As(err, &ve) {
 			return ve.ValidateName("shares")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
+		}
+		ce := new(errors.CompositeError)
+		if stderrors.As(err, &ce) {
 			return ce.ValidateName("shares")
 		}
+
 		return err
 	}
 

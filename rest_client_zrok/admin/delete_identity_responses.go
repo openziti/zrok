@@ -20,7 +20,7 @@ type DeleteIdentityReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *DeleteIdentityReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *DeleteIdentityReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewDeleteIdentityOK()
@@ -95,11 +95,11 @@ func (o *DeleteIdentityOK) Code() int {
 }
 
 func (o *DeleteIdentityOK) Error() string {
-	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityOK ", 200)
+	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityOK", 200)
 }
 
 func (o *DeleteIdentityOK) String() string {
-	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityOK ", 200)
+	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityOK", 200)
 }
 
 func (o *DeleteIdentityOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *DeleteIdentityUnauthorized) Code() int {
 }
 
 func (o *DeleteIdentityUnauthorized) Error() string {
-	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityUnauthorized ", 401)
+	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityUnauthorized", 401)
 }
 
 func (o *DeleteIdentityUnauthorized) String() string {
-	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityUnauthorized ", 401)
+	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityUnauthorized", 401)
 }
 
 func (o *DeleteIdentityUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *DeleteIdentityNotFound) Code() int {
 }
 
 func (o *DeleteIdentityNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityNotFound ", 404)
+	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityNotFound", 404)
 }
 
 func (o *DeleteIdentityNotFound) String() string {
-	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityNotFound ", 404)
+	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityNotFound", 404)
 }
 
 func (o *DeleteIdentityNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *DeleteIdentityInternalServerError) Code() int {
 }
 
 func (o *DeleteIdentityInternalServerError) Error() string {
-	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityInternalServerError ", 500)
+	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityInternalServerError", 500)
 }
 
 func (o *DeleteIdentityInternalServerError) String() string {
-	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityInternalServerError ", 500)
+	return fmt.Sprintf("[DELETE /identity][%d] deleteIdentityInternalServerError", 500)
 }
 
 func (o *DeleteIdentityInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

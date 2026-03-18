@@ -76,7 +76,7 @@ func NewShareHTTPHealthcheckUnauthorized() *ShareHTTPHealthcheckUnauthorized {
 // WriteResponse to the client
 func (o *ShareHTTPHealthcheckUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -101,7 +101,7 @@ func NewShareHTTPHealthcheckInternalServerError() *ShareHTTPHealthcheckInternalS
 // WriteResponse to the client
 func (o *ShareHTTPHealthcheckInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }
@@ -126,7 +126,7 @@ func NewShareHTTPHealthcheckBadGateway() *ShareHTTPHealthcheckBadGateway {
 // WriteResponse to the client
 func (o *ShareHTTPHealthcheckBadGateway) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(502)
 }

@@ -72,6 +72,7 @@ func (o *CreateFrontend) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -85,7 +86,7 @@ type CreateFrontendBody struct {
 	Dynamic bool `json:"dynamic,omitempty"`
 
 	// permission mode
-	// Enum: [open closed]
+	// Enum: ["open","closed"]
 	PermissionMode string `json:"permissionMode,omitempty"`
 
 	// public name
@@ -112,7 +113,7 @@ func (o *CreateFrontendBody) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-var createFrontendBodyTypePermissionModePropEnum []interface{}
+var createFrontendBodyTypePermissionModePropEnum []any
 
 func init() {
 	var res []string

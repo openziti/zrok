@@ -7,6 +7,7 @@ package rest_model_zrok
 
 import (
 	"context"
+	stderrors "errors"
 	"strconv"
 
 	"github.com/go-openapi/errors"
@@ -66,11 +67,15 @@ func (m *Overview) validateEnvironments(formats strfmt.Registry) error {
 
 		if m.Environments[i] != nil {
 			if err := m.Environments[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("environments" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("environments" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -92,11 +97,15 @@ func (m *Overview) validateNames(formats strfmt.Registry) error {
 
 		if m.Names[i] != nil {
 			if err := m.Names[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("names" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("names" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -118,11 +127,15 @@ func (m *Overview) validateNamespaces(formats strfmt.Registry) error {
 
 		if m.Namespaces[i] != nil {
 			if err := m.Namespaces[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("namespaces" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("namespaces" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -165,11 +178,15 @@ func (m *Overview) contextValidateEnvironments(ctx context.Context, formats strf
 			}
 
 			if err := m.Environments[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("environments" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("environments" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -190,11 +207,15 @@ func (m *Overview) contextValidateNames(ctx context.Context, formats strfmt.Regi
 			}
 
 			if err := m.Names[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("names" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("names" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -215,11 +236,15 @@ func (m *Overview) contextValidateNamespaces(ctx context.Context, formats strfmt
 			}
 
 			if err := m.Namespaces[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("namespaces" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("namespaces" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}

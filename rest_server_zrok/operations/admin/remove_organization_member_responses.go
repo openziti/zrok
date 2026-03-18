@@ -31,7 +31,7 @@ func NewRemoveOrganizationMemberOK() *RemoveOrganizationMemberOK {
 // WriteResponse to the client
 func (o *RemoveOrganizationMemberOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(200)
 }
@@ -56,7 +56,7 @@ func NewRemoveOrganizationMemberUnauthorized() *RemoveOrganizationMemberUnauthor
 // WriteResponse to the client
 func (o *RemoveOrganizationMemberUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -81,7 +81,7 @@ func NewRemoveOrganizationMemberNotFound() *RemoveOrganizationMemberNotFound {
 // WriteResponse to the client
 func (o *RemoveOrganizationMemberNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -106,7 +106,7 @@ func NewRemoveOrganizationMemberInternalServerError() *RemoveOrganizationMemberI
 // WriteResponse to the client
 func (o *RemoveOrganizationMemberInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

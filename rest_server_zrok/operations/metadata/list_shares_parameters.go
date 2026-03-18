@@ -28,7 +28,6 @@ func NewListSharesParams() ListSharesParams {
 //
 // swagger:parameters listShares
 type ListSharesParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -36,50 +35,62 @@ type ListSharesParams struct {
 	  In: query
 	*/
 	ActivityDuration *string
+
 	/*filter by backend mode
 	  In: query
 	*/
 	BackendMode *string
+
 	/*filter by created date (RFC3339 format)
 	  In: query
 	*/
 	CreatedAfter *string
+
 	/*filter by created date (RFC3339 format)
 	  In: query
 	*/
 	CreatedBefore *string
+
 	/*filter by environment ziti identity
 	  In: query
 	*/
 	EnvZID *string
+
 	/*filter shares with recent activity
 	  In: query
 	*/
 	HasActivity *bool
+
 	/*filter shares WITHOUT recent activity (inverse of hasActivity)
 	  In: query
 	*/
 	Idle *bool
+
 	/*filter by permission mode (open/closed)
 	  In: query
 	*/
 	PermissionMode *string
+
 	/*filter by share mode (public/private)
 	  In: query
 	*/
 	ShareMode *string
+
 	/*filter by share token (substring match)
 	  In: query
 	*/
 	ShareToken *string
+
 	/*filter by target (substring match)
 	  In: query
 	*/
 	Target *string
+
 	/*filter by updated date (RFC3339 format)
 	  In: query
 	*/
 	UpdatedAfter *string
+
 	/*filter by updated date (RFC3339 format)
 	  In: query
 	*/
@@ -94,7 +105,6 @@ func (o *ListSharesParams) BindRequest(r *http.Request, route *middleware.Matche
 	var res []error
 
 	o.HTTPRequest = r
-
 	qs := runtime.Values(r.URL.Query())
 
 	qActivityDuration, qhkActivityDuration, _ := qs.GetOK("activityDuration")

@@ -20,7 +20,7 @@ type AddNamespaceFrontendMappingReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *AddNamespaceFrontendMappingReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *AddNamespaceFrontendMappingReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewAddNamespaceFrontendMappingOK()
@@ -95,11 +95,11 @@ func (o *AddNamespaceFrontendMappingOK) Code() int {
 }
 
 func (o *AddNamespaceFrontendMappingOK) Error() string {
-	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingOK ", 200)
+	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingOK", 200)
 }
 
 func (o *AddNamespaceFrontendMappingOK) String() string {
-	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingOK ", 200)
+	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingOK", 200)
 }
 
 func (o *AddNamespaceFrontendMappingOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *AddNamespaceFrontendMappingUnauthorized) Code() int {
 }
 
 func (o *AddNamespaceFrontendMappingUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingUnauthorized ", 401)
+	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingUnauthorized", 401)
 }
 
 func (o *AddNamespaceFrontendMappingUnauthorized) String() string {
-	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingUnauthorized ", 401)
+	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingUnauthorized", 401)
 }
 
 func (o *AddNamespaceFrontendMappingUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *AddNamespaceFrontendMappingNotFound) Code() int {
 }
 
 func (o *AddNamespaceFrontendMappingNotFound) Error() string {
-	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingNotFound ", 404)
+	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingNotFound", 404)
 }
 
 func (o *AddNamespaceFrontendMappingNotFound) String() string {
-	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingNotFound ", 404)
+	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingNotFound", 404)
 }
 
 func (o *AddNamespaceFrontendMappingNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *AddNamespaceFrontendMappingInternalServerError) Code() int {
 }
 
 func (o *AddNamespaceFrontendMappingInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingInternalServerError ", 500)
+	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingInternalServerError", 500)
 }
 
 func (o *AddNamespaceFrontendMappingInternalServerError) String() string {
-	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingInternalServerError ", 500)
+	return fmt.Sprintf("[POST /namespace/frontend/mapping][%d] addNamespaceFrontendMappingInternalServerError", 500)
 }
 
 func (o *AddNamespaceFrontendMappingInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

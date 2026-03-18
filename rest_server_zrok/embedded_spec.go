@@ -307,6 +307,53 @@ func init() {
             "description": "internal server error"
           }
         }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "updateAccountPassword",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "422": {
+            "description": "password validation failure",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
       }
     },
     "/agent/access": {
@@ -4681,6 +4728,53 @@ func init() {
           },
           "404": {
             "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "patch": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "updateAccountPassword",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "422": {
+            "description": "password validation failure",
+            "schema": {
+              "$ref": "#/definitions/errorMessage"
+            }
           },
           "500": {
             "description": "internal server error"
