@@ -12,8 +12,8 @@ import requests
 from flask import Flask, Response, request
 from waitress import serve
 from zrok2.environment.root import Root
-from zrok2.model import (PROXY_BACKEND_MODE, PUBLIC_SHARE_MODE, PRIVATE_SHARE_MODE, Share,
-                        ShareRequest)
+from zrok2.model import (PROXY_BACKEND_MODE, PUBLIC_SHARE_MODE, PRIVATE_SHARE_MODE, Share,  # noqa: E501
+                         ShareRequest)
 from zrok2.overview import Overview
 from zrok2.share import CreateShare, ReleaseReservedShare
 
@@ -101,7 +101,7 @@ class ProxyShare:
         # Create the share
         share = CreateShare(root=root, request=share_request)
         if share_mode == PUBLIC_SHARE_MODE:
-            logger.debug(f"Created new proxy share with endpoints: {', '.join(share.FrontendEndpoints)}")
+            logger.debug(f"Created new proxy share with endpoints: {', '.join(share.FrontendEndpoints or [])}")
         elif share_mode == PRIVATE_SHARE_MODE:
             logger.debug(f"Created new private share with token: {share.Token}")
 
@@ -184,9 +184,9 @@ class ProxyShare:
             self._app = self._create_app()
 
         zrok_opts: Dict[str, Any] = {}
-        zrok_opts['cfg'] = zrok.decor.Opts(root=self.root, shrToken=self.token, bindPort=DUMMY_PORT)
+        zrok_opts['cfg'] = zrok2.decor.Opts(root=self.root, shrToken=self.token, bindPort=DUMMY_PORT)
 
-        @zrok.decor.zrok(opts=zrok_opts)
+        @zrok2.decor.zrok(opts=zrok_opts)
         def run_server():
             serve(self._app, port=DUMMY_PORT, _quiet=True)
 

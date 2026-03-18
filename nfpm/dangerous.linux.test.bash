@@ -193,10 +193,12 @@ install_openziti() {
 # ============================================================
 
 _exit_code=0
+_fail_summary=""
 _err_handler() {
     _exit_code=$?
     trap - ERR  # prevent re-entry
-    log_error "FAILED at line ${LINENO}: ${BASH_COMMAND} (exit ${_exit_code})"
+    _fail_summary="FAILED at line ${LINENO}: ${BASH_COMMAND} (exit ${_exit_code})"
+    log_error "${_fail_summary}"
     # Redirect to stderr so diagnostics don't pollute command substitution stdout
     dump_journal ziti-controller.service >&2
     dump_journal ziti-router.service >&2
@@ -233,7 +235,7 @@ stop_services() {
 # On failure: returns non-zero so the caller can decide whether to abort.
 purge_packages() {
     wait_for_dpkg_lock
-    sudo dpkg --purge zrok2-metrics-bridge zrok2-frontend zrok2-controller zrok2-agent zrok2 2>/dev/null || true
+    sudo dpkg --purge zrok2-metrics-bridge zrok2-metrics zrok2-frontend zrok2-controller zrok2-agent zrok2 2>/dev/null || true
     sudo dpkg --purge openziti-router openziti-controller openziti 2>/dev/null || true
     # Keep influxdb2 installed to avoid re-downloading from the slow InfluxData
     # repo on every run. Its data dirs are purged in purge_data() so each run
@@ -266,13 +268,24 @@ cleanup() {
 cleanup_on_exit() {
     set +o errexit
     if (( KEEP )); then
-        log_info "keeping test instance (--keep); run again to clean up"
-        return 0
+        log_info "keeping test instance (--keep); run with --only-clean to tear down"
+    else
+        log_section "Cleanup (on exit)"
+        stop_services
+        purge_packages 2>/dev/null || true
+        purge_data
     fi
-    log_section "Cleanup (on exit)"
-    stop_services
-    purge_packages 2>/dev/null || true
-    purge_data
+
+    # Print a clear one-line result summary
+    echo >&2
+    if (( _exit_code == 0 )); then
+        log_pass "dangerous.linux.test: PASSED"
+    else
+        log_fail "dangerous.linux.test: FAILED (exit ${_exit_code})"
+        if [[ -n "${_fail_summary}" ]]; then
+            log_error "  ${_fail_summary}"
+        fi
+    fi
 }
 trap 'cleanup_on_exit; exit $_exit_code' EXIT
 

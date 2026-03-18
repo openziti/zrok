@@ -49,3 +49,4 @@ __pycache__/
 /.coverage
 /sdk/python/src/dist/
 /sdk/python/.coverage
+.python-version

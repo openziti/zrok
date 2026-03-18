@@ -2,6 +2,7 @@
 name: Integration Tests
 
 on:  # yamllint disable-line rule:truthy
+  workflow_dispatch:
   pull_request:
     branches: [main]
     paths:
@@ -39,8 +40,10 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Python SDK
-        run: pip install -e sdk/python/src/[test]
+      - name: Install Python SDK and example dependencies
+        run: |
+          python3 -m venv sdk/python/.venv
+          sdk/python/.venv/bin/pip install -e 'sdk/python/src/[test]' flask waitress requests
 
       - name: Start zrok2 instance (built from source)
         run: bash docker/compose/zrok2-instance/dangerous.docker.test.bash --keep
@@ -49,9 +52,16 @@ jobs:
       - name: Run Python SDK integration tests
         run: |
           source docker/compose/zrok2-instance/.env
-          pytest sdk/python/tests/integration/ -v --tb=short
+          sdk/python/.venv/bin/pytest sdk/python/tests/integration/ -v --tb=short
         env:
           ZROK2_API_ENDPOINT: http://localhost:18080
+
+      - name: Run Python SDK example tests
+        run: |
+          source docker/compose/zrok2-instance/.env
+          ZROK2_API_ENDPOINT=http://localhost:18080 \
+          ZROK2_ADMIN_TOKEN="${ZROK2_ADMIN_TOKEN}" \
+          bash sdk/python/examples/test-examples.bash
 
       - name: Dump container logs on failure
         if: failure()

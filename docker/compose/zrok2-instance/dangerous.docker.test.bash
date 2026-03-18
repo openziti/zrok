@@ -116,17 +116,29 @@ cleanup_on_exit() {
     set +o errexit
     if (( KEEP )); then
         log_info "keeping stack (--keep); run with --only-clean to tear down"
-        return 0
+    else
+        teardown
     fi
-    teardown
+
+    echo >&2
+    if (( _exit_code == 0 )); then
+        log_pass "dangerous.docker.test: PASSED"
+    else
+        log_error "dangerous.docker.test: FAILED (exit ${_exit_code})"
+        if [[ -n "${_fail_summary}" ]]; then
+            log_error "  ${_fail_summary}"
+        fi
+    fi
 }
 trap 'cleanup_on_exit; exit $_exit_code' EXIT
 
 _exit_code=0
+_fail_summary=""
 _err_handler() {
     _exit_code=$?
     trap - ERR
-    log_error "FAILED at line ${LINENO}: ${BASH_COMMAND} (exit ${_exit_code})"
+    _fail_summary="FAILED at line ${LINENO}: ${BASH_COMMAND} (exit ${_exit_code})"
+    log_error "${_fail_summary}"
     dump_logs >&2
 }
 trap '_err_handler' ERR
