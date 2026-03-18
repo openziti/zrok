@@ -1,5 +1,4 @@
 ---
-title: Install zrok on macOS
 sidebar_label: macOS
 ---
 
@@ -9,11 +8,15 @@ import styles from '@zrokroot/src/css/download-card.module.css';
 import Homebrew from './_homebrew.mdx';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-## Homebrew
+# Install zrok on macOS
+
+Choose the install method that fits your setup.
+
+## Install with Homebrew
 
 <Homebrew />
 
-## Darwin binary
+## Install the binary
 
 <AssetsProvider>
   <div className={styles.downloadContainer}>
@@ -24,38 +27,41 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   </div>
 </AssetsProvider>
 
-Download the binary distribution for your macOS architecture. For Intel Macs use the `amd64` distribution. For Apple Silicon Macs use the `arm64` distribution.
+Download the binary distribution for your macOS architecture. For Intel Macs use the `amd64` distribution. For Apple
+Silicon Macs use the `arm64` distribution.
 
-1. Unarchive the distribution in a temporary directory.
+1. Unarchive the distribution in a temporary directory:
 
-    ```text
-    cd ~/Downloads && mkdir -p /tmp/zrok && tar -xf ./zrok*darwin*.tar.gz -C /tmp/zrok
+    ```bash
+    cd ~/Downloads && mkdir -p /tmp/zrok2 && tar -xf ./zrok*darwin*.tar.gz -C /tmp/zrok2
     ```
 
-1. Install the `zrok` executable.
+2. Install the `zrok2` executable:
 
-    ```text
-    mkdir -p ~/bin && install /tmp/zrok/zrok ~/bin/
+    ```bash
+    mkdir -p ~/bin && install /tmp/zrok2/zrok2 ~/bin/
     ```
 
-1. Add `~/bin` to your shell's executable search path. Optionally add this to your ~/.zshenv to persist the change.
+3. Add `~/bin` to your shell's executable search path:
 
-    ```text
+    ```bash
     PATH=~/bin:$PATH
     ```
 
-1. With the `zrok` executable in your path, you can then execute the `zrok2` command from your shell:
+    To persist this across sessions, add the line above to your `~/.zshenv`.
 
-    ```text
+4. Verify the install:
+
+    ```bash
     zrok2 version
     ```
 
     ```buttonless title="Output"
-                   _    
+                   _
      _____ __ ___ | | __
     |_  / '__/ _ \| |/ /
-     / /| | | (_) |   < 
+     / /| | | (_) |   <
     /___|_|  \___/|_|\_\
-    
-    v0.4.0 [c889005]
+
+    v2.0.0 [c889005]
     ```

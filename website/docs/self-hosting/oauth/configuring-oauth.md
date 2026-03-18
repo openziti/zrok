@@ -142,7 +142,7 @@ Once your public frontend is configured with OAuth providers, you can enable aut
 ### Example
 
 ```bash
-zrok share public --backend-mode web \
+zrok2 share public --backend-mode web \
   --oauth-provider google \
   --oauth-email-address-pattern '*@example.com' \
   --oauth-email-address-pattern 'admin@*' \

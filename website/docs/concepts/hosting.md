@@ -4,9 +4,11 @@ sidebar_position: 200
 
 # Hosting
 
+zrok is available both as a managed cloud service and as self-hosted software you can run on your own infrastructure.
+
 ## Self-hosted
 
-`zrok` is not limited to a managed offering. You can [host your own](../self-hosting/linux/index.mdx) instance of `zrok` as well. `zrok` is
+`zrok` is not limited to a managed offering. You can [host your own](../self-hosting/deployment/linux/index.mdx) instance of `zrok` as well. `zrok` is
 also freely available as open source software hosted by GitHub under a very permissive Apache v2 license.
 
 ## Managed service

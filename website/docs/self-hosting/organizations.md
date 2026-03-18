@@ -11,7 +11,7 @@ Future zrok releases will include additional organization features, including `-
 
 ## Configuring an organization
 
-The API endpoints used to manage organizations and their members require a site-level `ZROK2_ADMIN_TOKEN` to access. See the [self-hosting guide](linux/index.mdx#configure-the-controller) for details on configuring admin tokens.
+The API endpoints used to manage organizations and their members require a site-level `ZROK2_ADMIN_TOKEN` to access. See the [self-hosting guide](deployment/linux/index.mdx#configure-the-controller) for details on configuring admin tokens.
 
 ### Create an organization
 
@@ -22,7 +22,7 @@ $ zrok2 admin create organization --help
 Create a new organization
 
 Usage:
-  zrok admin create organization [flags]
+  zrok2 admin create organization [flags]
 
 Aliases:
   organization, org
@@ -64,7 +64,7 @@ We use the `zrok2 admin create org-member` command to add members to organizatio
 $ zrok2 admin create org-member 
 Error: accepts 2 arg(s), received 0
 Usage:
-  zrok admin create org-member <organizationToken> <accountEmail> [flags]
+  zrok2 admin create org-member <organizationToken> <accountEmail> [flags]
 
 Aliases:
   org-member, member

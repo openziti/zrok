@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@netfoundry/docusaurus-theme": "0.7.5"
+  }
+}

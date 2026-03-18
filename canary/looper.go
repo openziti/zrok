@@ -22,6 +22,7 @@ type LooperOptions struct {
 	MaxBatchPacing time.Duration
 	TargetName     string
 	BindAddress    string
+	FrontendScheme string
 	SnapshotQueue  chan *Snapshot
 }
 

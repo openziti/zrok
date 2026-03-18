@@ -1,6 +1,6 @@
 module github.com/openziti/zrok/v2
 
-go 1.25.3
+go 1.26
 
 require (
 	github.com/TwiN/go-away v1.8.0
