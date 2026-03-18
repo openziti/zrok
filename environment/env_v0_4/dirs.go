@@ -13,6 +13,9 @@ func SetRootDirName(name string) {
 }
 
 func rootDir() (string, error) {
+	if filepath.IsAbs(rootDirName) {
+		return rootDirName, nil
+	}
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", err

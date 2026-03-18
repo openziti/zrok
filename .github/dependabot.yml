@@ -13,3 +13,31 @@ updates:
           - "major"
           - "minor"
           - "patch"
+
+  # node, golang, openziti/ziti-cli in the compose build Dockerfile
+  - package-ecosystem: docker
+    directory: "/docker/compose/zrok2-instance"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      all:
+        applies-to: version-updates
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
+
+  # golang, debian in the cross-build container
+  - package-ecosystem: docker
+    directory: "/docker/images/cross-build"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      all:
+        applies-to: version-updates
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
