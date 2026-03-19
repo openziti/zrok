@@ -1,12 +1,12 @@
 ---
-title: Self-host a zrok2 instance in Kubernetes
+title: Self-hosting guide for Kubernetes
 sidebar_label: Kubernetes
 sidebar_position: 55
 ---
 
 This guide deploys a self-hosted zrok2 instance in Kubernetes using the
 `zrok2` Helm chart. The chart creates a controller, frontend, and bootstrap
-job that connect to an existing Ziti overlay network.
+job that connect to an existing OpenZiti overlay network.
 
 ## Prerequisites
 
@@ -19,14 +19,14 @@ job that connect to an existing Ziti overlay network.
 - A DNS zone with a wildcard `*` A record pointing to your ingress controller
   (e.g., `*.share.example.com`)
 
-## Add the Helm Repository
+## Step 1: Add the Helm repository
 
 ```bash
 helm repo add openziti https://openziti.github.io/helm-charts/
 helm repo update
 ```
 
-## Configure `values.yaml`
+## Step 2: Configure `values.yaml`
 
 Create a values file for your deployment:
 
@@ -75,21 +75,21 @@ frontend:
           - "*.share.example.com"
 ```
 
-### Key Configuration Options
+### Key configuration options
 
 | Value | Default | Description |
 |-------|---------|-------------|
 | `dnsZone` | `zrok.example.com` | DNS zone for public share URLs |
-| `ziti.advertisedHost` | `ziti-controller.ziti.svc.cluster.local` | Ziti management API host; use the ingress hostname when connecting via ingress |
-| `ziti.advertisedPort` | `1280` | Ziti management API port; use `443` when connecting via HTTPS ingress |
-| `ziti.password` | (required) | Ziti admin password |
-| `ziti.caSecretName` | `ziti-controller-ctrl-plane-cas` | Name of the ConfigMap containing the Ziti CA bundle — must match the name produced by your Ziti controller deployment |
+| `ziti.advertisedHost` | `ziti-controller.ziti.svc.cluster.local` | OpenZiti management API host; use the ingress hostname when connecting via ingress |
+| `ziti.advertisedPort` | `1280` | OpenZiti management API port; use `443` when connecting via HTTPS ingress |
+| `ziti.password` | (required) | OpenZiti admin password |
+| `ziti.caSecretName` | `ziti-controller-ctrl-plane-cas` | Name of the ConfigMap containing the OpenZiti CA bundle — must match the name produced by your OpenZiti controller deployment |
 | `controller.service.containerPort` | `18080` | Controller API port |
 | `frontend.service.containerPort` | `8080` | Frontend port |
 | `controller.persistence.enabled` | `true` | Enable PVC for SQLite3 |
 | `controller.persistence.size` | `2Gi` | PVC size |
 
-### Database Configuration
+### Database configuration
 
 By default, the chart uses SQLite3 with a PersistentVolumeClaim. For
 production, configure an external PostgreSQL database:
@@ -106,7 +106,7 @@ postgresql:
 When `postgresql.host` is set, the chart uses PostgreSQL and the SQLite3 PVC
 is not created.
 
-### Metrics Pipeline (Optional)
+### Metrics pipeline (optional)
 
 To enable usage metrics, configure external RabbitMQ and InfluxDB:
 
@@ -123,7 +123,7 @@ influxdb:
 
 The chart deploys a metrics bridge only when `rabbitmq.url` is set.
 
-## Install the Chart
+## Step 3: Install the chart
 
 ```bash
 helm install zrok2 openziti/zrok2 \
@@ -137,11 +137,11 @@ The release creates:
 1. A **controller deployment** with an init container that runs
    `zrok2 admin bootstrap`
 2. A **frontend deployment** with an init container that creates the
-   default "public" frontend in Ziti and zrok2
+   default "public" frontend in OpenZiti and zrok2
 3. A default **"ziggy" user account** whose enable token is saved in a
    Kubernetes Secret
 
-## Create Your First Account
+## Step 4: Create your first account
 
 After the bootstrap completes, retrieve the default account's enable token:
 
@@ -157,7 +157,7 @@ kubectl -n zrok2 exec deploy/zrok2 -c zrok2 -- \
   zrok2 admin create account you@example.com yourpassword
 ```
 
-## Enable a Client Environment
+## Step 5: Enable a client environment
 
 On your workstation, point the zrok2 CLI at your instance and enable:
 
@@ -207,7 +207,7 @@ frontend:
       cert-manager.io/cluster-issuer: letsencrypt-dns
 ```
 
-## Scaling Frontends
+## Scale frontends
 
 The frontend deployment can be scaled independently:
 
@@ -225,7 +225,7 @@ autoscaling:
   targetCPUUtilizationPercentage: 70
 ```
 
-## Uninstalling
+## Uninstall
 
 ```bash
 helm uninstall zrok2 -n zrok2
@@ -281,7 +281,7 @@ kubectl -n zrok2 exec deploy/zrok2 -c zrok2 -- \
 
 For SQLite3, ensure the PVC is bound and writable.
 
-## Chart Source
+## Chart source
 
 The chart source and full values reference are at:
 [github.com/openziti/helm-charts/tree/main/charts/zrok2](https://github.com/openziti/helm-charts/tree/main/charts/zrok2)

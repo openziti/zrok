@@ -22,8 +22,8 @@ frontend instances behind a reverse proxy (e.g., Caddy or Traefik). See
 - A DNS zone with a wildcard `*` A record resolving to the host
   (e.g., `*.share.example.com` → your server IP)
 - Ports reachable from the internet:
-  - **3022** — Ziti router data plane (always required; direct TLS, not proxied)
-  - **1280** — Ziti controller control plane (required for routers not co-located; uses mTLS and must be directly exposed — Caddy cannot proxy this port)
+  - **3022** — OpenZiti router data plane (always required; direct TLS, not proxied)
+  - **1280** — OpenZiti controller control plane (required for routers not co-located; uses mTLS and must be directly exposed — Caddy cannot proxy this port)
   - **443** — HTTPS for the zrok2 controller and frontend via Caddy (recommended for production)
 
 :::tip Use Caddy for TLS
@@ -63,22 +63,22 @@ At minimum, set these three values:
 |----------|-------------|---------|
 | `ZROK2_DNS_ZONE` | DNS zone with wildcard A record | `share.example.com` |
 | `ZROK2_ADMIN_TOKEN` | zrok2 admin token (≥32 chars) | `myadmintokenoflength32ormore...` |
-| `ZITI_PWD` | Ziti controller admin password | `mysecurepassword` |
+| `ZITI_PWD` | OpenZiti controller admin password | `mysecurepassword` |
 
 These match the same variable names used in the
 [Linux self-hosting guide](@zrokdocs/self-hosting/deployment/linux).
 
-### Optional Variables
+### Optional variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `ZROK2_STORE_TYPE` | `postgres` | Database backend (`postgres` or `sqlite3`) |
 | `ZROK2_DB_PASSWORD` | `zrok2defaultpw` | PostgreSQL password |
-| `ZITI_USER` | `admin` | Ziti admin username |
+| `ZITI_USER` | `admin` | OpenZiti admin username |
 | `ZROK2_CTRL_PORT` | `18080` | zrok2 controller API port |
 | `ZROK2_FRONTEND_PORT` | `8080` | zrok2 frontend port |
-| `ZITI_CTRL_PORT` | `1280` | Ziti control plane port |
-| `ZITI_ROUTER_PORT` | `3022` | Ziti data plane port |
+| `ZITI_CTRL_PORT` | `1280` | OpenZiti control plane port |
+| `ZITI_ROUTER_PORT` | `3022` | OpenZiti data plane port |
 | `ZROK2_INSECURE_INTERFACE` | `127.0.0.1` | Bind address for non-TLS ports |
 | `ZROK2_IMAGE` | `docker.io/openziti/zrok2` | zrok2 container image |
 | `ZROK2_TAG` | `latest` | zrok2 image tag — set to a specific version for reproducible deployments |
@@ -89,7 +89,7 @@ These match the same variable names used in the
 docker compose up -d
 ```
 
-On first start, one-shot init services bootstrap the Ziti overlay and zrok2
+On first start, one-shot init services bootstrap the OpenZiti overlay and zrok2
 stack before the main services begin. This takes 1–2 minutes. Monitor progress:
 
 ```bash
@@ -173,8 +173,8 @@ services:
       - "0.0.0.0:8080:8080"
 ```
 
-The Ziti router data-plane port (3022) already binds to `0.0.0.0` because SDK clients must reach it
-from outside the Docker network and Ziti uses TLS for security.
+The OpenZiti router data-plane port (3022) already binds to `0.0.0.0` because SDK clients must reach it
+from outside the Docker network and OpenZiti uses TLS for security.
 
 ## Optional: Enable TLS with Caddy
 
@@ -199,7 +199,7 @@ then handles TLS termination for all services:
 
 - `https://zrok2.share.example.com` → zrok2 controller API
 - `https://*.share.example.com` → zrok2 public frontend
-- `https://ziti.share.example.com` → Ziti management API
+- `https://ziti.share.example.com` → OpenZiti management API
 
 With TLS enabled, update your client:
 
@@ -272,7 +272,7 @@ COMPOSE_FILE=compose.yml:compose.build.yml:compose.caddy.yml \
 
 ### Bootstrap fails with "connection refused"
 
-The `zrok2-init` service waits for the Ziti controller health check. If the
+The `zrok2-init` service waits for the OpenZiti controller health check. If the
 controller fails to start, check its logs:
 
 ```bash
@@ -315,9 +315,9 @@ mapping updates work, and the full manual setup procedure, see the
 │                Docker Compose Network                │
 ├──────────────────────────────────────────────────────┤
 │                                                      │
-│  ziti-controller ──── Ziti control plane (PKI, etc.) │
+│  ziti-controller ──── OpenZiti control plane (PKI, etc.) │
 │       │                                              │
-│  ziti-router ──────── Ziti data plane (SDK traffic)  │
+│  ziti-router ──────── OpenZiti data plane (SDK traffic)  │
 │       │                                              │
 │  postgresql ───────── zrok2 database                 │
 │       │                                              │
