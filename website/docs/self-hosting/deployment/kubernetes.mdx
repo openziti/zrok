@@ -21,6 +21,8 @@ job that connect to an existing OpenZiti overlay network.
 
 ## Step 1: Add the Helm repository
 
+Add the OpenZiti Helm repository and update your local index:
+
 ```bash
 helm repo add openziti https://openziti.github.io/helm-charts/
 helm repo update
@@ -83,7 +85,7 @@ frontend:
 | `ziti.advertisedHost` | `ziti-controller.ziti.svc.cluster.local` | OpenZiti management API host; use the ingress hostname when connecting via ingress |
 | `ziti.advertisedPort` | `1280` | OpenZiti management API port; use `443` when connecting via HTTPS ingress |
 | `ziti.password` | (required) | OpenZiti admin password |
-| `ziti.caSecretName` | `ziti-controller-ctrl-plane-cas` | Name of the ConfigMap containing the OpenZiti CA bundle — must match the name produced by your OpenZiti controller deployment |
+| `ziti.caSecretName` | `ziti-controller-ctrl-plane-cas` | Name of the ConfigMap containing the OpenZiti CA bundle; must match the name produced by your OpenZiti controller deployment |
 | `controller.service.containerPort` | `18080` | Controller API port |
 | `frontend.service.containerPort` | `8080` | Frontend port |
 | `controller.persistence.enabled` | `true` | Enable PVC for SQLite3 |
@@ -103,8 +105,7 @@ postgresql:
   existingSecret: zrok2-db-credentials  # Secret with key "password"
 ```
 
-When `postgresql.host` is set, the chart uses PostgreSQL and the SQLite3 PVC
-is not created.
+When `postgresql.host` is set, the chart uses PostgreSQL and the SQLite3 PVC isn't created.
 
 ### Metrics pipeline (optional)
 
@@ -125,6 +126,8 @@ The chart deploys a metrics bridge only when `rabbitmq.url` is set.
 
 ## Step 3: Install the chart
 
+Install the `zrok2` chart into a new `zrok2` namespace:
+
 ```bash
 helm install zrok2 openziti/zrok2 \
   --namespace zrok2 --create-namespace \
@@ -134,12 +137,9 @@ helm install zrok2 openziti/zrok2 \
 
 The release creates:
 
-1. A **controller deployment** with an init container that runs
-   `zrok2 admin bootstrap`
-2. A **frontend deployment** with an init container that creates the
-   default "public" frontend in OpenZiti and zrok2
-3. A default **"ziggy" user account** whose enable token is saved in a
-   Kubernetes Secret
+- A **controller deployment** with an init container that runs `zrok2 admin bootstrap`
+- A **frontend deployment** with an init container that creates the default "public" frontend in OpenZiti and zrok2
+- A default **"ziggy" user account** whose enable token is saved in a Kubernetes secret
 
 ## Step 4: Create your first account
 
@@ -170,8 +170,8 @@ zrok2 enable <token>
 
 The chart creates Ingress resources for the controller and frontend when
 enabled. [Traefik](https://doc.traefik.io/traefik/) is the recommended
-ingress controller (ingress-nginx is sunset/EOL). For TLS, use
-[cert-manager](https://cert-manager.io/) with a ClusterIssuer that supports
+ingress controller (`ingress-nginx` is sunset/EOL). For TLS, use
+[cert-manager](https://cert-manager.io/) with a `ClusterIssuer` that supports
 DNS-01 challenges (required for wildcard certificates).
 
 ### Controller ingress
@@ -215,7 +215,7 @@ The frontend deployment can be scaled independently:
 kubectl -n zrok2 scale deploy/zrok2-frontend --replicas=3
 ```
 
-Or enable the HorizontalPodAutoscaler:
+Or enable the `HorizontalPodAutoscaler`:
 
 ```yaml
 autoscaling:
@@ -226,6 +226,8 @@ autoscaling:
 ```
 
 ## Uninstall
+
+Remove the Helm release:
 
 ```bash
 helm uninstall zrok2 -n zrok2
@@ -283,5 +285,5 @@ For SQLite3, ensure the PVC is bound and writable.
 
 ## Chart source
 
-The chart source and full values reference are at:
-[github.com/openziti/helm-charts/tree/main/charts/zrok2](https://github.com/openziti/helm-charts/tree/main/charts/zrok2)
+The chart source and full values reference are available in the
+[openziti/helm-charts](https://github.com/openziti/helm-charts/tree/main/charts/zrok2) repository.
