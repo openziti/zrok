@@ -4,38 +4,36 @@ sidebar_label: Docker
 sidebar_position: 45
 ---
 
-This guide walks through deploying a self-hosted zrok2 instance using Docker
-Compose. The stack runs the same components as the
-[Deploy zrok on Linux](@zrokdocs/self-hosting/deployment/linux) — OpenZiti overlay, zrok2
-controller, frontend, and PostgreSQL — using official container images with
-runtime configuration via environment variables.
+This guide walks through deploying a self-hosted zrok2 instance using Docker Compose. The stack runs the same components
+as the [Deploy zrok on Linux](@zrokdocs/self-hosting/deployment/linux): OpenZiti overlay, zrok2 controller, frontend,
+and PostgreSQL, using official container images with runtime configuration via environment variables.
 
 :::info Single-host deployment
-This compose stack runs one frontend instance. For higher throughput or availability, run multiple
-frontend instances behind a reverse proxy (e.g., Caddy or Traefik). See
-[Scaling frontends](@zrokdocs/self-hosting/scaling-frontends) for details.
+This compose stack runs one frontend instance. For higher throughput or availability, run multiple frontend instances
+behind a reverse proxy (e.g., Caddy or Traefik). See [Scaling frontends](@zrokdocs/self-hosting/scaling-frontends) for
+details.
 :::
 
 ## Prerequisites
 
 - Docker Engine 24+ with the Compose plugin (`docker compose`)
-- A DNS zone with a wildcard `*` A record resolving to the host
-  (e.g., `*.share.example.com` → your server IP)
+- A DNS zone with a wildcard `*` A record resolving to the host (e.g., `*.share.example.com` → your server IP)
 - Ports reachable from the internet:
-  - **3022** — OpenZiti router data plane (always required; direct TLS, not proxied)
-  - **1280** — OpenZiti controller control plane (required for routers not co-located; uses mTLS and must be directly exposed — Caddy cannot proxy this port)
-  - **443** — HTTPS for the zrok2 controller and frontend via Caddy (recommended for production)
+  - **3022**: OpenZiti router data plane (always required; direct TLS, not proxied)
+  - **1280**: OpenZiti controller control plane (required for routers not co-located; uses mTLS and must be directly
+    exposed—Caddy cannot proxy this port)
+  - **443**: HTTPS for the zrok2 controller and frontend via Caddy (recommended for production)
+  - **18080 and 8080**: zrok2 controller and frontend (local testing only, no TLS)
 
 :::tip Use Caddy for TLS
-Use the [Caddy TLS overlay](#optional-enable-tls-with-caddy) for production deployments.
-Caddy terminates TLS for the zrok2 controller API and the wildcard share frontend on port 443,
-routing by subdomain. This avoids exposing the insecure ports 18080 (controller) and 8080
-(frontend) directly to the internet.
+Use the [Caddy TLS overlay](#optional-enable-tls-with-caddy) for production deployments. Caddy terminates TLS for the
+zrok2 controller API and the wildcard share frontend on port 443, routing by subdomain. This avoids exposing the
+insecure ports 18080 (controller) and 8080 (frontend) directly to the internet.
 :::
 
-For local testing only (no TLS), 18080 and 8080 also need to be reachable.
-
 ## Step 1: Download the Compose project
+
+Download and extract the Compose project into a new `zrok2-instance` directory:
 
 ```bash
 curl -sSfL https://get.zrok.io/docker | tar -xz -C zrok2-instance
@@ -51,53 +49,54 @@ cd zrok/docker/compose/zrok2-instance
 
 ## Step 2: Configure environment variables
 
-Copy the example environment file and edit it:
+1. Copy the example environment file:
 
-```bash
-cp .env.example .env
-```
+    ```bash
+    cp .env.example .env
+    ```
 
-At minimum, set these three values:
+2. Open `.env` and set these three required values (they match the variable names used in
+   [Deploy zrok on Linux](@zrokdocs/self-hosting/deployment/linux)):
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `ZROK2_DNS_ZONE` | DNS zone with wildcard A record | `share.example.com` |
-| `ZROK2_ADMIN_TOKEN` | zrok2 admin token (≥32 chars) | `myadmintokenoflength32ormore...` |
-| `ZITI_PWD` | OpenZiti controller admin password | `mysecurepassword` |
-
-These match the same variable names used in the
-[Deploy zrok on Linux](@zrokdocs/self-hosting/deployment/linux).
+    | Variable            | Description                        | Example                           |
+    |---------------------|------------------------------------|-----------------------------------|
+    | `ZROK2_DNS_ZONE`    | DNS zone with wildcard A record    | `share.example.com`               |
+    | `ZROK2_ADMIN_TOKEN` | zrok2 admin token (≥32 chars)      | `myadmintokenoflength32ormore...` |
+    | `ZITI_PWD`          | OpenZiti controller admin password | `mysecurepassword`                |
 
 ### Optional variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `ZROK2_STORE_TYPE` | `postgres` | Database backend (`postgres` or `sqlite3`) |
-| `ZROK2_DB_PASSWORD` | `zrok2defaultpw` | PostgreSQL password |
-| `ZITI_USER` | `admin` | OpenZiti admin username |
-| `ZROK2_CTRL_PORT` | `18080` | zrok2 controller API port |
-| `ZROK2_FRONTEND_PORT` | `8080` | zrok2 frontend port |
-| `ZITI_CTRL_PORT` | `1280` | OpenZiti control plane port |
-| `ZITI_ROUTER_PORT` | `3022` | OpenZiti data plane port |
-| `ZROK2_INSECURE_INTERFACE` | `127.0.0.1` | Bind address for non-TLS ports |
-| `ZROK2_IMAGE` | `docker.io/openziti/zrok2` | zrok2 container image |
-| `ZROK2_TAG` | `latest` | zrok2 image tag — set to a specific version for reproducible deployments |
+These variables have working defaults; override them if your deployment needs differ.
+
+| Variable                   | Default                    | Description                                                             |
+|----------------------------|----------------------------|-------------------------------------------------------------------------|
+| `ZROK2_STORE_TYPE`         | `postgres`                 | Database backend (`postgres` or `sqlite3`)                              |
+| `ZROK2_DB_PASSWORD`        | `zrok2defaultpw`           | PostgreSQL password                                                     |
+| `ZITI_USER`                | `admin`                    | OpenZiti admin username                                                 |
+| `ZROK2_CTRL_PORT`          | `18080`                    | zrok2 controller API port                                               |
+| `ZROK2_FRONTEND_PORT`      | `8080`                     | zrok2 frontend port                                                     |
+| `ZITI_CTRL_PORT`           | `1280`                     | OpenZiti control plane port                                             |
+| `ZITI_ROUTER_PORT`         | `3022`                     | OpenZiti data plane port                                                |
+| `ZROK2_INSECURE_INTERFACE` | `127.0.0.1`                | Bind address for non-TLS ports                                          |
+| `ZROK2_IMAGE`              | `docker.io/openziti/zrok2` | zrok2 container image                                                   |
+| `ZROK2_TAG`                | `latest`                   | zrok2 image tag; set to a specific version for reproducible deployments |
 
 ## Step 3: Start the stack
+
+Start all services in detached mode:
 
 ```bash
 docker compose up -d
 ```
 
-On first start, one-shot init services bootstrap the OpenZiti overlay and zrok2
-stack before the main services begin. This takes 1–2 minutes. Monitor progress:
+On first start, `zrok2-init` bootstraps the OpenZiti overlay and zrok2 stack before the main services begin. This takes
+1–2 minutes. Monitor progress:
 
 ```bash
 docker compose logs -f zrok2-init
 ```
 
-Once `zrok2-init` exits successfully, the controller and frontend start
-automatically.
+Once `zrok2-init` exits successfully, the controller and frontend start automatically.
 
 ## Step 4: Verify the stack
 
@@ -116,18 +115,18 @@ curl -sf -H 'Accept: application/zrok.v1+json' \
 
 ## Step 5: Create your first account
 
+Create an account on your zrok2 instance:
+
 ```bash
 docker compose exec zrok2-controller \
   zrok2 admin create account you@example.com yourpassword
 ```
 
-The command prints an **enable token**. Save it — you'll need it to enable
-your environment.
+The command prints an **enable token**. Save it—you'll need it to enable your environment.
 
 ## Step 6: Enable a client environment
 
-On your workstation (not the server), install the zrok2 CLI and point it at
-your instance:
+On your workstation (not the server), install the zrok2 CLI and point it at your instance:
 
 ```bash
 export ZROK2_API_ENDPOINT=http://your-server:18080
@@ -138,33 +137,34 @@ Replace `<token>` with the enable token from the previous step.
 
 ## Step 7: Verify named shares work
 
-After enabling your environment, verify that the dynamic frontend serves named
-shares:
+After enabling your environment, verify that the dynamic frontend serves named shares:
 
-```bash
-# Create a named share (runs in foreground — use a separate terminal)
-zrok2 create name mytest
-zrok2 share public http://127.0.0.1:8080 --name-selection public:mytest
+1. Create a named share (runs in the foreground—use a separate terminal):
 
-# From another terminal, verify the frontend routes it
-curl -sf http://mytest.share.example.com:8080/
-```
+    ```bash
+    zrok2 create name mytest
+    zrok2 share public http://127.0.0.1:8080 --name-selection public:mytest
+    ```
+
+2. From another terminal, verify the frontend routes it:
+
+    ```bash
+    curl -sf http://mytest.share.example.com:8080/
+    ```
 
 ## Make the frontend publicly accessible
 
-By default, the zrok2 controller and frontend ports bind to `127.0.0.1` (localhost only) for
-safety. To make the frontend reachable from the internet without TLS, set `ZROK2_INSECURE_INTERFACE`
-in your `.env`:
+By default, the zrok2 controller and frontend ports bind to `127.0.0.1` (localhost only) for safety. To make the
+frontend reachable from the internet without TLS, set `ZROK2_INSECURE_INTERFACE` in your `.env`:
 
 ```bash
 ZROK2_INSECURE_INTERFACE=0.0.0.0
 ```
 
-This publishes ports 18080 (controller API) and 8080 (frontend) insecurely on all interfaces. For
-production, use the [Caddy TLS overlay](#optional-enable-tls-with-caddy) instead.
+This publishes ports 18080 (controller API) and 8080 (frontend) insecurely on all interfaces. For production, use the
+[Caddy TLS overlay](#optional-enable-tls-with-caddy) instead.
 
-Alternatively, publish only the frontend port by overriding the port mapping in a
-`compose.override.yml`:
+Alternatively, publish only the frontend port by overriding the port mapping in a `compose.override.yml`:
 
 ```yaml
 services:
@@ -173,13 +173,12 @@ services:
       - "0.0.0.0:8080:8080"
 ```
 
-The OpenZiti router data-plane port (3022) already binds to `0.0.0.0` because SDK clients must reach it
-from outside the Docker network and OpenZiti uses TLS for security.
+The OpenZiti router data-plane port (3022) already binds to `0.0.0.0` because SDK clients must reach it from outside the
+Docker network and OpenZiti uses TLS for security.
 
 ## Optional: Enable TLS with Caddy
 
-For production deployments, enable TLS using the Caddy overlay. Caddy
-acquires a wildcard certificate via DNS challenge.
+For production deployments, enable TLS using the Caddy overlay. Caddy acquires a wildcard certificate via DNS challenge.
 
 1. Set the Caddy variables in `.env`:
 
@@ -194,8 +193,8 @@ acquires a wildcard certificate via DNS challenge.
    COMPOSE_FILE=compose.yml:compose.caddy.yml docker compose up -d
    ```
 
-Caddy builds itself with the DNS plugin on first start (takes a few minutes),
-then handles TLS termination for all services:
+Caddy builds itself with the DNS plugin on first start (takes a few minutes), then handles TLS termination for all
+services:
 
 - `https://zrok2.share.example.com` → zrok2 controller API
 - `https://*.share.example.com` → zrok2 public frontend
@@ -215,10 +214,10 @@ To collect usage metrics, enable the metrics profile:
 docker compose --profile metrics up -d
 ```
 
-This adds InfluxDB and a metrics bridge service. You also need to configure the
-Ziti controller to emit `fabric.usage` events — see the
-[Deploy zrok on Linux](@zrokdocs/self-hosting/deployment/linux#step-12-configure-openziti-metrics-events)
-for the configuration reference.
+This adds InfluxDB and a metrics bridge service. You also need to configure the the OpenZiti controller to emit
+`fabric.usage` events. See [Deploy zrok on
+Linux](@zrokdocs/self-hosting/deployment/linux#step-12-configure-openziti-metrics-events) for the configuration
+reference.
 
 ### Verify InfluxDB has data
 
@@ -230,8 +229,7 @@ docker compose exec influxdb influx query \
   --org zrok2 --token "${ZROK2_INFLUX_TOKEN}" --raw
 ```
 
-A successful result contains CSV rows with count values. If no data appears, check the metrics
-bridge logs and RabbitMQ:
+A successful result contains CSV rows with count values. If no data appears, check the metrics bridge logs and RabbitMQ:
 
 ```bash
 docker compose logs zrok2-metrics-bridge --tail=50
@@ -240,17 +238,14 @@ docker compose exec rabbitmq rabbitmqctl list_queues
 
 ## Optional: Build from source
 
-For development or CI, you can build the zrok2 image from source instead of
-pulling a published image. This uses the `compose.build.yml` overlay, which
-adds a multi-stage Docker build (Go compilation + UI assets) to each zrok2
-service.
+For development or CI, you can build the zrok2 image from source instead of pulling a published image. This uses the
+`compose.build.yml` overlay, which adds a multi-stage Docker build (Go compilation + UI assets) to each zrok2 service.
 
 ```bash
 COMPOSE_FILE=compose.yml:compose.build.yml docker compose up -d --build --wait
 ```
 
-The build context is the repository root, so run this from a cloned
-repository:
+The build context is the repository root, so run this from a cloned repository:
 
 ```bash
 git clone https://github.com/openziti/zrok.git
@@ -260,8 +255,8 @@ cp .env.example .env
 COMPOSE_FILE=compose.yml:compose.build.yml docker compose up -d --build --wait
 ```
 
-The first build takes several minutes (Go module download + compilation). The
-build overlay can be combined with other overlays:
+The first build takes several minutes (Go module download + compilation). The build overlay can be combined with other
+overlays:
 
 ```bash
 COMPOSE_FILE=compose.yml:compose.build.yml:compose.caddy.yml \
@@ -272,8 +267,8 @@ COMPOSE_FILE=compose.yml:compose.build.yml:compose.caddy.yml \
 
 ### Bootstrap fails with "connection refused"
 
-The `zrok2-init` service waits for the OpenZiti controller health check. If the
-controller fails to start, check its logs:
+The `zrok2-init` service waits for the OpenZiti controller health check. If the controller fails to start, check its
+logs:
 
 ```bash
 docker compose logs ziti-controller
@@ -283,8 +278,7 @@ Common causes: incorrect `ZITI_PWD`, port conflicts, DNS resolution issues.
 
 ### Frontend returns 502
 
-The frontend needs the public identity created during bootstrap. Verify the
-init completed:
+The frontend needs the public identity created during bootstrap. Verify the init completed:
 
 ```bash
 docker compose logs zrok2-init
@@ -306,9 +300,8 @@ docker compose --profile metrics down -v --remove-orphans
 
 ## Architecture
 
-For details on what each service does, how the dynamic frontend's AMQP-based
-mapping updates work, and the full manual setup procedure, see the
-[Deploy zrok on Linux](@zrokdocs/self-hosting/deployment/linux).
+For details on what each service does, how the dynamic frontend's AMQP-based mapping updates work, and the full manual
+setup procedure, see the [Deploy zrok on Linux](@zrokdocs/self-hosting/deployment/linux).
 
 ```text
 ┌──────────────────────────────────────────────────────┐

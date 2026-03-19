@@ -4,9 +4,12 @@ title: Deploy zrok on Linux
 sidebar_label: Linux
 ---
 
+This guide walks through deploying a self-hosted zrok2 instance on a single Linux server, running the controller,
+frontend, and metrics bridge. This is the simplest production-ready configuration.
+
 :::info Single-host deployment
-This guide deploys all zrok components—controller, frontend, and metrics bridge—on a single Linux server. This is the
-simplest production-ready configuration. To scale the frontend for higher throughput or availability, see [Scaling frontends](@zrokdocs/self-hosting/scaling-frontends).
+To scale the frontend for higher throughput or availability, see
+[Scaling frontends](@zrokdocs/self-hosting/scaling-frontends).
 :::
 
 ## Prerequisites
@@ -17,9 +20,9 @@ Before you begin, make sure you have:
 - A wildcard DNS record like `*.zrok.example.com` that resolves to the server IP
 - A wildcard TLS certificate for `*.zrok.example.com` (e.g., from [Let's Encrypt](https://letsencrypt.org/))
 - An OpenZiti controller and router running on your server. OpenZiti provides the secure network backhaul for zrok
-  shares. You can run everything on the same Linux VPS. Follow the
-  [OpenZiti Linux deployment guides](https://netfoundry.io/docs/openziti/category/linux/) to install and configure
-  them, then verify the router is online:
+  shares. You can run everything on the same Linux VPS. Follow the [OpenZiti Linux deployment
+  guides](https://netfoundry.io/docs/openziti/category/linux/) to install and configure them, then verify the router is
+  online:
 
   ```bash
   ziti edge list edge-routers
@@ -206,13 +209,13 @@ Save the `--token` value—you'll need it for the controller configuration.
       password: "<your-ziti-admin-password>"
     ```
 
-    - `admin`: Defines privileged administrative credentials. Set the same value in the `ZROK2_ADMIN_TOKEN`
-      environment variable to run `zrok2 admin` commands.
-    - `bridge`: Configures the metrics bridge to consume OpenZiti `fabric.usage` events from a file and publish
-      them to the AMQP queue.
+    - `admin`: Defines privileged administrative credentials. Set the same value in the `ZROK2_ADMIN_TOKEN` environment
+      variable to run `zrok2 admin` commands.
+    - `bridge`: Configures the metrics bridge to consume OpenZiti `fabric.usage` events from a file and publish them to
+      the AMQP queue.
     - `metrics`: Configures the controller to consume events from the AMQP queue and write them to InfluxDB.
-    - `dynamic_proxy_controller`: Enables the gRPC/AMQP system for dynamic frontends. The identity file referenced
-      here will be created in a later step.
+    - `dynamic_proxy_controller`: Enables the gRPC/AMQP system for dynamic frontends. The identity file referenced here
+      will be created in a later step.
 
 2. Set file ownership and permissions:
 
@@ -241,7 +244,8 @@ export ZROK2_API_ENDPOINT=http://127.0.0.1:18080
 export ZROK2_ADMIN_TOKEN=<your-admin-token>
 ```
 
-For more information on environment variables and advanced configuration, see [Use another zrok instance](@zrokdocs/self-hosting/instance-configuration).
+For more information on environment variables and advanced configuration, see [Use another zrok
+instance](@zrokdocs/self-hosting/instance-configuration).
 
 ### Step 4: Bootstrap OpenZiti for zrok
 
@@ -290,8 +294,8 @@ namespace mapping.
 ### Step 7: Create the dynamicProxyController
 
 The dynamic proxy controller is a gRPC service that pushes real-time share mapping updates to the frontend over the Ziti
-overlay via AMQP. Without it, the frontend can't route named shares (e.g., `myapp.zrok.example.com`).
-Only random-token shares would work with polling.
+overlay via AMQP. Without it, the frontend can't route named shares (e.g., `myapp.zrok.example.com`). Only random-token
+shares would work with polling.
 
 1. Create the Ziti identity:
 
@@ -365,8 +369,8 @@ Only random-token shares would work with polling.
 :::note Why is this needed?
 When a user creates a named share (`zrok2 share public --name-selection public:myapp ...`), the controller publishes a
 mapping update to the `dynamicProxy` AMQP exchange. The frontend subscribes to this exchange and immediately starts
-routing `myapp.zrok.example.com` to the share's backend with no polling delay. The `dynamicProxyController` Ziti service is
-the gRPC channel over the Ziti overlay that delivers these mapping updates securely.
+routing `myapp.zrok.example.com` to the share's backend with no polling delay. The `dynamicProxyController` Ziti service
+is the gRPC channel over the Ziti overlay that delivers these mapping updates securely.
 :::
 
 ### Step 8: Create a namespace
@@ -426,8 +430,8 @@ Replace `<frontend-token>` with the token from [Step 6](#step-6-create-a-dynamic
     sudo chmod 640 /etc/zrok2/frontend.yml
     ```
 
-3. (If applicable) If the TLS certificate files are only readable by root (common with Let's Encrypt), grant read
-   access to the service users:
+3. (If applicable) If the TLS certificate files are only readable by root (common with Let's Encrypt), grant read access
+   to the service users:
 
     ```bash
     sudo groupadd --system zrok2-tls 2>/dev/null || true
@@ -665,8 +669,8 @@ sudo journalctl -u zrok2-controller --since "5 minutes ago"
 
 If a service fails to start, verify the configuration file syntax and that the OpenZiti network is reachable.
 
-For dynamic frontend troubleshooting (AMQP connectivity, gRPC errors, mapping issues), see
-[Dynamic proxy frontend migration guide](@zrokdocs/self-hosting/dynamic-proxy#troubleshooting).
+For dynamic frontend troubleshooting (AMQP connectivity, gRPC errors, mapping issues), see [Dynamic proxy frontend
+migration guide](@zrokdocs/self-hosting/dynamic-proxy#troubleshooting).
 
-For metrics troubleshooting (InfluxDB connectivity, AMQP queues, event flow), see
-[Configure metrics](@zrokdocs/self-hosting/metrics-and-limits/configuring-metrics).
+For metrics troubleshooting (InfluxDB connectivity, AMQP queues, event flow), see [Configure
+metrics](@zrokdocs/self-hosting/metrics-and-limits/configuring-metrics).
