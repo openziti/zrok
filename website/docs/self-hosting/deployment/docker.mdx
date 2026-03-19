@@ -1,12 +1,12 @@
 ---
-title: Self-hosting guide for Docker
+title: Deploy zrok on Docker
 sidebar_label: Docker
 sidebar_position: 45
 ---
 
 This guide walks through deploying a self-hosted zrok2 instance using Docker
 Compose. The stack runs the same components as the
-[Linux self-hosting guide](@zrokdocs/self-hosting/deployment/linux) — OpenZiti overlay, zrok2
+[Deploy zrok on Linux](@zrokdocs/self-hosting/deployment/linux) — OpenZiti overlay, zrok2
 controller, frontend, and PostgreSQL — using official container images with
 runtime configuration via environment variables.
 
@@ -66,7 +66,7 @@ At minimum, set these three values:
 | `ZITI_PWD` | OpenZiti controller admin password | `mysecurepassword` |
 
 These match the same variable names used in the
-[Linux self-hosting guide](@zrokdocs/self-hosting/deployment/linux).
+[Deploy zrok on Linux](@zrokdocs/self-hosting/deployment/linux).
 
 ### Optional variables
 
@@ -217,7 +217,7 @@ docker compose --profile metrics up -d
 
 This adds InfluxDB and a metrics bridge service. You also need to configure the
 Ziti controller to emit `fabric.usage` events — see the
-[Linux self-hosting guide](@zrokdocs/self-hosting/deployment/linux#step-12-configure-openziti-metrics-events)
+[Deploy zrok on Linux](@zrokdocs/self-hosting/deployment/linux#step-12-configure-openziti-metrics-events)
 for the configuration reference.
 
 ### Verify InfluxDB has data
@@ -308,7 +308,7 @@ docker compose --profile metrics down -v --remove-orphans
 
 For details on what each service does, how the dynamic frontend's AMQP-based
 mapping updates work, and the full manual setup procedure, see the
-[Linux self-hosting guide](@zrokdocs/self-hosting/deployment/linux).
+[Deploy zrok on Linux](@zrokdocs/self-hosting/deployment/linux).
 
 ```text
 ┌──────────────────────────────────────────────────────┐
