@@ -170,7 +170,7 @@ jobs:
 
   build-darwin:
     if: github.repository_owner == 'openziti' || vars.ZROK_SKIP_MACOS_BUILD == 'false'
-    runs-on: macos-26-large
+    runs-on: macos-15-intel
     steps:
       - name: import distribution cert
         uses: apple-actions/import-codesign-certs@v3
