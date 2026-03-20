@@ -36,14 +36,15 @@ insecure ports 18080 (controller) and 8080 (frontend) directly to the internet.
 Download and extract the Compose project into a new `zrok2-instance` directory:
 
 ```bash
-curl -sSfL https://get.zrok.io/docker | tar -xz -C zrok2-instance
+curl -sSfL https://get.openziti.io/zrok2-instance/fetch.bash | bash
 cd zrok2-instance
 ```
 
-Or clone the repository:
+This downloads the essential Docker Compose project files. Alternatively, clone the
+repository, e.g., if you wish to build `zrok2` from source with `compose.build.yml`:
 
 ```bash
-git clone https://github.com/openziti/zrok.git
+git clone --depth 1 https://github.com/openziti/zrok.git
 cd zrok/docker/compose/zrok2-instance
 ```
 
