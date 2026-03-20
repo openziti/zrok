@@ -98,12 +98,11 @@ jobs:
             SEMVER_PRE=${SEMVER#*-}
           fi
           BINARY_PACKAGES=(zrok2)
-          META_PACKAGES=(zrok2-agent)
-          # for PAX in zrok2{,-agent,-controller,-frontend,-metrics}; do
+          META_PACKAGES=(zrok2-agent zrok2-controller zrok2-frontend zrok2-metrics-bridge)
           for PAX in "${BINARY_PACKAGES[@]}" "${META_PACKAGES[@]}"; do
             _pattern="./dist/${PAX}-${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*.${ARCH}.rpm"
             if ! compgen -G "$_pattern" > /dev/null && [[ " ${META_PACKAGES[*]} " == *" ${PAX} "* ]]; then
-              # Fall back to noarch for meta packages like zrok2-agent
+              # Fall back to noarch for meta packages
               _pattern="./dist/${PAX}-${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*.noarch.rpm"
             fi
             if ! compgen -G "$_pattern" > /dev/null; then
@@ -141,12 +140,11 @@ jobs:
             SEMVER_PRE=${SEMVER#*-}
           fi
           BINARY_PACKAGES=(zrok2)
-          META_PACKAGES=(zrok2-agent)
-          # for PAX in zrok2{,-agent,-controller,-frontend,-metrics}; do
+          META_PACKAGES=(zrok2-agent zrok2-controller zrok2-frontend zrok2-metrics-bridge)
           for PAX in "${BINARY_PACKAGES[@]}" "${META_PACKAGES[@]}"; do
             _pattern="./dist/${PAX}_${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*_${ARCH}.deb"
             if ! compgen -G "$_pattern" > /dev/null && [[ " ${META_PACKAGES[*]} " == *" ${PAX} "* ]]; then
-              # Fall back to all for meta packages like zrok2-agent
+              # Fall back to all for meta packages
               _pattern="./dist/${PAX}_${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*_all.deb"
             fi
             if ! compgen -G "$_pattern" > /dev/null; then
@@ -172,7 +170,7 @@ jobs:
 
   build-darwin:
     if: github.repository_owner == 'openziti' || vars.ZROK_SKIP_MACOS_BUILD == 'false'
-    runs-on: macos-14
+    runs-on: macos-15-intel
     steps:
       - name: import distribution cert
         uses: apple-actions/import-codesign-certs@v3

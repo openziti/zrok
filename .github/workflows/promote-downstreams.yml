@@ -63,6 +63,9 @@ jobs:
         package_name:
           - zrok2
           - zrok2-agent
+          - zrok2-controller
+          - zrok2-frontend
+          - zrok2-metrics-bridge
         arch:
           - deb: amd64
             rpm: x86_64
@@ -90,7 +93,7 @@ jobs:
         shell: bash
         run: |
           # meta packages produce noarch RPMs; binary packages use the target arch
-          META_PACKAGES=(zrok2-agent)
+          META_PACKAGES=(zrok2-agent zrok2-controller zrok2-frontend zrok2-metrics-bridge)
           if [[ " ${META_PACKAGES[*]} " == *" ${{ matrix.package_name }} "* ]]; then
             _rpm_arch="noarch"
           else
@@ -108,7 +111,7 @@ jobs:
         shell: bash
         run: |
           # meta packages produce arch-independent (all) DEBs; binary packages use the target arch
-          META_PACKAGES=(zrok2-agent)
+          META_PACKAGES=(zrok2-agent zrok2-controller zrok2-frontend zrok2-metrics-bridge)
           if [[ " ${META_PACKAGES[*]} " == *" ${{ matrix.package_name }} "* ]]; then
             _deb_arch="all"
           else
