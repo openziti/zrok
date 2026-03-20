@@ -1,87 +1,43 @@
 import {Root} from "./environment";
 import {
     AuthUser,
+    MetadataApi,
     ShareApi,
     ShareRequest as ApiShareRequest,
     ShareRequestBackendModeEnum,
+    ShareRequestPermissionModeEnum,
     ShareRequestShareModeEnum,
-    UnshareRequest
+    UnshareRequest,
+    UpdateShareRequest as ApiUpdateShareRequest,
+    NameSelection as ApiNameSelection,
 } from "../api";
-
-export type ShareMode = string;
-export const PRIVATE_SHARE_MODE: ShareMode = "private";
-export const PUBLIC_SHARE_MODE: ShareMode = "public";
-
-export type BackendMode = string;
-export const PROXY_BACKEND_MODE: BackendMode = "proxy";
-export const TCP_TUNNEL_BACKEND_MODE: BackendMode = "tcpTunnel";
-export const UDP_TUNNEL_BACKEND_MODE: BackendMode = "udpTunnel";
-
-export type AuthScheme = string;
-export const AUTH_SCHEME_NONE = "none";
-export const AUTH_SCHEME_BASIC = "basic";
-export const AUTH_SCHEME_OAUTH = "oauth";
-
-export type PermissionMode = string;
-export const OPEN_PERMISSION_MODE = "open";
-export const CLOSED_PERMISSION_MODE = "closed";
-
-export class NameSelection {
-    namespaceToken: string;
-    name: string | undefined;
-
-    constructor(namespaceToken: string) {
-        this.namespaceToken = namespaceToken;
-    }
-}
-
-export class ShareRequest {
-    reserved: boolean;
-    uniqueName: string | undefined;
-    backendMode: BackendMode;
-    shareMode: ShareMode;
-    target: string;
-    nameSelections: NameSelection[] | undefined;
-    basicAuth: string[] | undefined;
-    oauthProvider: string | undefined;
-    oauthEmailDomains: string[] | undefined;
-    oauthRefreshInterval: string | undefined;
-    permissionMode: PermissionMode;
-    accessGrants: string[] | undefined;
-
-    constructor(shareMode: ShareMode, backendMode: BackendMode, target: string) {
-        this.reserved = false;
-        this.uniqueName = undefined;
-        this.backendMode = backendMode;
-        this.shareMode = shareMode;
-        this.target = target;
-        this.nameSelections = shareMode === PUBLIC_SHARE_MODE ? [{namespaceToken: "public"} as NameSelection] : undefined;
-        this.basicAuth = undefined;
-        this.oauthProvider = undefined;
-        this.oauthEmailDomains = undefined;
-        this.oauthRefreshInterval = undefined;
-        this.permissionMode = CLOSED_PERMISSION_MODE;
-        this.accessGrants = undefined;
-    }
-}
-
-export class Share {
-    shareToken: string;
-    frontendEndpoints: string[] | undefined;
-
-    constructor(shareToken: string, frontendEndpoints: string[] | undefined) {
-        this.shareToken = shareToken;
-        this.frontendEndpoints = frontendEndpoints;
-    }
-}
+import {
+    BackendMode,
+    Share,
+    ShareRequest,
+    ShareDetail,
+    PRIVATE_SHARE_MODE,
+    PUBLIC_SHARE_MODE,
+    PROXY_BACKEND_MODE,
+    WEB_BACKEND_MODE,
+    TCP_TUNNEL_BACKEND_MODE,
+    UDP_TUNNEL_BACKEND_MODE,
+    CADDY_BACKEND_MODE,
+    DRIVE_BACKEND_MODE,
+    SOCKS_BACKEND_MODE,
+    AUTH_SCHEME_NONE,
+    AUTH_SCHEME_BASIC,
+    AUTH_SCHEME_OAUTH,
+    CLOSED_PERMISSION_MODE,
+} from "./model";
 
 export const createShare = async (root: Root, request: ShareRequest): Promise<Share> => {
-    if(!root.isEnabled()) {
-        throw new Error("environment is not enabled; enable with 'zrok enable' first!");
+    if (!root.isEnabled()) {
+        throw new Error("environment is not enabled; enable with 'zrok2 enable' first!");
     }
 
     let req: ApiShareRequest;
-    switch(request.shareMode) {
+    switch (request.shareMode) {
         case PRIVATE_SHARE_MODE:
             req = toPrivateApiShareRequest(root, request);
             break;
@@ -92,7 +48,8 @@ export const createShare = async (root: Root, request: ShareRequest): Promise<Sh
             throw new Error("unknown share mode '" + request.shareMode + "'");
     }
 
-    let shr = await new ShareApi(root.apiConfiguration()).share({body: req})
+    const cfg = await root.client();
+    const shr = await new ShareApi(cfg).share({body: req})
         .catch(err => {
             throw new Error("unable to create share: " + err);
         });
@@ -100,62 +57,134 @@ export const createShare = async (root: Root, request: ShareRequest): Promise<Sh
     return new Share(shr.shareToken!, shr.frontendProxyEndpoints);
 }
 
-export const deleteShare = async (root: Root, shr: Share): Promise<any> => {
-    if(!root.isEnabled()) {
-        throw new Error("environment is not enable; enable with 'zrok enable' first!");
+export const deleteShare = async (root: Root, shr: Share): Promise<void> => {
+    if (!root.isEnabled()) {
+        throw new Error("environment is not enabled; enable with 'zrok2 enable' first!");
     }
-    let req: UnshareRequest = {
+    const req: UnshareRequest = {
         envZId: root.environment?.zId!,
         shareToken: shr.shareToken
     };
-    return new ShareApi(root.apiConfiguration()).unshare({body: req})
+    const cfg = await root.client();
+    await new ShareApi(cfg).unshare({body: req})
         .catch(err => {
             throw new Error("unable to delete share: " + err);
         });
 }
 
-const toPrivateApiShareRequest = (root: Root, request: ShareRequest): ApiShareRequest => {
+export const releaseReservedShare = async (root: Root, shr: Share): Promise<void> => {
+    if (!root.isEnabled()) {
+        throw new Error("environment is not enabled; enable with 'zrok2 enable' first!");
+    }
+    const req: UnshareRequest = {
+        envZId: root.environment?.zId!,
+        shareToken: shr.shareToken,
+    };
+    const cfg = await root.client();
+    await new ShareApi(cfg).unshare({body: req})
+        .catch(err => {
+            throw new Error("unable to release reserved share: " + err);
+        });
+}
+
+export const modifyShare = async (
+    root: Root,
+    shareToken: string,
+    addAccessGrants?: string[],
+    removeAccessGrants?: string[],
+): Promise<void> => {
+    if (!root.isEnabled()) {
+        throw new Error("environment is not enabled; enable with 'zrok2 enable' first!");
+    }
+    const req: ApiUpdateShareRequest = {
+        shareToken: shareToken,
+        addAccessGrants: addAccessGrants || [],
+        removeAccessGrants: removeAccessGrants || [],
+    };
+    const cfg = await root.client();
+    await new ShareApi(cfg).updateShare({body: req})
+        .catch(err => {
+            throw new Error("unable to modify share: " + err);
+        });
+}
+
+export const getShareDetail = async (root: Root, shareToken: string): Promise<ShareDetail> => {
+    if (!root.isEnabled()) {
+        throw new Error("environment is not enabled; enable with 'zrok2 enable' first!");
+    }
+    const cfg = await root.client();
+    const res = await new MetadataApi(cfg).getShareDetail({shareToken})
+        .catch(err => {
+            throw new Error("unable to get share detail: " + err);
+        });
+
     return {
+        token: res.shareToken || "",
+        zId: res.zId || "",
+        envZId: res.envZId || "",
+        shareMode: res.shareMode || "",
+        backendMode: res.backendMode || "",
+        frontendEndpoints: res.frontendEndpoints || [],
+        target: res.target || "",
+        limited: res.limited || false,
+        createdAt: res.createdAt || 0,
+        updatedAt: res.updatedAt || 0,
+    };
+}
+
+const toPrivateApiShareRequest = (root: Root, request: ShareRequest): ApiShareRequest => {
+    const out: ApiShareRequest = {
         envZId: root.environment?.zId,
         shareMode: ShareRequestShareModeEnum.Private,
         backendMode: toApiBackendMode(request.backendMode),
         target: request.target,
         authScheme: AUTH_SCHEME_NONE,
-        permissionMode: CLOSED_PERMISSION_MODE,
+        permissionMode: (request.permissionMode || CLOSED_PERMISSION_MODE) as ShareRequestPermissionModeEnum,
     };
+    if (request.nameSelections) {
+        out.nameSelections = request.nameSelections.map(n => ({
+            namespaceToken: n.namespaceToken,
+            name: n.name,
+        } as ApiNameSelection));
+    }
+    if (request.accessGrants) {
+        out.accessGrants = request.accessGrants;
+    }
+    return out;
 }
 
 const toPublicApiShareRequest = (root: Root, request: ShareRequest): ApiShareRequest => {
-    let out: ApiShareRequest = {
+    const out: ApiShareRequest = {
         envZId: root.environment?.zId,
         shareMode: ShareRequestShareModeEnum.Public,
         backendMode: toApiBackendMode(request.backendMode),
         target: request.target,
         authScheme: AUTH_SCHEME_NONE,
+        permissionMode: request.permissionMode as ShareRequestPermissionModeEnum,
     };
     if (request.nameSelections) {
-        let nss = new Array<NameSelection>();
-        request.nameSelections.forEach(n => {
-            nss.push({namespaceToken: n.namespaceToken, name: n.name})
-        })
-        out.nameSelections = nss;
+        out.nameSelections = request.nameSelections.map(n => ({
+            namespaceToken: n.namespaceToken,
+            name: n.name,
+        } as ApiNameSelection));
+    }
+    if (request.accessGrants) {
+        out.accessGrants = request.accessGrants;
     }
 
-    if(request.oauthProvider !== undefined) {
+    if (request.oauthProvider !== undefined) {
         out.authScheme = AUTH_SCHEME_OAUTH;
         out.oauthProvider = request.oauthProvider;
         out.oauthEmailDomains = request.oauthEmailDomains;
         out.oauthRefreshInterval = request.oauthRefreshInterval;
 
-    } else if(request.basicAuth?.length! > 0) {
+    } else if (request.basicAuth && request.basicAuth.length > 0) {
         out.authScheme = AUTH_SCHEME_BASIC;
-        for(let pair in request.basicAuth) {
-            let tokens = pair.split(":");
-            if(tokens.length === 2) {
-                if(out.basicAuthUsers === undefined) {
-                    out.basicAuthUsers = new Array<AuthUser>();
-                }
-                out.basicAuthUsers.push({username: tokens[0].trim(), password: tokens[1].trim()})
+        out.basicAuthUsers = new Array<AuthUser>();
+        for (const pair of request.basicAuth) {
+            const tokens = pair.split(":");
+            if (tokens.length === 2) {
+                out.basicAuthUsers.push({username: tokens[0].trim(), password: tokens[1].trim()});
             }
         }
     }
@@ -163,14 +192,22 @@ const toPublicApiShareRequest = (root: Root, request: ShareRequest): ApiShareReq
     return out;
 }
 
-const toApiBackendMode = (mode: BackendMode): ShareRequestBackendModeEnum | undefined => {
-    switch(mode) {
+export const toApiBackendMode = (mode: BackendMode): ShareRequestBackendModeEnum | undefined => {
+    switch (mode) {
         case PROXY_BACKEND_MODE:
             return ShareRequestBackendModeEnum.Proxy;
+        case WEB_BACKEND_MODE:
+            return ShareRequestBackendModeEnum.Web;
         case TCP_TUNNEL_BACKEND_MODE:
             return ShareRequestBackendModeEnum.TcpTunnel;
         case UDP_TUNNEL_BACKEND_MODE:
             return ShareRequestBackendModeEnum.UdpTunnel;
+        case CADDY_BACKEND_MODE:
+            return ShareRequestBackendModeEnum.Caddy;
+        case DRIVE_BACKEND_MODE:
+            return ShareRequestBackendModeEnum.Drive;
+        case SOCKS_BACKEND_MODE:
+            return ShareRequestBackendModeEnum.Socks;
         default:
             return undefined;
     }
