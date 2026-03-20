@@ -3,10 +3,10 @@
 This directory contains the Docker Compose project for self-hosting a
 complete zrok2 instance with a Ziti overlay network.
 
-For the full self-hosting guide, see:
-**<https://docs.zrok.io/docs/self-hosting/docker/>**
+For the full self-hosting guide, see deployments:
+**<https://netfoundry.io/docs/zrok/category/deployment>**
 
-## Quick Start
+## Quick start
 
 ```bash
 cp .env.example .env
@@ -14,27 +14,40 @@ cp .env.example .env
 docker compose up -d
 ```
 
-## Files
+Or download the essential Docker Compose files without cloning the repository:
+
+```bash
+curl -sSfL https://get.openziti.io/zrok2-instance/fetch.bash | bash
+cd zrok2-instance
+```
+
+## Essential files
 
 | File | Purpose |
-|------|---------|
-| `compose.yml` | Core services (Ziti, zrok2, PostgreSQL) |
+| ---- | ------- |
+| `compose.yml` | Core services: Ziti overlay, zrok2, PostgreSQL, RabbitMQ |
 | `compose.caddy.yml` | Optional TLS overlay with Caddy |
-| `Caddyfile` | Caddy reverse proxy configuration |
 | `.env.example` | Documented environment variable template |
+| `entrypoint-init.bash` | Bootstrap script for the `zrok2-init` one-shot container |
+| `fetch.bash` | Download script — fetches these files into a `zrok2-instance/` directory |
 
-## Architecture
+## Services
 
 The stack deploys these services:
 
 - **ziti-controller** — Ziti control plane (PKI, identities, policies)
 - **ziti-router** — Ziti data plane (SDK traffic)
 - **postgresql** — zrok2 database (default; SQLite3 available)
-- **zrok2-init** — one-shot bootstrap (generates config, creates identities)
+- **rabbitmq** — AMQP message bus for the dynamic frontend's real-time
+  share mapping updates (required for named public shares via
+  `zrok2 share public --name-selection`)
+- **zrok2-init** — one-shot bootstrap (generates config, creates
+  identities, sets up the `dynamicProxyController` gRPC service)
 - **zrok2-controller** — zrok2 API and admin
-- **zrok2-frontend** — public share frontend
+- **zrok2-frontend** — AMQP-backed dynamic public share frontend
 
 Optional metrics pipeline (enable with `--profile metrics`):
 
-- **rabbitmq** — metrics message queue
 - **influxdb** — metrics time-series storage
+- **zrok2-metrics-bridge** — reads Ziti usage events and publishes to
+  RabbitMQ for the zrok2 controller to write to InfluxDB

@@ -3,6 +3,6 @@
   "position": 5,
   "link": {
     "type": "generated-index",
-    "description": "Deploy and operate your own zrok instance on Linux, Docker, or Kubernetes."
+    "description": "Deploy and operate your own zrok instance on Linux, Docker, or Kubernetes. These guides cover configuration, OAuth authentication, metrics and limits, organizations, and user management."
   }
 }
