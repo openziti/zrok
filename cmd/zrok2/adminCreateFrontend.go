@@ -21,7 +21,7 @@ type adminCreateFrontendCommand struct {
 
 func newAdminCreateFrontendCommand() *adminCreateFrontendCommand {
 	cmd := &cobra.Command{
-		Use:   "frontend <zitiId> <publicName> [urlTemplate]",
+		Use:   "frontend <zitiId> <publicName>",
 		Short: "Create a global public frontend",
 		Args:  cobra.RangeArgs(2, 3),
 	}

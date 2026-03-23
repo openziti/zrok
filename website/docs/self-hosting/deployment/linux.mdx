@@ -285,7 +285,7 @@ With `ZROK2_ADMIN_TOKEN` and `ZROK2_API_ENDPOINT` set, create a dynamic frontend
 identity created by `zrok2 admin bootstrap` (shown in its output):
 
 ```bash
-zrok2 admin create frontend --dynamic <public-ziti-id> public
+zrok2 admin create frontend --dynamic -- <public-ziti-id> public
 ```
 
 This outputs a **frontend token** (e.g., `zEjQqHliYXF6`). Save it—you'll need it for the frontend configuration and
@@ -430,16 +430,44 @@ Replace `<frontend-token>` with the token from [Step 6](#step-6-create-a-dynamic
     sudo chmod 640 /etc/zrok2/frontend.yml
     ```
 
-3. (If applicable) If the TLS certificate files are only readable by root (common with Let's Encrypt), grant read access
-   to the service users:
+3. (If applicable) If the zrok controller terminates TLS directly (i.e., you uncommented the `tls:` section in
+   `ctrl.yml` rather than fronting with Caddy or Traefik), the service users need read access to the certificate
+   files. Let's Encrypt certificates are typically only readable by root.
+
+    Create a shared group and grant it read access to the certificate files:
 
     ```bash
     sudo groupadd --system zrok2-tls 2>/dev/null || true
-    sudo usermod -aG zrok2-tls zrok2-controller
-    sudo usermod -aG zrok2-tls zrok2-frontend
     sudo chgrp -R zrok2-tls /etc/letsencrypt/archive/zrok.example.com/
     sudo chmod g+r /etc/letsencrypt/archive/zrok.example.com/*
     sudo chmod o+x /etc/letsencrypt /etc/letsencrypt/live /etc/letsencrypt/archive
+    ```
+
+    Then add `SupplementaryGroups=zrok2-tls` to each service's systemd override so the process runs with the group.
+    `systemctl edit` creates a drop-in override that persists across package upgrades:
+
+    ```bash
+    sudo -E systemctl edit zrok2-controller
+    ```
+
+    Add:
+
+    ```ini
+    [Service]
+    SupplementaryGroups=zrok2-tls
+    ```
+
+    Repeat for the frontend:
+
+    ```bash
+    sudo -E systemctl edit zrok2-frontend
+    ```
+
+    Add the same `[Service]` / `SupplementaryGroups=zrok2-tls` block. Then reload and restart:
+
+    ```bash
+    sudo systemctl daemon-reload
+    sudo systemctl restart zrok2-controller zrok2-frontend
     ```
 
 For a complete reference of all frontend options including OAuth, see the

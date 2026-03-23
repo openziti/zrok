@@ -805,7 +805,7 @@ step_create_frontend() {
     info "Found public identity Ziti ID: $public_ziti_id"
 
     local output
-    if ! output=$(zrok2_admin create frontend --dynamic "$public_ziti_id" public 2>&1); then
+    if ! output=$(zrok2_admin create frontend --dynamic -- "$public_ziti_id" public 2>&1); then
         error "zrok2 admin create frontend failed: $output"
         return 1
     fi
