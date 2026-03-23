@@ -9,7 +9,7 @@ zrok (*/ziːɹɒk/ ZEE-rock*) is a secure, open-source platform for sharing loca
 without opening firewall ports or managing TLS. Built on [OpenZiti](https://openziti.io/) zero-trust networking and
 backed by [NetFoundry](https://netfoundry.io), it supports public HTTPS shares with optional authentication and private
 shares accessible only to other zrok users. Run it as a hosted service at [myzrok.io](https://myzrok.io) with a generous
-free tier, or [self-host your own instance](./self-hosting/deployment/linux/index.mdx) on Linux, Docker, or Kubernetes.
+free tier, or [self-host your own instance](./self-hosting/deployment/linux.mdx) on Linux, Docker, or Kubernetes.
 
 zrok is free and open source under the [Apache v2 license](https://github.com/openziti/zrok/blob/main/LICENSE). The
 source code is available on [GitHub](https://github.com/openziti/zrok).
