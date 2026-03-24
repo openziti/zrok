@@ -61,5 +61,11 @@ func (r *Registry) Save(path string) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(path, data, 0644)
+	// Atomic write: temp file + rename prevents a truncated registry if the
+	// process exits mid-write (observed during container shutdown races).
+	tmp := path + ".tmp"
+	if err := os.WriteFile(tmp, data, 0644); err != nil {
+		return err
+	}
+	return os.Rename(tmp, path)
 }

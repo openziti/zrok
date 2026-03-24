@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -105,19 +106,58 @@ func (a *Agent) Run() error {
 func (a *Agent) Shutdown() {
 	dl.Infof("stopping")
 
+	// Prevent the manager() select loop from saving the registry while we're
+	// shutting down — we'll do a final save ourselves.
 	a.persistRegistry = false
 
 	if err := os.Remove(a.agentSocket); err != nil {
 		dl.Warnf("unable to remove agent socket: %v", err)
 	}
+
+	// Save the registry BEFORE releasing shares on the controller.  This
+	// ensures the share configs survive even if the release API call fails
+	// (controller unreachable, container killed, etc.).  On the next start,
+	// ReloadRegistry will re-create the shares.  The atomic Save (temp +
+	// rename) prevents the truncated-file corruption that occurs when the
+	// process exits mid-write.
+	//
+	// Call saveRegistryNow directly since persistRegistry is already false
+	// (which blocks SaveRegistry and the retry manager from overwriting
+	// this save during the shutdown race).
+	if err := a.saveRegistryNow(); err != nil {
+		dl.Errorf("error saving registry during shutdown: %v", err)
+	}
+
+	// Release shares and accesses on the controller.  Only make the API
+	// call — don't StopChild/WaitChild because the monitor() goroutine and
+	// manager() select loop race to reap the same child processes.  The OS
+	// kills children when the parent exits.
+	var wg sync.WaitGroup
 	for _, shr := range a.shares {
-		dl.Debugf("stopping share '%v'", shr.token)
-		a.rmShare <- shr
+		wg.Add(1)
+		go func(s *share) {
+			defer wg.Done()
+			dl.Infof("releasing share '%v' on controller", s.token)
+			if err := a.deleteShare(s.token); err != nil {
+				dl.Errorf("error releasing share '%v': %v", s.token, err)
+			} else {
+				dl.Infof("released share '%v'", s.token)
+			}
+		}(shr)
 	}
 	for _, acc := range a.accesses {
-		dl.Debugf("stopping access '%v'", acc.token)
-		a.rmAccess <- acc
+		wg.Add(1)
+		go func(ac *access) {
+			defer wg.Done()
+			dl.Infof("releasing access '%v' on controller", ac.frontendToken)
+			if err := a.deleteAccess(ac.token, ac.frontendToken); err != nil {
+				dl.Errorf("error releasing access '%v': %v", ac.frontendToken, err)
+			} else {
+				dl.Infof("released access '%v'", ac.frontendToken)
+			}
+		}(acc)
 	}
+	wg.Wait()
 
 	a.retryManager.stop()
 }
@@ -239,6 +279,13 @@ func (a *Agent) ReloadRegistry() error {
 }
 
 func (a *Agent) SaveRegistry() error {
+	if !a.persistRegistry {
+		return nil
+	}
+	return a.saveRegistryNow()
+}
+
+func (a *Agent) saveRegistryNow() error {
 	r := &Registry{}
 	// save private accesses
 	for _, acc := range a.accesses {
