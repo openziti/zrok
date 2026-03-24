@@ -26,7 +26,6 @@ func NewListFrontendNamespaceMappingsParams() ListFrontendNamespaceMappingsParam
 //
 // swagger:parameters listFrontendNamespaceMappings
 type ListFrontendNamespaceMappingsParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 

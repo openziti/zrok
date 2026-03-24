@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 	"unicode"
@@ -77,7 +78,10 @@ func CreateToken() (string, error) {
 }
 
 func realRemoteAddress(req *http.Request) string {
-	ip := strings.Split(req.RemoteAddr, ":")[0]
+	ip, _, err := net.SplitHostPort(req.RemoteAddr)
+	if err != nil {
+		ip = req.RemoteAddr
+	}
 	fwdAddress := req.Header.Get("X-Forwarded-For")
 	if fwdAddress != "" {
 		ip = fwdAddress

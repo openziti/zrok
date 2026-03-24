@@ -1,0 +1,8 @@
+{
+  "label": "zrok agent",
+  "position": 3,
+  "link": {
+    "type": "doc",
+    "id": "how-tos/agent/index"
+  }
+}

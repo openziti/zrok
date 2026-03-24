@@ -1,0 +1,95 @@
+---
+sidebar_label: Configure HTTP health checks
+sidebar_position: 30
+---
+
+# Configure HTTP health checks
+
+As of `v1.0.7`, the zrok agent supports health checks for `proxy` backend shares. Health checks are not yet
+implemented for other backend modes.
+
+## Run local health checks
+
+1. Create a share:
+
+    ```bash
+    zrok2 share public http://127.0.0.1:18080
+    ```
+
+    ```buttonless title="Output"
+    token:"8rvjpmeeyvwc"  frontendEndpoints:"http://8rvjpmeeyvwc.zrok.example.com:8080"
+    ```
+
+2. Run a health check against the share token:
+
+    ```bash
+    zrok2 agent share http-healthcheck 8rvjpmeeyvwc GET / 200
+    ```
+
+    ```buttonless title="Output"
+    healthy
+    ```
+
+    A non-existent endpoint returns an unhealthy status:
+
+    ```bash
+    zrok2 agent share http-healthcheck 8rvjpmeeyvwc GET /non-existent 200
+    ```
+
+    ```buttonless title="Output"
+    unhealthy; unexpected status code; got '202', want '200'
+    ```
+
+### Detect communications errors
+
+The health check also reports low-level communication errors when the backend is unreachable. For example, create
+a share pointing to an address that isn't listening:
+
+```bash
+zrok2 share public http://127.1.1.1:9090
+```
+
+```buttonless title="Output"
+token:"2bfvnne6kb3c"  frontendEndpoints:"http://2bfvnne6kb3c.zrok.quigley.com:8080"
+```
+
+Running a health check against that share returns a connection error:
+
+```bash
+zrok2 agent share http-healthcheck 2bfvnne6kb3c GET / 200
+```
+
+```buttonless title="Output"
+unhealthy; failed to execute request: Get "http://127.1.1.1:9090/": dial tcp 127.1.1.1:9090: connect: connection refused
+```
+
+## Check health via the remoting API
+
+When your agent is enrolled in remoting, use the `/agent/share/http-healthcheck` endpoint to check backend
+connectivity remotely:
+
+```bash
+curl -H "X-TOKEN: 5hLXj48Bmn11" -XPOST -H "Content-Type: application/zrok.v1+json" \
+  -d '{"envZId": "MxMbUXSANU", "shareToken": "8rvjpmeeyvwc", "httpVerb": "GET", "endpoint": "/", "expectedHttpResponse": 200}' \
+  http://localhost:18080/api/v2/agent/share/http-healthcheck
+```
+
+```buttonless title="Output"
+{
+  "healthy": true
+}
+```
+
+A non-existent endpoint returns an error:
+
+```bash
+curl -H "X-TOKEN: 5hLXj48Bmn11" -XPOST -H "Content-Type: application/zrok.v1+json" \
+  -d '{"envZId": "MxMbUXSANU", "shareToken": "8rvjpmeeyvwc", "httpVerb": "GET", "endpoint": "/non-existent", "expectedHttpResponse": 200}' \
+  http://localhost:18080/api/v2/agent/share/http-healthcheck
+```
+
+```buttonless title="Output"
+{
+  "error": "unexpected status code; got '202', want '200'"
+}
+```

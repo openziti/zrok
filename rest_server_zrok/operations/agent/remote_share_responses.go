@@ -76,7 +76,7 @@ func NewRemoteShareUnauthorized() *RemoteShareUnauthorized {
 // WriteResponse to the client
 func (o *RemoteShareUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -101,7 +101,7 @@ func NewRemoteShareInternalServerError() *RemoteShareInternalServerError {
 // WriteResponse to the client
 func (o *RemoteShareInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }
@@ -126,7 +126,7 @@ func NewRemoteShareBadGateway() *RemoteShareBadGateway {
 // WriteResponse to the client
 func (o *RemoteShareBadGateway) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(502)
 }

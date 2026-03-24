@@ -17,7 +17,7 @@ import {SLOTS, ExtensionNavItem} from "./extensions/types.ts";
 interface NavBarProps {
     logout: () => void;
     visualizer: boolean;
-    toggleMode: (boolean) => void;
+    toggleMode: (mode: boolean) => void;
 }
 
 const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
@@ -91,7 +91,7 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
     const limitedIndicator = (
         <Grid2 display="flex" justifyContent="right">
             <Tooltip title="Bandwidth Limit Reached!">
-                <Button color="error" onClick={openLimitedModal}><LimitIcon /></Button>
+                <Button color="error" aria-label="Bandwidth Limit Reached!" onClick={openLimitedModal}><LimitIcon /></Button>
             </Tooltip>
         </Grid2>
     );
@@ -99,7 +99,7 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
     const gettingStartedButton = (
         <Grid2 display="flex" justifyContent="right">
             <Tooltip title="Getting Started Wizard">
-                <Button style={{ backgroundColor: "#9bf316", color: "black" }} onClick={openGettingStarted}>CLICK HERE TO GET STARTED!</Button>
+                <Button sx={{ backgroundColor: 'secondary.main', color: 'common.black' }} onClick={openGettingStarted}>CLICK HERE TO GET STARTED!</Button>
             </Tooltip>
         </Grid2>
     );
@@ -107,7 +107,7 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
     const helpButton = (
         <Grid2 display="flex" justifyContent="right">
             <Tooltip title="Getting Started Wizard">
-                <Button style={{ color: "#9bf316" }} onClick={openGettingStarted}><HelpIcon /></Button>
+                <Button sx={{ color: 'secondary.main' }} aria-label="Getting Started Wizard" onClick={openGettingStarted}><HelpIcon /></Button>
             </Tooltip>
         </Grid2>
     );
@@ -118,15 +118,15 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
 
     return (
         <>
-            <Box sx={{ flexGrow: 1 }}>
+            <Box sx={{ flexShrink: 0 }}>
                 <AppBar position="static">
                     <Toolbar>
                         <Typography variant="h6" sx={{ flexGrow: 1 }}>
                             <Grid2 container sx={{ flexGrow: 1 }}>
                                 <Grid2 display="flex" justifyContent="left">
-                                    <img src={zrokLogo} height="30" />
+                                    <img src={zrokLogo} height="30" alt="zrok logo" />
                                 </Grid2>
-                                <Grid2 display="flex" justifyContent="left" size="grow" sx={{ ml: 3 }} color="#9bf316">
+                                <Grid2 display="flex" justifyContent="left" size="grow" sx={{ ml: 3, color: 'secondary.main' }}>
                                     <strong>z r o k</strong>
                                 </Grid2>
                                 {/* Extension slot: left side of navbar */}
@@ -141,7 +141,7 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
 
                             <Grid2 display="flex" justifyContent="right" size="grow">
                                 <Tooltip title="Toggle Interface Mode (Ctrl-`)">
-                                    <Button color="inherit" onClick={handleClick}>{ visualizer ? <VisualizerIcon /> : <TabularIcon /> }</Button>
+                                    <Button color="inherit" aria-label="Toggle Interface Mode" onClick={handleClick}>{ visualizer ? <VisualizerIcon /> : <TabularIcon /> }</Button>
                                 </Tooltip>
                             </Grid2>
                             { limited ? limitedIndicator : null }
@@ -155,7 +155,7 @@ const NavBar = ({ logout, visualizer, toggleMode }: NavBarProps) => {
                             { !nodes || nodes.length > 1 ? helpButton : gettingStartedButton }
                             <Grid2 display="flex" justifyContent="right">
                                 <Tooltip title="Logout">
-                                    <Button color="inherit" onClick={logout}><LogoutIcon /></Button>
+                                    <Button color="inherit" aria-label="Logout" onClick={logout}><LogoutIcon /></Button>
                                 </Tooltip>
                             </Grid2>
                         </Grid2>

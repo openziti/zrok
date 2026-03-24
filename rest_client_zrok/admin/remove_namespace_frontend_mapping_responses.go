@@ -20,7 +20,7 @@ type RemoveNamespaceFrontendMappingReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *RemoveNamespaceFrontendMappingReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *RemoveNamespaceFrontendMappingReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 200:
 		result := NewRemoveNamespaceFrontendMappingOK()
@@ -95,11 +95,11 @@ func (o *RemoveNamespaceFrontendMappingOK) Code() int {
 }
 
 func (o *RemoveNamespaceFrontendMappingOK) Error() string {
-	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingOK ", 200)
+	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingOK", 200)
 }
 
 func (o *RemoveNamespaceFrontendMappingOK) String() string {
-	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingOK ", 200)
+	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingOK", 200)
 }
 
 func (o *RemoveNamespaceFrontendMappingOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -151,11 +151,11 @@ func (o *RemoveNamespaceFrontendMappingUnauthorized) Code() int {
 }
 
 func (o *RemoveNamespaceFrontendMappingUnauthorized) Error() string {
-	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingUnauthorized ", 401)
+	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingUnauthorized", 401)
 }
 
 func (o *RemoveNamespaceFrontendMappingUnauthorized) String() string {
-	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingUnauthorized ", 401)
+	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingUnauthorized", 401)
 }
 
 func (o *RemoveNamespaceFrontendMappingUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -207,11 +207,11 @@ func (o *RemoveNamespaceFrontendMappingNotFound) Code() int {
 }
 
 func (o *RemoveNamespaceFrontendMappingNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingNotFound ", 404)
+	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingNotFound", 404)
 }
 
 func (o *RemoveNamespaceFrontendMappingNotFound) String() string {
-	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingNotFound ", 404)
+	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingNotFound", 404)
 }
 
 func (o *RemoveNamespaceFrontendMappingNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -263,11 +263,11 @@ func (o *RemoveNamespaceFrontendMappingInternalServerError) Code() int {
 }
 
 func (o *RemoveNamespaceFrontendMappingInternalServerError) Error() string {
-	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingInternalServerError ", 500)
+	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingInternalServerError", 500)
 }
 
 func (o *RemoveNamespaceFrontendMappingInternalServerError) String() string {
-	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingInternalServerError ", 500)
+	return fmt.Sprintf("[DELETE /namespace/frontend/mapping][%d] removeNamespaceFrontendMappingInternalServerError", 500)
 }
 
 func (o *RemoveNamespaceFrontendMappingInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

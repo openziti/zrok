@@ -1,0 +1,3 @@
+[flake8]
+exclude = src/zrok_api, src/build, src/test, tests/integration, .venv
+max-line-length = 120

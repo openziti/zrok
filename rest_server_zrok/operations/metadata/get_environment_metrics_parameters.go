@@ -27,7 +27,6 @@ func NewGetEnvironmentMetricsParams() GetEnvironmentMetricsParams {
 //
 // swagger:parameters getEnvironmentMetrics
 type GetEnvironmentMetricsParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -35,6 +34,7 @@ type GetEnvironmentMetricsParams struct {
 	  In: query
 	*/
 	Duration *string
+
 	/*
 	  Required: true
 	  In: path
@@ -50,7 +50,6 @@ func (o *GetEnvironmentMetricsParams) BindRequest(r *http.Request, route *middle
 	var res []error
 
 	o.HTTPRequest = r
-
 	qs := runtime.Values(r.URL.Query())
 
 	qDuration, qhkDuration, _ := qs.GetOK("duration")

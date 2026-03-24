@@ -1,23 +1,24 @@
-import {Handle, Position} from "@xyflow/react";
+import {Handle, Node, NodeProps, Position} from "@xyflow/react";
 import {Grid2} from "@mui/material";
 import AccountIcon from "@mui/icons-material/Person4";
 import useApiConsoleStore from "./model/store.ts";
 import {SparkLineChart} from "@mui/x-charts";
 import {useEffect, useState} from "react";
+import {AccountNodeData} from "./model/graph.ts";
+import {COLORS} from "./styling/theme.ts";
 
-
-const AccountNode = ({ data }) => {
+const AccountNode = ({ data }: NodeProps<Node<AccountNodeData>>) => {
     const environments = useApiConsoleStore((state) => state.environments);
     const [sparkData, setSparkData] = useState<number[]>(Array<number>(31).fill(0));
     const hiddenSparkline = <></>;
     const visibleSparkline = (
         <Grid2 container sx={{ flexGrow: 1, p: 0.5 }}>
-            <SparkLineChart data={sparkData} height={30} width={100} colors={['#04adef']}  />
+            <SparkLineChart data={sparkData} height={30} width={100} colors={[COLORS.metrics]}  />
         </Grid2>
     );
 
     useEffect(() => {
-        let s = new Array<number>(31);
+        const s = new Array<number>(31);
         if(environments) {
             environments.forEach(env => {
                 if(env.activity) {

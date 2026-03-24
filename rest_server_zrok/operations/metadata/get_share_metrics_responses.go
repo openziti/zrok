@@ -78,7 +78,7 @@ func NewGetShareMetricsBadRequest() *GetShareMetricsBadRequest {
 // WriteResponse to the client
 func (o *GetShareMetricsBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(400)
 }
@@ -103,7 +103,7 @@ func NewGetShareMetricsUnauthorized() *GetShareMetricsUnauthorized {
 // WriteResponse to the client
 func (o *GetShareMetricsUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -128,7 +128,7 @@ func NewGetShareMetricsInternalServerError() *GetShareMetricsInternalServerError
 // WriteResponse to the client
 func (o *GetShareMetricsInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

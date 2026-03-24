@@ -2,11 +2,12 @@ import {BrowserRouter, Route, Routes, useNavigate} from "react-router";
 import ApiConsole from "./ApiConsole.tsx";
 import Login from "./Login.tsx";
 import {useEffect, useState, useCallback} from "react";
-import {User} from "./model/user.ts";
+import {clearStoredUser, loadStoredUser, saveStoredUser, User} from "./model/user.ts";
 import useApiConsoleStore from "./model/store.ts";
 import ForgotPassword from "./ForgotPassword.tsx";
 import Register from "./Register.tsx";
 import ResetPassword from "./ResetPassword.tsx";
+import ErrorBoundary from "./ErrorBoundary.tsx";
 import {extensionRegistry} from "./extensions/registry.ts";
 import {loadExtensions} from "./extensions.config.ts";
 import {Snackbar, Alert} from "@mui/material";
@@ -62,18 +63,15 @@ const AppContent = () => {
     // Check for stored user on mount
     useEffect(() => {
         const checkUser = () => {
-            const storedUser = localStorage.getItem("user");
-            if (storedUser) {
-                updateUser(JSON.parse(storedUser));
-            }
-        }
+            updateUser(loadStoredUser());
+        };
         checkUser();
 
         document.addEventListener("userUpdated", checkUser);
 
         return () => {
             document.removeEventListener("userUpdated", checkUser);
-        }
+        };
     }, [updateUser]);
 
     // Notify extensions of user changes
@@ -89,26 +87,28 @@ const AppContent = () => {
 
     const login = (user: User) => {
         updateUser(user);
-        localStorage.setItem("user", JSON.stringify(user));
-    }
+        saveStoredUser(user);
+    };
 
     const logout = () => {
-        updateUser(null as User);
-        localStorage.clear();
-    }
+        updateUser(null);
+        clearStoredUser();
+    };
 
     // Get extension routes
     const extensionRoutes = extensionRegistry.getRoutes();
 
-    const consoleRoot = user ? <ApiConsole logout={logout}/> : <Login onLogin={login}/>
+    const consoleRoot = user
+        ? <ErrorBoundary><ApiConsole logout={logout}/></ErrorBoundary>
+        : <Login onLogin={login}/>
 
     return (
         <>
             <Routes>
                 <Route index element={consoleRoot}/>
-                <Route path="/forgotPassword" element={<ForgotPassword />} />
-                <Route path="/register/:regToken" element={<Register />} />
-                <Route path="/resetPassword/:resetToken" element={<ResetPassword />} />
+                <Route path="/forgotPassword" element={<ErrorBoundary><ForgotPassword /></ErrorBoundary>} />
+                <Route path="/register/:regToken" element={<ErrorBoundary><Register /></ErrorBoundary>} />
+                <Route path="/resetPassword/:resetToken" element={<ErrorBoundary><ResetPassword /></ErrorBoundary>} />
 
                 {/* Extension routes */}
                 {extensionRoutes.map((route) => {
@@ -134,11 +134,13 @@ const AppContent = () => {
                             key={`${route.extensionId}-${route.path}`}
                             path={route.path}
                             element={
-                                <RouteComponent
-                                    user={user}
-                                    context={context!}
-                                    logout={logout}
-                                />
+                                <ErrorBoundary>
+                                    <RouteComponent
+                                        user={user}
+                                        context={context!}
+                                        logout={logout}
+                                    />
+                                </ErrorBoundary>
                             }
                         />
                     );
@@ -170,6 +172,6 @@ const App = () => {
             <AppContent />
         </BrowserRouter>
     );
-}
+};
 
 export default App;

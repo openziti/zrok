@@ -1,0 +1,91 @@
+# Docker Compose overlay for the canary integration test.
+# Merged by dangerous.docker.test.bash — not part of the user-facing stack.
+#
+# The canary service uses host networking so *.localhost resolves to 127.0.0.1
+# and reaches published frontend and controller ports directly.
+
+services:
+  canary:
+    image: ${ZROK2_IMAGE:-docker.io/openziti/zrok2}:${ZROK2_TAG:-latest}
+    network_mode: host
+    environment:
+      ZROK2_API_ENDPOINT: http://127.0.0.1:${ZROK2_CTRL_PORT:-18080}
+      ZROK2_ADMIN_TOKEN: ${ZROK2_ADMIN_TOKEN}
+      ZROK2_DANGEROUS_CANARY: "1"
+      ZROK2_FRONTEND_PORT: ${ZROK2_FRONTEND_PORT:-8080}
+      ZROK2_DNS_ZONE: ${ZROK2_DNS_ZONE:-localhost}
+      HOME: /tmp/canary
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        set -o errexit -o nounset -o pipefail
+
+        FRONTEND_PORT="$${ZROK2_FRONTEND_PORT}"
+        DNS_ZONE="$${ZROK2_DNS_ZONE}"
+
+        # Create a throwaway canary account and enable an environment.
+        # ZROK2_API_ENDPOINT is already set — zrok2 enable bootstraps
+        # the environment in one shot.
+        TOKEN=$$(zrok2 admin create account \
+          "canary-$$(date +%s)@zrok.internal" "canarypass")
+        echo "canary account token: $${TOKEN}"
+        zrok2 enable "$${TOKEN}" --description canary-test
+
+        # ── Test 1: Canary looper (random share token) ──────────────────
+        # Exercises the public frontend with random share tokens.  The
+        # host-networked container reaches the frontend at
+        # localhost:ZROK2_FRONTEND_PORT, and *.localhost resolves to
+        # 127.0.0.1 (RFC 6761).
+        echo "=== Test 1: canary public-proxy looper ==="
+        zrok2 test canary public-proxy \
+          --iterations 3 --loopers 1 \
+          --min-payload 256 --max-payload 256 \
+          --min-pacing 1s --max-pacing 1s \
+          --http --frontend-port "$${FRONTEND_PORT}"
+
+        # ── Test 2: Named share via --name-selection ────────────────────
+        # Creates a share with an explicit name in the public namespace,
+        # then verifies the AMQP-backed dynamic frontend routes it.
+        echo "=== Test 2: named share ==="
+        SHARE_NAME="citest-$$(date +%s)"
+
+        BACKEND_PORT=19999
+        zrok2 test endpoint --port "$${BACKEND_PORT}" &
+        HTTP_PID=$$!
+
+        # Pre-create the name (v2 equivalent of "zrok reserve").
+        zrok2 create name "$${SHARE_NAME}"
+
+        # Create the named share in the background (long-running).
+        zrok2 share public "http://127.0.0.1:$${BACKEND_PORT}" \
+          --name-selection "public:$${SHARE_NAME}" \
+          --backend-mode proxy --headless &
+        SHARE_PID=$$!
+
+        # Wait for the share to propagate to the dynamic frontend.
+        echo "waiting for named share '$${SHARE_NAME}' ..."
+        sleep 5
+        ATTEMPTS=30
+        while (( ATTEMPTS-- > 0 )); do
+          if curl -sf -H "Host: $${SHARE_NAME}.$${DNS_ZONE}" \
+              "http://127.0.0.1:$${FRONTEND_PORT}/" 2>/dev/null \
+              | grep -q "zrok"; then
+            echo "PASS: named share '$${SHARE_NAME}' content verified"
+            break
+          fi
+          sleep 2
+        done
+        if (( ATTEMPTS < 0 )); then
+          echo "FAIL: named share '$${SHARE_NAME}' not reachable after 60s"
+          kill $${SHARE_PID} $${HTTP_PID} 2>/dev/null || true
+          exit 1
+        fi
+
+        # Clean up share and backend.
+        kill $${SHARE_PID} $${HTTP_PID} 2>/dev/null || true
+        wait $${SHARE_PID} 2>/dev/null || true
+        wait $${HTTP_PID} 2>/dev/null || true
+
+        zrok2 disable || true
+        echo "=== All canary tests passed ==="
+    profiles: ["canary"]

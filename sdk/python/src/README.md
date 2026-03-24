@@ -126,6 +126,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**remove_namespace_frontend_mapping**](docs/AdminApi.md#remove_namespace_frontend_mapping) | **DELETE** /namespace/frontend/mapping | 
 *AdminApi* | [**remove_namespace_grant**](docs/AdminApi.md#remove_namespace_grant) | **DELETE** /namespace/grant | 
 *AdminApi* | [**remove_organization_member**](docs/AdminApi.md#remove_organization_member) | **POST** /organization/remove | 
+*AdminApi* | [**update_account_password**](docs/AdminApi.md#update_account_password) | **PATCH** /account | 
 *AdminApi* | [**update_frontend**](docs/AdminApi.md#update_frontend) | **PATCH** /frontend | 
 *AdminApi* | [**update_namespace**](docs/AdminApi.md#update_namespace) | **PATCH** /namespace | 
 *AgentApi* | [**enroll**](docs/AgentApi.md#enroll) | **POST** /agent/enroll | 

@@ -1,0 +1,37 @@
+---
+sidebar_label: Use SOCKS proxy mode
+---
+
+# Use SOCKS proxy mode
+
+The `socks` backend mode creates a SOCKS5 proxy for dynamic port forwarding to multiple destinations through a single
+share. Use this when you need to access multiple services on a remote network.
+
+1. On the remote machine, create a private share in SOCKS mode:
+
+    ```bash
+    zrok2 share private --backend-mode socks
+    ```
+
+2. On your local machine, bind the share to a local SOCKS5 port:
+
+    ```bash
+    zrok2 access private --bind 127.0.0.1:1080 <share-token>
+    ```
+
+3. Configure your applications to use the SOCKS5 proxy at `127.0.0.1:1080`. For example:
+
+    **curl:**
+
+    ```bash
+    curl --socks5-hostname 127.0.0.1:1080 http://internal-server:8080/api
+    ```
+
+    **SSH (to access any host reachable from the remote machine):**
+
+    ```bash
+    ssh -o ProxyCommand='nc -x 127.0.0.1:1080 %h %p' user@internal-host
+    ```
+
+    **Browser:** Configure your browser's proxy settings to use SOCKS5 proxy `127.0.0.1:1080` to browse internal
+    web applications.

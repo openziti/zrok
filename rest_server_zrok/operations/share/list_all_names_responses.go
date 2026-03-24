@@ -81,7 +81,7 @@ func NewListAllNamesUnauthorized() *ListAllNamesUnauthorized {
 // WriteResponse to the client
 func (o *ListAllNamesUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -106,7 +106,7 @@ func NewListAllNamesInternalServerError() *ListAllNamesInternalServerError {
 // WriteResponse to the client
 func (o *ListAllNamesInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

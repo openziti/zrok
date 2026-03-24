@@ -189,6 +189,10 @@ export interface RemoveOrganizationMemberOperationRequest {
     body?: RemoveOrganizationMemberRequest;
 }
 
+export interface UpdateAccountPasswordRequest {
+    body?: LoginRequest;
+}
+
 export interface UpdateFrontendOperationRequest {
     body?: UpdateFrontendRequest;
 }
@@ -1070,6 +1074,39 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async removeOrganizationMember(requestParameters: RemoveOrganizationMemberOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.removeOrganizationMemberRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async updateAccountPasswordRaw(requestParameters: UpdateAccountPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/account`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'PATCH',
+            headers: headerParameters,
+            query: queryParameters,
+            body: LoginRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async updateAccountPassword(requestParameters: UpdateAccountPasswordRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateAccountPasswordRaw(requestParameters, initOverrides);
     }
 
     /**

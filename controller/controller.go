@@ -82,6 +82,7 @@ func Run(inCfg *config.Config) error {
 	api.AdminRemoveNamespaceFrontendMappingHandler = newRemoveNamespaceFrontendMappingHandler()
 	api.AdminRemoveNamespaceGrantHandler = newRemoveNamespaceGrantHandler()
 	api.AdminRemoveOrganizationMemberHandler = newRemoveOrganizationMemberHandler()
+	api.AdminUpdateAccountPasswordHandler = newUpdateAccountPasswordHandler(cfg)
 	api.AdminUpdateFrontendHandler = newUpdateFrontendHandler()
 	api.AdminUpdateNamespaceHandler = newUpdateNamespaceHandler()
 	if cfg.AgentController != nil {

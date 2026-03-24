@@ -44,7 +44,7 @@ func (o *ListFrontendNamespaceMappingsURL) Build() (*url.URL, error) {
 
 	frontendToken := o.FrontendToken
 	if frontendToken != "" {
-		_path = strings.Replace(_path, "{frontendToken}", frontendToken, -1)
+		_path = strings.ReplaceAll(_path, "{frontendToken}", frontendToken)
 	} else {
 		return nil, errors.New("frontendToken is required on ListFrontendNamespaceMappingsURL")
 	}

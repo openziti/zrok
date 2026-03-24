@@ -27,7 +27,6 @@ func NewDeleteFrontendParams() DeleteFrontendParams {
 //
 // swagger:parameters deleteFrontend
 type DeleteFrontendParams struct {
-
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
@@ -47,7 +46,9 @@ func (o *DeleteFrontendParams) BindRequest(r *http.Request, route *middleware.Ma
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
-		defer r.Body.Close()
+		defer func() {
+			_ = r.Body.Close()
+		}()
 		var body DeleteFrontendBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))

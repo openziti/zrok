@@ -76,7 +76,7 @@ func NewListOrganizationMembersUnauthorized() *ListOrganizationMembersUnauthoriz
 // WriteResponse to the client
 func (o *ListOrganizationMembersUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -101,7 +101,7 @@ func NewListOrganizationMembersNotFound() *ListOrganizationMembersNotFound {
 // WriteResponse to the client
 func (o *ListOrganizationMembersNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -126,7 +126,7 @@ func NewListOrganizationMembersInternalServerError() *ListOrganizationMembersInt
 // WriteResponse to the client
 func (o *ListOrganizationMembersInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

@@ -76,7 +76,7 @@ func NewCreateOrganizationUnauthorized() *CreateOrganizationUnauthorized {
 // WriteResponse to the client
 func (o *CreateOrganizationUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -101,7 +101,7 @@ func NewCreateOrganizationInternalServerError() *CreateOrganizationInternalServe
 // WriteResponse to the client
 func (o *CreateOrganizationInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

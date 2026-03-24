@@ -81,7 +81,7 @@ func NewListNamesForNamespaceUnauthorized() *ListNamesForNamespaceUnauthorized {
 // WriteResponse to the client
 func (o *ListNamesForNamespaceUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(401)
 }
@@ -106,7 +106,7 @@ func NewListNamesForNamespaceNotFound() *ListNamesForNamespaceNotFound {
 // WriteResponse to the client
 func (o *ListNamesForNamespaceNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(404)
 }
@@ -131,7 +131,7 @@ func NewListNamesForNamespaceInternalServerError() *ListNamesForNamespaceInterna
 // WriteResponse to the client
 func (o *ListNamesForNamespaceInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
 }

@@ -8,11 +8,45 @@ export class Graph {
     edges: Edge[];
 }
 
-export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Overview): Graph => {
-    let newVov = new Graph();
+export interface AccountNodeData {
+    label: string;
+    limited: boolean;
+}
 
-    let accountNode = {
-        id: u.token,
+export interface EnvironmentNodeData {
+    label: string;
+    envZId: string;
+    limited: boolean;
+    empty: boolean;
+}
+
+export interface ShareNodeData {
+    label: string;
+    shareToken: string;
+    envZId: string;
+    limited: boolean;
+    accessed: boolean;
+}
+
+export interface AccessNodeData {
+    label: string;
+    feId: number;
+    target: string;
+    bindAddress: string;
+    backendMode: string;
+    envZId: string;
+    ownedShare?: boolean;
+}
+
+const warnSkippedOverviewRecord = (kind: "environment" | "share" | "frontend", context: Record<string, unknown>) => {
+    console.warn(`skipping malformed overview '${kind}' record`, context);
+};
+
+export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Overview): Graph => {
+    const newVov = new Graph();
+
+    const accountNode = {
+        id: u.email,
         data: {
             label: u.email,
             limited: limited
@@ -24,14 +58,24 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
     newVov.edges = [];
 
     if(newOv) {
-        let allShares = {};
-        let allFrontends = [];
+        const allShares: Record<string, Node> = {};
+        const allFrontends: Node[] = [];
         newOv.environments?.forEach(env => {
-            let envNode = {
-                id: env.environment?.zId!,
+            const environmentId = env.environment?.zId;
+            if(!environmentId) {
+                warnSkippedOverviewRecord("environment", {
+                    description: env.environment?.description,
+                    shareCount: env.shares?.length,
+                    frontendCount: env.frontends?.length,
+                });
+                return;
+            }
+
+            const envNode = {
+                id: environmentId,
                 data: {
-                    label: env.environment?.description,
-                    envZId: env.environment?.zId!,
+                    label: env.environment?.description ?? environmentId,
+                    envZId: environmentId,
                     limited: limited,
                     empty: true
                 },
@@ -43,49 +87,71 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                 id: accountNode.id + "-" + envNode.id,
                 source: accountNode.id!,
                 target: envNode.id!,
-                type: "straight"
+                type: "hierarchy"
             });
             if(env.shares) {
                 envNode.data.empty = false;
                 env.shares.forEach(shr => {
-                    let shrLabel = shr.shareToken!;
-                    if(shr.target !== "") {
-                        shrLabel = shr.target!;
+                    const shareToken = shr.shareToken;
+                    if(!shareToken) {
+                        warnSkippedOverviewRecord("share", {
+                            environmentId,
+                            target: shr.target,
+                            backendMode: shr.backendMode,
+                        });
+                        return;
                     }
-                    let shrNode = {
-                        id: shr.shareToken!,
+
+                    let shrLabel = shareToken;
+                    if(shr.target) {
+                        shrLabel = shr.target;
+                    }
+
+                    const shrNode = {
+                        id: shareToken,
                         data: {
                             label: shrLabel,
-                            shareToken: shr.shareToken!,
-                            envZId: env.environment?.zId!,
+                            shareToken: shareToken,
+                            envZId: environmentId,
                             limited: limited,
                             accessed: false,
                         },
                         type: "share",
                         position: { x: 0, y: 0 }
                     }
-                    allShares[shr.shareToken!] = shrNode;
+                    allShares[shareToken] = shrNode;
                     newVov.nodes.push(shrNode);
                     newVov.edges.push({
                         id: envNode.id + "-" + shrNode.id,
                         source: envNode.id!,
                         target: shrNode.id!,
-                        type: "straight"
+                        type: "hierarchy"
                     });
                 });
             }
             if(env.frontends) {
                 envNode.data.empty = false;
                 env.frontends.forEach(fe => {
-                    let feNode = {
-                        id: fe.frontendToken!,
+                    const frontendToken = fe.frontendToken;
+                    if(!frontendToken) {
+                        warnSkippedOverviewRecord("frontend", {
+                            environmentId,
+                            frontendId: fe.id,
+                            shareToken: fe.shareToken,
+                            bindAddress: fe.bindAddress,
+                        });
+                        return;
+                    }
+
+                    const feNode = {
+                        id: frontendToken,
                         data: {
-                            label: fe.frontendToken!,
+                            label: fe.bindAddress ? fe.bindAddress : frontendToken,
                             feId: fe.id,
                             target: fe.shareToken,
                             bindAddress: fe.bindAddress,
-                            backendMode: fe.backendMode,
-                            envZId: fe.zId,
+                            backendMode: fe.backendMode ?? "",
+                            envZId: environmentId,
                         },
                         type: "access",
                         position: { x: 0, y: 0 }
@@ -96,21 +162,21 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                         id: envNode.id + "-" + feNode.id,
                         source: envNode.id!,
                         target: feNode.id!,
-                        type: "straight"
+                        type: "hierarchy"
                     });
                 });
             }
         });
         allFrontends.forEach(fe => {
-            let target = allShares[fe.data.target];
+            const target = allShares[fe.data.target];
             if(target) {
                 target.data.accessed = true;
                 fe.data.ownedShare = true;
-                let edge: Edge = {
+                const edge: Edge = {
                     id: target.id + "-" + fe.id,
-                    source: fe.id!,
+                    source: fe.id,
                     sourceHandle: "share",
-                    target: target.id!,
+                    target: target.id,
                     targetHandle: "access",
                     type: "access",
                     animated: true
@@ -143,7 +209,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
 
     // and then do the opposite; add any nodes that are in the new overview, but missing from the old overview.
     outNodes.push(...newVov.nodes.filter(newNode => !outNodes.find(oldNode => oldNode.id === newNode.id
-        && oldNode.data.accessed == newNode.data.accessed
+        && oldNode.data.accessed === newNode.data.accessed
         && oldNode.data.ownedShare === newNode.data.ownedShare
         && oldNode.data.limited === newNode.data.limited
         && oldNode.data.label === newNode.data.label)));
@@ -155,7 +221,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
     return newVov;
 }
 
-const sortNodes = (nodes) => {
+const sortNodes = (nodes: Node[]): Node[] => {
     return nodes.sort((a, b) => {
         if(a.id > b.id) {
             return 1;
@@ -172,26 +238,157 @@ export const nodesEqual = (a: Node[], b: Node[]) => {
     if(a && !b) return false;
     if(b && !a) return false;
     if(a.length !== b.length) return false;
-    return a.every((e, i) => e.id === b[i].id && e.data.limited === b[i].data.limited && e.data.label === b[i].data.label);
+    return a.every((e, i) => e.id === b[i].id
+        && e.data.limited === b[i].data.limited
+        && e.data.label === b[i].data.label
+        && e.data.accessed === b[i].data.accessed
+        && e.data.ownedShare === b[i].data.ownedShare);
 }
 
-export const layout = (nodes, edges): Graph => {
-    if(!nodes) {
-        return { nodes: [], edges: [] };
+export const focusGraph = (graph: Graph, focusNodeId: string): Graph => {
+    const nodeMap = new Map<string, Node>();
+    for(const n of graph.nodes) {
+        nodeMap.set(n.id, n);
     }
-    let g = tree();
-    if(nodes.length === 0) return { nodes, edges };
-    const width = 100;
-    const height = 75;
+
+    const parentOf = new Map<string, string>();
+    for(const e of graph.edges) {
+        if(e.type === "hierarchy") {
+            parentOf.set(e.target, e.source);
+        }
+    }
+
+    const childrenOf = new Map<string, string[]>();
+    for(const e of graph.edges) {
+        if(e.type === "hierarchy") {
+            const list = childrenOf.get(e.source) || [];
+            list.push(e.target);
+            childrenOf.set(e.source, list);
+        }
+    }
+
+    const focusNode = nodeMap.get(focusNodeId);
+    if(!focusNode) return graph;
+
+    const included = new Set<string>();
+
+    const addWithParents = (id: string) => {
+        let cur = id;
+        while(cur) {
+            included.add(cur);
+            cur = parentOf.get(cur);
+        }
+    };
+
+    if(focusNode.type === "account") {
+        return graph;
+    } else if(focusNode.type === "environment") {
+        addWithParents(focusNodeId);
+        const children = childrenOf.get(focusNodeId) || [];
+        for(const childId of children) {
+            included.add(childId);
+            const child = nodeMap.get(childId);
+            if(child?.type === "access") {
+                for(const e of graph.edges) {
+                    if(e.type === "access" && e.source === childId) {
+                        included.add(e.target);
+                        addWithParents(e.target);
+                    }
+                }
+            }
+        }
+    } else if(focusNode.type === "share") {
+        addWithParents(focusNodeId);
+        for(const e of graph.edges) {
+            if(e.type === "access" && e.target === focusNodeId) {
+                included.add(e.source);
+                addWithParents(e.source);
+            }
+        }
+    } else if(focusNode.type === "access") {
+        addWithParents(focusNodeId);
+        for(const e of graph.edges) {
+            if(e.type === "access" && e.source === focusNodeId) {
+                included.add(e.target);
+                addWithParents(e.target);
+            }
+        }
+    }
+
+    const out = new Graph();
+    out.nodes = graph.nodes.filter(n => included.has(n.id));
+    out.edges = graph.edges.filter(e => included.has(e.source) && included.has(e.target));
+    return out;
+}
+
+export const layout = (nodes: Node[], edges: Edge[]): Graph => {
+    if(!nodes || nodes.length === 0) {
+        return { nodes: nodes || [], edges };
+    }
+
+    const hierarchyEdges = edges.filter((edge) => edge.type !== "access");
+
+    // compute spacing from measured node dimensions if available
+    let maxWidth = 0;
+    let maxHeight = 0;
+    let hasMeasurements = false;
+    for(const node of nodes) {
+        if(node.measured?.width && node.measured?.height) {
+            hasMeasurements = true;
+            maxWidth = Math.max(maxWidth, node.measured.width);
+            maxHeight = Math.max(maxHeight, node.measured.height);
+        }
+    }
+
+    // use actual node sizes + padding, or compact defaults before first measurement
+    const nodeWidth = hasMeasurements ? maxWidth + 10 : 120;
+    const nodeHeight = hasMeasurements ? (maxHeight + 60) * 2 : 260;
+
     const hierarchy = stratify()
         .id((node) => node.id)
-        .parentId((node) => edges.find((edge) => edge.target === node.id)?.source);
+        .parentId((node) => hierarchyEdges.find((edge) => edge.target === node.id)?.source);
+
     const root = hierarchy(nodes);
-    const layout = g.nodeSize([width * 2, height * 2])(root);
+
+    // sort children: shares left, accesses right
+    root.each((node) => {
+        if(node.children) {
+            node.children.sort((a, b) => {
+                const aType = a.data.type || "";
+                const bType = b.data.type || "";
+                if(aType === "share" && bType === "access") return -1;
+                if(aType === "access" && bType === "share") return 1;
+                return (a.data.id || "").localeCompare(b.data.id || "");
+            });
+        }
+    });
+
+    const g = tree()
+        .nodeSize([nodeWidth, nodeHeight])
+        .separation(() => 1);
+    const laid = g(root);
+
+    // compute global baseline Y for access edge lane routing
+    // lanes start below the tallest node so they never overlap with sparkline content
+    let laneBaseY = 0;
+    for (const desc of laid.descendants()) {
+        const bottomY = desc.y + (desc.data.measured?.height ?? 50) + 25;
+        laneBaseY = Math.max(laneBaseY, bottomY);
+    }
+
+    // assign lane indices to access edges for distinct routing
+    let accessEdgeIndex = 0;
+    const laneCount = edges.filter(e => e.type === "access").length;
+    const indexedEdges = edges.map((edge) => {
+        if(edge.type === "access") {
+            return { ...edge, data: { ...edge.data, laneIndex: accessEdgeIndex++, laneCount, laneBaseY } };
+        }
+        return edge;
+    });
+
     return {
-        nodes: layout
-            .descendants()
+        nodes: laid.descendants()
             .map((node) => ({...node.data, position: {x: node.x, y: node.y}})),
-        edges,
-    } as Graph
+        edges: indexedEdges,
+    } as Graph;
 }

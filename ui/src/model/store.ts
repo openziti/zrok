@@ -12,14 +12,15 @@ import {MRT_PaginationState, MRT_SortingState} from "material-react-table";
 type ExtensionStates = Record<string, Record<string, unknown>>;
 
 type StoreState = {
-    user: User;
+    user: User | null;
     limited: boolean;
     graph: Graph;
     environments: Array<Environment>;
-    sparkdata: Map<string, Number[]>;
+    sparkdata: Map<string, number[]>;
     nodes: Node[];
     edges: Edge[];
-    selectedNode: Node;
+    selectedNode: Node | null;
+    focusNodeId: string | null;
     viewport: Viewport;
     pagination: MRT_PaginationState;
     sorting: MRT_SortingState;
@@ -36,6 +37,7 @@ type StoreAction = {
     updateNodes: (nodes: StoreState['nodes']) => void,
     updateEdges: (edges: StoreState['edges']) => void,
     updateSelectedNode: (selectedNode: StoreState['selectedNode']) => void,
+    updateFocusNodeId: (focusNodeId: StoreState['focusNodeId']) => void,
     updateViewport: (viewport: StoreState['viewport']) => void,
     updatePagination: (pagination: StoreState['pagination']) => void,
     updateSorting: (sorting: StoreState['sorting']) => void,
@@ -56,22 +58,24 @@ const useApiConsoleStore = create<StoreState & StoreAction>((set) => ({
     limited: false,
     graph: new Graph(),
     environments: new Array<Environment>(),
-    sparkdata: new Map<string, Number[]>(),
+    sparkdata: new Map<string, number[]>(),
     nodes: [],
     edges: [],
     selectedNode: null,
+    focusNodeId: null,
     viewport: {x: 0, y: 0, zoom: 1},
     pagination: {pageIndex: 0, pageSize: 15},
     sorting: [{id: "data.label", desc: false}] as MRT_SortingState,
     extensions: {},
     updateUser: (user) => set({user: user}),
     updateLimited: (limited) => set({limited: limited}),
-    updateGraph: (vov) => set({overview: vov}),
+    updateGraph: (vov) => set({graph: vov}),
     updateEnvironments: (environments) => set({environments: environments}),
     updateSparkdata: (sparkdata) => set({sparkdata: sparkdata}),
     updateNodes: (nodes) => set({nodes: nodes}),
     updateEdges: (edges) => set({edges: edges}),
     updateSelectedNode: (selectedNode) => set({selectedNode: selectedNode}),
+    updateFocusNodeId: (focusNodeId) => set({focusNodeId: focusNodeId}),
     updateViewport: (viewport) => set({viewport: viewport}),
     updatePagination: (pagination) => set({pagination: pagination}),
     updateSorting: (sorting) => set({sorting: sorting}),

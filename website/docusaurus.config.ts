@@ -9,7 +9,7 @@ import {
     remarkScopedPath,
     remarkYouTube
 } from "@netfoundry/docusaurus-theme/plugins";
-import {zrokDocsPluginConfig} from "./docusaurus-plugin-zrok-docs.ts";
+import {zrokDocsPluginConfig, zrokRedirects} from "./docusaurus-plugin-zrok-docs.ts";
 
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
@@ -89,29 +89,7 @@ const config: Config = {
                 }
             };
         },
-        [
-            '@docusaurus/plugin-client-redirects',
-            {
-                redirects: [
-                    {
-                        to: `$/docs/zrok/guides/self-hosting/linux`,
-                        from: [`/docs/zrok/guides/self-hosting/self_hosting_guide`],
-                    },
-                    {
-                        to: `/docs/zrok/guides/self-hosting/linux/nginx`,
-                        from: [`/docs/zrok/guides/self-hosting/nginx_tls_guide/`]
-                    },
-                    {
-                        to: `/docs/zrok/guides/self-hosting/metrics-and-limits/configuring-limits`,
-                        from: [`/docs/zrok/guides/metrics-and-limits/configuring-limits`],
-                    },
-                    {
-                        to: `/docs/zrok/guides/self-hosting/metrics-and-limits/configuring-metrics`,
-                        from: [`/docs/zrok/guides/metrics-and-limits/configuring-metrics`],
-                    }
-                ]
-            }
-        ],
+        zrokRedirects(),
         function yamlLoaderPlugin() {
             return {
                 name: 'custom-webpack-plugin',
@@ -129,7 +107,13 @@ const config: Config = {
                 },
             };
         },
-        zrokDocsPluginConfig(ZROK_ROOT, [{ from: '@zrokdocs', to: `/docs/zrok` }]),
+        zrokDocsPluginConfig(ZROK_ROOT, [
+            { from: '@zrokdocs',       to: '/docs/zrok' },
+            { from: '@selfhosteddocs', to: 'https://netfoundry.io/docs/selfhosted' },
+            { from: '@openzitidocs',   to: 'https://netfoundry.io/docs/openziti' },
+            { from: '@frontdoordocs',  to: 'https://netfoundry.io/docs/frontdoor' },
+            { from: '@zlandocs',       to: 'https://netfoundry.io/docs/zlan' },
+        ]),
         [
             '@docusaurus/plugin-content-pages',
             {

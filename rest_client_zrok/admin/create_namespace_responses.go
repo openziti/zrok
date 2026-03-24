@@ -7,6 +7,8 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 
@@ -21,7 +23,7 @@ type CreateNamespaceReader struct {
 }
 
 // ReadResponse reads a server response into the received o.
-func (o *CreateNamespaceReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
+func (o *CreateNamespaceReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (any, error) {
 	switch response.Code() {
 	case 201:
 		result := NewCreateNamespaceCreated()
@@ -97,11 +99,13 @@ func (o *CreateNamespaceCreated) Code() int {
 }
 
 func (o *CreateNamespaceCreated) Error() string {
-	return fmt.Sprintf("[POST /namespace][%d] createNamespaceCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /namespace][%d] createNamespaceCreated %s", 201, payload)
 }
 
 func (o *CreateNamespaceCreated) String() string {
-	return fmt.Sprintf("[POST /namespace][%d] createNamespaceCreated  %+v", 201, o.Payload)
+	payload, _ := json.Marshal(o.Payload)
+	return fmt.Sprintf("[POST /namespace][%d] createNamespaceCreated %s", 201, payload)
 }
 
 func (o *CreateNamespaceCreated) GetPayload() *CreateNamespaceCreatedBody {
@@ -113,7 +117,7 @@ func (o *CreateNamespaceCreated) readResponse(response runtime.ClientResponse, c
 	o.Payload = new(CreateNamespaceCreatedBody)
 
 	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -164,11 +168,11 @@ func (o *CreateNamespaceUnauthorized) Code() int {
 }
 
 func (o *CreateNamespaceUnauthorized) Error() string {
-	return fmt.Sprintf("[POST /namespace][%d] createNamespaceUnauthorized ", 401)
+	return fmt.Sprintf("[POST /namespace][%d] createNamespaceUnauthorized", 401)
 }
 
 func (o *CreateNamespaceUnauthorized) String() string {
-	return fmt.Sprintf("[POST /namespace][%d] createNamespaceUnauthorized ", 401)
+	return fmt.Sprintf("[POST /namespace][%d] createNamespaceUnauthorized", 401)
 }
 
 func (o *CreateNamespaceUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -220,11 +224,11 @@ func (o *CreateNamespaceConflict) Code() int {
 }
 
 func (o *CreateNamespaceConflict) Error() string {
-	return fmt.Sprintf("[POST /namespace][%d] createNamespaceConflict ", 409)
+	return fmt.Sprintf("[POST /namespace][%d] createNamespaceConflict", 409)
 }
 
 func (o *CreateNamespaceConflict) String() string {
-	return fmt.Sprintf("[POST /namespace][%d] createNamespaceConflict ", 409)
+	return fmt.Sprintf("[POST /namespace][%d] createNamespaceConflict", 409)
 }
 
 func (o *CreateNamespaceConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -276,11 +280,11 @@ func (o *CreateNamespaceInternalServerError) Code() int {
 }
 
 func (o *CreateNamespaceInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /namespace][%d] createNamespaceInternalServerError ", 500)
+	return fmt.Sprintf("[POST /namespace][%d] createNamespaceInternalServerError", 500)
 }
 
 func (o *CreateNamespaceInternalServerError) String() string {
-	return fmt.Sprintf("[POST /namespace][%d] createNamespaceInternalServerError ", 500)
+	return fmt.Sprintf("[POST /namespace][%d] createNamespaceInternalServerError", 500)
 }
 
 func (o *CreateNamespaceInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

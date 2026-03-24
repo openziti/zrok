@@ -8,6 +8,7 @@ package agent
 import (
 	"context"
 	"encoding/json"
+	stderrors "errors"
 	"net/http"
 	"strconv"
 
@@ -73,6 +74,7 @@ func (o *RemoteShare) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -86,7 +88,7 @@ type RemoteShareBody struct {
 	AccessGrants []string `json:"accessGrants"`
 
 	// backend mode
-	// Enum: [proxy web tcpTunnel udpTunnel caddy drive socks]
+	// Enum: ["proxy","web","tcpTunnel","udpTunnel","caddy","drive","socks"]
 	BackendMode string `json:"backendMode,omitempty"`
 
 	// basic auth
@@ -117,7 +119,7 @@ type RemoteShareBody struct {
 	PrivateShareToken string `json:"privateShareToken,omitempty"`
 
 	// share mode
-	// Enum: [public private]
+	// Enum: ["public","private"]
 	ShareMode string `json:"shareMode,omitempty"`
 
 	// target
@@ -149,7 +151,7 @@ func (o *RemoteShareBody) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-var remoteShareBodyTypeBackendModePropEnum []interface{}
+var remoteShareBodyTypeBackendModePropEnum []any
 
 func init() {
 	var res []string
@@ -218,11 +220,15 @@ func (o *RemoteShareBody) validateNameSelections(formats strfmt.Registry) error 
 
 		if o.NameSelections[i] != nil {
 			if err := o.NameSelections[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("body" + "." + "nameSelections" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("body" + "." + "nameSelections" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}
@@ -232,7 +238,7 @@ func (o *RemoteShareBody) validateNameSelections(formats strfmt.Registry) error 
 	return nil
 }
 
-var remoteShareBodyTypeShareModePropEnum []interface{}
+var remoteShareBodyTypeShareModePropEnum []any
 
 func init() {
 	var res []string
@@ -299,11 +305,15 @@ func (o *RemoteShareBody) contextValidateNameSelections(ctx context.Context, for
 			}
 
 			if err := o.NameSelections[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
+				ve := new(errors.Validation)
+				if stderrors.As(err, &ve) {
 					return ve.ValidateName("body" + "." + "nameSelections" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
+				}
+				ce := new(errors.CompositeError)
+				if stderrors.As(err, &ce) {
 					return ce.ValidateName("body" + "." + "nameSelections" + "." + strconv.Itoa(i))
 				}
+
 				return err
 			}
 		}

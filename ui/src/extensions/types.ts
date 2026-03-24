@@ -205,7 +205,7 @@ export interface PanelExtensionProps {
   node: Node;
 
   /** Current authenticated user */
-  user: User;
+  user: User | null;
 
   /** Extension context */
   context: ExtensionContext;

@@ -1,12 +1,12 @@
-# zrok - Secure Internet Sharing Made Simple
+# zrok - Secure internet sharing made simple
 
 ![zrok logo](docs/images/zrok_cover.png)
 
 **Share anything, anywhere, instantly. Enterprise reliability. No firewall changes. No port forwarding. No hassle.**
 
-`zrok` lets you securely share web services, files, and network resources with anyone—whether they're across the internet or your private network. Built on zero-trust networking, it works through firewalls and NAT without requiring any network configuration changes.
+zrok lets you securely share web services, files, and network resources with anyone—whether they're across the internet or your private network. Built on zero-trust networking, it works through firewalls and NAT without requiring any network configuration changes.
 
-## Quick Start
+## Quick start
 
 Get sharing in under 2 minutes:
 
@@ -29,29 +29,34 @@ $ zrok share private localhost:3000
 
 ![zrok Web Console](docs/images/zrok_web_console.png)
 
-## What You Can Share
+## What you can share
 
-### Web Services
+### Web services
+
 Instantly make local web apps accessible over the internet:
 
 ```bash
-$ zrok share public localhost:8080
+zrok share public localhost:8080
 ```
+
 ![zrok share public](docs/images/zrok_share_public.png)
 
-### Files & Directories  
+### Files & directories
+
 Turn any folder into a shareable network drive:
 
 ```bash
-$ zrok share public --backend-mode drive ~/Repos/zrok
+zrok share public --backend-mode drive ~/Repos/zrok
 ```
+
 ![zrok share public -b drive](docs/images/zrok_share_public_drive.png)
 ![mounted zrok drive](docs/images/zrok_share_public_drive_explorer.png)
 
-### Private Resources
+### Private resources
+
 Share TCP/UDP services securely with other zrok users—no public internet exposure.
 
-## Key Features
+## Key features
 
 - **Zero Configuration**: Works through firewalls, NAT, and corporate networks
 - **Secure by Default**: End-to-end encryption with zero-trust architecture  
@@ -60,9 +65,9 @@ Share TCP/UDP services securely with other zrok users—no public internet expos
 - **Cross-Platform**: Windows, macOS, Linux, and Raspberry Pi
 - **Self-Hostable**: Run your own zrok service instance
 
-## How It Works
+## How it works
 
-`zrok` is built on [OpenZiti](https://docs.openziti.io/docs/learn/introduction/), a programmable zero-trust network overlay. This means:
+zrok is built on [OpenZiti](https://docs.openziti.io/docs/learn/introduction/), a programmable zero-trust network overlay. This means:
 
 - **No inbound connectivity required**: Works from behind firewalls and NAT
 - **End-to-end encryption**: All traffic is encrypted, even from zrok servers
@@ -71,7 +76,7 @@ Share TCP/UDP services securely with other zrok users—no public internet expos
 
 ## Developer SDK
 
-Embed `zrok` sharing into your applications with our Go SDK:
+Embed zrok sharing into your applications with our Go SDK:
 
 ```go
 // Create a share
@@ -86,13 +91,13 @@ listener, err := sdk.NewListener(shr.Token, root)
 
 [Read the SDK guide](https://blog.openziti.io/the-zrok-sdk) for complete examples.
 
-## Self-Hosting
+## Self-hosting
 
-Run your own `zrok` service—from Raspberry Pi to enterprise scale:
+Run your own zrok service—from Raspberry Pi to enterprise scale:
 
 - Single binary contains everything you need
-- Scales from small personal instances to large public services  
-- Built on the same codebase as the public `zrok.io` service
+- Scales from small personal instances to large public services
+- Built on the same codebase as the public zrok.io service
 
 [Self-Hosting Guide](https://docs.zrok.io/docs/guides/self-hosting/self_hosting_guide/)
 
@@ -100,7 +105,7 @@ Run your own `zrok` service—from Raspberry Pi to enterprise scale:
 
 - **[Documentation](https://docs.zrok.io/)**
 - **[Office Hours Videos](https://www.youtube.com/watch?v=Edqv7yRmXb0&list=PLMUj_5fklasLuM6XiCNqwAFBuZD1t2lO2)**
-- **[Building from Source](./BUILD.md)**
+- **[Building from source](./BUILD.md)**
 - **[Contributing](./CONTRIBUTING.md)**
 
 ---

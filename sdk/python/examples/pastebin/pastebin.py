@@ -3,12 +3,15 @@ import argparse
 import atexit
 import sys
 import os
-import zrok
-import zrok.listener
-import zrok.dialer
-from zrok.model import AccessRequest, ShareRequest
+import zrok2
+import zrok2.listener
+import zrok2.dialer
+from zrok2.model import AccessRequest, ShareRequest
 import signal
 import threading
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from common import get_root  # noqa: E402
 
 exit_signal = threading.Event()
 
@@ -20,12 +23,12 @@ def signal_handler(signum, frame):
 
 class copyto:
     def handle(self, *args, **kwargs):
-        root = zrok.environment.root.Load()
+        root = get_root()
 
         try:
-            shr = zrok.share.CreateShare(root=root, request=ShareRequest(
-                BackendMode=zrok.model.TCP_TUNNEL_BACKEND_MODE,
-                ShareMode=zrok.model.PRIVATE_SHARE_MODE,
+            shr = zrok2.share.CreateShare(root=root, request=ShareRequest(
+                BackendMode=zrok2.model.TCP_TUNNEL_BACKEND_MODE,
+                ShareMode=zrok2.model.PRIVATE_SHARE_MODE,
                 Target="pastebin"
             ))
         except Exception as e:
@@ -34,7 +37,7 @@ class copyto:
 
         def removeShare():
             try:
-                zrok.share.DeleteShare(root, shr)
+                zrok2.share.DeleteShare(root, shr)
             except Exception as e:
                 print("unable to delete share", e)
                 sys.exit(1)
@@ -43,7 +46,7 @@ class copyto:
         data = self.loadData()
         print("access your pastebin using 'pastebin.py pastefrom " + shr.Token + "'")
 
-        with zrok.listener.Listener(shr.Token, root) as server:
+        with zrok2.listener.Listener(shr.Token, root) as server:
             while not exit_signal.is_set():
                 conn, peer = server.accept()
                 with conn:
@@ -59,10 +62,10 @@ class copyto:
 
 
 def pastefrom(options):
-    root = zrok.environment.root.Load()
+    root = get_root()
 
     try:
-        acc = zrok.access.CreateAccess(root=root, request=AccessRequest(
+        acc = zrok2.access.CreateAccess(root=root, request=AccessRequest(
             ShareToken=options.shrToken,
         ))
     except Exception as e:
@@ -71,13 +74,13 @@ def pastefrom(options):
 
     def removeAccess():
         try:
-            zrok.access.DeleteAccess(root, acc)
+            zrok2.access.DeleteAccess(root, acc)
         except Exception as e:
             print("unable to delete access", e)
             sys.exit(1)
     atexit.register(removeAccess)
 
-    client = zrok.dialer.Dialer(options.shrToken, root)
+    client = zrok2.dialer.Dialer(options.shrToken, root)
     data = client.recv(1024)
     print(data.decode('utf-8'))
 

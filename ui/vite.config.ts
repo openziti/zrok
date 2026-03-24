@@ -30,6 +30,34 @@ export default defineConfig({
     //   verbose: true,
     // }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("react-dom") || id.includes("react-router") || id.includes("@emotion") || id.match(/\/react\//)) {
+              return "vendor-react";
+            }
+            if (id.includes("@mui/x-charts") || id.includes("@mui/x-charts-vendor")) {
+              return "vendor-mui-charts";
+            }
+            if (id.includes("@mui/x-date-pickers")) {
+              return "vendor-mui-pickers";
+            }
+            if (id.includes("@mui")) {
+              return "vendor-mui";
+            }
+            if (id.includes("@xyflow") || id.includes("d3-hierarchy")) {
+              return "vendor-visualizer";
+            }
+            if (id.includes("material-react-table")) {
+              return "vendor-table";
+            }
+          }
+        },
+      },
+    },
+  },
   server: {
     proxy: {
       '/api/v2': {

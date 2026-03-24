@@ -1,10 +1,11 @@
-import {User} from "./model/user.ts";
-import {useEffect, useRef, useState} from "react";
+import {saveStoredUser, User} from "./model/user.ts";
+import {useEffect, useState} from "react";
 import {modalStyle} from "./styling/theme.ts";
 import {Box, Button, Checkbox, FormControlLabel, Grid2, Modal, Typography} from "@mui/material";
 import {getAccountApi} from "./model/api.ts";
 import useApiConsoleStore from "./model/store.ts";
 import ClipboardText from "./ClipboardText.tsx";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface RegenerateAccountTokenModalProps {
     close: () => void;
@@ -12,17 +13,14 @@ interface RegenerateAccountTokenModalProps {
     user: User;
 }
 
+type RegenerateTokenStatus = "idle" | "success" | "failed";
+
 const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountTokenModalProps) => {
     const updateUser = useApiConsoleStore((state) => state.updateUser);
-    const [errorMessage, setErrorMessage] = useState<React.JSX.Element>(null);
-    const [successMessage, setSuccessMessage] = useState<React.JSX.Element>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [newToken, setNewToken] = useState<string | null>(null);
+    const [status, setStatus] = useState<RegenerateTokenStatus>("idle");
     const [checked, setChecked] = useState<boolean>(false);
-    const checkedRef = useRef<boolean>(checked);
-    checkedRef.current = checked;
-
-    const toggleChecked = () => {
-        setChecked(!checkedRef.current);
-    }
 
     const reload = () => {
         window.location.reload();
@@ -30,40 +28,36 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
 
     useEffect(() => {
         setChecked(false);
-        setSuccessMessage(null);
+        setErrorMessage(null);
+        setNewToken(null);
+        setStatus("idle");
     }, [isOpen]);
 
     const regenerateToken = () => {
         getAccountApi(user).regenerateAccountToken({body: {emailAddress: user.email}})
             .then(d => {
-                let newUser = {
+                const newUser = {
                     email: user.email!,
                     token: d.accountToken!,
                 }
-                console.log(user, newUser);
                 updateUser(newUser);
-                localStorage.setItem("user", JSON.stringify(newUser));
+                saveStoredUser(newUser);
                 document.dispatchEvent(new Event("userUpdated"));
-                setSuccessMessage(<><Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
-                    <Typography variant="h6" sx={{ mt: 2, p: 1 }}>Your new account token is: <code>{d.accountToken}</code> <ClipboardText text={String(d.accountToken)} /></Typography>
-                </Grid2>
-                <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Button type="primary" variant="contained" onClick={reload}>Reload API Console</Button>
-                </Grid2></>);
+                setErrorMessage(null);
+                setNewToken(d.accountToken ?? null);
+                setStatus("success");
             })
-            .catch(e => {
-                e.response.json().then(ex => {
-                    setErrorMessage(<Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
-                        <Typography color="red">{ex.message}</Typography>
-                    </Grid2>);
-                    console.log("releaseAccess", ex.message);
-                });
+            .catch(async (e) => {
+                const msg = await extractErrorMessage(e, "failed to regenerate account token");
+                setErrorMessage(msg);
+                setNewToken(null);
+                setStatus("failed");
             });
     }
 
     const controls = <>
         <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-        <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I confirm that I want to regenerate my account token</p>} sx={{ mt: 2 }} />
+        <FormControlLabel control={<Checkbox checked={checked} onChange={(_, nextChecked) => setChecked(nextChecked)} />} label={<p>I confirm that I want to regenerate my account token</p>} sx={{ mt: 2 }} />
         </Grid2>
         <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
             <Button color="error" variant="contained" disabled={!checked} onClick={regenerateToken}>Regenerate Account Token</Button>
@@ -71,10 +65,10 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
     </>;
 
     return (
-        <Modal open={isOpen} onClose={close}>
+        <Modal open={isOpen} onClose={close} aria-labelledby="modal-title-regenerate-token">
             <Box sx={{ ...modalStyle }}>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Typography variant="h5"><strong>Regenerate Account Token</strong></Typography>
+                    <Typography variant="h5" id="modal-title-regenerate-token"><strong>Regenerate Account Token</strong></Typography>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
                     <Typography variant="h6" color="red">
@@ -105,12 +99,23 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
                         <code> zrok rebase accountToken </code> command as described above.
                     </Typography>
                 </Grid2>
-                { successMessage ? null : controls }
-                {successMessage}
-                {errorMessage}
+                {status !== "success" ? controls : null}
+                {status === "success" && newToken ? <>
+                    <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
+                        <Typography variant="h6" sx={{ mt: 2, p: 1 }}>
+                            Your new account token is: <code>{newToken}</code> <ClipboardText text={newToken} />
+                        </Typography>
+                    </Grid2>
+                    <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
+                        <Button type="primary" variant="contained" onClick={reload}>Reload API Console</Button>
+                    </Grid2>
+                </> : null}
+                {errorMessage ? <Grid2 container sx={{ flexGrow: 1 }} alignItems="center">
+                    <Typography color="error">{errorMessage}</Typography>
+                </Grid2> : null}
             </Box>
         </Modal>
     );
-}
+};
 
 export default RegenerateAccountTokenModal;

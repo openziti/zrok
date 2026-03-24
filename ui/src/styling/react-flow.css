@@ -4,21 +4,21 @@
     color: white;
     border: 2px solid white;
     border-radius: 10px;
-    background-color: #241775;
+    background-color: var(--zrok-primary);
     text-color: white;
 }
 .react-flow__node.selected {
     color: black;
-    background-color: #9bf316;
-    border: 2px solid #241775;
+    background-color: var(--zrok-secondary);
+    border: 2px solid var(--zrok-primary);
     font-weight: bold;
 }
 .react-flow__handle {
-    background-color: #9bf316;
-    border: 1px solid #241775;
+    background-color: var(--zrok-secondary);
+    border: 1px solid var(--zrok-primary);
 }
 .react-flow__edge-path {
-    stroke: #241775;
+    stroke: var(--zrok-primary);
 }
 .react-flow__attribution {
     display: none;

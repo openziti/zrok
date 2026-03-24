@@ -48,6 +48,14 @@ CHANGE: All logging migrated from `githhub.com/michaelquigley/pfxlog` and `githu
 
 FIX: Updated the unique constraint on the `accounts.email` column to only be unique when `is not deleted`. This only fixes PostgreSQL databases; fixing SQLite databases effectively requires rebuilding the entire database, see the comment in the issue for details. (https://github.com/openziti/zrok/issues/1109)
 
+FEATURE: Added configuration option for OIDC authentication prompts.
+
+FEATURE: New `names`>`disable_share_token_profanity_check` and `names`>`disable_namespace_name_profanity_check` configuration options to disable profanity checking for share tokens and namespace names. (https://github.com/openziti/zrok/issues/1152)
+
+FEATURE: `zrok2 admin update password`; adminstrative password change function (https://github.com/openziti/zrok/issues/1129)
+
+FIX: Improved ipv6 address parsing in `realRemoteAddress` in the `controller` package.
+
 ## v1.1.11
 
 CHANGE: The `vpn` backend mode has been removed from zrok due to dependency management issues. The underlying TUN device libraries created conflicts that prevented updates to critical dependencies. See the [VPN removal guide](https://docs.zrok.io/docs/guides/vpn/) for migration alternatives and future plans.
