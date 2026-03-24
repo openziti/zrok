@@ -82,6 +82,7 @@ func Run(inCfg *config.Config) error {
 	api.AdminListNamespacesHandler = newListNamespacesHandler()
 	api.AdminListOrganizationMembersHandler = newListOrganizationMembersHandler()
 	api.AdminListOrganizationsHandler = newListOrganizationsHandler()
+	api.AdminRemoveAppliedLimitClassesHandler = newRemoveAppliedLimitClassesHandler()
 	api.AdminRemoveNamespaceFrontendMappingHandler = newRemoveNamespaceFrontendMappingHandler()
 	api.AdminRemoveNamespaceGrantHandler = newRemoveNamespaceGrantHandler()
 	api.AdminRemoveOrganizationMemberHandler = newRemoveOrganizationMemberHandler()

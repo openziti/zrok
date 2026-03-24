@@ -126,6 +126,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**list_namespaces**](docs/AdminApi.md#list_namespaces) | **GET** /namespaces | 
 *AdminApi* | [**list_organization_members**](docs/AdminApi.md#list_organization_members) | **POST** /organization/list | 
 *AdminApi* | [**list_organizations**](docs/AdminApi.md#list_organizations) | **GET** /organizations | 
+*AdminApi* | [**remove_applied_limit_classes**](docs/AdminApi.md#remove_applied_limit_classes) | **DELETE** /applied-limit-class | 
 *AdminApi* | [**remove_namespace_frontend_mapping**](docs/AdminApi.md#remove_namespace_frontend_mapping) | **DELETE** /namespace/frontend/mapping | 
 *AdminApi* | [**remove_namespace_grant**](docs/AdminApi.md#remove_namespace_grant) | **DELETE** /namespace/grant | 
 *AdminApi* | [**remove_organization_member**](docs/AdminApi.md#remove_organization_member) | **POST** /organization/remove | 

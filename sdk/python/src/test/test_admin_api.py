@@ -182,6 +182,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_remove_applied_limit_classes(self) -> None:
+        """Test case for remove_applied_limit_classes
+
+        """
+        pass
+
     def test_remove_namespace_frontend_mapping(self) -> None:
         """Test case for remove_namespace_frontend_mapping
 

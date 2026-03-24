@@ -23,6 +23,13 @@ func (str *Store) ApplyLimitClass(lc *AppliedLimitClass, trx *sqlx.Tx) (int, err
 	return id, nil
 }
 
+func (str *Store) RemoveAppliedLimitClass(acctId, lcId int, trx *sqlx.Tx) error {
+	if _, err := trx.Exec("delete from applied_limit_classes where account_id = $1 and limit_class_id = $2", acctId, lcId); err != nil {
+		return errors.Wrap(err, "error deleting applied_limit_class")
+	}
+	return nil
+}
+
 func (str *Store) FindAppliedLimitClassesForAccount(acctId int, trx *sqlx.Tx) ([]*LimitClass, error) {
 	rows, err := trx.Queryx("select limit_classes.* from applied_limit_classes, limit_classes where applied_limit_classes.account_id = $1 and applied_limit_classes.limit_class_id = limit_classes.id", acctId)
 	if err != nil {

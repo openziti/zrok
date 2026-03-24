@@ -198,6 +198,10 @@ export interface ListOrganizationMembersRequest {
     body?: CreateOrganization201Response;
 }
 
+export interface RemoveAppliedLimitClassesRequest {
+    body?: ApplyLimitClassesRequest;
+}
+
 export interface RemoveNamespaceFrontendMappingOperationRequest {
     body?: RemoveNamespaceFrontendMappingRequest;
 }
@@ -1097,6 +1101,39 @@ export class AdminApi extends runtime.BaseAPI {
     async listOrganizations(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ListOrganizations200Response> {
         const response = await this.listOrganizationsRaw(initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async removeAppliedLimitClassesRaw(requestParameters: RemoveAppliedLimitClassesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/applied-limit-class`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ApplyLimitClassesRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async removeAppliedLimitClasses(requestParameters: RemoveAppliedLimitClassesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.removeAppliedLimitClassesRaw(requestParameters, initOverrides);
     }
 
     /**

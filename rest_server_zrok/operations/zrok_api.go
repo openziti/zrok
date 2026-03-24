@@ -486,6 +486,13 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			return middleware.NotImplemented("operation agent.RemoteUnshare has not yet been implemented")
 		}),
 
+		AdminRemoveAppliedLimitClassesHandler: admin.RemoveAppliedLimitClassesHandlerFunc(func(params admin.RemoveAppliedLimitClassesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation admin.RemoveAppliedLimitClasses has not yet been implemented")
+		}),
+
 		AdminRemoveNamespaceFrontendMappingHandler: admin.RemoveNamespaceFrontendMappingHandlerFunc(func(params admin.RemoveNamespaceFrontendMappingParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			_ = params
 			_ = principal
@@ -791,6 +798,8 @@ type ZrokAPI struct {
 	AgentRemoteUnaccessHandler agent.RemoteUnaccessHandler
 	// AgentRemoteUnshareHandler sets the operation handler for the remote unshare operation
 	AgentRemoteUnshareHandler agent.RemoteUnshareHandler
+	// AdminRemoveAppliedLimitClassesHandler sets the operation handler for the remove applied limit classes operation
+	AdminRemoveAppliedLimitClassesHandler admin.RemoveAppliedLimitClassesHandler
 	// AdminRemoveNamespaceFrontendMappingHandler sets the operation handler for the remove namespace frontend mapping operation
 	AdminRemoveNamespaceFrontendMappingHandler admin.RemoveNamespaceFrontendMappingHandler
 	// AdminRemoveNamespaceGrantHandler sets the operation handler for the remove namespace grant operation
@@ -1098,6 +1107,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AgentRemoteUnshareHandler == nil {
 		unregistered = append(unregistered, "agent.RemoteUnshareHandler")
+	}
+	if o.AdminRemoveAppliedLimitClassesHandler == nil {
+		unregistered = append(unregistered, "admin.RemoveAppliedLimitClassesHandler")
 	}
 	if o.AdminRemoveNamespaceFrontendMappingHandler == nil {
 		unregistered = append(unregistered, "admin.RemoveNamespaceFrontendMappingHandler")
@@ -1508,6 +1520,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/agent/unshare"] = agent.NewRemoteUnshare(o.context, o.AgentRemoteUnshareHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/applied-limit-class"] = admin.NewRemoveAppliedLimitClasses(o.context, o.AdminRemoveAppliedLimitClassesHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
