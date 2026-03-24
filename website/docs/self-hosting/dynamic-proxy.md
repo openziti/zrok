@@ -229,17 +229,16 @@ Parameters:
 Create a frontend with the dynamic flag enabled:
 
 ```bash
-zrok2 admin create frontend --dynamic public "http://{token}.zrok.example.com:8080"
+zrok2 admin create frontend --dynamic -- <public-ziti-id> public
 ```
 
 This creates a dynamic frontend and outputs a frontend token (e.g., `KMmfE0VXO7Pp`).
 
 Command breakdown:
 - **`--dynamic`**: enables dynamic mode (required for dynamicProxy)
-- **`public`**: Ziti identity that will bind the frontend (must have dial permissions to dynamicProxyController service)
-- **`"http://{token}.zrok.example.com:8080"`**: URL template for shares
-  - This is the legacy URL template used with legacy `publicProxy` frontends; disregarded by new v2 `dynamicProxy` installations and will be removed in future versions of zrok
-  - `{token}` is replaced with the share token or name
+- **`<public-ziti-id>`**: Ziti ID of the `public` identity (from `zrok2 admin bootstrap` output)
+- **`public`**: the public name for the frontend
+- **`--`**: end-of-flags separator (prevents Ziti IDs starting with `-` from being parsed as flags)
   - can use `https` if you configure TLS in the frontend config
   
 

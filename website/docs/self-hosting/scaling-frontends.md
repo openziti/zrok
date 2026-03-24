@@ -58,8 +58,8 @@ optionally its own Ziti identity. Map each to the same namespace(s).
 
 ```bash
 # Create additional frontends (each gets a unique token)
-zrok2 admin create frontend --dynamic <public-ziti-id> frontend-2
-zrok2 admin create frontend --dynamic <public-ziti-id> frontend-3
+zrok2 admin create frontend --dynamic -- <public-ziti-id> frontend-2
+zrok2 admin create frontend --dynamic -- <public-ziti-id> frontend-3
 
 # Map them to the same namespace
 zrok2 admin create namespace-frontend public <frontend-2-token>
@@ -77,7 +77,7 @@ To create a separate identity for each frontend:
 zrok2 admin create identity public-2
 
 # Create the frontend using the new identity's Ziti ID
-zrok2 admin create frontend --dynamic <public-2-ziti-id> frontend-2
+zrok2 admin create frontend --dynamic -- <public-2-ziti-id> frontend-2
 ```
 
 Then configure each frontend's `frontend.yaml` with its own `frontend_token`,
