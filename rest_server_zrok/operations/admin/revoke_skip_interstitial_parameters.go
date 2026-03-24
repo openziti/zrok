@@ -14,33 +14,33 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// NewGrantsParams creates a new GrantsParams object
+// NewRevokeSkipInterstitialParams creates a new RevokeSkipInterstitialParams object
 //
 // There are no default values defined in the spec.
-func NewGrantsParams() GrantsParams {
+func NewRevokeSkipInterstitialParams() RevokeSkipInterstitialParams {
 
-	return GrantsParams{}
+	return RevokeSkipInterstitialParams{}
 }
 
-// GrantsParams contains all the bound params for the grants operation
+// RevokeSkipInterstitialParams contains all the bound params for the revoke skip interstitial operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters grants
-type GrantsParams struct {
+// swagger:parameters revokeSkipInterstitial
+type RevokeSkipInterstitialParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
 	/*
 	  In: body
 	*/
-	Body GrantsBody
+	Body RevokeSkipInterstitialBody
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewGrantsParams() beforehand.
-func (o *GrantsParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewRevokeSkipInterstitialParams() beforehand.
+func (o *RevokeSkipInterstitialParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -49,7 +49,7 @@ func (o *GrantsParams) BindRequest(r *http.Request, route *middleware.MatchedRou
 		defer func() {
 			_ = r.Body.Close()
 		}()
-		var body GrantsBody
+		var body RevokeSkipInterstitialBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {

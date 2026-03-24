@@ -272,6 +272,13 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			return middleware.NotImplemented("operation metadata.GetShareMetrics has not yet been implemented")
 		}),
 
+		AdminGetSkipInterstitialGrantHandler: admin.GetSkipInterstitialGrantHandlerFunc(func(params admin.GetSkipInterstitialGrantParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation admin.GetSkipInterstitialGrant has not yet been implemented")
+		}),
+
 		MetadataGetSparklinesHandler: metadata.GetSparklinesHandlerFunc(func(params metadata.GetSparklinesParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			_ = params
 			_ = principal
@@ -279,11 +286,11 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			return middleware.NotImplemented("operation metadata.GetSparklines has not yet been implemented")
 		}),
 
-		AdminGrantsHandler: admin.GrantsHandlerFunc(func(params admin.GrantsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+		AdminGrantSkipInterstitialHandler: admin.GrantSkipInterstitialHandlerFunc(func(params admin.GrantSkipInterstitialParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			_ = params
 			_ = principal
 
-			return middleware.NotImplemented("operation admin.Grants has not yet been implemented")
+			return middleware.NotImplemented("operation admin.GrantSkipInterstitial has not yet been implemented")
 		}),
 
 		AccountInviteHandler: account.InviteHandlerFunc(func(params account.InviteParams) middleware.Responder {
@@ -526,6 +533,13 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			return middleware.NotImplemented("operation account.ResetPasswordRequest has not yet been implemented")
 		}),
 
+		AdminRevokeSkipInterstitialHandler: admin.RevokeSkipInterstitialHandlerFunc(func(params admin.RevokeSkipInterstitialParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation admin.RevokeSkipInterstitial has not yet been implemented")
+		}),
+
 		ShareShareHandler: share.ShareHandlerFunc(func(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			_ = params
 			_ = principal
@@ -736,10 +750,12 @@ type ZrokAPI struct {
 	MetadataGetShareDetailHandler metadata.GetShareDetailHandler
 	// MetadataGetShareMetricsHandler sets the operation handler for the get share metrics operation
 	MetadataGetShareMetricsHandler metadata.GetShareMetricsHandler
+	// AdminGetSkipInterstitialGrantHandler sets the operation handler for the get skip interstitial grant operation
+	AdminGetSkipInterstitialGrantHandler admin.GetSkipInterstitialGrantHandler
 	// MetadataGetSparklinesHandler sets the operation handler for the get sparklines operation
 	MetadataGetSparklinesHandler metadata.GetSparklinesHandler
-	// AdminGrantsHandler sets the operation handler for the grants operation
-	AdminGrantsHandler admin.GrantsHandler
+	// AdminGrantSkipInterstitialHandler sets the operation handler for the grant skip interstitial operation
+	AdminGrantSkipInterstitialHandler admin.GrantSkipInterstitialHandler
 	// AccountInviteHandler sets the operation handler for the invite operation
 	AccountInviteHandler account.InviteHandler
 	// AdminInviteTokenGenerateHandler sets the operation handler for the invite token generate operation
@@ -810,6 +826,8 @@ type ZrokAPI struct {
 	AccountResetPasswordHandler account.ResetPasswordHandler
 	// AccountResetPasswordRequestHandler sets the operation handler for the reset password request operation
 	AccountResetPasswordRequestHandler account.ResetPasswordRequestHandler
+	// AdminRevokeSkipInterstitialHandler sets the operation handler for the revoke skip interstitial operation
+	AdminRevokeSkipInterstitialHandler admin.RevokeSkipInterstitialHandler
 	// ShareShareHandler sets the operation handler for the share operation
 	ShareShareHandler share.ShareHandler
 	// AgentShareHTTPHealthcheckHandler sets the operation handler for the share Http healthcheck operation
@@ -1015,11 +1033,14 @@ func (o *ZrokAPI) Validate() error {
 	if o.MetadataGetShareMetricsHandler == nil {
 		unregistered = append(unregistered, "metadata.GetShareMetricsHandler")
 	}
+	if o.AdminGetSkipInterstitialGrantHandler == nil {
+		unregistered = append(unregistered, "admin.GetSkipInterstitialGrantHandler")
+	}
 	if o.MetadataGetSparklinesHandler == nil {
 		unregistered = append(unregistered, "metadata.GetSparklinesHandler")
 	}
-	if o.AdminGrantsHandler == nil {
-		unregistered = append(unregistered, "admin.GrantsHandler")
+	if o.AdminGrantSkipInterstitialHandler == nil {
+		unregistered = append(unregistered, "admin.GrantSkipInterstitialHandler")
 	}
 	if o.AccountInviteHandler == nil {
 		unregistered = append(unregistered, "account.InviteHandler")
@@ -1125,6 +1146,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AccountResetPasswordRequestHandler == nil {
 		unregistered = append(unregistered, "account.ResetPasswordRequestHandler")
+	}
+	if o.AdminRevokeSkipInterstitialHandler == nil {
+		unregistered = append(unregistered, "admin.RevokeSkipInterstitialHandler")
 	}
 	if o.ShareShareHandler == nil {
 		unregistered = append(unregistered, "share.ShareHandler")
@@ -1396,6 +1420,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/metrics/share/{shareToken}"] = metadata.NewGetShareMetrics(o.context, o.MetadataGetShareMetricsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/skip-interstitial-grant"] = admin.NewGetSkipInterstitialGrant(o.context, o.AdminGetSkipInterstitialGrantHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -1403,7 +1431,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/grants"] = admin.NewGrants(o.context, o.AdminGrantsHandler)
+	o.handlers["POST"]["/skip-interstitial-grant"] = admin.NewGrantSkipInterstitial(o.context, o.AdminGrantSkipInterstitialHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -1544,6 +1572,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/resetPasswordRequest"] = account.NewResetPasswordRequest(o.context, o.AccountResetPasswordRequestHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/skip-interstitial-grant"] = admin.NewRevokeSkipInterstitial(o.context, o.AdminRevokeSkipInterstitialHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

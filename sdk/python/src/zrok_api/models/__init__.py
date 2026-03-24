@@ -46,6 +46,7 @@ from zrok_api.models.environment_and_resources import EnvironmentAndResources
 from zrok_api.models.environment_summary import EnvironmentSummary
 from zrok_api.models.environments_list import EnvironmentsList
 from zrok_api.models.frontend import Frontend
+from zrok_api.models.get_skip_interstitial_grant200_response import GetSkipInterstitialGrant200Response
 from zrok_api.models.get_sparklines200_response import GetSparklines200Response
 from zrok_api.models.get_sparklines_request import GetSparklinesRequest
 from zrok_api.models.invite_request import InviteRequest

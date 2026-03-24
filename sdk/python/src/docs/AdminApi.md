@@ -20,7 +20,8 @@ Method | HTTP request | Description
 [**delete_identity**](AdminApi.md#delete_identity) | **DELETE** /identity | 
 [**delete_namespace**](AdminApi.md#delete_namespace) | **DELETE** /namespace | 
 [**delete_organization**](AdminApi.md#delete_organization) | **DELETE** /organization | 
-[**grants**](AdminApi.md#grants) | **POST** /grants | 
+[**get_skip_interstitial_grant**](AdminApi.md#get_skip_interstitial_grant) | **GET** /skip-interstitial-grant | 
+[**grant_skip_interstitial**](AdminApi.md#grant_skip_interstitial) | **POST** /skip-interstitial-grant | 
 [**invite_token_generate**](AdminApi.md#invite_token_generate) | **POST** /invite/token/generate | 
 [**list_applied_limit_classes**](AdminApi.md#list_applied_limit_classes) | **POST** /applied-limit-class/list | 
 [**list_frontend_namespace_mappings**](AdminApi.md#list_frontend_namespace_mappings) | **GET** /frontend/namespace/mapping/{frontendToken} | 
@@ -34,6 +35,7 @@ Method | HTTP request | Description
 [**remove_namespace_frontend_mapping**](AdminApi.md#remove_namespace_frontend_mapping) | **DELETE** /namespace/frontend/mapping | 
 [**remove_namespace_grant**](AdminApi.md#remove_namespace_grant) | **DELETE** /namespace/grant | 
 [**remove_organization_member**](AdminApi.md#remove_organization_member) | **POST** /organization/remove | 
+[**revoke_skip_interstitial**](AdminApi.md#revoke_skip_interstitial) | **DELETE** /skip-interstitial-grant | 
 [**update_account_password**](AdminApi.md#update_account_password) | **PATCH** /account | 
 [**update_frontend**](AdminApi.md#update_frontend) | **PATCH** /frontend | 
 [**update_namespace**](AdminApi.md#update_namespace) | **PATCH** /namespace | 
@@ -1252,8 +1254,85 @@ void (empty response body)
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **grants**
-> grants(body=body)
+# **get_skip_interstitial_grant**
+> GetSkipInterstitialGrant200Response get_skip_interstitial_grant(email)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.get_skip_interstitial_grant200_response import GetSkipInterstitialGrant200Response
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    email = 'email_example' # str | 
+
+    try:
+        api_response = api_instance.get_skip_interstitial_grant(email)
+        print("The response of AdminApi->get_skip_interstitial_grant:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AdminApi->get_skip_interstitial_grant: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **email** | **str**|  | 
+
+### Return type
+
+[**GetSkipInterstitialGrant200Response**](GetSkipInterstitialGrant200Response.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**401** | unauthorized |  -  |
+**404** | account not found |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **grant_skip_interstitial**
+> grant_skip_interstitial(body=body)
 
 ### Example
 
@@ -1289,9 +1368,9 @@ with zrok_api.ApiClient(configuration) as api_client:
     body = zrok_api.Verify200Response() # Verify200Response |  (optional)
 
     try:
-        api_instance.grants(body=body)
+        api_instance.grant_skip_interstitial(body=body)
     except Exception as e:
-        print("Exception when calling AdminApi->grants: %s\n" % e)
+        print("Exception when calling AdminApi->grant_skip_interstitial: %s\n" % e)
 ```
 
 
@@ -1322,7 +1401,7 @@ void (empty response body)
 |-------------|-------------|------------------|
 **200** | ok |  -  |
 **401** | unauthorized |  -  |
-**404** | not found |  -  |
+**404** | account not found |  -  |
 **500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -2301,6 +2380,81 @@ void (empty response body)
 **200** | member removed |  -  |
 **401** | unauthorized |  -  |
 **404** | not found |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **revoke_skip_interstitial**
+> revoke_skip_interstitial(body=body)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.verify200_response import Verify200Response
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.Verify200Response() # Verify200Response |  (optional)
+
+    try:
+        api_instance.revoke_skip_interstitial(body=body)
+    except Exception as e:
+        print("Exception when calling AdminApi->revoke_skip_interstitial: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**Verify200Response**](Verify200Response.md)|  | [optional] 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: Not defined
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**401** | unauthorized |  -  |
+**404** | account not found |  -  |
 **500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

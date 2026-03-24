@@ -1922,46 +1922,6 @@ func init() {
         }
       }
     },
-    "/grants": {
-      "post": {
-        "security": [
-          {
-            "key": []
-          }
-        ],
-        "tags": [
-          "admin"
-        ],
-        "operationId": "grants",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "properties": {
-                "email": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "ok"
-          },
-          "401": {
-            "description": "unauthorized"
-          },
-          "404": {
-            "description": "not found"
-          },
-          "500": {
-            "description": "internal server error"
-          }
-        }
-      }
-    },
     "/identity": {
       "post": {
         "security": [
@@ -3814,6 +3774,128 @@ func init() {
             "schema": {
               "$ref": "#/definitions/errorMessage"
             }
+          }
+        }
+      }
+    },
+    "/skip-interstitial-grant": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "getSkipInterstitialGrant",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "email",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "granted": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "grantSkipInterstitial",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "revokeSkipInterstitial",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }
@@ -6457,46 +6539,6 @@ func init() {
         }
       }
     },
-    "/grants": {
-      "post": {
-        "security": [
-          {
-            "key": []
-          }
-        ],
-        "tags": [
-          "admin"
-        ],
-        "operationId": "grants",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "properties": {
-                "email": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "ok"
-          },
-          "401": {
-            "description": "unauthorized"
-          },
-          "404": {
-            "description": "not found"
-          },
-          "500": {
-            "description": "internal server error"
-          }
-        }
-      }
-    },
     "/identity": {
       "post": {
         "security": [
@@ -8273,6 +8315,128 @@ func init() {
             "schema": {
               "$ref": "#/definitions/errorMessage"
             }
+          }
+        }
+      }
+    },
+    "/skip-interstitial-grant": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "getSkipInterstitialGrant",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "email",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "granted": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "grantSkipInterstitial",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "revokeSkipInterstitial",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }

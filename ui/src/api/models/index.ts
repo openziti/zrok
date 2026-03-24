@@ -31,6 +31,7 @@ export * from './EnvironmentAndResources';
 export * from './EnvironmentSummary';
 export * from './EnvironmentsList';
 export * from './Frontend';
+export * from './GetSkipInterstitialGrant200Response';
 export * from './GetSparklines200Response';
 export * from './GetSparklinesRequest';
 export * from './InviteRequest';

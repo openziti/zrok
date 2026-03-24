@@ -122,8 +122,14 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
-    def test_grants(self) -> None:
-        """Test case for grants
+    def test_get_skip_interstitial_grant(self) -> None:
+        """Test case for get_skip_interstitial_grant
+
+        """
+        pass
+
+    def test_grant_skip_interstitial(self) -> None:
+        """Test case for grant_skip_interstitial
 
         """
         pass
@@ -202,6 +208,12 @@ class TestAdminApi(unittest.TestCase):
 
     def test_remove_organization_member(self) -> None:
         """Test case for remove_organization_member
+
+        """
+        pass
+
+    def test_revoke_skip_interstitial(self) -> None:
+        """Test case for revoke_skip_interstitial
 
         """
         pass

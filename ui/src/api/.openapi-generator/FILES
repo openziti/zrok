@@ -38,6 +38,7 @@ models/EnvironmentAndResources.ts
 models/EnvironmentSummary.ts
 models/EnvironmentsList.ts
 models/Frontend.ts
+models/GetSkipInterstitialGrant200Response.ts
 models/GetSparklines200Response.ts
 models/GetSparklinesRequest.ts
 models/InviteRequest.ts

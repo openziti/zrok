@@ -65,6 +65,7 @@ __all__ = [
     "EnvironmentSummary",
     "EnvironmentsList",
     "Frontend",
+    "GetSkipInterstitialGrant200Response",
     "GetSparklines200Response",
     "GetSparklinesRequest",
     "InviteRequest",
@@ -177,6 +178,7 @@ from zrok_api.models.environment_and_resources import EnvironmentAndResources as
 from zrok_api.models.environment_summary import EnvironmentSummary as EnvironmentSummary
 from zrok_api.models.environments_list import EnvironmentsList as EnvironmentsList
 from zrok_api.models.frontend import Frontend as Frontend
+from zrok_api.models.get_skip_interstitial_grant200_response import GetSkipInterstitialGrant200Response as GetSkipInterstitialGrant200Response
 from zrok_api.models.get_sparklines200_response import GetSparklines200Response as GetSparklines200Response
 from zrok_api.models.get_sparklines_request import GetSparklinesRequest as GetSparklinesRequest
 from zrok_api.models.invite_request import InviteRequest as InviteRequest
