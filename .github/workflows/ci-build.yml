@@ -175,3 +175,46 @@ jobs:
 
           flake8 .
 
+      - name: Verify wheel declares all runtime deps
+        shell: bash
+        run: |
+
+          set -o errexit
+          set -o pipefail
+          set -o xtrace
+
+          # Build the wheel in an isolated environment (like PyPI publish does)
+          pip install build
+          python -m build src/
+
+          # Install ONLY the built wheel in a fresh venv — no extras, no
+          # requirements.txt — to test exactly what "pip install zrok2" gets.
+          python -m venv /tmp/wheel-check
+          /tmp/wheel-check/bin/pip install src/dist/*.whl
+
+          # Compare declared wheel deps against requirements.txt
+          /tmp/wheel-check/bin/python -c "
+          import re, sys
+          from importlib.metadata import requires
+          from pathlib import Path
+
+          req_names = set()
+          for line in Path('src/requirements.txt').read_text().splitlines():
+              line = line.strip()
+              if line and not line.startswith('#'):
+                  req_names.add(re.split(r'[<>=~!\s]', line)[0].strip().lower())
+
+          declared = set()
+          for r in (requires('zrok2') or []):
+              if 'extra' not in r:
+                  declared.add(re.split(r'[<>=~!\s]', r)[0].strip().lower())
+
+          missing = req_names - declared
+          if missing:
+              print(f'FAIL: wheel is missing deps from requirements.txt: {missing}', file=sys.stderr)
+              sys.exit(1)
+          print(f'OK: wheel declares all {len(req_names)} deps from requirements.txt')
+          "
+
+          rm -rf /tmp/wheel-check
+
