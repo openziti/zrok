@@ -19,6 +19,7 @@ import type {
   AddNamespaceFrontendMappingRequest,
   AddNamespaceGrantRequest,
   AddOrganizationMemberRequest,
+  ApplyLimitClassesRequest,
   CreateFrontend201Response,
   CreateFrontendRequest,
   CreateIdentity201Response,
@@ -53,6 +54,8 @@ import {
     AddNamespaceGrantRequestToJSON,
     AddOrganizationMemberRequestFromJSON,
     AddOrganizationMemberRequestToJSON,
+    ApplyLimitClassesRequestFromJSON,
+    ApplyLimitClassesRequestToJSON,
     CreateFrontend201ResponseFromJSON,
     CreateFrontend201ResponseToJSON,
     CreateFrontendRequestFromJSON,
@@ -117,6 +120,10 @@ export interface AddNamespaceGrantOperationRequest {
 
 export interface AddOrganizationMemberOperationRequest {
     body?: AddOrganizationMemberRequest;
+}
+
+export interface ApplyLimitClassesOperationRequest {
+    body?: ApplyLimitClassesRequest;
 }
 
 export interface CreateAccountRequest {
@@ -350,6 +357,39 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async addOrganizationMember(requestParameters: AddOrganizationMemberOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.addOrganizationMemberRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async applyLimitClassesRaw(requestParameters: ApplyLimitClassesOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/applied-limit-class`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ApplyLimitClassesRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async applyLimitClasses(requestParameters: ApplyLimitClassesOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.applyLimitClassesRaw(requestParameters, initOverrides);
     }
 
     /**

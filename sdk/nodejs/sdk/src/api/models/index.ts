@@ -8,6 +8,7 @@ export * from './AddFrontendGrantRequest';
 export * from './AddNamespaceFrontendMappingRequest';
 export * from './AddNamespaceGrantRequest';
 export * from './AddOrganizationMemberRequest';
+export * from './ApplyLimitClassesRequest';
 export * from './AuthUser';
 export * from './ChangePasswordRequest';
 export * from './ClientVersionCheckRequest';

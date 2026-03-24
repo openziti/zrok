@@ -15,6 +15,7 @@ models/AddFrontendGrantRequest.ts
 models/AddNamespaceFrontendMappingRequest.ts
 models/AddNamespaceGrantRequest.ts
 models/AddOrganizationMemberRequest.ts
+models/ApplyLimitClassesRequest.ts
 models/AuthUser.ts
 models/ChangePasswordRequest.ts
 models/ClientVersionCheckRequest.ts

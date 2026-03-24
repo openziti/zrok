@@ -108,6 +108,8 @@ type ClientService interface {
 
 	AddOrganizationMember(params *AddOrganizationMemberParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*AddOrganizationMemberCreated, error)
 
+	ApplyLimitClasses(params *ApplyLimitClassesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ApplyLimitClassesOK, error)
+
 	CreateAccount(params *CreateAccountParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateAccountCreated, error)
 
 	CreateFrontend(params *CreateFrontendParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateFrontendCreated, error)
@@ -338,6 +340,50 @@ func (a *Client) AddOrganizationMember(params *AddOrganizationMemberParams, auth
 	//
 	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for addOrganizationMember: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+ApplyLimitClasses apply limit classes API
+*/
+func (a *Client) ApplyLimitClasses(params *ApplyLimitClassesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ApplyLimitClassesOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewApplyLimitClassesParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "applyLimitClasses",
+		Method:             "POST",
+		PathPattern:        "/applied-limit-class",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ApplyLimitClassesReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*ApplyLimitClassesOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for applyLimitClasses: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

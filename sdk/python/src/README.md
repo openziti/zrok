@@ -104,6 +104,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**add_namespace_frontend_mapping**](docs/AdminApi.md#add_namespace_frontend_mapping) | **POST** /namespace/frontend/mapping | 
 *AdminApi* | [**add_namespace_grant**](docs/AdminApi.md#add_namespace_grant) | **POST** /namespace/grant | 
 *AdminApi* | [**add_organization_member**](docs/AdminApi.md#add_organization_member) | **POST** /organization/add | 
+*AdminApi* | [**apply_limit_classes**](docs/AdminApi.md#apply_limit_classes) | **POST** /applied-limit-class | 
 *AdminApi* | [**create_account**](docs/AdminApi.md#create_account) | **POST** /account | 
 *AdminApi* | [**create_frontend**](docs/AdminApi.md#create_frontend) | **POST** /frontend | 
 *AdminApi* | [**create_identity**](docs/AdminApi.md#create_identity) | **POST** /identity | 
@@ -185,6 +186,7 @@ Class | Method | HTTP request | Description
  - [AddNamespaceFrontendMappingRequest](docs/AddNamespaceFrontendMappingRequest.md)
  - [AddNamespaceGrantRequest](docs/AddNamespaceGrantRequest.md)
  - [AddOrganizationMemberRequest](docs/AddOrganizationMemberRequest.md)
+ - [ApplyLimitClassesRequest](docs/ApplyLimitClassesRequest.md)
  - [AuthUser](docs/AuthUser.md)
  - [ChangePasswordRequest](docs/ChangePasswordRequest.md)
  - [ClientVersionCheckRequest](docs/ClientVersionCheckRequest.md)

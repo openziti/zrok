@@ -60,6 +60,7 @@ func Run(inCfg *config.Config) error {
 	api.AdminAddNamespaceFrontendMappingHandler = newAddNamespaceFrontendMappingHandler()
 	api.AdminAddNamespaceGrantHandler = newAddNamespaceGrantHandler()
 	api.AdminAddOrganizationMemberHandler = newAddOrganizationMemberHandler()
+	api.AdminApplyLimitClassesHandler = newApplyLimitClassesHandler()
 	api.AdminCreateAccountHandler = newCreateAccountHandler()
 	api.AdminCreateFrontendHandler = newCreateFrontendHandler()
 	api.AdminCreateIdentityHandler = newCreateIdentityHandler()

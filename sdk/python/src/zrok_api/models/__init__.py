@@ -22,6 +22,7 @@ from zrok_api.models.add_frontend_grant_request import AddFrontendGrantRequest
 from zrok_api.models.add_namespace_frontend_mapping_request import AddNamespaceFrontendMappingRequest
 from zrok_api.models.add_namespace_grant_request import AddNamespaceGrantRequest
 from zrok_api.models.add_organization_member_request import AddOrganizationMemberRequest
+from zrok_api.models.apply_limit_classes_request import ApplyLimitClassesRequest
 from zrok_api.models.auth_user import AuthUser
 from zrok_api.models.change_password_request import ChangePasswordRequest
 from zrok_api.models.client_version_check_request import ClientVersionCheckRequest

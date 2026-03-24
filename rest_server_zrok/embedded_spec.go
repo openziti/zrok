@@ -969,6 +969,52 @@ func init() {
         }
       }
     },
+    "/applied-limit-class": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "applyLimitClasses",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "limitClassIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "applied"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account or limit class not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/applied-limit-class/list": {
       "post": {
         "security": [
@@ -5450,6 +5496,52 @@ func init() {
           },
           "502": {
             "description": "bad gateway; agent not reachable"
+          }
+        }
+      }
+    },
+    "/applied-limit-class": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "applyLimitClasses",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "limitClassIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "applied"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account or limit class not found"
+          },
+          "500": {
+            "description": "internal server error"
           }
         }
       }

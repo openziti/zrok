@@ -50,6 +50,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_apply_limit_classes(self) -> None:
+        """Test case for apply_limit_classes
+
+        """
+        pass
+
     def test_create_account(self) -> None:
         """Test case for create_account
 

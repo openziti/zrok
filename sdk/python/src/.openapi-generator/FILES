@@ -11,6 +11,7 @@ docs/AddNamespaceGrantRequest.md
 docs/AddOrganizationMemberRequest.md
 docs/AdminApi.md
 docs/AgentApi.md
+docs/ApplyLimitClassesRequest.md
 docs/AuthUser.md
 docs/ChangePasswordRequest.md
 docs/ClientVersionCheckRequest.md
@@ -109,6 +110,7 @@ test/test_add_namespace_grant_request.py
 test/test_add_organization_member_request.py
 test/test_admin_api.py
 test/test_agent_api.py
+test/test_apply_limit_classes_request.py
 test/test_auth_user.py
 test/test_change_password_request.py
 test/test_client_version_check_request.py
@@ -214,6 +216,7 @@ zrok_api/models/add_frontend_grant_request.py
 zrok_api/models/add_namespace_frontend_mapping_request.py
 zrok_api/models/add_namespace_grant_request.py
 zrok_api/models/add_organization_member_request.py
+zrok_api/models/apply_limit_classes_request.py
 zrok_api/models/auth_user.py
 zrok_api/models/change_password_request.py
 zrok_api/models/client_version_check_request.py

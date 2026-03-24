@@ -85,6 +85,13 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			return middleware.NotImplemented("operation admin.AddOrganizationMember has not yet been implemented")
 		}),
 
+		AdminApplyLimitClassesHandler: admin.ApplyLimitClassesHandlerFunc(func(params admin.ApplyLimitClassesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation admin.ApplyLimitClasses has not yet been implemented")
+		}),
+
 		AccountChangePasswordHandler: account.ChangePasswordHandlerFunc(func(params account.ChangePasswordParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			_ = params
 			_ = principal
@@ -668,6 +675,8 @@ type ZrokAPI struct {
 	AdminAddNamespaceGrantHandler admin.AddNamespaceGrantHandler
 	// AdminAddOrganizationMemberHandler sets the operation handler for the add organization member operation
 	AdminAddOrganizationMemberHandler admin.AddOrganizationMemberHandler
+	// AdminApplyLimitClassesHandler sets the operation handler for the apply limit classes operation
+	AdminApplyLimitClassesHandler admin.ApplyLimitClassesHandler
 	// AccountChangePasswordHandler sets the operation handler for the change password operation
 	AccountChangePasswordHandler account.ChangePasswordHandler
 	// MetadataClientVersionCheckHandler sets the operation handler for the client version check operation
@@ -915,6 +924,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminAddOrganizationMemberHandler == nil {
 		unregistered = append(unregistered, "admin.AddOrganizationMemberHandler")
+	}
+	if o.AdminApplyLimitClassesHandler == nil {
+		unregistered = append(unregistered, "admin.ApplyLimitClassesHandler")
 	}
 	if o.AccountChangePasswordHandler == nil {
 		unregistered = append(unregistered, "account.ChangePasswordHandler")
@@ -1264,6 +1276,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/organization/add"] = admin.NewAddOrganizationMember(o.context, o.AdminAddOrganizationMemberHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/applied-limit-class"] = admin.NewApplyLimitClasses(o.context, o.AdminApplyLimitClassesHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
