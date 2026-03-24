@@ -81,13 +81,13 @@ func (h *grantSkipInterstitialHandler) Handle(params admin.GrantSkipInterstitial
 		return admin.NewGrantSkipInterstitialInternalServerError()
 	}
 
-	if err := trx.Commit(); err != nil {
-		dl.Errorf("error committing transaction: %v", err)
+	if err := syncSkipInterstitialForAccount(acct, true); err != nil {
+		dl.Errorf("error syncing skip interstitial for '%v': %v", params.Body.Email, err)
 		return admin.NewGrantSkipInterstitialInternalServerError()
 	}
 
-	if err := syncSkipInterstitialForAccount(acct, true); err != nil {
-		dl.Errorf("error syncing skip interstitial for '%v': %v", params.Body.Email, err)
+	if err := trx.Commit(); err != nil {
+		dl.Errorf("error committing transaction: %v", err)
 		return admin.NewGrantSkipInterstitialInternalServerError()
 	}
 
@@ -126,21 +126,23 @@ func (h *revokeSkipInterstitialHandler) Handle(params admin.RevokeSkipInterstiti
 		return admin.NewRevokeSkipInterstitialInternalServerError()
 	}
 
-	if err := trx.Commit(); err != nil {
-		dl.Errorf("error committing transaction: %v", err)
+	if err := syncSkipInterstitialForAccount(acct, false); err != nil {
+		dl.Errorf("error syncing skip interstitial for '%v': %v", params.Body.Email, err)
 		return admin.NewRevokeSkipInterstitialInternalServerError()
 	}
 
-	if err := syncSkipInterstitialForAccount(acct, false); err != nil {
-		dl.Errorf("error syncing skip interstitial for '%v': %v", params.Body.Email, err)
+	if err := trx.Commit(); err != nil {
+		dl.Errorf("error committing transaction: %v", err)
 		return admin.NewRevokeSkipInterstitialInternalServerError()
 	}
 
 	return admin.NewRevokeSkipInterstitialOK()
 }
 
-// syncSkipInterstitialForAccount synchronizes the interstitial setting on all
-// public (non-drive) share Ziti configs for the given account.
+// syncSkipInterstitialForAccount best-effort synchronizes the interstitial
+// setting on existing public (non-drive) share Ziti configs for the given
+// account. Failures while processing individual shares are logged and skipped,
+// since affected shares can be recreated to correct transient issues.
 func syncSkipInterstitialForAccount(acct *store.Account, skipInterstitial bool) error {
 	trx, err := str.Begin()
 	if err != nil {

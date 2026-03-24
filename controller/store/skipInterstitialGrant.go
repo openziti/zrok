@@ -18,6 +18,14 @@ func (str *Store) IsAccountGrantedSkipInterstitial(acctId int, trx *sqlx.Tx) (bo
 }
 
 func (str *Store) GrantSkipInterstitial(acctId int, trx *sqlx.Tx) error {
+	granted, err := str.IsAccountGrantedSkipInterstitial(acctId, trx)
+	if err != nil {
+		return err
+	}
+	if granted {
+		return nil
+	}
+
 	stmt, err := trx.Prepare("insert into skip_interstitial_grants (account_id) values ($1)")
 	if err != nil {
 		return errors.Wrap(err, "error preparing skip_interstitial_grants insert statement")

@@ -111,6 +111,48 @@ func (lc LimitClass) GetLimitAction() LimitAction {
 	return lc.LimitAction
 }
 
+func (lc LimitClass) IsResourceCountClass() bool {
+	if lc.BackendMode != nil {
+		return false
+	}
+	if lc.Environments == Unlimited && lc.Shares == Unlimited && lc.ReservedShares == Unlimited && lc.UniqueNames == Unlimited && lc.ShareFrontends == Unlimited {
+		return false
+	}
+	return true
+}
+
+func (lc LimitClass) IsUnscopedBandwidthClass() bool {
+	if lc.BackendMode != nil {
+		return false
+	}
+	if lc.Environments > Unlimited || lc.Shares > Unlimited || lc.ReservedShares > Unlimited || lc.UniqueNames > Unlimited || lc.ShareFrontends > Unlimited {
+		return false
+	}
+	if lc.PeriodMinutes < 1 {
+		return false
+	}
+	if lc.RxBytes == Unlimited && lc.TxBytes == Unlimited && lc.TotalBytes == Unlimited {
+		return false
+	}
+	return true
+}
+
+func (lc LimitClass) IsScopedBandwidthClass() bool {
+	if lc.BackendMode == nil {
+		return false
+	}
+	if lc.Environments > Unlimited {
+		return false
+	}
+	if lc.PeriodMinutes < 1 {
+		return false
+	}
+	if lc.RxBytes == Unlimited && lc.TxBytes == Unlimited && lc.TotalBytes == Unlimited {
+		return false
+	}
+	return true
+}
+
 func (lc LimitClass) String() string {
 	out := "LimitClass<"
 	if lc.Label != nil && *lc.Label != "" {

@@ -72,24 +72,20 @@ func TestUserLimits_ToBandwidthArraySimple(t *testing.T) {
 	}
 }
 
-func TestAgent_ClassificationMethods(t *testing.T) {
-	a := &Agent{
-		cfg: DefaultConfig(),
-	}
-
+func TestLimitClass_ClassificationMethods(t *testing.T) {
 	t.Run("isResourceCountClass", func(t *testing.T) {
 		validRC := &store.LimitClass{
 			Model:        store.Model{Id: 1},
 			Environments: 10,
 		}
-		assert.True(t, a.isResourceCountClass(validRC))
+		assert.True(t, validRC.IsResourceCountClass())
 
 		proxyMode := sdk.ProxyBackendMode
 		invalidRC := &store.LimitClass{
 			Model:       store.Model{Id: 2},
 			BackendMode: &proxyMode,
 		}
-		assert.False(t, a.isResourceCountClass(invalidRC))
+		assert.False(t, invalidRC.IsResourceCountClass())
 	})
 
 	t.Run("isUnscopedBandwidthClass", func(t *testing.T) {
@@ -103,7 +99,7 @@ func TestAgent_ClassificationMethods(t *testing.T) {
 			UniqueNames:    store.Unlimited,
 			ShareFrontends: store.Unlimited,
 		}
-		assert.True(t, a.isUnscopedBandwidthClass(validBwc))
+		assert.True(t, validBwc.IsUnscopedBandwidthClass())
 
 		proxyMode := sdk.ProxyBackendMode
 		invalidBwc := &store.LimitClass{
@@ -112,7 +108,7 @@ func TestAgent_ClassificationMethods(t *testing.T) {
 			PeriodMinutes: 60,
 			RxBytes:       1024,
 		}
-		assert.False(t, a.isUnscopedBandwidthClass(invalidBwc))
+		assert.False(t, invalidBwc.IsUnscopedBandwidthClass())
 	})
 
 	t.Run("isScopedLimitClass", func(t *testing.T) {
@@ -128,14 +124,14 @@ func TestAgent_ClassificationMethods(t *testing.T) {
 			UniqueNames:    store.Unlimited,
 			ShareFrontends: store.Unlimited,
 		}
-		assert.True(t, a.isScopedLimitClass(validSLC))
+		assert.True(t, validSLC.IsScopedBandwidthClass())
 
 		invalidSLC := &store.LimitClass{
 			Model:         store.Model{Id: 2},
 			PeriodMinutes: 60,
 			RxBytes:       1024,
 		}
-		assert.False(t, a.isScopedLimitClass(invalidSLC))
+		assert.False(t, invalidSLC.IsScopedBandwidthClass())
 	})
 }
 
