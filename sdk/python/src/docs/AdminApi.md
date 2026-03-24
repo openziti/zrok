@@ -23,6 +23,7 @@ Method | HTTP request | Description
 [**invite_token_generate**](AdminApi.md#invite_token_generate) | **POST** /invite/token/generate | 
 [**list_frontend_namespace_mappings**](AdminApi.md#list_frontend_namespace_mappings) | **GET** /frontend/namespace/mapping/{frontendToken} | 
 [**list_frontends**](AdminApi.md#list_frontends) | **GET** /frontends | 
+[**list_limit_classes**](AdminApi.md#list_limit_classes) | **POST** /limit-class/list | 
 [**list_namespace_frontend_mappings**](AdminApi.md#list_namespace_frontend_mappings) | **GET** /namespace/frontend/mapping/{namespaceToken} | 
 [**list_namespaces**](AdminApi.md#list_namespaces) | **GET** /namespaces | 
 [**list_organization_members**](AdminApi.md#list_organization_members) | **POST** /organization/list | 
@@ -1467,6 +1468,83 @@ This endpoint does not need any parameter.
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | ok |  -  |
+**401** | unauthorized |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **list_limit_classes**
+> List[ListLimitClasses200ResponseInner] list_limit_classes(body=body)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.list_limit_classes200_response_inner import ListLimitClasses200ResponseInner
+from zrok_api.models.list_limit_classes_request import ListLimitClassesRequest
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.ListLimitClassesRequest() # ListLimitClassesRequest |  (optional)
+
+    try:
+        api_response = api_instance.list_limit_classes(body=body)
+        print("The response of AdminApi->list_limit_classes:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AdminApi->list_limit_classes: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**ListLimitClassesRequest**](ListLimitClassesRequest.md)|  | [optional] 
+
+### Return type
+
+[**List[ListLimitClasses200ResponseInner]**](ListLimitClasses200ResponseInner.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | limit classes |  -  |
 **401** | unauthorized |  -  |
 **500** | internal server error |  -  |
 

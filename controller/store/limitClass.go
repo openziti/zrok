@@ -173,3 +173,19 @@ func (str *Store) GetLimitClass(lcId int, trx *sqlx.Tx) (*LimitClass, error) {
 	}
 	return lc, nil
 }
+
+func (str *Store) FindLimitClassesByLabel(label string, trx *sqlx.Tx) ([]*LimitClass, error) {
+	rows, err := trx.Queryx("select * from limit_classes where label = $1 and not deleted", label)
+	if err != nil {
+		return nil, errors.Wrap(err, "error finding limit classes by label")
+	}
+	var lcs []*LimitClass
+	for rows.Next() {
+		lc := &LimitClass{}
+		if err := rows.StructScan(lc); err != nil {
+			return nil, errors.Wrap(err, "error scanning limit_classes")
+		}
+		lcs = append(lcs, lc)
+	}
+	return lcs, nil
+}

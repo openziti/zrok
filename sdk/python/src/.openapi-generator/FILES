@@ -41,6 +41,8 @@ docs/InviteRequest.md
 docs/InviteTokenGenerateRequest.md
 docs/ListFrontendNamespaceMappings200ResponseInner.md
 docs/ListFrontends200ResponseInner.md
+docs/ListLimitClasses200ResponseInner.md
+docs/ListLimitClassesRequest.md
 docs/ListMemberships200Response.md
 docs/ListMemberships200ResponseMembershipsInner.md
 docs/ListNamespaces200ResponseInner.md
@@ -137,6 +139,8 @@ test/test_invite_request.py
 test/test_invite_token_generate_request.py
 test/test_list_frontend_namespace_mappings200_response_inner.py
 test/test_list_frontends200_response_inner.py
+test/test_list_limit_classes200_response_inner.py
+test/test_list_limit_classes_request.py
 test/test_list_memberships200_response.py
 test/test_list_memberships200_response_memberships_inner.py
 test/test_list_namespaces200_response_inner.py
@@ -239,6 +243,8 @@ zrok_api/models/invite_request.py
 zrok_api/models/invite_token_generate_request.py
 zrok_api/models/list_frontend_namespace_mappings200_response_inner.py
 zrok_api/models/list_frontends200_response_inner.py
+zrok_api/models/list_limit_classes200_response_inner.py
+zrok_api/models/list_limit_classes_request.py
 zrok_api/models/list_memberships200_response.py
 zrok_api/models/list_memberships200_response_memberships_inner.py
 zrok_api/models/list_namespaces200_response_inner.py

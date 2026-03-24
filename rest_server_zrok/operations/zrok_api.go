@@ -327,6 +327,13 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			return middleware.NotImplemented("operation admin.ListFrontends has not yet been implemented")
 		}),
 
+		AdminListLimitClassesHandler: admin.ListLimitClassesHandlerFunc(func(params admin.ListLimitClassesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation admin.ListLimitClasses has not yet been implemented")
+		}),
+
 		MetadataListMembershipsHandler: metadata.ListMembershipsHandlerFunc(func(params metadata.ListMembershipsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			_ = params
 			_ = principal
@@ -724,6 +731,8 @@ type ZrokAPI struct {
 	AdminListFrontendNamespaceMappingsHandler admin.ListFrontendNamespaceMappingsHandler
 	// AdminListFrontendsHandler sets the operation handler for the list frontends operation
 	AdminListFrontendsHandler admin.ListFrontendsHandler
+	// AdminListLimitClassesHandler sets the operation handler for the list limit classes operation
+	AdminListLimitClassesHandler admin.ListLimitClassesHandler
 	// MetadataListMembershipsHandler sets the operation handler for the list memberships operation
 	MetadataListMembershipsHandler metadata.ListMembershipsHandler
 	// ShareListNamesForNamespaceHandler sets the operation handler for the list names for namespace operation
@@ -1002,6 +1011,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminListFrontendsHandler == nil {
 		unregistered = append(unregistered, "admin.ListFrontendsHandler")
+	}
+	if o.AdminListLimitClassesHandler == nil {
+		unregistered = append(unregistered, "admin.ListLimitClassesHandler")
 	}
 	if o.MetadataListMembershipsHandler == nil {
 		unregistered = append(unregistered, "metadata.ListMembershipsHandler")
@@ -1380,6 +1392,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/frontends"] = admin.NewListFrontends(o.context, o.AdminListFrontendsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/limit-class/list"] = admin.NewListLimitClasses(o.context, o.AdminListLimitClassesHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

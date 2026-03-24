@@ -36,6 +36,8 @@ export * from './InviteRequest';
 export * from './InviteTokenGenerateRequest';
 export * from './ListFrontendNamespaceMappings200ResponseInner';
 export * from './ListFrontends200ResponseInner';
+export * from './ListLimitClasses200ResponseInner';
+export * from './ListLimitClassesRequest';
 export * from './ListMemberships200Response';
 export * from './ListMemberships200ResponseMembershipsInner';
 export * from './ListNamespaces200ResponseInner';

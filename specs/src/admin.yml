@@ -818,3 +818,60 @@
         description: unauthorized
       500:
         description: internal server error
+
+/limit-class/list:
+  post:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: listLimitClasses
+    parameters:
+      - name: body
+        in: body
+        schema:
+          properties:
+            label:
+              type: string
+    responses:
+      200:
+        description: limit classes
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              label:
+                type: string
+              backendMode:
+                type: string
+              environments:
+                type: integer
+              shares:
+                type: integer
+              reservedShares:
+                type: integer
+              uniqueNames:
+                type: integer
+              shareFrontends:
+                type: integer
+              periodMinutes:
+                type: integer
+              rxBytes:
+                type: integer
+              txBytes:
+                type: integer
+              totalBytes:
+                type: integer
+              limitAction:
+                type: string
+              createdAt:
+                type: integer
+              updatedAt:
+                type: integer
+      401:
+        description: unauthorized
+      500:
+        description: internal server error

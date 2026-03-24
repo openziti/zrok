@@ -140,6 +140,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_list_limit_classes(self) -> None:
+        """Test case for list_limit_classes
+
+        """
+        pass
+
     def test_list_namespace_frontend_mappings(self) -> None:
         """Test case for list_namespace_frontend_mappings
 

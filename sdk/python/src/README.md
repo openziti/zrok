@@ -119,6 +119,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**invite_token_generate**](docs/AdminApi.md#invite_token_generate) | **POST** /invite/token/generate | 
 *AdminApi* | [**list_frontend_namespace_mappings**](docs/AdminApi.md#list_frontend_namespace_mappings) | **GET** /frontend/namespace/mapping/{frontendToken} | 
 *AdminApi* | [**list_frontends**](docs/AdminApi.md#list_frontends) | **GET** /frontends | 
+*AdminApi* | [**list_limit_classes**](docs/AdminApi.md#list_limit_classes) | **POST** /limit-class/list | 
 *AdminApi* | [**list_namespace_frontend_mappings**](docs/AdminApi.md#list_namespace_frontend_mappings) | **GET** /namespace/frontend/mapping/{namespaceToken} | 
 *AdminApi* | [**list_namespaces**](docs/AdminApi.md#list_namespaces) | **GET** /namespaces | 
 *AdminApi* | [**list_organization_members**](docs/AdminApi.md#list_organization_members) | **POST** /organization/list | 
@@ -212,6 +213,8 @@ Class | Method | HTTP request | Description
  - [InviteTokenGenerateRequest](docs/InviteTokenGenerateRequest.md)
  - [ListFrontendNamespaceMappings200ResponseInner](docs/ListFrontendNamespaceMappings200ResponseInner.md)
  - [ListFrontends200ResponseInner](docs/ListFrontends200ResponseInner.md)
+ - [ListLimitClasses200ResponseInner](docs/ListLimitClasses200ResponseInner.md)
+ - [ListLimitClassesRequest](docs/ListLimitClassesRequest.md)
  - [ListMemberships200Response](docs/ListMemberships200Response.md)
  - [ListMemberships200ResponseMembershipsInner](docs/ListMemberships200ResponseMembershipsInner.md)
  - [ListNamespaces200ResponseInner](docs/ListNamespaces200ResponseInner.md)
