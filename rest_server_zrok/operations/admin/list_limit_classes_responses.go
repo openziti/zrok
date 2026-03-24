@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
 
 // ListLimitClassesOKCode is the HTTP code returned for type ListLimitClassesOK
@@ -24,7 +26,7 @@ type ListLimitClassesOK struct {
 	/*
 	  In: Body
 	*/
-	Payload []*ListLimitClassesOKBodyItems0 `json:"body,omitempty"`
+	Payload []*rest_model_zrok.LimitClass `json:"body,omitempty"`
 }
 
 // NewListLimitClassesOK creates ListLimitClassesOK with default headers values
@@ -34,13 +36,13 @@ func NewListLimitClassesOK() *ListLimitClassesOK {
 }
 
 // WithPayload adds the payload to the list limit classes o k response
-func (o *ListLimitClassesOK) WithPayload(payload []*ListLimitClassesOKBodyItems0) *ListLimitClassesOK {
+func (o *ListLimitClassesOK) WithPayload(payload []*rest_model_zrok.LimitClass) *ListLimitClassesOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the list limit classes o k response
-func (o *ListLimitClassesOK) SetPayload(payload []*ListLimitClassesOKBodyItems0) {
+func (o *ListLimitClassesOK) SetPayload(payload []*rest_model_zrok.LimitClass) {
 	o.Payload = payload
 }
 
@@ -51,7 +53,7 @@ func (o *ListLimitClassesOK) WriteResponse(rw http.ResponseWriter, producer runt
 	payload := o.Payload
 	if payload == nil {
 		// return empty array
-		payload = make([]*ListLimitClassesOKBodyItems0, 0, 50)
+		payload = make([]*rest_model_zrok.LimitClass, 0, 50)
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {

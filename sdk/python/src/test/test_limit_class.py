@@ -14,10 +14,10 @@
 
 import unittest
 
-from zrok_api.models.list_limit_classes200_response_inner import ListLimitClasses200ResponseInner
+from zrok_api.models.limit_class import LimitClass
 
-class TestListLimitClasses200ResponseInner(unittest.TestCase):
-    """ListLimitClasses200ResponseInner unit test stubs"""
+class TestLimitClass(unittest.TestCase):
+    """LimitClass unit test stubs"""
 
     def setUp(self):
         pass
@@ -25,16 +25,16 @@ class TestListLimitClasses200ResponseInner(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def make_instance(self, include_optional) -> ListLimitClasses200ResponseInner:
-        """Test ListLimitClasses200ResponseInner
+    def make_instance(self, include_optional) -> LimitClass:
+        """Test LimitClass
             include_optional is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
-        # uncomment below to create an instance of `ListLimitClasses200ResponseInner`
+        # uncomment below to create an instance of `LimitClass`
         """
-        model = ListLimitClasses200ResponseInner()
+        model = LimitClass()
         if include_optional:
-            return ListLimitClasses200ResponseInner(
+            return LimitClass(
                 id = 56,
                 label = '',
                 backend_mode = '',
@@ -52,12 +52,12 @@ class TestListLimitClasses200ResponseInner(unittest.TestCase):
                 updated_at = 56
             )
         else:
-            return ListLimitClasses200ResponseInner(
+            return LimitClass(
         )
         """
 
-    def testListLimitClasses200ResponseInner(self):
-        """Test ListLimitClasses200ResponseInner"""
+    def testLimitClass(self):
+        """Test LimitClass"""
         # inst_req_only = self.make_instance(include_optional=False)
         # inst_req_and_optional = self.make_instance(include_optional=True)
 

@@ -306,6 +306,13 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			return middleware.NotImplemented("operation share.ListAllNames has not yet been implemented")
 		}),
 
+		AdminListAppliedLimitClassesHandler: admin.ListAppliedLimitClassesHandlerFunc(func(params admin.ListAppliedLimitClassesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation admin.ListAppliedLimitClasses has not yet been implemented")
+		}),
+
 		MetadataListEnvironmentsHandler: metadata.ListEnvironmentsHandlerFunc(func(params metadata.ListEnvironmentsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			_ = params
 			_ = principal
@@ -725,6 +732,8 @@ type ZrokAPI struct {
 	MetadataListAccessesHandler metadata.ListAccessesHandler
 	// ShareListAllNamesHandler sets the operation handler for the list all names operation
 	ShareListAllNamesHandler share.ListAllNamesHandler
+	// AdminListAppliedLimitClassesHandler sets the operation handler for the list applied limit classes operation
+	AdminListAppliedLimitClassesHandler admin.ListAppliedLimitClassesHandler
 	// MetadataListEnvironmentsHandler sets the operation handler for the list environments operation
 	MetadataListEnvironmentsHandler metadata.ListEnvironmentsHandler
 	// AdminListFrontendNamespaceMappingsHandler sets the operation handler for the list frontend namespace mappings operation
@@ -1002,6 +1011,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.ShareListAllNamesHandler == nil {
 		unregistered = append(unregistered, "share.ListAllNamesHandler")
+	}
+	if o.AdminListAppliedLimitClassesHandler == nil {
+		unregistered = append(unregistered, "admin.ListAppliedLimitClassesHandler")
 	}
 	if o.MetadataListEnvironmentsHandler == nil {
 		unregistered = append(unregistered, "metadata.ListEnvironmentsHandler")
@@ -1380,6 +1392,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/share/names"] = share.NewListAllNames(o.context, o.ShareListAllNamesHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/applied-limit-class/list"] = admin.NewListAppliedLimitClasses(o.context, o.AdminListAppliedLimitClassesHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

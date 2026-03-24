@@ -969,6 +969,52 @@ func init() {
         }
       }
     },
+    "/applied-limit-class/list": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "listAppliedLimitClasses",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "applied limit classes",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/limitClass"
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/changePassword": {
       "post": {
         "security": [
@@ -2025,54 +2071,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "backendMode": {
-                    "type": "string"
-                  },
-                  "createdAt": {
-                    "type": "integer"
-                  },
-                  "environments": {
-                    "type": "integer"
-                  },
-                  "id": {
-                    "type": "integer"
-                  },
-                  "label": {
-                    "type": "string"
-                  },
-                  "limitAction": {
-                    "type": "string"
-                  },
-                  "periodMinutes": {
-                    "type": "integer"
-                  },
-                  "reservedShares": {
-                    "type": "integer"
-                  },
-                  "rxBytes": {
-                    "type": "integer"
-                  },
-                  "shareFrontends": {
-                    "type": "integer"
-                  },
-                  "shares": {
-                    "type": "integer"
-                  },
-                  "totalBytes": {
-                    "type": "integer"
-                  },
-                  "txBytes": {
-                    "type": "integer"
-                  },
-                  "uniqueNames": {
-                    "type": "integer"
-                  },
-                  "updatedAt": {
-                    "type": "integer"
-                  }
-                }
+                "$ref": "#/definitions/limitClass"
               }
             }
           },
@@ -4176,6 +4175,56 @@ func init() {
         "$ref": "#/definitions/frontend"
       }
     },
+    "limitClass": {
+      "type": "object",
+      "properties": {
+        "backendMode": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "integer"
+        },
+        "environments": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "label": {
+          "type": "string"
+        },
+        "limitAction": {
+          "type": "string"
+        },
+        "periodMinutes": {
+          "type": "integer"
+        },
+        "reservedShares": {
+          "type": "integer"
+        },
+        "rxBytes": {
+          "type": "integer"
+        },
+        "shareFrontends": {
+          "type": "integer"
+        },
+        "shares": {
+          "type": "integer"
+        },
+        "totalBytes": {
+          "type": "integer"
+        },
+        "txBytes": {
+          "type": "integer"
+        },
+        "uniqueNames": {
+          "type": "integer"
+        },
+        "updatedAt": {
+          "type": "integer"
+        }
+      }
+    },
     "metrics": {
       "type": "object",
       "properties": {
@@ -5405,6 +5454,52 @@ func init() {
         }
       }
     },
+    "/applied-limit-class/list": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "listAppliedLimitClasses",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "applied limit classes",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/limitClass"
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/changePassword": {
       "post": {
         "security": [
@@ -6421,7 +6516,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/ListLimitClassesOKBodyItems0"
+                "$ref": "#/definitions/limitClass"
               }
             }
           },
@@ -8333,56 +8428,6 @@ func init() {
         }
       }
     },
-    "ListLimitClassesOKBodyItems0": {
-      "type": "object",
-      "properties": {
-        "backendMode": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "integer"
-        },
-        "environments": {
-          "type": "integer"
-        },
-        "id": {
-          "type": "integer"
-        },
-        "label": {
-          "type": "string"
-        },
-        "limitAction": {
-          "type": "string"
-        },
-        "periodMinutes": {
-          "type": "integer"
-        },
-        "reservedShares": {
-          "type": "integer"
-        },
-        "rxBytes": {
-          "type": "integer"
-        },
-        "shareFrontends": {
-          "type": "integer"
-        },
-        "shares": {
-          "type": "integer"
-        },
-        "totalBytes": {
-          "type": "integer"
-        },
-        "txBytes": {
-          "type": "integer"
-        },
-        "uniqueNames": {
-          "type": "integer"
-        },
-        "updatedAt": {
-          "type": "integer"
-        }
-      }
-    },
     "ListNamespaceFrontendMappingsOKBodyItems0": {
       "type": "object",
       "properties": {
@@ -8787,6 +8832,56 @@ func init() {
       "type": "array",
       "items": {
         "$ref": "#/definitions/frontend"
+      }
+    },
+    "limitClass": {
+      "type": "object",
+      "properties": {
+        "backendMode": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "integer"
+        },
+        "environments": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "label": {
+          "type": "string"
+        },
+        "limitAction": {
+          "type": "string"
+        },
+        "periodMinutes": {
+          "type": "integer"
+        },
+        "reservedShares": {
+          "type": "integer"
+        },
+        "rxBytes": {
+          "type": "integer"
+        },
+        "shareFrontends": {
+          "type": "integer"
+        },
+        "shares": {
+          "type": "integer"
+        },
+        "totalBytes": {
+          "type": "integer"
+        },
+        "txBytes": {
+          "type": "integer"
+        },
+        "uniqueNames": {
+          "type": "integer"
+        },
+        "updatedAt": {
+          "type": "integer"
+        }
       }
     },
     "metrics": {

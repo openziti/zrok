@@ -16,113 +16,113 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface ListLimitClasses200ResponseInner
+ * @interface LimitClass
  */
-export interface ListLimitClasses200ResponseInner {
+export interface LimitClass {
     /**
      * 
      * @type {number}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     id?: number;
     /**
      * 
      * @type {string}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     label?: string;
     /**
      * 
      * @type {string}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     backendMode?: string;
     /**
      * 
      * @type {number}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     environments?: number;
     /**
      * 
      * @type {number}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     shares?: number;
     /**
      * 
      * @type {number}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     reservedShares?: number;
     /**
      * 
      * @type {number}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     uniqueNames?: number;
     /**
      * 
      * @type {number}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     shareFrontends?: number;
     /**
      * 
      * @type {number}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     periodMinutes?: number;
     /**
      * 
      * @type {number}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     rxBytes?: number;
     /**
      * 
      * @type {number}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     txBytes?: number;
     /**
      * 
      * @type {number}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     totalBytes?: number;
     /**
      * 
      * @type {string}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     limitAction?: string;
     /**
      * 
      * @type {number}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     createdAt?: number;
     /**
      * 
      * @type {number}
-     * @memberof ListLimitClasses200ResponseInner
+     * @memberof LimitClass
      */
     updatedAt?: number;
 }
 
 /**
- * Check if a given object implements the ListLimitClasses200ResponseInner interface.
+ * Check if a given object implements the LimitClass interface.
  */
-export function instanceOfListLimitClasses200ResponseInner(value: object): value is ListLimitClasses200ResponseInner {
+export function instanceOfLimitClass(value: object): value is LimitClass {
     return true;
 }
 
-export function ListLimitClasses200ResponseInnerFromJSON(json: any): ListLimitClasses200ResponseInner {
-    return ListLimitClasses200ResponseInnerFromJSONTyped(json, false);
+export function LimitClassFromJSON(json: any): LimitClass {
+    return LimitClassFromJSONTyped(json, false);
 }
 
-export function ListLimitClasses200ResponseInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): ListLimitClasses200ResponseInner {
+export function LimitClassFromJSONTyped(json: any, ignoreDiscriminator: boolean): LimitClass {
     if (json == null) {
         return json;
     }
@@ -146,11 +146,11 @@ export function ListLimitClasses200ResponseInnerFromJSONTyped(json: any, ignoreD
     };
 }
 
-export function ListLimitClasses200ResponseInnerToJSON(json: any): ListLimitClasses200ResponseInner {
-    return ListLimitClasses200ResponseInnerToJSONTyped(json, false);
+export function LimitClassToJSON(json: any): LimitClass {
+    return LimitClassToJSONTyped(json, false);
 }
 
-export function ListLimitClasses200ResponseInnerToJSONTyped(value?: ListLimitClasses200ResponseInner | null, ignoreDiscriminator: boolean = false): any {
+export function LimitClassToJSONTyped(value?: LimitClass | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

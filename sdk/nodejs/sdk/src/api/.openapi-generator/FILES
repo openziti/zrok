@@ -41,9 +41,9 @@ models/GetSparklines200Response.ts
 models/GetSparklinesRequest.ts
 models/InviteRequest.ts
 models/InviteTokenGenerateRequest.ts
+models/LimitClass.ts
 models/ListFrontendNamespaceMappings200ResponseInner.ts
 models/ListFrontends200ResponseInner.ts
-models/ListLimitClasses200ResponseInner.ts
 models/ListLimitClassesRequest.ts
 models/ListMemberships200Response.ts
 models/ListMemberships200ResponseMembershipsInner.ts

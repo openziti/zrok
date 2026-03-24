@@ -1063,40 +1063,37 @@ paths:
           schema:
             type: array
             items:
-              type: object
-              properties:
-                id:
-                  type: integer
-                label:
-                  type: string
-                backendMode:
-                  type: string
-                environments:
-                  type: integer
-                shares:
-                  type: integer
-                reservedShares:
-                  type: integer
-                uniqueNames:
-                  type: integer
-                shareFrontends:
-                  type: integer
-                periodMinutes:
-                  type: integer
-                rxBytes:
-                  type: integer
-                txBytes:
-                  type: integer
-                totalBytes:
-                  type: integer
-                limitAction:
-                  type: string
-                createdAt:
-                  type: integer
-                updatedAt:
-                  type: integer
+              $ref: "#/definitions/limitClass"
         401:
           description: unauthorized
+        500:
+          description: internal server error
+  
+  /applied-limit-class/list:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: listAppliedLimitClasses
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              email:
+                type: string
+      responses:
+        200:
+          description: applied limit classes
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/limitClass"
+        401:
+          description: unauthorized
+        404:
+          description: account not found
         500:
           description: internal server error
   #
@@ -2632,6 +2629,40 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/frontend"
+  
+  limitClass:
+    type: object
+    properties:
+      id:
+        type: integer
+      label:
+        type: string
+      backendMode:
+        type: string
+      environments:
+        type: integer
+      shares:
+        type: integer
+      reservedShares:
+        type: integer
+      uniqueNames:
+        type: integer
+      shareFrontends:
+        type: integer
+      periodMinutes:
+        type: integer
+      rxBytes:
+        type: integer
+      txBytes:
+        type: integer
+      totalBytes:
+        type: integer
+      limitAction:
+        type: string
+      createdAt:
+        type: integer
+      updatedAt:
+        type: integer
   
   metrics:
     type: object

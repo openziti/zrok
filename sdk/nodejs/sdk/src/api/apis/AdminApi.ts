@@ -29,9 +29,9 @@ import type {
   CreateOrganizationRequest,
   DeleteIdentityRequest,
   InviteTokenGenerateRequest,
+  LimitClass,
   ListFrontendNamespaceMappings200ResponseInner,
   ListFrontends200ResponseInner,
-  ListLimitClasses200ResponseInner,
   ListLimitClassesRequest,
   ListNamespaces200ResponseInner,
   ListOrganizationMembers200Response,
@@ -73,12 +73,12 @@ import {
     DeleteIdentityRequestToJSON,
     InviteTokenGenerateRequestFromJSON,
     InviteTokenGenerateRequestToJSON,
+    LimitClassFromJSON,
+    LimitClassToJSON,
     ListFrontendNamespaceMappings200ResponseInnerFromJSON,
     ListFrontendNamespaceMappings200ResponseInnerToJSON,
     ListFrontends200ResponseInnerFromJSON,
     ListFrontends200ResponseInnerToJSON,
-    ListLimitClasses200ResponseInnerFromJSON,
-    ListLimitClasses200ResponseInnerToJSON,
     ListLimitClassesRequestFromJSON,
     ListLimitClassesRequestToJSON,
     ListNamespaces200ResponseInnerFromJSON,
@@ -169,6 +169,10 @@ export interface GrantsRequest {
 
 export interface InviteTokenGenerateOperationRequest {
     body?: InviteTokenGenerateRequest;
+}
+
+export interface ListAppliedLimitClassesRequest {
+    body?: Verify200Response;
 }
 
 export interface ListFrontendNamespaceMappingsRequest {
@@ -784,6 +788,40 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
+    async listAppliedLimitClassesRaw(requestParameters: ListAppliedLimitClassesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<LimitClass>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/applied-limit-class/list`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: Verify200ResponseToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(LimitClassFromJSON));
+    }
+
+    /**
+     */
+    async listAppliedLimitClasses(requestParameters: ListAppliedLimitClassesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<LimitClass>> {
+        const response = await this.listAppliedLimitClassesRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async listFrontendNamespaceMappingsRaw(requestParameters: ListFrontendNamespaceMappingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ListFrontendNamespaceMappings200ResponseInner>>> {
         if (requestParameters['frontendToken'] == null) {
             throw new runtime.RequiredError(
@@ -854,7 +892,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async listLimitClassesRaw(requestParameters: ListLimitClassesOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ListLimitClasses200ResponseInner>>> {
+    async listLimitClassesRaw(requestParameters: ListLimitClassesOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<LimitClass>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -876,12 +914,12 @@ export class AdminApi extends runtime.BaseAPI {
             body: ListLimitClassesRequestToJSON(requestParameters['body']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ListLimitClasses200ResponseInnerFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(LimitClassFromJSON));
     }
 
     /**
      */
-    async listLimitClasses(requestParameters: ListLimitClassesOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ListLimitClasses200ResponseInner>> {
+    async listLimitClasses(requestParameters: ListLimitClassesOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<LimitClass>> {
         const response = await this.listLimitClassesRaw(requestParameters, initOverrides);
         return await response.value();
     }

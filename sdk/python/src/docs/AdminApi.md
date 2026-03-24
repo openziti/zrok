@@ -21,6 +21,7 @@ Method | HTTP request | Description
 [**delete_organization**](AdminApi.md#delete_organization) | **DELETE** /organization | 
 [**grants**](AdminApi.md#grants) | **POST** /grants | 
 [**invite_token_generate**](AdminApi.md#invite_token_generate) | **POST** /invite/token/generate | 
+[**list_applied_limit_classes**](AdminApi.md#list_applied_limit_classes) | **POST** /applied-limit-class/list | 
 [**list_frontend_namespace_mappings**](AdminApi.md#list_frontend_namespace_mappings) | **GET** /frontend/namespace/mapping/{frontendToken} | 
 [**list_frontends**](AdminApi.md#list_frontends) | **GET** /frontends | 
 [**list_limit_classes**](AdminApi.md#list_limit_classes) | **POST** /limit-class/list | 
@@ -1324,6 +1325,84 @@ void (empty response body)
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **list_applied_limit_classes**
+> List[LimitClass] list_applied_limit_classes(body=body)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.limit_class import LimitClass
+from zrok_api.models.verify200_response import Verify200Response
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    body = zrok_api.Verify200Response() # Verify200Response |  (optional)
+
+    try:
+        api_response = api_instance.list_applied_limit_classes(body=body)
+        print("The response of AdminApi->list_applied_limit_classes:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AdminApi->list_applied_limit_classes: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**Verify200Response**](Verify200Response.md)|  | [optional] 
+
+### Return type
+
+[**List[LimitClass]**](LimitClass.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: application/zrok.v1+json
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | applied limit classes |  -  |
+**401** | unauthorized |  -  |
+**404** | account not found |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **list_frontend_namespace_mappings**
 > List[ListFrontendNamespaceMappings200ResponseInner] list_frontend_namespace_mappings(frontend_token)
 
@@ -1474,7 +1553,7 @@ This endpoint does not need any parameter.
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_limit_classes**
-> List[ListLimitClasses200ResponseInner] list_limit_classes(body=body)
+> List[LimitClass] list_limit_classes(body=body)
 
 ### Example
 
@@ -1482,7 +1561,7 @@ This endpoint does not need any parameter.
 
 ```python
 import zrok_api
-from zrok_api.models.list_limit_classes200_response_inner import ListLimitClasses200ResponseInner
+from zrok_api.models.limit_class import LimitClass
 from zrok_api.models.list_limit_classes_request import ListLimitClassesRequest
 from zrok_api.rest import ApiException
 from pprint import pprint
@@ -1529,7 +1608,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**List[ListLimitClasses200ResponseInner]**](ListLimitClasses200ResponseInner.md)
+[**List[LimitClass]**](LimitClass.md)
 
 ### Authorization
 

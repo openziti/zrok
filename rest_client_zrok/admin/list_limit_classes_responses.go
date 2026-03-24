@@ -15,6 +15,8 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+
+	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
 
 // ListLimitClassesReader is a Reader for the ListLimitClasses structure.
@@ -59,7 +61,7 @@ ListLimitClassesOK describes a response with status code 200, with default heade
 limit classes
 */
 type ListLimitClassesOK struct {
-	Payload []*ListLimitClassesOKBodyItems0
+	Payload []*rest_model_zrok.LimitClass
 }
 
 // IsSuccess returns true when this list limit classes o k response has a 2xx status code
@@ -102,7 +104,7 @@ func (o *ListLimitClassesOK) String() string {
 	return fmt.Sprintf("[POST /limit-class/list][%d] listLimitClassesOK %s", 200, payload)
 }
 
-func (o *ListLimitClassesOK) GetPayload() []*ListLimitClassesOKBodyItems0 {
+func (o *ListLimitClassesOK) GetPayload() []*rest_model_zrok.LimitClass {
 	return o.Payload
 }
 
@@ -259,86 +261,6 @@ func (o *ListLimitClassesBody) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (o *ListLimitClassesBody) UnmarshalBinary(b []byte) error {
 	var res ListLimitClassesBody
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*o = res
-	return nil
-}
-
-/*
-ListLimitClassesOKBodyItems0 list limit classes o k body items0
-swagger:model ListLimitClassesOKBodyItems0
-*/
-type ListLimitClassesOKBodyItems0 struct {
-
-	// backend mode
-	BackendMode string `json:"backendMode,omitempty"`
-
-	// created at
-	CreatedAt int64 `json:"createdAt,omitempty"`
-
-	// environments
-	Environments int64 `json:"environments,omitempty"`
-
-	// id
-	ID int64 `json:"id,omitempty"`
-
-	// label
-	Label string `json:"label,omitempty"`
-
-	// limit action
-	LimitAction string `json:"limitAction,omitempty"`
-
-	// period minutes
-	PeriodMinutes int64 `json:"periodMinutes,omitempty"`
-
-	// reserved shares
-	ReservedShares int64 `json:"reservedShares,omitempty"`
-
-	// rx bytes
-	RxBytes int64 `json:"rxBytes,omitempty"`
-
-	// share frontends
-	ShareFrontends int64 `json:"shareFrontends,omitempty"`
-
-	// shares
-	Shares int64 `json:"shares,omitempty"`
-
-	// total bytes
-	TotalBytes int64 `json:"totalBytes,omitempty"`
-
-	// tx bytes
-	TxBytes int64 `json:"txBytes,omitempty"`
-
-	// unique names
-	UniqueNames int64 `json:"uniqueNames,omitempty"`
-
-	// updated at
-	UpdatedAt int64 `json:"updatedAt,omitempty"`
-}
-
-// Validate validates this list limit classes o k body items0
-func (o *ListLimitClassesOKBodyItems0) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this list limit classes o k body items0 based on context it is used
-func (o *ListLimitClassesOKBodyItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (o *ListLimitClassesOKBodyItems0) MarshalBinary() ([]byte, error) {
-	if o == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(o)
-}
-
-// UnmarshalBinary interface implementation
-func (o *ListLimitClassesOKBodyItems0) UnmarshalBinary(b []byte) error {
-	var res ListLimitClassesOKBodyItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

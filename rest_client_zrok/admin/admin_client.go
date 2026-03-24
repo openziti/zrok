@@ -134,6 +134,8 @@ type ClientService interface {
 
 	InviteTokenGenerate(params *InviteTokenGenerateParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*InviteTokenGenerateCreated, error)
 
+	ListAppliedLimitClasses(params *ListAppliedLimitClassesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListAppliedLimitClassesOK, error)
+
 	ListFrontendNamespaceMappings(params *ListFrontendNamespaceMappingsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListFrontendNamespaceMappingsOK, error)
 
 	ListFrontends(params *ListFrontendsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListFrontendsOK, error)
@@ -908,6 +910,50 @@ func (a *Client) InviteTokenGenerate(params *InviteTokenGenerateParams, authInfo
 	//
 	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for inviteTokenGenerate: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+ListAppliedLimitClasses list applied limit classes API
+*/
+func (a *Client) ListAppliedLimitClasses(params *ListAppliedLimitClassesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListAppliedLimitClassesOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewListAppliedLimitClassesParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "listAppliedLimitClasses",
+		Method:             "POST",
+		PathPattern:        "/applied-limit-class/list",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ListAppliedLimitClassesReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*ListAppliedLimitClassesOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listAppliedLimitClasses: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
