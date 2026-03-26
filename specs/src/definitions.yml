@@ -187,6 +187,40 @@ frontends:
   items:
     $ref: "#/definitions/frontend"
 
+limitClass:
+  type: object
+  properties:
+    id:
+      type: integer
+    label:
+      type: string
+    backendMode:
+      type: string
+    environments:
+      type: integer
+    shares:
+      type: integer
+    reservedShares:
+      type: integer
+    uniqueNames:
+      type: integer
+    shareFrontends:
+      type: integer
+    periodMinutes:
+      type: integer
+    rxBytes:
+      type: integer
+    txBytes:
+      type: integer
+    totalBytes:
+      type: integer
+    limitAction:
+      type: string
+    createdAt:
+      type: integer
+    updatedAt:
+      type: integer
+
 metrics:
   type: object
   properties:

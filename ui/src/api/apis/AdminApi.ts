@@ -19,6 +19,7 @@ import type {
   AddNamespaceFrontendMappingRequest,
   AddNamespaceGrantRequest,
   AddOrganizationMemberRequest,
+  ApplyLimitClassesRequest,
   CreateFrontend201Response,
   CreateFrontendRequest,
   CreateIdentity201Response,
@@ -28,9 +29,12 @@ import type {
   CreateOrganization201Response,
   CreateOrganizationRequest,
   DeleteIdentityRequest,
+  GetSkipInterstitialGrant200Response,
   InviteTokenGenerateRequest,
+  LimitClass,
   ListFrontendNamespaceMappings200ResponseInner,
   ListFrontends200ResponseInner,
+  ListLimitClassesRequest,
   ListNamespaces200ResponseInner,
   ListOrganizationMembers200Response,
   ListOrganizations200Response,
@@ -51,6 +55,8 @@ import {
     AddNamespaceGrantRequestToJSON,
     AddOrganizationMemberRequestFromJSON,
     AddOrganizationMemberRequestToJSON,
+    ApplyLimitClassesRequestFromJSON,
+    ApplyLimitClassesRequestToJSON,
     CreateFrontend201ResponseFromJSON,
     CreateFrontend201ResponseToJSON,
     CreateFrontendRequestFromJSON,
@@ -69,12 +75,18 @@ import {
     CreateOrganizationRequestToJSON,
     DeleteIdentityRequestFromJSON,
     DeleteIdentityRequestToJSON,
+    GetSkipInterstitialGrant200ResponseFromJSON,
+    GetSkipInterstitialGrant200ResponseToJSON,
     InviteTokenGenerateRequestFromJSON,
     InviteTokenGenerateRequestToJSON,
+    LimitClassFromJSON,
+    LimitClassToJSON,
     ListFrontendNamespaceMappings200ResponseInnerFromJSON,
     ListFrontendNamespaceMappings200ResponseInnerToJSON,
     ListFrontends200ResponseInnerFromJSON,
     ListFrontends200ResponseInnerToJSON,
+    ListLimitClassesRequestFromJSON,
+    ListLimitClassesRequestToJSON,
     ListNamespaces200ResponseInnerFromJSON,
     ListNamespaces200ResponseInnerToJSON,
     ListOrganizationMembers200ResponseFromJSON,
@@ -111,6 +123,10 @@ export interface AddNamespaceGrantOperationRequest {
 
 export interface AddOrganizationMemberOperationRequest {
     body?: AddOrganizationMemberRequest;
+}
+
+export interface ApplyLimitClassesOperationRequest {
+    body?: ApplyLimitClassesRequest;
 }
 
 export interface CreateAccountRequest {
@@ -157,7 +173,11 @@ export interface DeleteOrganizationRequest {
     body?: CreateOrganization201Response;
 }
 
-export interface GrantsRequest {
+export interface GetSkipInterstitialGrantRequest {
+    email: string;
+}
+
+export interface GrantSkipInterstitialRequest {
     body?: Verify200Response;
 }
 
@@ -165,8 +185,16 @@ export interface InviteTokenGenerateOperationRequest {
     body?: InviteTokenGenerateRequest;
 }
 
+export interface ListAppliedLimitClassesRequest {
+    body?: Verify200Response;
+}
+
 export interface ListFrontendNamespaceMappingsRequest {
     frontendToken: string;
+}
+
+export interface ListLimitClassesOperationRequest {
+    body?: ListLimitClassesRequest;
 }
 
 export interface ListNamespaceFrontendMappingsRequest {
@@ -175,6 +203,10 @@ export interface ListNamespaceFrontendMappingsRequest {
 
 export interface ListOrganizationMembersRequest {
     body?: CreateOrganization201Response;
+}
+
+export interface RemoveAppliedLimitClassesRequest {
+    body?: ApplyLimitClassesRequest;
 }
 
 export interface RemoveNamespaceFrontendMappingOperationRequest {
@@ -187,6 +219,10 @@ export interface RemoveNamespaceGrantRequest {
 
 export interface RemoveOrganizationMemberOperationRequest {
     body?: RemoveOrganizationMemberRequest;
+}
+
+export interface RevokeSkipInterstitialRequest {
+    body?: Verify200Response;
 }
 
 export interface UpdateAccountPasswordRequest {
@@ -336,6 +372,39 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async addOrganizationMember(requestParameters: AddOrganizationMemberOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.addOrganizationMemberRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async applyLimitClassesRaw(requestParameters: ApplyLimitClassesOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/applied-limit-class`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ApplyLimitClassesRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async applyLimitClasses(requestParameters: ApplyLimitClassesOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.applyLimitClassesRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -708,7 +777,49 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async grantsRaw(requestParameters: GrantsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getSkipInterstitialGrantRaw(requestParameters: GetSkipInterstitialGrantRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetSkipInterstitialGrant200Response>> {
+        if (requestParameters['email'] == null) {
+            throw new runtime.RequiredError(
+                'email',
+                'Required parameter "email" was null or undefined when calling getSkipInterstitialGrant().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['email'] != null) {
+            queryParameters['email'] = requestParameters['email'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/skip-interstitial-grant`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => GetSkipInterstitialGrant200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getSkipInterstitialGrant(requestParameters: GetSkipInterstitialGrantRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetSkipInterstitialGrant200Response> {
+        const response = await this.getSkipInterstitialGrantRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async grantSkipInterstitialRaw(requestParameters: GrantSkipInterstitialRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -720,7 +831,7 @@ export class AdminApi extends runtime.BaseAPI {
         }
 
 
-        let urlPath = `/grants`;
+        let urlPath = `/skip-interstitial-grant`;
 
         const response = await this.request({
             path: urlPath,
@@ -735,8 +846,8 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async grants(requestParameters: GrantsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.grantsRaw(requestParameters, initOverrides);
+    async grantSkipInterstitial(requestParameters: GrantSkipInterstitialRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.grantSkipInterstitialRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -770,6 +881,40 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async inviteTokenGenerate(requestParameters: InviteTokenGenerateOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.inviteTokenGenerateRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async listAppliedLimitClassesRaw(requestParameters: ListAppliedLimitClassesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<LimitClass>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/applied-limit-class/list`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: Verify200ResponseToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(LimitClassFromJSON));
+    }
+
+    /**
+     */
+    async listAppliedLimitClasses(requestParameters: ListAppliedLimitClassesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<LimitClass>> {
+        const response = await this.listAppliedLimitClassesRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -839,6 +984,40 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async listFrontends(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ListFrontends200ResponseInner>> {
         const response = await this.listFrontendsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async listLimitClassesRaw(requestParameters: ListLimitClassesOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<LimitClass>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/limit-class/list`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ListLimitClassesRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(LimitClassFromJSON));
+    }
+
+    /**
+     */
+    async listLimitClasses(requestParameters: ListLimitClassesOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<LimitClass>> {
+        const response = await this.listLimitClassesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -979,6 +1158,39 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
+    async removeAppliedLimitClassesRaw(requestParameters: RemoveAppliedLimitClassesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/applied-limit-class`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ApplyLimitClassesRequestToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async removeAppliedLimitClasses(requestParameters: RemoveAppliedLimitClassesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.removeAppliedLimitClassesRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
     async removeNamespaceFrontendMappingRaw(requestParameters: RemoveNamespaceFrontendMappingOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
@@ -1074,6 +1286,39 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async removeOrganizationMember(requestParameters: RemoveOrganizationMemberOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.removeOrganizationMemberRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async revokeSkipInterstitialRaw(requestParameters: RevokeSkipInterstitialRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/zrok.v1+json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/skip-interstitial-grant`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+            body: Verify200ResponseToJSON(requestParameters['body']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async revokeSkipInterstitial(requestParameters: RevokeSkipInterstitialRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.revokeSkipInterstitialRaw(requestParameters, initOverrides);
     }
 
     /**

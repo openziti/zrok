@@ -104,6 +104,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**add_namespace_frontend_mapping**](docs/AdminApi.md#add_namespace_frontend_mapping) | **POST** /namespace/frontend/mapping | 
 *AdminApi* | [**add_namespace_grant**](docs/AdminApi.md#add_namespace_grant) | **POST** /namespace/grant | 
 *AdminApi* | [**add_organization_member**](docs/AdminApi.md#add_organization_member) | **POST** /organization/add | 
+*AdminApi* | [**apply_limit_classes**](docs/AdminApi.md#apply_limit_classes) | **POST** /applied-limit-class | 
 *AdminApi* | [**create_account**](docs/AdminApi.md#create_account) | **POST** /account | 
 *AdminApi* | [**create_frontend**](docs/AdminApi.md#create_frontend) | **POST** /frontend | 
 *AdminApi* | [**create_identity**](docs/AdminApi.md#create_identity) | **POST** /identity | 
@@ -115,17 +116,22 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**delete_identity**](docs/AdminApi.md#delete_identity) | **DELETE** /identity | 
 *AdminApi* | [**delete_namespace**](docs/AdminApi.md#delete_namespace) | **DELETE** /namespace | 
 *AdminApi* | [**delete_organization**](docs/AdminApi.md#delete_organization) | **DELETE** /organization | 
-*AdminApi* | [**grants**](docs/AdminApi.md#grants) | **POST** /grants | 
+*AdminApi* | [**get_skip_interstitial_grant**](docs/AdminApi.md#get_skip_interstitial_grant) | **GET** /skip-interstitial-grant | 
+*AdminApi* | [**grant_skip_interstitial**](docs/AdminApi.md#grant_skip_interstitial) | **POST** /skip-interstitial-grant | 
 *AdminApi* | [**invite_token_generate**](docs/AdminApi.md#invite_token_generate) | **POST** /invite/token/generate | 
+*AdminApi* | [**list_applied_limit_classes**](docs/AdminApi.md#list_applied_limit_classes) | **POST** /applied-limit-class/list | 
 *AdminApi* | [**list_frontend_namespace_mappings**](docs/AdminApi.md#list_frontend_namespace_mappings) | **GET** /frontend/namespace/mapping/{frontendToken} | 
 *AdminApi* | [**list_frontends**](docs/AdminApi.md#list_frontends) | **GET** /frontends | 
+*AdminApi* | [**list_limit_classes**](docs/AdminApi.md#list_limit_classes) | **POST** /limit-class/list | 
 *AdminApi* | [**list_namespace_frontend_mappings**](docs/AdminApi.md#list_namespace_frontend_mappings) | **GET** /namespace/frontend/mapping/{namespaceToken} | 
 *AdminApi* | [**list_namespaces**](docs/AdminApi.md#list_namespaces) | **GET** /namespaces | 
 *AdminApi* | [**list_organization_members**](docs/AdminApi.md#list_organization_members) | **POST** /organization/list | 
 *AdminApi* | [**list_organizations**](docs/AdminApi.md#list_organizations) | **GET** /organizations | 
+*AdminApi* | [**remove_applied_limit_classes**](docs/AdminApi.md#remove_applied_limit_classes) | **DELETE** /applied-limit-class | 
 *AdminApi* | [**remove_namespace_frontend_mapping**](docs/AdminApi.md#remove_namespace_frontend_mapping) | **DELETE** /namespace/frontend/mapping | 
 *AdminApi* | [**remove_namespace_grant**](docs/AdminApi.md#remove_namespace_grant) | **DELETE** /namespace/grant | 
 *AdminApi* | [**remove_organization_member**](docs/AdminApi.md#remove_organization_member) | **POST** /organization/remove | 
+*AdminApi* | [**revoke_skip_interstitial**](docs/AdminApi.md#revoke_skip_interstitial) | **DELETE** /skip-interstitial-grant | 
 *AdminApi* | [**update_account_password**](docs/AdminApi.md#update_account_password) | **PATCH** /account | 
 *AdminApi* | [**update_frontend**](docs/AdminApi.md#update_frontend) | **PATCH** /frontend | 
 *AdminApi* | [**update_namespace**](docs/AdminApi.md#update_namespace) | **PATCH** /namespace | 
@@ -183,6 +189,7 @@ Class | Method | HTTP request | Description
  - [AddNamespaceFrontendMappingRequest](docs/AddNamespaceFrontendMappingRequest.md)
  - [AddNamespaceGrantRequest](docs/AddNamespaceGrantRequest.md)
  - [AddOrganizationMemberRequest](docs/AddOrganizationMemberRequest.md)
+ - [ApplyLimitClassesRequest](docs/ApplyLimitClassesRequest.md)
  - [AuthUser](docs/AuthUser.md)
  - [ChangePasswordRequest](docs/ChangePasswordRequest.md)
  - [ClientVersionCheckRequest](docs/ClientVersionCheckRequest.md)
@@ -206,12 +213,15 @@ Class | Method | HTTP request | Description
  - [EnvironmentSummary](docs/EnvironmentSummary.md)
  - [EnvironmentsList](docs/EnvironmentsList.md)
  - [Frontend](docs/Frontend.md)
+ - [GetSkipInterstitialGrant200Response](docs/GetSkipInterstitialGrant200Response.md)
  - [GetSparklines200Response](docs/GetSparklines200Response.md)
  - [GetSparklinesRequest](docs/GetSparklinesRequest.md)
  - [InviteRequest](docs/InviteRequest.md)
  - [InviteTokenGenerateRequest](docs/InviteTokenGenerateRequest.md)
+ - [LimitClass](docs/LimitClass.md)
  - [ListFrontendNamespaceMappings200ResponseInner](docs/ListFrontendNamespaceMappings200ResponseInner.md)
  - [ListFrontends200ResponseInner](docs/ListFrontends200ResponseInner.md)
+ - [ListLimitClassesRequest](docs/ListLimitClassesRequest.md)
  - [ListMemberships200Response](docs/ListMemberships200Response.md)
  - [ListMemberships200ResponseMembershipsInner](docs/ListMemberships200ResponseMembershipsInner.md)
  - [ListNamespaces200ResponseInner](docs/ListNamespaces200ResponseInner.md)

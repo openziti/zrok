@@ -50,6 +50,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_apply_limit_classes(self) -> None:
+        """Test case for apply_limit_classes
+
+        """
+        pass
+
     def test_create_account(self) -> None:
         """Test case for create_account
 
@@ -116,14 +122,26 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
-    def test_grants(self) -> None:
-        """Test case for grants
+    def test_get_skip_interstitial_grant(self) -> None:
+        """Test case for get_skip_interstitial_grant
+
+        """
+        pass
+
+    def test_grant_skip_interstitial(self) -> None:
+        """Test case for grant_skip_interstitial
 
         """
         pass
 
     def test_invite_token_generate(self) -> None:
         """Test case for invite_token_generate
+
+        """
+        pass
+
+    def test_list_applied_limit_classes(self) -> None:
+        """Test case for list_applied_limit_classes
 
         """
         pass
@@ -136,6 +154,12 @@ class TestAdminApi(unittest.TestCase):
 
     def test_list_frontends(self) -> None:
         """Test case for list_frontends
+
+        """
+        pass
+
+    def test_list_limit_classes(self) -> None:
+        """Test case for list_limit_classes
 
         """
         pass
@@ -164,6 +188,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_remove_applied_limit_classes(self) -> None:
+        """Test case for remove_applied_limit_classes
+
+        """
+        pass
+
     def test_remove_namespace_frontend_mapping(self) -> None:
         """Test case for remove_namespace_frontend_mapping
 
@@ -178,6 +208,12 @@ class TestAdminApi(unittest.TestCase):
 
     def test_remove_organization_member(self) -> None:
         """Test case for remove_organization_member
+
+        """
+        pass
+
+    def test_revoke_skip_interstitial(self) -> None:
+        """Test case for revoke_skip_interstitial
 
         """
         pass

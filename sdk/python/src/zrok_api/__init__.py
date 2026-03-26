@@ -41,6 +41,7 @@ __all__ = [
     "AddNamespaceFrontendMappingRequest",
     "AddNamespaceGrantRequest",
     "AddOrganizationMemberRequest",
+    "ApplyLimitClassesRequest",
     "AuthUser",
     "ChangePasswordRequest",
     "ClientVersionCheckRequest",
@@ -64,12 +65,15 @@ __all__ = [
     "EnvironmentSummary",
     "EnvironmentsList",
     "Frontend",
+    "GetSkipInterstitialGrant200Response",
     "GetSparklines200Response",
     "GetSparklinesRequest",
     "InviteRequest",
     "InviteTokenGenerateRequest",
+    "LimitClass",
     "ListFrontendNamespaceMappings200ResponseInner",
     "ListFrontends200ResponseInner",
+    "ListLimitClassesRequest",
     "ListMemberships200Response",
     "ListMemberships200ResponseMembershipsInner",
     "ListNamespaces200ResponseInner",
@@ -150,6 +154,7 @@ from zrok_api.models.add_frontend_grant_request import AddFrontendGrantRequest a
 from zrok_api.models.add_namespace_frontend_mapping_request import AddNamespaceFrontendMappingRequest as AddNamespaceFrontendMappingRequest
 from zrok_api.models.add_namespace_grant_request import AddNamespaceGrantRequest as AddNamespaceGrantRequest
 from zrok_api.models.add_organization_member_request import AddOrganizationMemberRequest as AddOrganizationMemberRequest
+from zrok_api.models.apply_limit_classes_request import ApplyLimitClassesRequest as ApplyLimitClassesRequest
 from zrok_api.models.auth_user import AuthUser as AuthUser
 from zrok_api.models.change_password_request import ChangePasswordRequest as ChangePasswordRequest
 from zrok_api.models.client_version_check_request import ClientVersionCheckRequest as ClientVersionCheckRequest
@@ -173,12 +178,15 @@ from zrok_api.models.environment_and_resources import EnvironmentAndResources as
 from zrok_api.models.environment_summary import EnvironmentSummary as EnvironmentSummary
 from zrok_api.models.environments_list import EnvironmentsList as EnvironmentsList
 from zrok_api.models.frontend import Frontend as Frontend
+from zrok_api.models.get_skip_interstitial_grant200_response import GetSkipInterstitialGrant200Response as GetSkipInterstitialGrant200Response
 from zrok_api.models.get_sparklines200_response import GetSparklines200Response as GetSparklines200Response
 from zrok_api.models.get_sparklines_request import GetSparklinesRequest as GetSparklinesRequest
 from zrok_api.models.invite_request import InviteRequest as InviteRequest
 from zrok_api.models.invite_token_generate_request import InviteTokenGenerateRequest as InviteTokenGenerateRequest
+from zrok_api.models.limit_class import LimitClass as LimitClass
 from zrok_api.models.list_frontend_namespace_mappings200_response_inner import ListFrontendNamespaceMappings200ResponseInner as ListFrontendNamespaceMappings200ResponseInner
 from zrok_api.models.list_frontends200_response_inner import ListFrontends200ResponseInner as ListFrontends200ResponseInner
+from zrok_api.models.list_limit_classes_request import ListLimitClassesRequest as ListLimitClassesRequest
 from zrok_api.models.list_memberships200_response import ListMemberships200Response as ListMemberships200Response
 from zrok_api.models.list_memberships200_response_memberships_inner import ListMemberships200ResponseMembershipsInner as ListMemberships200ResponseMembershipsInner
 from zrok_api.models.list_namespaces200_response_inner import ListNamespaces200ResponseInner as ListNamespaces200ResponseInner

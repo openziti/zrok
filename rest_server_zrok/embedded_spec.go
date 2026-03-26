@@ -969,6 +969,142 @@ func init() {
         }
       }
     },
+    "/applied-limit-class": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "applyLimitClasses",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "limitClassIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "applied"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account or limit class not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "removeAppliedLimitClasses",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "limitClassIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "removed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/applied-limit-class/list": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "listAppliedLimitClasses",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "applied limit classes",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/limitClass"
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/changePassword": {
       "post": {
         "security": [
@@ -1786,46 +1922,6 @@ func init() {
         }
       }
     },
-    "/grants": {
-      "post": {
-        "security": [
-          {
-            "key": []
-          }
-        ],
-        "tags": [
-          "admin"
-        ],
-        "operationId": "grants",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "properties": {
-                "email": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "ok"
-          },
-          "401": {
-            "description": "unauthorized"
-          },
-          "404": {
-            "description": "not found"
-          },
-          "500": {
-            "description": "internal server error"
-          }
-        }
-      }
-    },
     "/identity": {
       "post": {
         "security": [
@@ -1985,6 +2081,49 @@ func init() {
           },
           "400": {
             "description": "invite tokens not created"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/limit-class/list": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "listLimitClasses",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "label": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "limit classes",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/limitClass"
+              }
+            }
           },
           "401": {
             "description": "unauthorized"
@@ -3639,6 +3778,128 @@ func init() {
         }
       }
     },
+    "/skip-interstitial-grant": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "getSkipInterstitialGrant",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "email",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "granted": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "grantSkipInterstitial",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "revokeSkipInterstitial",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/sparklines": {
       "post": {
         "security": [
@@ -4084,6 +4345,56 @@ func init() {
       "type": "array",
       "items": {
         "$ref": "#/definitions/frontend"
+      }
+    },
+    "limitClass": {
+      "type": "object",
+      "properties": {
+        "backendMode": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "integer"
+        },
+        "environments": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "label": {
+          "type": "string"
+        },
+        "limitAction": {
+          "type": "string"
+        },
+        "periodMinutes": {
+          "type": "integer"
+        },
+        "reservedShares": {
+          "type": "integer"
+        },
+        "rxBytes": {
+          "type": "integer"
+        },
+        "shareFrontends": {
+          "type": "integer"
+        },
+        "shares": {
+          "type": "integer"
+        },
+        "totalBytes": {
+          "type": "integer"
+        },
+        "txBytes": {
+          "type": "integer"
+        },
+        "uniqueNames": {
+          "type": "integer"
+        },
+        "updatedAt": {
+          "type": "integer"
+        }
       }
     },
     "metrics": {
@@ -5315,6 +5626,142 @@ func init() {
         }
       }
     },
+    "/applied-limit-class": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "applyLimitClasses",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "limitClassIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "applied"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account or limit class not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "removeAppliedLimitClasses",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "limitClassIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "removed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/applied-limit-class/list": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "listAppliedLimitClasses",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "applied limit classes",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/limitClass"
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/changePassword": {
       "post": {
         "security": [
@@ -6092,46 +6539,6 @@ func init() {
         }
       }
     },
-    "/grants": {
-      "post": {
-        "security": [
-          {
-            "key": []
-          }
-        ],
-        "tags": [
-          "admin"
-        ],
-        "operationId": "grants",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "properties": {
-                "email": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "ok"
-          },
-          "401": {
-            "description": "unauthorized"
-          },
-          "404": {
-            "description": "not found"
-          },
-          "500": {
-            "description": "internal server error"
-          }
-        }
-      }
-    },
     "/identity": {
       "post": {
         "security": [
@@ -6291,6 +6698,49 @@ func init() {
           },
           "400": {
             "description": "invite tokens not created"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
+    "/limit-class/list": {
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "listLimitClasses",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "label": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "limit classes",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/limitClass"
+              }
+            }
           },
           "401": {
             "description": "unauthorized"
@@ -7869,6 +8319,128 @@ func init() {
         }
       }
     },
+    "/skip-interstitial-grant": {
+      "get": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "getSkipInterstitialGrant",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "email",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "granted": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "grantSkipInterstitial",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
+        "tags": [
+          "admin"
+        ],
+        "operationId": "revokeSkipInterstitial",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "account not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    },
     "/sparklines": {
       "post": {
         "security": [
@@ -8604,6 +9176,56 @@ func init() {
       "type": "array",
       "items": {
         "$ref": "#/definitions/frontend"
+      }
+    },
+    "limitClass": {
+      "type": "object",
+      "properties": {
+        "backendMode": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "integer"
+        },
+        "environments": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "integer"
+        },
+        "label": {
+          "type": "string"
+        },
+        "limitAction": {
+          "type": "string"
+        },
+        "periodMinutes": {
+          "type": "integer"
+        },
+        "reservedShares": {
+          "type": "integer"
+        },
+        "rxBytes": {
+          "type": "integer"
+        },
+        "shareFrontends": {
+          "type": "integer"
+        },
+        "shares": {
+          "type": "integer"
+        },
+        "totalBytes": {
+          "type": "integer"
+        },
+        "txBytes": {
+          "type": "integer"
+        },
+        "uniqueNames": {
+          "type": "integer"
+        },
+        "updatedAt": {
+          "type": "integer"
+        }
       }
     },
     "metrics": {

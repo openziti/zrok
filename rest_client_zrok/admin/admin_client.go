@@ -108,6 +108,8 @@ type ClientService interface {
 
 	AddOrganizationMember(params *AddOrganizationMemberParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*AddOrganizationMemberCreated, error)
 
+	ApplyLimitClasses(params *ApplyLimitClassesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ApplyLimitClassesOK, error)
+
 	CreateAccount(params *CreateAccountParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateAccountCreated, error)
 
 	CreateFrontend(params *CreateFrontendParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*CreateFrontendCreated, error)
@@ -130,13 +132,19 @@ type ClientService interface {
 
 	DeleteOrganization(params *DeleteOrganizationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteOrganizationOK, error)
 
-	Grants(params *GrantsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GrantsOK, error)
+	GetSkipInterstitialGrant(params *GetSkipInterstitialGrantParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetSkipInterstitialGrantOK, error)
+
+	GrantSkipInterstitial(params *GrantSkipInterstitialParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GrantSkipInterstitialOK, error)
 
 	InviteTokenGenerate(params *InviteTokenGenerateParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*InviteTokenGenerateCreated, error)
+
+	ListAppliedLimitClasses(params *ListAppliedLimitClassesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListAppliedLimitClassesOK, error)
 
 	ListFrontendNamespaceMappings(params *ListFrontendNamespaceMappingsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListFrontendNamespaceMappingsOK, error)
 
 	ListFrontends(params *ListFrontendsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListFrontendsOK, error)
+
+	ListLimitClasses(params *ListLimitClassesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListLimitClassesOK, error)
 
 	ListNamespaceFrontendMappings(params *ListNamespaceFrontendMappingsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListNamespaceFrontendMappingsOK, error)
 
@@ -146,11 +154,15 @@ type ClientService interface {
 
 	ListOrganizations(params *ListOrganizationsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListOrganizationsOK, error)
 
+	RemoveAppliedLimitClasses(params *RemoveAppliedLimitClassesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoveAppliedLimitClassesOK, error)
+
 	RemoveNamespaceFrontendMapping(params *RemoveNamespaceFrontendMappingParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoveNamespaceFrontendMappingOK, error)
 
 	RemoveNamespaceGrant(params *RemoveNamespaceGrantParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoveNamespaceGrantOK, error)
 
 	RemoveOrganizationMember(params *RemoveOrganizationMemberParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoveOrganizationMemberOK, error)
+
+	RevokeSkipInterstitial(params *RevokeSkipInterstitialParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RevokeSkipInterstitialOK, error)
 
 	UpdateAccountPassword(params *UpdateAccountPasswordParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UpdateAccountPasswordOK, error)
 
@@ -334,6 +346,50 @@ func (a *Client) AddOrganizationMember(params *AddOrganizationMemberParams, auth
 	//
 	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for addOrganizationMember: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+ApplyLimitClasses apply limit classes API
+*/
+func (a *Client) ApplyLimitClasses(params *ApplyLimitClassesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ApplyLimitClassesOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewApplyLimitClassesParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "applyLimitClasses",
+		Method:             "POST",
+		PathPattern:        "/applied-limit-class",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ApplyLimitClassesReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*ApplyLimitClassesOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for applyLimitClasses: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -822,22 +878,22 @@ func (a *Client) DeleteOrganization(params *DeleteOrganizationParams, authInfo r
 }
 
 /*
-Grants grants API
+GetSkipInterstitialGrant get skip interstitial grant API
 */
-func (a *Client) Grants(params *GrantsParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GrantsOK, error) {
+func (a *Client) GetSkipInterstitialGrant(params *GetSkipInterstitialGrantParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetSkipInterstitialGrantOK, error) {
 	// NOTE: parameters are not validated before sending
 	if params == nil {
-		params = NewGrantsParams()
+		params = NewGetSkipInterstitialGrantParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "grants",
-		Method:             "POST",
-		PathPattern:        "/grants",
+		ID:                 "getSkipInterstitialGrant",
+		Method:             "GET",
+		PathPattern:        "/skip-interstitial-grant",
 		ProducesMediaTypes: []string{"application/zrok.v1+json"},
 		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &GrantsReader{formats: a.formats},
+		Reader:             &GetSkipInterstitialGrantReader{formats: a.formats},
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
@@ -851,7 +907,7 @@ func (a *Client) Grants(params *GrantsParams, authInfo runtime.ClientAuthInfoWri
 	}
 
 	// only one success response has to be checked
-	success, ok := result.(*GrantsOK)
+	success, ok := result.(*GetSkipInterstitialGrantOK)
 	if ok {
 		return success, nil
 	}
@@ -861,7 +917,51 @@ func (a *Client) Grants(params *GrantsParams, authInfo runtime.ClientAuthInfoWri
 	// no default response is defined.
 	//
 	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for grants: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for getSkipInterstitialGrant: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+GrantSkipInterstitial grant skip interstitial API
+*/
+func (a *Client) GrantSkipInterstitial(params *GrantSkipInterstitialParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GrantSkipInterstitialOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewGrantSkipInterstitialParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "grantSkipInterstitial",
+		Method:             "POST",
+		PathPattern:        "/skip-interstitial-grant",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GrantSkipInterstitialReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*GrantSkipInterstitialOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for grantSkipInterstitial: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -906,6 +1006,50 @@ func (a *Client) InviteTokenGenerate(params *InviteTokenGenerateParams, authInfo
 	//
 	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for inviteTokenGenerate: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+ListAppliedLimitClasses list applied limit classes API
+*/
+func (a *Client) ListAppliedLimitClasses(params *ListAppliedLimitClassesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListAppliedLimitClassesOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewListAppliedLimitClassesParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "listAppliedLimitClasses",
+		Method:             "POST",
+		PathPattern:        "/applied-limit-class/list",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ListAppliedLimitClassesReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*ListAppliedLimitClassesOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listAppliedLimitClasses: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -994,6 +1138,50 @@ func (a *Client) ListFrontends(params *ListFrontendsParams, authInfo runtime.Cli
 	//
 	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for listFrontends: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+ListLimitClasses list limit classes API
+*/
+func (a *Client) ListLimitClasses(params *ListLimitClassesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*ListLimitClassesOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewListLimitClassesParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "listLimitClasses",
+		Method:             "POST",
+		PathPattern:        "/limit-class/list",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &ListLimitClassesReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*ListLimitClassesOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listLimitClasses: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -1174,6 +1362,50 @@ func (a *Client) ListOrganizations(params *ListOrganizationsParams, authInfo run
 }
 
 /*
+RemoveAppliedLimitClasses remove applied limit classes API
+*/
+func (a *Client) RemoveAppliedLimitClasses(params *RemoveAppliedLimitClassesParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoveAppliedLimitClassesOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewRemoveAppliedLimitClassesParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "removeAppliedLimitClasses",
+		Method:             "DELETE",
+		PathPattern:        "/applied-limit-class",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &RemoveAppliedLimitClassesReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*RemoveAppliedLimitClassesOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for removeAppliedLimitClasses: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
 RemoveNamespaceFrontendMapping remove namespace frontend mapping API
 */
 func (a *Client) RemoveNamespaceFrontendMapping(params *RemoveNamespaceFrontendMappingParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RemoveNamespaceFrontendMappingOK, error) {
@@ -1302,6 +1534,50 @@ func (a *Client) RemoveOrganizationMember(params *RemoveOrganizationMemberParams
 	//
 	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for removeOrganizationMember: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+RevokeSkipInterstitial revoke skip interstitial API
+*/
+func (a *Client) RevokeSkipInterstitial(params *RevokeSkipInterstitialParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RevokeSkipInterstitialOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewRevokeSkipInterstitialParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "revokeSkipInterstitial",
+		Method:             "DELETE",
+		PathPattern:        "/skip-interstitial-grant",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &RevokeSkipInterstitialReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*RevokeSkipInterstitialOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for revokeSkipInterstitial: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

@@ -522,31 +522,6 @@ paths:
         500:
           description: internal server error
   
-  /grants:
-    post:
-      tags:
-        - admin
-      security:
-        - key: []
-      operationId: grants
-      parameters:
-        - name: body
-          in: body
-          schema:
-            properties:
-              email:
-                type: string
-      responses:
-        200:
-          description: ok
-        401:
-          description: unauthorized
-        404:
-          description: not found
-        500:
-          description: internal server error
-  
-  
   /identity:
     post:
       tags:
@@ -1040,6 +1015,187 @@ paths:
                       type: string
         401:
           description: unauthorized
+        500:
+          description: internal server error
+  
+  /limit-class/list:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: listLimitClasses
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              label:
+                type: string
+      responses:
+        200:
+          description: limit classes
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/limitClass"
+        401:
+          description: unauthorized
+        500:
+          description: internal server error
+  
+  /applied-limit-class:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: applyLimitClasses
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              email:
+                type: string
+              limitClassIds:
+                type: array
+                items:
+                  type: integer
+      responses:
+        200:
+          description: applied
+        401:
+          description: unauthorized
+        404:
+          description: account or limit class not found
+        500:
+          description: internal server error
+    delete:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: removeAppliedLimitClasses
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              email:
+                type: string
+              limitClassIds:
+                type: array
+                items:
+                  type: integer
+      responses:
+        200:
+          description: removed
+        401:
+          description: unauthorized
+        404:
+          description: account not found
+        500:
+          description: internal server error
+  
+  /applied-limit-class/list:
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: listAppliedLimitClasses
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              email:
+                type: string
+      responses:
+        200:
+          description: applied limit classes
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/limitClass"
+        401:
+          description: unauthorized
+        404:
+          description: account not found
+        500:
+          description: internal server error
+  
+  /skip-interstitial-grant:
+    get:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: getSkipInterstitialGrant
+      parameters:
+        - name: email
+          in: query
+          type: string
+          required: true
+      responses:
+        200:
+          description: ok
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              granted:
+                type: boolean
+        401:
+          description: unauthorized
+        404:
+          description: account not found
+        500:
+          description: internal server error
+    post:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: grantSkipInterstitial
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              email:
+                type: string
+      responses:
+        200:
+          description: ok
+        401:
+          description: unauthorized
+        404:
+          description: account not found
+        500:
+          description: internal server error
+    delete:
+      tags:
+        - admin
+      security:
+        - key: []
+      operationId: revokeSkipInterstitial
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              email:
+                type: string
+      responses:
+        200:
+          description: ok
+        401:
+          description: unauthorized
+        404:
+          description: account not found
         500:
           description: internal server error
   #
@@ -2575,6 +2731,40 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/frontend"
+  
+  limitClass:
+    type: object
+    properties:
+      id:
+        type: integer
+      label:
+        type: string
+      backendMode:
+        type: string
+      environments:
+        type: integer
+      shares:
+        type: integer
+      reservedShares:
+        type: integer
+      uniqueNames:
+        type: integer
+      shareFrontends:
+        type: integer
+      periodMinutes:
+        type: integer
+      rxBytes:
+        type: integer
+      txBytes:
+        type: integer
+      totalBytes:
+        type: integer
+      limitAction:
+        type: string
+      createdAt:
+        type: integer
+      updatedAt:
+        type: integer
   
   metrics:
     type: object

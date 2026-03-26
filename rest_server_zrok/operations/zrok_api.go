@@ -85,6 +85,13 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			return middleware.NotImplemented("operation admin.AddOrganizationMember has not yet been implemented")
 		}),
 
+		AdminApplyLimitClassesHandler: admin.ApplyLimitClassesHandlerFunc(func(params admin.ApplyLimitClassesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation admin.ApplyLimitClasses has not yet been implemented")
+		}),
+
 		AccountChangePasswordHandler: account.ChangePasswordHandlerFunc(func(params account.ChangePasswordParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			_ = params
 			_ = principal
@@ -265,6 +272,13 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			return middleware.NotImplemented("operation metadata.GetShareMetrics has not yet been implemented")
 		}),
 
+		AdminGetSkipInterstitialGrantHandler: admin.GetSkipInterstitialGrantHandlerFunc(func(params admin.GetSkipInterstitialGrantParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation admin.GetSkipInterstitialGrant has not yet been implemented")
+		}),
+
 		MetadataGetSparklinesHandler: metadata.GetSparklinesHandlerFunc(func(params metadata.GetSparklinesParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			_ = params
 			_ = principal
@@ -272,11 +286,11 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			return middleware.NotImplemented("operation metadata.GetSparklines has not yet been implemented")
 		}),
 
-		AdminGrantsHandler: admin.GrantsHandlerFunc(func(params admin.GrantsParams, principal *rest_model_zrok.Principal) middleware.Responder {
+		AdminGrantSkipInterstitialHandler: admin.GrantSkipInterstitialHandlerFunc(func(params admin.GrantSkipInterstitialParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			_ = params
 			_ = principal
 
-			return middleware.NotImplemented("operation admin.Grants has not yet been implemented")
+			return middleware.NotImplemented("operation admin.GrantSkipInterstitial has not yet been implemented")
 		}),
 
 		AccountInviteHandler: account.InviteHandlerFunc(func(params account.InviteParams) middleware.Responder {
@@ -306,6 +320,13 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			return middleware.NotImplemented("operation share.ListAllNames has not yet been implemented")
 		}),
 
+		AdminListAppliedLimitClassesHandler: admin.ListAppliedLimitClassesHandlerFunc(func(params admin.ListAppliedLimitClassesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation admin.ListAppliedLimitClasses has not yet been implemented")
+		}),
+
 		MetadataListEnvironmentsHandler: metadata.ListEnvironmentsHandlerFunc(func(params metadata.ListEnvironmentsParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			_ = params
 			_ = principal
@@ -325,6 +346,13 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			_ = principal
 
 			return middleware.NotImplemented("operation admin.ListFrontends has not yet been implemented")
+		}),
+
+		AdminListLimitClassesHandler: admin.ListLimitClassesHandlerFunc(func(params admin.ListLimitClassesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation admin.ListLimitClasses has not yet been implemented")
 		}),
 
 		MetadataListMembershipsHandler: metadata.ListMembershipsHandlerFunc(func(params metadata.ListMembershipsParams, principal *rest_model_zrok.Principal) middleware.Responder {
@@ -465,6 +493,13 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			return middleware.NotImplemented("operation agent.RemoteUnshare has not yet been implemented")
 		}),
 
+		AdminRemoveAppliedLimitClassesHandler: admin.RemoveAppliedLimitClassesHandlerFunc(func(params admin.RemoveAppliedLimitClassesParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation admin.RemoveAppliedLimitClasses has not yet been implemented")
+		}),
+
 		AdminRemoveNamespaceFrontendMappingHandler: admin.RemoveNamespaceFrontendMappingHandlerFunc(func(params admin.RemoveNamespaceFrontendMappingParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			_ = params
 			_ = principal
@@ -496,6 +531,13 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			_ = params
 
 			return middleware.NotImplemented("operation account.ResetPasswordRequest has not yet been implemented")
+		}),
+
+		AdminRevokeSkipInterstitialHandler: admin.RevokeSkipInterstitialHandlerFunc(func(params admin.RevokeSkipInterstitialParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation admin.RevokeSkipInterstitial has not yet been implemented")
 		}),
 
 		ShareShareHandler: share.ShareHandlerFunc(func(params share.ShareParams, principal *rest_model_zrok.Principal) middleware.Responder {
@@ -654,6 +696,8 @@ type ZrokAPI struct {
 	AdminAddNamespaceGrantHandler admin.AddNamespaceGrantHandler
 	// AdminAddOrganizationMemberHandler sets the operation handler for the add organization member operation
 	AdminAddOrganizationMemberHandler admin.AddOrganizationMemberHandler
+	// AdminApplyLimitClassesHandler sets the operation handler for the apply limit classes operation
+	AdminApplyLimitClassesHandler admin.ApplyLimitClassesHandler
 	// AccountChangePasswordHandler sets the operation handler for the change password operation
 	AccountChangePasswordHandler account.ChangePasswordHandler
 	// MetadataClientVersionCheckHandler sets the operation handler for the client version check operation
@@ -706,10 +750,12 @@ type ZrokAPI struct {
 	MetadataGetShareDetailHandler metadata.GetShareDetailHandler
 	// MetadataGetShareMetricsHandler sets the operation handler for the get share metrics operation
 	MetadataGetShareMetricsHandler metadata.GetShareMetricsHandler
+	// AdminGetSkipInterstitialGrantHandler sets the operation handler for the get skip interstitial grant operation
+	AdminGetSkipInterstitialGrantHandler admin.GetSkipInterstitialGrantHandler
 	// MetadataGetSparklinesHandler sets the operation handler for the get sparklines operation
 	MetadataGetSparklinesHandler metadata.GetSparklinesHandler
-	// AdminGrantsHandler sets the operation handler for the grants operation
-	AdminGrantsHandler admin.GrantsHandler
+	// AdminGrantSkipInterstitialHandler sets the operation handler for the grant skip interstitial operation
+	AdminGrantSkipInterstitialHandler admin.GrantSkipInterstitialHandler
 	// AccountInviteHandler sets the operation handler for the invite operation
 	AccountInviteHandler account.InviteHandler
 	// AdminInviteTokenGenerateHandler sets the operation handler for the invite token generate operation
@@ -718,12 +764,16 @@ type ZrokAPI struct {
 	MetadataListAccessesHandler metadata.ListAccessesHandler
 	// ShareListAllNamesHandler sets the operation handler for the list all names operation
 	ShareListAllNamesHandler share.ListAllNamesHandler
+	// AdminListAppliedLimitClassesHandler sets the operation handler for the list applied limit classes operation
+	AdminListAppliedLimitClassesHandler admin.ListAppliedLimitClassesHandler
 	// MetadataListEnvironmentsHandler sets the operation handler for the list environments operation
 	MetadataListEnvironmentsHandler metadata.ListEnvironmentsHandler
 	// AdminListFrontendNamespaceMappingsHandler sets the operation handler for the list frontend namespace mappings operation
 	AdminListFrontendNamespaceMappingsHandler admin.ListFrontendNamespaceMappingsHandler
 	// AdminListFrontendsHandler sets the operation handler for the list frontends operation
 	AdminListFrontendsHandler admin.ListFrontendsHandler
+	// AdminListLimitClassesHandler sets the operation handler for the list limit classes operation
+	AdminListLimitClassesHandler admin.ListLimitClassesHandler
 	// MetadataListMembershipsHandler sets the operation handler for the list memberships operation
 	MetadataListMembershipsHandler metadata.ListMembershipsHandler
 	// ShareListNamesForNamespaceHandler sets the operation handler for the list names for namespace operation
@@ -764,6 +814,8 @@ type ZrokAPI struct {
 	AgentRemoteUnaccessHandler agent.RemoteUnaccessHandler
 	// AgentRemoteUnshareHandler sets the operation handler for the remote unshare operation
 	AgentRemoteUnshareHandler agent.RemoteUnshareHandler
+	// AdminRemoveAppliedLimitClassesHandler sets the operation handler for the remove applied limit classes operation
+	AdminRemoveAppliedLimitClassesHandler admin.RemoveAppliedLimitClassesHandler
 	// AdminRemoveNamespaceFrontendMappingHandler sets the operation handler for the remove namespace frontend mapping operation
 	AdminRemoveNamespaceFrontendMappingHandler admin.RemoveNamespaceFrontendMappingHandler
 	// AdminRemoveNamespaceGrantHandler sets the operation handler for the remove namespace grant operation
@@ -774,6 +826,8 @@ type ZrokAPI struct {
 	AccountResetPasswordHandler account.ResetPasswordHandler
 	// AccountResetPasswordRequestHandler sets the operation handler for the reset password request operation
 	AccountResetPasswordRequestHandler account.ResetPasswordRequestHandler
+	// AdminRevokeSkipInterstitialHandler sets the operation handler for the revoke skip interstitial operation
+	AdminRevokeSkipInterstitialHandler admin.RevokeSkipInterstitialHandler
 	// ShareShareHandler sets the operation handler for the share operation
 	ShareShareHandler share.ShareHandler
 	// AgentShareHTTPHealthcheckHandler sets the operation handler for the share Http healthcheck operation
@@ -898,6 +952,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.AdminAddOrganizationMemberHandler == nil {
 		unregistered = append(unregistered, "admin.AddOrganizationMemberHandler")
 	}
+	if o.AdminApplyLimitClassesHandler == nil {
+		unregistered = append(unregistered, "admin.ApplyLimitClassesHandler")
+	}
 	if o.AccountChangePasswordHandler == nil {
 		unregistered = append(unregistered, "account.ChangePasswordHandler")
 	}
@@ -976,11 +1033,14 @@ func (o *ZrokAPI) Validate() error {
 	if o.MetadataGetShareMetricsHandler == nil {
 		unregistered = append(unregistered, "metadata.GetShareMetricsHandler")
 	}
+	if o.AdminGetSkipInterstitialGrantHandler == nil {
+		unregistered = append(unregistered, "admin.GetSkipInterstitialGrantHandler")
+	}
 	if o.MetadataGetSparklinesHandler == nil {
 		unregistered = append(unregistered, "metadata.GetSparklinesHandler")
 	}
-	if o.AdminGrantsHandler == nil {
-		unregistered = append(unregistered, "admin.GrantsHandler")
+	if o.AdminGrantSkipInterstitialHandler == nil {
+		unregistered = append(unregistered, "admin.GrantSkipInterstitialHandler")
 	}
 	if o.AccountInviteHandler == nil {
 		unregistered = append(unregistered, "account.InviteHandler")
@@ -994,6 +1054,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.ShareListAllNamesHandler == nil {
 		unregistered = append(unregistered, "share.ListAllNamesHandler")
 	}
+	if o.AdminListAppliedLimitClassesHandler == nil {
+		unregistered = append(unregistered, "admin.ListAppliedLimitClassesHandler")
+	}
 	if o.MetadataListEnvironmentsHandler == nil {
 		unregistered = append(unregistered, "metadata.ListEnvironmentsHandler")
 	}
@@ -1002,6 +1065,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AdminListFrontendsHandler == nil {
 		unregistered = append(unregistered, "admin.ListFrontendsHandler")
+	}
+	if o.AdminListLimitClassesHandler == nil {
+		unregistered = append(unregistered, "admin.ListLimitClassesHandler")
 	}
 	if o.MetadataListMembershipsHandler == nil {
 		unregistered = append(unregistered, "metadata.ListMembershipsHandler")
@@ -1063,6 +1129,9 @@ func (o *ZrokAPI) Validate() error {
 	if o.AgentRemoteUnshareHandler == nil {
 		unregistered = append(unregistered, "agent.RemoteUnshareHandler")
 	}
+	if o.AdminRemoveAppliedLimitClassesHandler == nil {
+		unregistered = append(unregistered, "admin.RemoveAppliedLimitClassesHandler")
+	}
 	if o.AdminRemoveNamespaceFrontendMappingHandler == nil {
 		unregistered = append(unregistered, "admin.RemoveNamespaceFrontendMappingHandler")
 	}
@@ -1077,6 +1146,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.AccountResetPasswordRequestHandler == nil {
 		unregistered = append(unregistered, "account.ResetPasswordRequestHandler")
+	}
+	if o.AdminRevokeSkipInterstitialHandler == nil {
+		unregistered = append(unregistered, "admin.RevokeSkipInterstitialHandler")
 	}
 	if o.ShareShareHandler == nil {
 		unregistered = append(unregistered, "share.ShareHandler")
@@ -1243,6 +1315,10 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/applied-limit-class"] = admin.NewApplyLimitClasses(o.context, o.AdminApplyLimitClassesHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/changePassword"] = account.NewChangePassword(o.context, o.AccountChangePasswordHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
@@ -1344,6 +1420,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/metrics/share/{shareToken}"] = metadata.NewGetShareMetrics(o.context, o.MetadataGetShareMetricsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/skip-interstitial-grant"] = admin.NewGetSkipInterstitialGrant(o.context, o.AdminGetSkipInterstitialGrantHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -1351,7 +1431,7 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/grants"] = admin.NewGrants(o.context, o.AdminGrantsHandler)
+	o.handlers["POST"]["/skip-interstitial-grant"] = admin.NewGrantSkipInterstitial(o.context, o.AdminGrantSkipInterstitialHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -1368,6 +1448,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/share/names"] = share.NewListAllNames(o.context, o.ShareListAllNamesHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/applied-limit-class/list"] = admin.NewListAppliedLimitClasses(o.context, o.AdminListAppliedLimitClassesHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -1380,6 +1464,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/frontends"] = admin.NewListFrontends(o.context, o.AdminListFrontendsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/limit-class/list"] = admin.NewListLimitClasses(o.context, o.AdminListLimitClassesHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -1463,6 +1551,10 @@ func (o *ZrokAPI) initHandlerCache() {
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
+	o.handlers["DELETE"]["/applied-limit-class"] = admin.NewRemoveAppliedLimitClasses(o.context, o.AdminRemoveAppliedLimitClassesHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
 	o.handlers["DELETE"]["/namespace/frontend/mapping"] = admin.NewRemoveNamespaceFrontendMapping(o.context, o.AdminRemoveNamespaceFrontendMappingHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
@@ -1480,6 +1572,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/resetPasswordRequest"] = account.NewResetPasswordRequest(o.context, o.AccountResetPasswordRequestHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/skip-interstitial-grant"] = admin.NewRevokeSkipInterstitial(o.context, o.AdminRevokeSkipInterstitialHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

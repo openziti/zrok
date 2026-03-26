@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v2.0.1
+
+FEATURE: Added several new `admin` API endpoints for interfacing with additional management controls: finding limit classes by label, finding applied/applying/removing limit classes from accounts, getting/setting skip interstitial status for an account (https://github.com/openziti/zrok/issues/1210)
+
+CHANGE: Removed the legacy `admin` `/grants` endpoint. Its prior synchronization behavior is now replaced by the new skip interstitial grant management endpoints. (https://github.com/openziti/zrok/issues/726)
+
+CHANGE: Applying limit classes now validates requested assignments to prevent conflicting effective limit class combinations on an account (https://github.com/openziti/zrok/issues/726)
+
 ## v2.0.0
 
 FEATURE: Major changes to how "unique names" and "reserved sharing" work. See the [zrok v2 Migration Guide](https://docs.zrok.io) for details. Reserved sharing, including the `zrok reserve`, `zrok release` and `zrok share reserved` commands have been removed. Namespaces and reserved names replace these concepts in a much more powerful, flexible way which can accomplish what reserved sharing did in a much better way. (https://github.com/openziti/zrok/issues/726)
