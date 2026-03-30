@@ -223,7 +223,7 @@ func (p *githubProvider) loginHandler() func(w http.ResponseWriter, r *http.Requ
 // logoutHandler creates the logout handler for revoking GitHub tokens and clearing cookies
 func (p *githubProvider) logoutHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := getSessionCookie(r, p.oauthCfg.CookieName)
+		cookie, err := getSessionCookie(r, p.oauthCfg)
 		if err == nil {
 			tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 				return p.signingKey, nil

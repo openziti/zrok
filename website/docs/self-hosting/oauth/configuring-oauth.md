@@ -22,6 +22,7 @@ oauth:
   endpoint_url:               "https://oauth.your-domain.com"
   cookie_name:                "zrok-auth-session"
   cookie_domain:              "your-domain.com"
+  max_cookie_chunks:          10
   session_lifetime:           "6h"
   intermediate_lifetime:      "5m"
   signing_key:                "your-unique-signing-key"
@@ -49,12 +50,13 @@ oauth:
 
 ### Configuration parameters
 
-All of the following parmeters _must_ be specified in the frontend configuration. There are no defaults.
+All of the following parmeters _must_ be specified in the frontend configuration unless otherwise noted.
 
 - **`bind_address`**: IP and port where the OAuth frontend will listen (format: `ip:port`)
 - **`endpoint_url`**: Public base URL where OAuth redirects will be handled
 - **`cookie_name`**: Name for authentication cookies (suggested to use `zrok-auth-session`)
 - **`cookie_domain`**: Domain where authentication cookies should be stored
+- **`max_cookie_chunks`**: Optional maximum number of striped session-cookie chunks to accept or emit (default: `10`, internally capped to a safe maximum)
 - **`session_lifetime`**: How long authentication sessions remain valid (e.g., `6h`, `24h`)
 - **`intermediate_lifetime`**: Lifetime for intermediate OAuth tokens (e.g., `5m`)
 - **`signing_key`**: Unique 32+ character string for securing authentication payloads

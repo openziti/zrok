@@ -312,6 +312,7 @@ oauth:
   endpoint_url: "https://oauth.zrok.example.com"
   cookie_name: "zrok-auth-session"
   cookie_domain: "zrok.example.com"
+  max_cookie_chunks: 10
   session_lifetime: "6h"
   intermediate_lifetime: "5m"
   signing_key: "your-unique-signing-key-32-chars-min"
@@ -531,6 +532,7 @@ oauth:
   endpoint_url: "https://oauth.zrok.example.com:8443"
   cookie_name: "zrok-auth-session"
   cookie_domain: "zrok.example.com"
+  max_cookie_chunks: 10  # Optional: maximum cookie stripes to accept or emit (default: 10)
   session_lifetime: "6h"
   intermediate_lifetime: "5m"
   signing_key: "your-32-plus-character-signing-key-here"

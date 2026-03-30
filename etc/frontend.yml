@@ -49,6 +49,11 @@ v: 4
 #  #
 #  cookie_domain: zrok.io
 #
+#  # `max_cookie_chunks` is the maximum number of striped session-cookie chunks to accept or emit.
+#  # Defaults to 10 and is internally capped for safety.
+#  #
+#  max_cookie_chunks: 10
+#
 #  # `session_lifetime` is the maximum lifetime for an authentication session.
 #  #
 #  session_lifetime: 6h

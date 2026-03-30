@@ -148,7 +148,7 @@ func (p *oidcProvider) refreshHandler() http.HandlerFunc {
 			return
 		}
 
-		cookie, err := getSessionCookie(r, p.oauthCfg.CookieName)
+		cookie, err := getSessionCookie(r, p.oauthCfg)
 		if err != nil {
 			dl.Errorf("unable to get auth session cookie: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to get auth session cookie")))
@@ -245,7 +245,7 @@ func (p *oidcProvider) loginHandler() func(w http.ResponseWriter, r *http.Reques
 // logoutHandler creates the logout handler for revoking OIDC tokens and clearing cookies
 func (p *oidcProvider) logoutHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := getSessionCookie(r, p.oauthCfg.CookieName)
+		cookie, err := getSessionCookie(r, p.oauthCfg)
 		if err == nil {
 			tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 				return p.signingKey, nil

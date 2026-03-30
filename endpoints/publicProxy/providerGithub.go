@@ -195,7 +195,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 	http.Handle(fmt.Sprintf("/%v/auth/callback", c.Name), rp.CodeExchangeHandler(login, provider))
 
 	logout := func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := getSessionCookie(r, cfg.CookieName)
+		cookie, err := getSessionCookie(r, cfg)
 		if err == nil {
 			tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 				return signingKey, nil
