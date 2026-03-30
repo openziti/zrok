@@ -234,7 +234,7 @@ void (empty response body)
 ### HTTP request headers
 
  - **Content-Type**: application/zrok.v1+json
- - **Accept**: Not defined
+ - **Accept**: application/zrok.v1+json
 
 ### HTTP response details
 
@@ -243,6 +243,7 @@ void (empty response body)
 **200** | name deleted |  -  |
 **401** | unauthorized |  -  |
 **404** | name not found |  -  |
+**409** | name is still attached to an active share |  -  |
 **500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

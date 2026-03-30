@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/go-openapi/runtime/middleware"
@@ -70,6 +71,16 @@ func (h *createShareNameHandler) Handle(params share.CreateShareNameParams, prin
 		return share.NewCreateShareNameConflict().WithPayload(rest_model_zrok.ErrorMessage(fmt.Sprintf("'%v' is not a valid share name; failed profanity or DNS check", params.Body.Name)))
 	}
 
+	conflictMsg, err := h.healStaleFrontendMappings(ns, params.Body.Name, trx)
+	if err != nil {
+		dl.Errorf("error healing stale frontend mappings for name '%v' in namespace '%v': %v", params.Body.Name, ns.Token, err)
+		return share.NewCreateShareNameInternalServerError()
+	}
+	if conflictMsg != "" {
+		dl.Errorf("%v", conflictMsg)
+		return share.NewCreateShareNameConflict().WithPayload(rest_model_zrok.ErrorMessage(conflictMsg))
+	}
+
 	// create allocated name
 	an := &store.Name{
 		NamespaceId: ns.Id,
@@ -90,6 +101,35 @@ func (h *createShareNameHandler) Handle(params share.CreateShareNameParams, prin
 
 	dl.Infof("created allocated name '%v' in namespace '%v' for account '%v'", params.Body.Name, ns.Token, principal.Email)
 	return share.NewCreateShareNameCreated()
+}
+
+func (h *createShareNameHandler) healStaleFrontendMappings(ns *store.Namespace, name string, trx *sqlx.Tx) (string, error) {
+	frontends, err := str.FindDynamicFrontendsForNamespace(ns.Id, trx)
+	if err != nil {
+		return "", errors.Wrapf(err, "error finding dynamic frontends for namespace '%v'", ns.Token)
+	}
+
+	frontendName := util.NameInNamespace(name, ns.Name)
+	for _, frontend := range frontends {
+		mapping, err := str.FindFrontendMappingByFrontendTokenAndNameWithShareState(frontend.Token, frontendName, trx)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				continue
+			}
+			return "", errors.Wrapf(err, "error finding frontend mapping for name '%v' on frontend '%v'", frontendName, frontend.Token)
+		}
+
+		if mapping.ShareDeleted == nil || !*mapping.ShareDeleted {
+			return fmt.Sprintf("name '%v' in namespace '%v' is still attached to share '%v'; unshare it before reusing the name", name, ns.Token, mapping.ShareToken), nil
+		}
+
+		if err := str.DeleteFrontendMappingsByFrontendTokenAndName(frontend.Token, frontendName, trx); err != nil {
+			return "", errors.Wrapf(err, "error deleting stale frontend mapping for name '%v' on frontend '%v'", frontendName, frontend.Token)
+		}
+		dl.Infof("deleted stale frontend mapping '%v' from frontend '%v' while creating name", frontendName, frontend.Token)
+	}
+
+	return "", nil
 }
 
 func (h *createShareNameHandler) checkLimits(principal *rest_model_zrok.Principal, trx *sqlx.Tx) error {

@@ -10,6 +10,8 @@ CHANGE: Applying limit classes now validates requested assignments to prevent co
 
 FIX: Escaped proxyUi output by switching to html/template and removed reflected refreshInterval values from github oauth error pages.
 
+FIX: Users could get into a state where an allocated name returns a `500` error; this happened by various combinations of abnormal share termination, or deleting a name from underneath a live share... both resulted in bad frontend mappings that prevented proper share operation. The `zrok2 delete name` now refuses to delete names with an active share (`zrok2 delete share` first). The `zrok2 create name` now includes "healing" functionality that removes extraneous frontend mapping rows for the newly created namespace. Users can `zrok2 delete name` and `zrok2 create name` to fix any old issues around this. (https://github.com/openziti/zrok/issues/1219)
+
 ## v2.0.0
 
 FEATURE: Major changes to how "unique names" and "reserved sharing" work. See the [zrok v2 Migration Guide](https://docs.zrok.io) for details. Reserved sharing, including the `zrok reserve`, `zrok release` and `zrok share reserved` commands have been removed. Namespaces and reserved names replace these concepts in a much more powerful, flexible way which can accomplish what reserved sharing did in a much better way. (https://github.com/openziti/zrok/issues/726)
