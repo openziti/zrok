@@ -4,6 +4,7 @@ import (
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/environment"
 	"github.com/openziti/zrok/v2/rest_client_zrok/share"
+	"github.com/openziti/zrok/v2/tui"
 	"github.com/spf13/cobra"
 )
 
@@ -37,7 +38,7 @@ func (cmd *deleteNameCommand) run(_ *cobra.Command, args []string) {
 
 	zrok, err := env.Client()
 	if err != nil {
-		panic(err)
+		tui.Error("unable to get zrok client", err)
 	}
 
 	req := share.NewDeleteShareNameParams()
@@ -48,7 +49,10 @@ func (cmd *deleteNameCommand) run(_ *cobra.Command, args []string) {
 
 	_, err = zrok.Share.DeleteShareName(req, auth)
 	if err != nil {
-		panic(err)
+		if conflict, ok := err.(*share.DeleteShareNameConflict); ok {
+			tui.Error(string(conflict.GetPayload()), nil)
+		}
+		tui.Error("unable to delete name", err)
 	}
 
 	dl.Infof("deleted name '%v' from namespace '%v'", args[0], cmd.namespaceToken)

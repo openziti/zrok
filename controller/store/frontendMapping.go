@@ -15,6 +15,11 @@ type FrontendMapping struct {
 	CreatedAt     time.Time
 }
 
+type FrontendMappingWithShareState struct {
+	FrontendMapping
+	ShareDeleted *bool `db:"share_deleted"`
+}
+
 func (str *Store) CreateFrontendMapping(fm *FrontendMapping, trx *sqlx.Tx) (int, error) {
 	stmt, err := trx.Prepare("insert into frontend_mappings (frontend_token, name, share_token) values ($1, $2, $3) returning id")
 	if err != nil {
@@ -36,6 +41,20 @@ func (str *Store) DeleteFrontendMappingsByFrontendTokenAndName(frontendToken, na
 		return errors.Wrap(err, "error executing frontend_mappings delete by frontend_token and name statement")
 	}
 	return nil
+}
+
+func (str *Store) FindFrontendMappingByFrontendTokenAndNameWithShareState(frontendToken, name string, trx *sqlx.Tx) (*FrontendMappingWithShareState, error) {
+	sql := `select fm.id, fm.frontend_token, fm.name, fm.share_token, fm.created_at,
+	               s.deleted as share_deleted
+	        from frontend_mappings fm
+	        left join shares s on fm.share_token = s.token
+	        where fm.frontend_token = $1 and fm.name = $2`
+
+	mapping := &FrontendMappingWithShareState{}
+	if err := trx.QueryRowx(sql, frontendToken, name).StructScan(mapping); err != nil {
+		return nil, errors.Wrap(err, "error selecting frontend mapping by frontend token and name with share state")
+	}
+	return mapping, nil
 }
 
 func (str *Store) FindFrontendMappingsWithHigherId(frontendToken, name string, id int64, trx *sqlx.Tx) ([]*FrontendMapping, error) {
