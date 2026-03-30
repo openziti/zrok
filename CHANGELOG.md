@@ -14,6 +14,10 @@ FIX: Users could get into a state where an allocated name returns a `500` error;
 
 FIX: Configurable upper limit on the number of cookie stripes allowed for the OAuth session cookie; includes hard limit on upper number of stripes at 32. Defaults to 10. (https://github.com/openziti/zrok/issues/1217)
 
+FEATURE: New `zrok2 delete access` subcommand that allows end users to clean up stale access frontends from the command line.
+
+FIX: Security hardening for the `/unaccess` endpoint.
+
 ## v2.0.0
 
 FEATURE: Major changes to how "unique names" and "reserved sharing" work. See the [zrok v2 Migration Guide](https://docs.zrok.io) for details. Reserved sharing, including the `zrok reserve`, `zrok release` and `zrok share reserved` commands have been removed. Namespaces and reserved names replace these concepts in a much more powerful, flexible way which can accomplish what reserved sharing did in a much better way. (https://github.com/openziti/zrok/issues/726)
