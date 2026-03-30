@@ -8,6 +8,8 @@ CHANGE: Removed the legacy `admin` `/grants` endpoint. Its prior synchronization
 
 CHANGE: Applying limit classes now validates requested assignments to prevent conflicting effective limit class combinations on an account (https://github.com/openziti/zrok/issues/726)
 
+FIX: Configurable upper limit on the number of cookie stripes allowed for the OAuth session cookie; includes hard limit on upper number of stripes at 32. Defaults to 10. (https://github.com/openziti/zrok/issues/1217)
+
 ## v2.0.0
 
 FEATURE: Major changes to how "unique names" and "reserved sharing" work. See the [zrok v2 Migration Guide](https://docs.zrok.io) for details. Reserved sharing, including the `zrok reserve`, `zrok release` and `zrok share reserved` commands have been removed. Namespaces and reserved names replace these concepts in a much more powerful, flexible way which can accomplish what reserved sharing did in a much better way. (https://github.com/openziti/zrok/issues/726)
