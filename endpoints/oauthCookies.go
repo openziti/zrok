@@ -21,7 +21,41 @@ type OAuthCookieConfig interface {
 	GetCookieName() string
 	GetCookieDomain() string
 	GetMaxCookieSize() int
+	GetMaxCookieChunks() int
 	GetSessionLifetime() time.Duration
+}
+
+const (
+	defaultMaxCookieChunks = 10
+	hardMaxCookieChunks    = 32
+)
+
+func getEffectiveMaxCookieChunks(cfg OAuthCookieConfig) int {
+	maxCookieChunks := cfg.GetMaxCookieChunks()
+	if maxCookieChunks == 0 {
+		return defaultMaxCookieChunks
+	}
+	return min(maxCookieChunks, hardMaxCookieChunks)
+}
+
+func getChunkCount(compressedToken string, maxCookieSize int) (int, int, error) {
+	chunkCount := 1
+	for {
+		prefixLen := len(fmt.Sprintf("%d|", chunkCount))
+		firstChunkSize := maxCookieSize - prefixLen
+		if firstChunkSize <= 0 {
+			return 0, 0, errors.New("max cookie size too small for striping")
+		}
+
+		requiredChunks := 1
+		if len(compressedToken) > firstChunkSize {
+			requiredChunks += (len(compressedToken) - firstChunkSize + maxCookieSize - 1) / maxCookieSize
+		}
+		if requiredChunks == chunkCount {
+			return chunkCount, firstChunkSize, nil
+		}
+		chunkCount = requiredChunks
+	}
 }
 
 // CompressToken compresses a JWT token string using gzip and returns a base64-encoded string
@@ -62,7 +96,9 @@ func DecompressToken(compressed string) (string, error) {
 }
 
 // GetSessionCookie retrieves and reassembles a session cookie, handling both single and striped cookies
-func GetSessionCookie(r *http.Request, cookieName string) (*http.Cookie, error) {
+func GetSessionCookie(r *http.Request, cfg OAuthCookieConfig) (*http.Cookie, error) {
+	cookieName := cfg.GetCookieName()
+
 	// get the first cookie
 	cookie, err := r.Cookie(cookieName)
 	if err != nil {
@@ -76,26 +112,30 @@ func GetSessionCookie(r *http.Request, cookieName string) (*http.Cookie, error) 
 		parts := strings.SplitN(cookie.Value, "|", 2)
 		if len(parts) == 2 {
 			count, err := strconv.Atoi(parts[0])
-			if err == nil && count > 0 {
-				// this is a striped cookie
-				chunks := make([]string, count)
-				chunks[0] = parts[1]
-
-				// fetch the remaining chunks
-				for i := 1; i < count; i++ {
-					chunkCookie, err := r.Cookie(fmt.Sprintf("%s_%d", cookieName, i))
-					if err != nil {
-						return nil, errors.Errorf("missing cookie chunk '%s_%d'", cookieName, i)
-					}
-					chunks[i] = chunkCookie.Value
-				}
-
-				// reassemble the compressed value
-				compressedValue = strings.Join(chunks, "")
-			} else {
-				// not a valid stripe prefix, treat as single cookie
-				compressedValue = cookie.Value
+			if err != nil || count <= 0 {
+				return nil, errors.Errorf("invalid cookie chunk count '%s'", parts[0])
 			}
+
+			maxCookieChunks := getEffectiveMaxCookieChunks(cfg)
+			if count > maxCookieChunks {
+				return nil, errors.Errorf("cookie chunk count '%d' exceeds maximum '%d'", count, maxCookieChunks)
+			}
+
+			// this is a striped cookie
+			chunks := make([]string, count)
+			chunks[0] = parts[1]
+
+			// fetch the remaining chunks
+			for i := 1; i < count; i++ {
+				chunkCookie, err := r.Cookie(fmt.Sprintf("%s_%d", cookieName, i))
+				if err != nil {
+					return nil, errors.Errorf("missing cookie chunk '%s_%d'", cookieName, i)
+				}
+				chunks[i] = chunkCookie.Value
+			}
+
+			// reassemble the compressed value
+			compressedValue = strings.Join(chunks, "")
 		} else {
 			compressedValue = cookie.Value
 		}
@@ -144,14 +184,15 @@ func SetSessionCookie(w http.ResponseWriter, cookieName string, tokenValue strin
 
 	// check if we need to stripe the cookie
 	if len(compressedToken) > maxCookieSize {
-		// calculate number of chunks needed
-		chunkCount := (len(compressedToken) + maxCookieSize - 1) / maxCookieSize
+		// calculate number of chunks needed, accounting for the count prefix in the first chunk
+		chunkCount, firstChunkSize, err := getChunkCount(compressedToken, maxCookieSize)
+		if err != nil {
+			return err
+		}
 
-		// calculate chunk size (leaving room for the count prefix in first cookie)
-		prefixLen := len(fmt.Sprintf("%d|", chunkCount))
-		firstChunkSize := maxCookieSize - prefixLen
-		if firstChunkSize <= 0 {
-			return errors.New("max cookie size too small for striping")
+		maxCookieChunks := getEffectiveMaxCookieChunks(cfg)
+		if chunkCount > maxCookieChunks {
+			return errors.Errorf("compressed token requires '%d' cookie chunks; maximum is '%d'", chunkCount, maxCookieChunks)
 		}
 
 		// set first cookie with count prefix
