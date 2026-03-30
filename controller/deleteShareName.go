@@ -54,6 +54,28 @@ func (h *deleteShareNameHandler) Handle(params share.DeleteShareNameParams, prin
 		return share.NewDeleteShareNameUnauthorized()
 	}
 
+	// do not allow deleting names that are still attached to a live share
+	mappings, err := str.FindShareNameMappingsByNameIdWithShare(an.Id, trx)
+	if err != nil {
+		dl.Errorf("error finding share name mappings for name '%v' in namespace '%v': %v", params.Body.Name, ns.Token, err)
+		return share.NewDeleteShareNameInternalServerError()
+	}
+	for _, mapping := range mappings {
+		if !mapping.ShareDeleted {
+			msg := rest_model_zrok.ErrorMessage("name '" + params.Body.Name + "' in namespace '" + ns.Token + "' is still attached to share '" + mapping.ShareToken + "'; unshare it before deleting the name")
+			dl.Errorf("%v", msg)
+			return share.NewDeleteShareNameConflict().WithPayload(msg)
+		}
+	}
+
+	// clean up any stale mappings from already deleted shares before deleting the name
+	for _, mapping := range mappings {
+		if err := str.DeleteShareNameMapping(mapping.Id, trx); err != nil {
+			dl.Errorf("error deleting stale share name mapping '%v' for name '%v' in namespace '%v': %v", mapping.Id, params.Body.Name, ns.Token, err)
+			return share.NewDeleteShareNameInternalServerError()
+		}
+	}
+
 	// delete allocated name
 	if err := str.DeleteName(an.Id, trx); err != nil {
 		dl.Errorf("error deleting allocated name '%v' in namespace '%v' for account '%v': %v", params.Body.Name, ns.Token, principal.Email, err)

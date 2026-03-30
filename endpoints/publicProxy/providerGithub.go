@@ -125,8 +125,8 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 		if v, err := time.ParseDuration(token.Claims.(*IntermediateJWT).RefreshInterval); err == nil {
 			refreshInterval = v
 		} else {
-			errOut := errors.Wrapf(err, "unable to parse authorization check interval '%v'", token.Claims.(*IntermediateJWT).RefreshInterval)
-			dl.Error(errOut)
+			errOut := errors.New("unable to parse authorization check interval")
+			dl.Errorf("unable to parse authorization check interval '%v': %v", token.Claims.(*IntermediateJWT).RefreshInterval, err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errOut))
 			return
 		}

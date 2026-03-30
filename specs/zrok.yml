@@ -2412,6 +2412,10 @@ paths:
           description: unauthorized
         404:
           description: name not found
+        409:
+          description: name is still attached to an active share
+          schema:
+            $ref: "#/definitions/errorMessage"
         500:
           description: internal server error
   
@@ -2541,6 +2545,7 @@ paths:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
+
 
 definitions:
   authUser:

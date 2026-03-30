@@ -8,6 +8,10 @@ CHANGE: Removed the legacy `admin` `/grants` endpoint. Its prior synchronization
 
 CHANGE: Applying limit classes now validates requested assignments to prevent conflicting effective limit class combinations on an account (https://github.com/openziti/zrok/issues/726)
 
+FIX: Escaped proxyUi output by switching to html/template and removed reflected refreshInterval values from github oauth error pages.
+
+FIX: Users could get into a state where an allocated name returns a `500` error; this happened by various combinations of abnormal share termination, or deleting a name from underneath a live share... both resulted in bad frontend mappings that prevented proper share operation. The `zrok2 delete name` now refuses to delete names with an active share (`zrok2 delete share` first). The `zrok2 create name` now includes "healing" functionality that removes extraneous frontend mapping rows for the newly created namespace. Users can `zrok2 delete name` and `zrok2 create name` to fix any old issues around this. (https://github.com/openziti/zrok/issues/1219)
+
 FIX: Configurable upper limit on the number of cookie stripes allowed for the OAuth session cookie; includes hard limit on upper number of stripes at 32. Defaults to 10. (https://github.com/openziti/zrok/issues/1217)
 
 ## v2.0.0
