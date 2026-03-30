@@ -14,6 +14,10 @@ FIX: Users could get into a state where an allocated name returns a `500` error;
 
 FIX: Configurable upper limit on the number of cookie stripes allowed for the OAuth session cookie; includes hard limit on upper number of stripes at 32. Defaults to 10. (https://github.com/openziti/zrok/issues/1217)
 
+FEATURE: New `zrok2 delete access` subcommand that allows end users to clean up stale access frontends from the command line.
+
+FIX: Security hardening for the `/unaccess` endpoint.
+
 FIX: Always return success on reset password request, even if account not found... unless there was actually an error.
 
 ## v2.0.0

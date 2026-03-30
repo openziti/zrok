@@ -47,15 +47,10 @@ func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_mo
 		return share.NewUnaccessUnauthorized()
 	}
 
-	sfe, err := str.FindFrontendWithToken(feToken, trx)
+	sfe, err := str.FindFrontendWithTokenAndEnvironment(feToken, senv.Id, trx)
 	if err != nil {
-		dl.Errorf("error finding frontend for '%v': %v", principal.Email, err)
-		return share.NewUnaccessInternalServerError()
-	}
-
-	if sfe == nil || (sfe.EnvironmentId != nil && *sfe.EnvironmentId != senv.Id) {
-		dl.Errorf("frontend named '%v' not found", feToken)
-		return share.NewUnaccessInternalServerError()
+		dl.Errorf("frontend named '%v' not found or not owned by environment '%v': %v", feToken, envZId, err)
+		return share.NewUnaccessNotFound()
 	}
 
 	if err := str.DeleteFrontend(sfe.Id, trx); err != nil {
