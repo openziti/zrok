@@ -1,6 +1,8 @@
 package controller
 
 import (
+	stderrors "errors"
+
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/controller/store"
@@ -25,8 +27,6 @@ func (handler *resetPasswordRequestHandler) Handle(params account.ResetPasswordR
 	}
 	dl.Infof("received reset password request for email '%v'", params.Body.EmailAddress)
 
-	var token string
-
 	trx, err := str.Begin()
 	if err != nil {
 		dl.Errorf("error starting transaction for request '%v': %v", params.Body.EmailAddress, err)
@@ -34,15 +34,19 @@ func (handler *resetPasswordRequestHandler) Handle(params account.ResetPasswordR
 	}
 	defer func() { _ = trx.Rollback() }()
 
-	token, err = CreateToken()
+	a, err := str.FindAccountWithEmail(params.Body.EmailAddress, trx)
 	if err != nil {
-		dl.Errorf("error creating token for '%v': %v", params.Body.EmailAddress, err)
+		if stderrors.Is(err, store.ErrAccountNotFound) {
+			dl.Infof("received reset password request for unknown email '%v'", params.Body.EmailAddress)
+			return account.NewResetPasswordRequestCreated()
+		}
+		dl.Errorf("error looking up account for '%v': %v", params.Body.EmailAddress, err)
 		return account.NewResetPasswordRequestInternalServerError()
 	}
 
-	a, err := str.FindAccountWithEmail(params.Body.EmailAddress, trx)
+	token, err := CreateToken()
 	if err != nil {
-		dl.Errorf("no account found for '%v': %v", params.Body.EmailAddress, err)
+		dl.Errorf("error creating token for '%v': %v", params.Body.EmailAddress, err)
 		return account.NewResetPasswordRequestInternalServerError()
 	}
 

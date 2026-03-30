@@ -18,6 +18,8 @@ FEATURE: New `zrok2 delete access` subcommand that allows end users to clean up 
 
 FIX: Security hardening for the `/unaccess` endpoint.
 
+FIX: Always return success on reset password request, even if account not found... unless there was actually an error.
+
 ## v2.0.0
 
 FEATURE: Major changes to how "unique names" and "reserved sharing" work. See the [zrok v2 Migration Guide](https://docs.zrok.io) for details. Reserved sharing, including the `zrok reserve`, `zrok release` and `zrok share reserved` commands have been removed. Namespaces and reserved names replace these concepts in a much more powerful, flexible way which can accomplish what reserved sharing did in a much better way. (https://github.com/openziti/zrok/issues/726)
