@@ -216,6 +216,7 @@ services:
       ZROK2_ADMIN_TOKEN: ${ZROK2_ADMIN_TOKEN:?err}
       ZROK2_API_ENDPOINT: http://127.0.0.1:${ZROK2_CTRL_PORT:-18080}
       HOME: /var/lib/zrok2
+      DL_USE_JSON: "false"  # configure log format
     depends_on:
       zrok2-init:
         condition: service_completed_successfully
@@ -243,6 +244,7 @@ services:
     environment:
       ZROK2_API_ENDPOINT: http://zrok2-controller:${ZROK2_CTRL_PORT:-18080}
       HOME: /var/lib/zrok2
+      DL_USE_JSON: "false"  # configure log format
     depends_on:
       zrok2-controller:
         condition: service_healthy
@@ -267,6 +269,7 @@ services:
     profiles: ["metrics"]
     environment:
       HOME: /var/lib/zrok2
+      DL_USE_JSON: "false"  # configure log format
     depends_on:
       zrok2-controller:
         condition: service_healthy
