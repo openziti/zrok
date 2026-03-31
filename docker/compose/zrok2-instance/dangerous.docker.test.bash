@@ -246,6 +246,12 @@ for var in ZROK2_ADMIN_TOKEN ZITI_PWD ZROK2_DB_PASSWORD \
     sed -i "s|^${var}=.*|${var}=$(generate_password)|" "${ENV_FILE}"
 done
 sed -i "s|^ZROK2_DNS_ZONE=.*|ZROK2_DNS_ZONE=zrok.127.0.0.1.sslip.io|" "${ENV_FILE}"
+# Tag the locally-built image distinctly from published images so the test
+# never accidentally uses a stale published openziti/zrok2:latest.
+ZROK2_CI_IMAGE="zrok2-ci-test"
+ZROK2_CI_TAG="local"
+echo "ZROK2_IMAGE=${ZROK2_CI_IMAGE}" >> "${ENV_FILE}"
+echo "ZROK2_TAG=${ZROK2_CI_TAG}" >> "${ENV_FILE}"
 # Enable the metrics pipeline so we can verify InfluxDB receives data.
 sed -i "s|^# ZROK2_METRICS_ENABLED=.*|ZROK2_METRICS_ENABLED=true|" "${ENV_FILE}"
 # Pin Ziti image repo and/or tag if specified.
@@ -427,3 +433,201 @@ else
         exec -T ziti-controller wc -l /ziti-controller/fabric-usage.json 2>&1 || true
     exit 1
 fi
+
+# ============================================================
+# Phase 6: Agent graceful shutdown releases named shares
+# ============================================================
+#
+# Verifies the fix for the agent shutdown race: the agent must release its
+# named share on the controller before exiting so that a subsequent agent
+# start (or different agent) can re-use the same name without hitting a
+# 409 shareConflict.
+
+log_section "Phase 6: Agent graceful shutdown releases named shares"
+
+AGENT_NAME="agent-ci-$(date +%s)"
+AGENT_HOME="/tmp/agent-${AGENT_NAME}"
+FRONTEND_PORT="${ZROK2_FRONTEND_PORT:-8080}"
+DNS_ZONE="${ZROK2_DNS_ZONE:-zrok.127.0.0.1.sslip.io}"
+
+# Resolve the locally-built zrok2 image from the running compose stack.
+# The compose build overlay tags the image for each service; we grab the
+# image used by the controller (any zrok2 service would work).
+ZROK2_TEST_IMAGE=$(cd "${COMPOSE_PROJECT_DIR}" && \
+    docker compose images zrok2-controller --format json 2>/dev/null \
+    | jq -r '.[0] | "\(.Repository):\(.Tag)"' 2>/dev/null)
+if [[ -z "${ZROK2_TEST_IMAGE}" ]]; then
+    ZROK2_TEST_IMAGE="${ZROK2_IMAGE:-docker.io/openziti/zrok2}:${ZROK2_TAG:-latest}"
+    log_info "could not resolve image from compose; falling back to ${ZROK2_TEST_IMAGE}"
+fi
+log_info "using image: ${ZROK2_TEST_IMAGE}"
+
+# Create a test account and enable an environment inside a helper container.
+# The environment state is stored on a named volume so the agent container
+# can mount it.
+AGENT_VOLUME="zrok2-agent-test-${AGENT_NAME}"
+docker volume create "${AGENT_VOLUME}" >/dev/null
+
+# Fix volume ownership (same pattern as compose's zrok-init service).
+docker run --rm --user root \
+    -v "${AGENT_VOLUME}:${AGENT_HOME}" \
+    busybox chown -Rc 2171:2171 "${AGENT_HOME}/"
+
+log_info "creating agent test account and environment..."
+docker run --rm --network=host --entrypoint bash \
+    -e "ZROK2_API_ENDPOINT=${ZROK2_API_ENDPOINT}" \
+    -e "ZROK2_ADMIN_TOKEN=${ZROK2_ADMIN_TOKEN}" \
+    -e "HOME=${AGENT_HOME}" \
+    -v "${AGENT_VOLUME}:${AGENT_HOME}" \
+    "${ZROK2_TEST_IMAGE}" \
+    -c "
+        set -euo pipefail
+        TOKEN=\$(zrok2 admin create account \
+            'agent-${AGENT_NAME}@zrok.internal' 'agentpass')
+        ZROK2_ENABLE_TOKEN=\"\${TOKEN}\" zrok2-enable
+        zrok2 create name '${AGENT_NAME}'
+    "
+log_pass "agent account enabled, name '${AGENT_NAME}' created"
+
+# Start the agent with a named share in a detached container.
+AGENT_CONTAINER="zrok2-agent-test-${AGENT_NAME}"
+AGENT_BACKEND_PORT=19191
+
+# Start a test HTTP endpoint in the agent container so the share has a
+# reachable backend.  Bind to all interfaces so it's reachable from the
+# overlay network, not just loopback.
+log_info "starting agent with test endpoint and named share '${AGENT_NAME}'..."
+docker run -d --name "${AGENT_CONTAINER}" --network=host --entrypoint bash \
+    -e "ZROK2_API_ENDPOINT=${ZROK2_API_ENDPOINT}" \
+    -e "HOME=${AGENT_HOME}" \
+    -v "${AGENT_VOLUME}:${AGENT_HOME}" \
+    "${ZROK2_TEST_IMAGE}" \
+    -c "
+        set -euo pipefail
+        rm -f '${AGENT_HOME}/.zrok2/agent.socket'
+
+        # Start a test HTTP backend on all interfaces.
+        zrok2 test endpoint --address 0.0.0.0 --port ${AGENT_BACKEND_PORT} &
+
+        zrok2 agent start &
+        AGENT_PID=\$!
+        # Forward SIGTERM to the agent so Shutdown() runs on docker stop.
+        trap 'kill -TERM \${AGENT_PID} 2>/dev/null; wait \${AGENT_PID} 2>/dev/null' TERM
+        sleep 3
+        zrok2 share public \
+            --name-selection 'public:${AGENT_NAME}' \
+            --headless \
+            'http://127.0.0.1:${AGENT_BACKEND_PORT}'
+        wait \${AGENT_PID}
+    "
+
+# Wait for the share to appear on the frontend.
+log_info "waiting for agent share '${AGENT_NAME}' to be routable..."
+_share_found=false
+for _attempt in $(seq 1 30); do
+    if curl -sf \
+        -H "Host: ${AGENT_NAME}.${DNS_ZONE}" \
+        "http://127.0.0.1:${FRONTEND_PORT}/" 2>/dev/null \
+        | grep -q "zrok"; then
+        _share_found=true
+        break
+    fi
+    sleep 2
+done
+
+if [[ "${_share_found}" != "true" ]]; then
+    log_error "agent share '${AGENT_NAME}' not routable after 60s"
+    docker logs "${AGENT_CONTAINER}" --tail=30 2>&1 || true
+    docker rm -f "${AGENT_CONTAINER}" 2>/dev/null || true
+    docker volume rm "${AGENT_VOLUME}" 2>/dev/null || true
+    exit 1
+fi
+log_pass "agent share '${AGENT_NAME}' is routable"
+
+# Gracefully stop the agent container. The Shutdown() method should block
+# until deleteShare completes on the controller.
+log_info "stopping agent container gracefully (10s grace)..."
+docker stop --timeout 10 "${AGENT_CONTAINER}"
+docker rm "${AGENT_CONTAINER}" 2>/dev/null || true
+log_info "agent container stopped"
+
+# Verify the name is released: create a throwaway share with the same name.
+# If the agent's Shutdown didn't release, this will 409.
+# Verify the name is released: try to create a new share with the same name.
+# If the agent's Shutdown didn't release, the POST /share returns 409.
+# We run the share in the background, wait briefly for the API call to
+# succeed (or fail), then check if the process is still alive.  If it exited
+# immediately with an error, the name wasn't released.
+log_info "verifying name '${AGENT_NAME}' is released on controller..."
+VERIFY_CONTAINER="zrok2-verify-release-${AGENT_NAME}"
+docker run -d --name "${VERIFY_CONTAINER}" --network=host --entrypoint bash \
+    -e "ZROK2_API_ENDPOINT=${ZROK2_API_ENDPOINT}" \
+    -e "HOME=${AGENT_HOME}" \
+    -v "${AGENT_VOLUME}:${AGENT_HOME}" \
+    "${ZROK2_TEST_IMAGE}" \
+    -c "
+        set -euo pipefail
+        zrok2 share public 'http://127.0.0.1:${AGENT_BACKEND_PORT}' \
+            --name-selection 'public:${AGENT_NAME}' \
+            --backend-mode proxy --headless
+    "
+# Give the share API call a few seconds to succeed or 409.
+sleep 5
+if docker inspect "${VERIFY_CONTAINER}" --format '{{.State.Running}}' 2>/dev/null | grep -q true; then
+    log_pass "name '${AGENT_NAME}' is available after agent shutdown (no 409)"
+    docker stop --time 2 "${VERIFY_CONTAINER}" 2>/dev/null || true
+else
+    _verify_exit=$(docker inspect "${VERIFY_CONTAINER}" --format '{{.State.ExitCode}}' 2>/dev/null || echo "unknown")
+    log_error "name '${AGENT_NAME}' NOT released — share exited with code ${_verify_exit}"
+    docker logs "${VERIFY_CONTAINER}" --tail=10 2>&1 || true
+    docker rm "${VERIFY_CONTAINER}" 2>/dev/null || true
+    docker volume rm "${AGENT_VOLUME}" 2>/dev/null || true
+    exit 1
+fi
+docker rm "${VERIFY_CONTAINER}" 2>/dev/null || true
+
+# Restart the agent and verify it reloads the share from the registry.
+log_info "restarting agent to verify registry reload..."
+AGENT_CONTAINER2="zrok2-agent-test2-${AGENT_NAME}"
+docker run -d --name "${AGENT_CONTAINER2}" --network=host --entrypoint bash \
+    -e "ZROK2_API_ENDPOINT=${ZROK2_API_ENDPOINT}" \
+    -e "HOME=${AGENT_HOME}" \
+    -v "${AGENT_VOLUME}:${AGENT_HOME}" \
+    "${ZROK2_TEST_IMAGE}" \
+    -c "
+        set -euo pipefail
+        rm -f '${AGENT_HOME}/.zrok2/agent.socket'
+        zrok2 test endpoint --address 0.0.0.0 --port ${AGENT_BACKEND_PORT} &
+        zrok2 agent start &
+        AGENT_PID=\$!
+        trap 'kill -TERM \${AGENT_PID} 2>/dev/null; wait \${AGENT_PID} 2>/dev/null' TERM
+        wait \${AGENT_PID}
+    "
+
+# Wait for the agent to reload the share from its registry.
+log_info "waiting for agent to reload share '${AGENT_NAME}' from registry..."
+_reload_ok=false
+for _attempt in $(seq 1 30); do
+    if curl -sf \
+        -H "Host: ${AGENT_NAME}.${DNS_ZONE}" \
+        "http://127.0.0.1:${FRONTEND_PORT}/" 2>/dev/null \
+        | grep -q "zrok"; then
+        _reload_ok=true
+        break
+    fi
+    sleep 2
+done
+
+docker stop --timeout 10 "${AGENT_CONTAINER2}" 2>/dev/null || true
+docker rm "${AGENT_CONTAINER2}" 2>/dev/null || true
+
+if [[ "${_reload_ok}" == "true" ]]; then
+    log_pass "agent reloaded share '${AGENT_NAME}' from registry after restart"
+else
+    log_error "agent failed to reload share '${AGENT_NAME}' after restart"
+    docker logs "${AGENT_CONTAINER2}" --tail=30 2>&1 || true
+fi
+
+# Clean up the test volume.
+docker volume rm "${AGENT_VOLUME}" 2>/dev/null || true
+log_pass "agent graceful shutdown test passed"

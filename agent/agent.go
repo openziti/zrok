@@ -2,9 +2,12 @@ package agent
 
 import (
 	"context"
+	"encoding/json"
 	"net"
 	"net/http"
 	"os"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -105,19 +108,58 @@ func (a *Agent) Run() error {
 func (a *Agent) Shutdown() {
 	dl.Infof("stopping")
 
+	// Prevent the manager() select loop from saving the registry while we're
+	// shutting down — we'll do a final save ourselves.
 	a.persistRegistry = false
 
 	if err := os.Remove(a.agentSocket); err != nil {
 		dl.Warnf("unable to remove agent socket: %v", err)
 	}
+
+	// Save the registry BEFORE releasing shares on the controller.  This
+	// ensures the share configs survive even if the release API call fails
+	// (controller unreachable, container killed, etc.).  On the next start,
+	// ReloadRegistry will re-create the shares.  The atomic Save (temp +
+	// rename) prevents the truncated-file corruption that occurs when the
+	// process exits mid-write.
+	//
+	// Call saveRegistryNow directly since persistRegistry is already false
+	// (which blocks SaveRegistry and the retry manager from overwriting
+	// this save during the shutdown race).
+	if err := a.saveRegistryNow(); err != nil {
+		dl.Errorf("error saving registry during shutdown: %v", err)
+	}
+
+	// Release shares and accesses on the controller.  Only make the API
+	// call — don't StopChild/WaitChild because the monitor() goroutine and
+	// manager() select loop race to reap the same child processes.  The OS
+	// kills children when the parent exits.
+	var wg sync.WaitGroup
 	for _, shr := range a.shares {
-		dl.Debugf("stopping share '%v'", shr.token)
-		a.rmShare <- shr
+		wg.Add(1)
+		go func(s *share) {
+			defer wg.Done()
+			dl.Infof("releasing share '%v' on controller", s.token)
+			if err := a.deleteShare(s.token); err != nil {
+				dl.Errorf("error releasing share '%v': %v", s.token, err)
+			} else {
+				dl.Infof("released share '%v'", s.token)
+			}
+		}(shr)
 	}
 	for _, acc := range a.accesses {
-		dl.Debugf("stopping access '%v'", acc.token)
-		a.rmAccess <- acc
+		wg.Add(1)
+		go func(ac *access) {
+			defer wg.Done()
+			dl.Infof("releasing access '%v' on controller", ac.frontendToken)
+			if err := a.deleteAccess(ac.token, ac.frontendToken); err != nil {
+				dl.Errorf("error releasing access '%v': %v", ac.frontendToken, err)
+			} else {
+				dl.Infof("released access '%v'", ac.frontendToken)
+			}
+		}(acc)
 	}
+	wg.Wait()
 
 	a.retryManager.stop()
 }
@@ -176,6 +218,27 @@ func (a *Agent) ReloadRegistry() error {
 				registryModified = true
 			}
 		} else {
+			// If the error is a 409 name conflict and the stale share belongs
+			// to this environment, release it and retry once before falling
+			// back to exponential backoff.
+			if strings.Contains(err.Error(), "shareConflict") {
+				if a.releaseOwnConflictingShare(share.Request.NameSelections) {
+					dl.Infof("retrying public share '%v' after releasing own stale conflict", share.Request.Target)
+					if token, frontends, retryErr := a.SharePublic(share.Request); retryErr == nil {
+						dl.Infof("restarted public share '%v' -> token='%v', frontends='%v'", share.Request.Target, token, frontends)
+						if share.Failure != nil {
+							share.Failure = nil
+							registryModified = true
+						}
+						continue
+					} else {
+						dl.Warnf("retry after conflict release also failed for '%v': %v", share.Request.Target, retryErr)
+					}
+				} else {
+					dl.Warnf("name conflict for '%v' is not from this environment; cannot auto-resolve", share.Request.Target)
+				}
+			}
+
 			dl.Warnf("failed to restart public share '%v': %v (will retry)", share.Request.Target, err)
 			if share.Failure != nil {
 				share.Failure.Count++
@@ -239,6 +302,13 @@ func (a *Agent) ReloadRegistry() error {
 }
 
 func (a *Agent) SaveRegistry() error {
+	if !a.persistRegistry {
+		return nil
+	}
+	return a.saveRegistryNow()
+}
+
+func (a *Agent) saveRegistryNow() error {
 	r := &Registry{}
 	// save private accesses
 	for _, acc := range a.accesses {
@@ -488,6 +558,69 @@ func (a *Agent) manager() {
 			}
 		}
 	}
+}
+
+// releaseOwnConflictingShare checks if a name conflict (409) is caused by a
+// stale share in this agent's own environment.  If so, it releases the stale
+// share so the next creation attempt can succeed.  Shares belonging to other
+// environments are never touched.
+func (a *Agent) releaseOwnConflictingShare(nameSelections []NameSelection) bool {
+	envZId := a.root.Environment().ZitiIdentity
+	if envZId == "" {
+		return false
+	}
+
+	overviewJSON, err := sdk.Overview(a.root)
+	if err != nil {
+		dl.Warnf("unable to fetch overview for conflict resolution: %v", err)
+		return false
+	}
+
+	type overviewEnv struct {
+		Environment struct {
+			ZId string `json:"zId"`
+		} `json:"environment"`
+		Shares []struct {
+			Token          string `json:"token"`
+			NameSelections []struct {
+				Name string `json:"name"`
+			} `json:"nameSelections"`
+		} `json:"shares"`
+	}
+	var ov struct {
+		Environments []overviewEnv `json:"environments"`
+	}
+	if err := json.Unmarshal([]byte(overviewJSON), &ov); err != nil {
+		dl.Warnf("unable to parse overview for conflict resolution: %v", err)
+		return false
+	}
+
+	conflictingNames := make(map[string]bool)
+	for _, ns := range nameSelections {
+		if ns.Name != "" {
+			conflictingNames[ns.Name] = true
+		}
+	}
+
+	for _, env := range ov.Environments {
+		if env.Environment.ZId != envZId {
+			continue // not our environment — don't touch
+		}
+		for _, shr := range env.Shares {
+			for _, ns := range shr.NameSelections {
+				if conflictingNames[ns.Name] {
+					dl.Infof("releasing stale share '%v' (name '%v') from own environment", shr.Token, ns.Name)
+					if err := sdk.DeleteShare(a.root, &sdk.Share{Token: shr.Token}); err != nil {
+						dl.Warnf("unable to release stale share '%v': %v", shr.Token, err)
+						return false
+					}
+					return true
+				}
+			}
+		}
+	}
+
+	return false
 }
 
 func (a *Agent) deleteShare(token string) error {

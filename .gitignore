@@ -16,6 +16,8 @@ node_modules/
 
 # Artifacts
 /dist/
+/sdk/nodejs/sdk/dist/
+/sdk/python/src/dist/
 
 # Generated files
 .docusaurus
@@ -33,21 +35,18 @@ go.work.sum
 *-venv/
 .venv/
 /localtest/
+.obsidian
 
 # cache used by local dev cross-build script
 /.npm
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-.obsidian
-
-sdk/nodejs/sdk/dist
+.docker-builder-built
 
 # py module artifacts
 *.egg-info/
 __pycache__/
 /.coverage
-/sdk/python/src/dist/
 /sdk/python/.coverage
 .python-version
