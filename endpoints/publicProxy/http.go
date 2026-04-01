@@ -192,7 +192,7 @@ func shareHandler(handler http.Handler, cfg *Config, signingKey []byte, ctx ziti
 
 		if r.Method == http.MethodOptions {
 			if cfg.Oauth != nil {
-				setOAuthCorsHeaders(w, r, cfg.Oauth)
+				setOAuthCorsHeaders(w, r)
 			}
 			filterSessionCookies(w, r, cfg)
 			handler.ServeHTTP(w, r)
