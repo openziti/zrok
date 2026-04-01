@@ -29,8 +29,14 @@ func (c *zrokClaims) getTargetHost() (jwt.ClaimStrings, error) {
 	return jwt.ClaimStrings{c.TargetHost}, nil
 }
 
-func setOAuthCorsHeaders(w http.ResponseWriter, cfg *oauthConfig) {
-	w.Header().Set("Access-Control-Allow-Origin", cfg.EndpointUrl)
+func setOAuthCorsHeaders(w http.ResponseWriter, r *http.Request, cfg *oauthConfig) {
+	origin := r.Header.Get("Origin")
+	if origin != "" {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+	} else {
+		w.Header().Set("Access-Control-Allow-Origin", cfg.EndpointUrl)
+	}
+	w.Header().Set("Vary", "Origin")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
@@ -38,12 +44,12 @@ func setOAuthCorsHeaders(w http.ResponseWriter, cfg *oauthConfig) {
 }
 
 func oauthLoginRequired(w http.ResponseWriter, r *http.Request, cfg *oauthConfig, provider, target string, refreshInterval time.Duration) {
-	setOAuthCorsHeaders(w, cfg)
+	setOAuthCorsHeaders(w, r, cfg)
 	http.Redirect(w, r, fmt.Sprintf("%s/%s/login?targetHost=%s&refreshInterval=%s", cfg.EndpointUrl, provider, url.QueryEscape(target), refreshInterval.String()), http.StatusFound)
 }
 
 func oauthRefreshRequired(w http.ResponseWriter, r *http.Request, cfg *oauthConfig, provider, target string) {
-	setOAuthCorsHeaders(w, cfg)
+	setOAuthCorsHeaders(w, r, cfg)
 	http.Redirect(w, r, fmt.Sprintf("%s/%s/refresh?targetHost=%s", cfg.EndpointUrl, provider, url.QueryEscape(target)), http.StatusFound)
 }
 
