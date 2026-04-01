@@ -91,7 +91,7 @@ func (r *oauthRouter) Start() error {
 
 	r.server = &http.Server{
 		Addr:         r.cfg.BindAddress,
-		Handler:      r.router,
+		Handler:      oauthCorsMiddleware(r.router),
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
 		IdleTimeout:  60 * time.Second,
@@ -120,6 +120,24 @@ func (r *oauthRouter) Stop() error {
 		return r.server.Shutdown(ctx)
 	}
 	return nil
+}
+
+func oauthCorsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodOptions {
+			origin := r.Header.Get("Origin")
+			if origin != "" {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+				w.Header().Set("Vary", "Origin")
+				w.Header().Set("Access-Control-Allow-Credentials", "true")
+				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+				w.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+			}
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 // buildOAuthRouter creates and registers the OAuth router as a df component
