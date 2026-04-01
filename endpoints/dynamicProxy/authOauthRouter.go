@@ -130,7 +130,7 @@ func oauthCorsMiddleware(next http.Handler) http.Handler {
 				w.Header().Set("Access-Control-Allow-Origin", origin)
 				w.Header().Set("Vary", "Origin")
 				w.Header().Set("Access-Control-Allow-Credentials", "true")
-				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, zt-session")
 				w.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
 			}
 			w.WriteHeader(http.StatusNoContent)
