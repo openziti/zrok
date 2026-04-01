@@ -10,6 +10,7 @@ import (
 	"github.com/michaelquigley/df/da"
 	"github.com/michaelquigley/df/dd"
 	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/endpoints"
 	"github.com/openziti/zrok/v2/endpoints/proxyUi"
 	"github.com/pkg/errors"
 )
@@ -91,7 +92,7 @@ func (r *oauthRouter) Start() error {
 
 	r.server = &http.Server{
 		Addr:         r.cfg.BindAddress,
-		Handler:      oauthCorsMiddleware(r.router),
+		Handler:      oauthOptionsHandler(r.cfg, r.router),
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
 		IdleTimeout:  60 * time.Second,
@@ -122,18 +123,16 @@ func (r *oauthRouter) Stop() error {
 	return nil
 }
 
-func oauthCorsMiddleware(next http.Handler) http.Handler {
+func oauthOptionsHandler(cfg *oauthConfig, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodOptions {
-			origin := r.Header.Get("Origin")
-			if origin != "" {
-				w.Header().Set("Access-Control-Allow-Origin", origin)
-				w.Header().Set("Vary", "Origin")
-				w.Header().Set("Access-Control-Allow-Credentials", "true")
-				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, zt-session")
-				w.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+			cookies := r.Cookies()
+			r.Header.Del("Cookie")
+			filtered := endpoints.FilterSessionCookies(cookies, cfg.CookieName)
+			for _, cookie := range filtered {
+				r.AddCookie(cookie)
 			}
-			w.WriteHeader(http.StatusNoContent)
+			next.ServeHTTP(w, r)
 			return
 		}
 		next.ServeHTTP(w, r)
