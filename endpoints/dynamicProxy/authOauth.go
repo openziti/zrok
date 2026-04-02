@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/gobwas/glob"
@@ -30,7 +32,23 @@ func (c *zrokClaims) getTargetHost() (jwt.ClaimStrings, error) {
 	return jwt.ClaimStrings{c.TargetHost}, nil
 }
 
-func oauthLoginRequired(w http.ResponseWriter, r *http.Request, cfg *oauthConfig, provider, target string, refreshInterval time.Duration) {
+func (h *authHandler) oauthLoginRequired(w http.ResponseWriter, r *http.Request, cfg *oauthConfig, provider, target string, refreshInterval time.Duration) {
+	// issue an internal OPTIONS request to the backend to retrieve CORS headers
+	optionsReq, _ := http.NewRequest(http.MethodOptions, r.URL.String(), nil)
+	optionsReq.Host = r.Host
+	optionsReq.URL = r.URL
+	rec := httptest.NewRecorder()
+	h.handler.ServeHTTP(rec, optionsReq)
+
+	// copy CORS headers from the backend response
+	for name, values := range rec.Header() {
+		if strings.HasPrefix(strings.ToLower(name), "access-control-") {
+			for _, v := range values {
+				w.Header().Add(name, v)
+			}
+		}
+	}
+
 	loginUrl := fmt.Sprintf("%s/%s/login?targetHost=%s&refreshInterval=%s", cfg.EndpointUrl, provider, url.QueryEscape(target), refreshInterval.String())
 	w.Header().Set("WWW-Authenticate", "oauth")
 	w.Header().Set("Content-Type", "application/json")
@@ -57,7 +75,7 @@ func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg ma
 	cookie, err := getSessionCookie(r, h.cfg.Oauth)
 	if err != nil {
 		dl.Errorf("unable to get '%v' cookie: %v", h.cfg.Oauth.CookieName, err)
-		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
+		h.oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		return false
 	}
 
@@ -81,14 +99,14 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 	})
 	if err != nil {
 		dl.Errorf("unable to parse jwt: %v", err)
-		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
+		h.oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		return false
 	}
 
 	claims := tkn.Claims.(*zrokClaims)
 	if claims.Provider != provider || claims.RefreshInterval != refreshInterval || claims.TargetHost != r.Host {
 		dl.Errorf("token validation failed; restarting auth flow (email: '%v', target: '%v')", claims.Email, target)
-		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
+		h.oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		return false
 	}
 
@@ -98,7 +116,7 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 			oauthRefreshRequired(w, r, h.cfg.Oauth, provider, target)
 		} else {
 			dl.Warnf("oauth session expired; re-login (email: '%v', target: '%v')", claims.Email, target)
-			oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
+			h.oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		}
 		return false
 	} else {

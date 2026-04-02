@@ -1,16 +1,22 @@
 package dynamicProxy
 
-import "github.com/golang-jwt/jwt/v5"
+import (
+	"net/http"
+
+	"github.com/golang-jwt/jwt/v5"
+)
 
 type authHandler struct {
 	cfg        *config
 	signingKey []byte
+	handler    http.Handler
 }
 
-func newAuthHandler(cfg *config, signingKey []byte) *authHandler {
+func newAuthHandler(cfg *config, signingKey []byte, handler http.Handler) *authHandler {
 	return &authHandler{
 		cfg:        cfg,
 		signingKey: signingKey,
+		handler:    handler,
 	}
 }
 

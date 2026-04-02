@@ -100,9 +100,11 @@ func TestShareHandlerGetStillRedirectsForOAuth(t *testing.T) {
 	})
 	defer restore()
 
-	upstreamCalled := false
+	getProxied := false
 	handler := shareHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		upstreamCalled = true
+		if r.Method == http.MethodGet {
+			getProxied = true
+		}
 		w.WriteHeader(http.StatusNoContent)
 	}), &Config{
 		HostMatch: "example.com",
@@ -118,7 +120,7 @@ func TestShareHandlerGetStillRedirectsForOAuth(t *testing.T) {
 	rec := httptest.NewRecorder()
 	handler.ServeHTTP(rec, req)
 
-	if upstreamCalled {
+	if getProxied {
 		t.Fatal("expected GET request without session to be blocked by frontend auth")
 	}
 	if rec.Code != http.StatusUnauthorized {

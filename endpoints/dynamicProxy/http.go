@@ -186,7 +186,7 @@ func hostTargetReverseProxy(cfg *config, ctx ziti.Context, mappings *mappings) *
 }
 
 func shareHandler(handler http.Handler, cfg *config, signingKey []byte, ctx ziti.Context, mappings *mappings) http.HandlerFunc {
-	auth := newAuthHandler(cfg, signingKey)
+	auth := newAuthHandler(cfg, signingKey, handler)
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		mapping, found := mappings.getMapping(hostOnly(r.Host))
