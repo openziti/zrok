@@ -1,6 +1,7 @@
 package publicProxy
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -28,7 +29,11 @@ func (c *zrokClaims) getTargetHost() (jwt.ClaimStrings, error) {
 }
 
 func oauthLoginRequired(w http.ResponseWriter, r *http.Request, cfg *OauthConfig, provider, target string, refreshInterval time.Duration) {
-	http.Redirect(w, r, fmt.Sprintf("%s/%s/login?targetHost=%s&refreshInterval=%s", cfg.EndpointUrl, provider, url.QueryEscape(target), refreshInterval.String()), http.StatusFound)
+	loginUrl := fmt.Sprintf("%s/%s/login?targetHost=%s&refreshInterval=%s", cfg.EndpointUrl, provider, url.QueryEscape(target), refreshInterval.String())
+	w.Header().Set("WWW-Authenticate", "oauth")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusUnauthorized)
+	json.NewEncoder(w).Encode(map[string]string{"login_url": loginUrl})
 }
 
 func oauthRefreshRequired(w http.ResponseWriter, r *http.Request, cfg *OauthConfig, provider, target string) {

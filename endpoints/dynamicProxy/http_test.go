@@ -1,6 +1,7 @@
 package dynamicProxy
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -129,11 +130,21 @@ func TestShareHandlerGetStillRedirectsForOAuth(t *testing.T) {
 	if upstreamCalled {
 		t.Fatal("expected GET request without session to be blocked by frontend auth")
 	}
-	if rec.Code != http.StatusFound {
-		t.Fatalf("expected status %d, got %d", http.StatusFound, rec.Code)
+	if rec.Code != http.StatusUnauthorized {
+		t.Fatalf("expected status %d, got %d", http.StatusUnauthorized, rec.Code)
 	}
-	if location := rec.Header().Get("Location"); !strings.Contains(location, "/github/login") {
-		t.Fatalf("expected oauth redirect location, got %q", location)
+	if auth := rec.Header().Get("WWW-Authenticate"); auth != "oauth" {
+		t.Fatalf("expected WWW-Authenticate: oauth, got %q", auth)
+	}
+	if ct := rec.Header().Get("Content-Type"); !strings.Contains(ct, "application/json") {
+		t.Fatalf("expected application/json content type, got %q", ct)
+	}
+	var body map[string]string
+	if err := json.NewDecoder(rec.Body).Decode(&body); err != nil {
+		t.Fatalf("expected json body: %v", err)
+	}
+	if loginUrl, ok := body["login_url"]; !ok || !strings.Contains(loginUrl, "/github/login") {
+		t.Fatalf("expected login_url containing /github/login, got %q", body["login_url"])
 	}
 }
 
