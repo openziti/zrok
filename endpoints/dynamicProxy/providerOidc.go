@@ -17,6 +17,7 @@ import (
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/endpoints/proxyUi"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	zhttp "github.com/zitadel/oidc/v3/pkg/http"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 )
 
@@ -303,8 +304,10 @@ func createOidcProvider(config *oidcConfig, oauthCfg *oauthConfig, tls bool) (*o
 		return nil, err
 	}
 
+	cookieHandler := zhttp.NewCookieHandler(signingKey, encryptionKey, zhttp.WithUnsecure(), zhttp.WithDomain(oauthCfg.CookieDomain))
 	redirectUrl := fmt.Sprintf("%v/%v/auth/callback", oauthCfg.EndpointUrl, config.Name)
 	providerOptions := []rp.Option{
+		rp.WithCookieHandler(cookieHandler),
 		rp.WithVerifierOpts(rp.WithIssuedAtOffset(5 * time.Second)),
 	}
 	if config.DiscoveryURL != "" {
