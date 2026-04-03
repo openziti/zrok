@@ -51,7 +51,7 @@ func (c *oidcConfig) configure(cfg *OauthConfig, tls bool) error {
 	if err != nil {
 		return err
 	}
-	cookieHandler := zhttp.NewCookieHandler(signingKey, encryptionKey, zhttp.WithUnsecure(), zhttp.WithDomain(cfg.CookieDomain))
+	cookieHandler := zhttp.NewCookieHandler(signingKey, encryptionKey, zhttp.WithSameSite(http.SameSiteNoneMode), zhttp.WithDomain(cfg.CookieDomain))
 	redirectUrl := fmt.Sprintf("%v/%v/auth/callback", cfg.EndpointUrl, c.Name)
 	providerOptions := []rp.Option{
 		rp.WithCookieHandler(cookieHandler),
