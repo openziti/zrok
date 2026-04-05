@@ -4,9 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/gobwas/glob"
@@ -33,20 +31,9 @@ func (c *zrokClaims) getTargetHost() (jwt.ClaimStrings, error) {
 }
 
 func (h *authHandler) oauthLoginRequired(w http.ResponseWriter, r *http.Request, cfg *oauthConfig, provider, target string, refreshInterval time.Duration) {
-	// issue an internal OPTIONS request to the backend to retrieve CORS headers
-	optionsReq, _ := http.NewRequest(http.MethodOptions, r.URL.String(), nil)
-	optionsReq.Host = r.Host
-	optionsReq.URL = r.URL
-	rec := httptest.NewRecorder()
-	h.handler.ServeHTTP(rec, optionsReq)
-
-	// copy CORS headers from the backend response
-	for name, values := range rec.Header() {
-		if strings.HasPrefix(strings.ToLower(name), "access-control-") {
-			for _, v := range values {
-				w.Header().Add(name, v)
-			}
-		}
+	if (r.Header.Get("Origin") != "") && (r.Header.Get("Origin") != "null") {
+		w.Header().Add("Access-Control-Allow-Credentials", "true")
+		w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 	}
 
 	loginUrl := fmt.Sprintf("%s/%s/login?targetHost=%s&refreshInterval=%s", cfg.EndpointUrl, provider, url.QueryEscape(target), refreshInterval.String())
