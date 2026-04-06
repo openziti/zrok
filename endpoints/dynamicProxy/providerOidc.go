@@ -129,6 +129,9 @@ func (p *oidcProvider) authHandler() http.HandlerFunc {
 			rp.WithResponseModeURLParam("query"),
 			rp.WithURLParam("access_type", "offline"),
 		}
+		// Add required CORS headers
+		w.Header().Add("Access-Control-Allow-Credentials", "true")
+		w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 		rp.AuthURLHandler(state, p.provider, urlOptions...).ServeHTTP(w, r)
 	}
 }
@@ -197,6 +200,9 @@ func (p *oidcProvider) refreshHandler() http.HandlerFunc {
 			targetHost:      targetHost,
 		})
 
+		// Add required CORS headers
+		w.Header().Add("Access-Control-Allow-Credentials", "true")
+		w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 		http.Redirect(w, r, fmt.Sprintf("%v://%v", scheme, targetHost), http.StatusFound)
 	}
 }
@@ -238,6 +244,9 @@ func (p *oidcProvider) loginHandler() func(w http.ResponseWriter, r *http.Reques
 		if p.tls {
 			scheme = "https"
 		}
+		// Add required CORS headers
+		w.Header().Add("Access-Control-Allow-Credentials", "true")
+		w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).TargetHost), http.StatusFound)
 	}
 }
