@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/openziti/zrok/v2/endpoints"
@@ -134,7 +135,9 @@ func (p *oidcProvider) authHandler() http.HandlerFunc {
 		if (r.Header.Get("Origin") != "") && (r.Header.Get("Origin") != "null") {
 			w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 		} else if (r.Header.Get("Referer") != "") && (r.Header.Get("Referer") != "null") {
-			w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Referer"))
+			// need to trim the trailing slash from the referer header, if present
+			referer := strings.TrimSuffix(r.Header.Get("Referer"), "/")
+			w.Header().Add("Access-Control-Allow-Origin", referer)
 		}
 		rp.AuthURLHandler(state, p.provider, urlOptions...).ServeHTTP(w, r)
 	}
