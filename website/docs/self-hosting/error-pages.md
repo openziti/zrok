@@ -9,10 +9,8 @@ zrok includes a built-in error page template that displays user-friendly message
 "share not found", "unauthorized access", and "bad gateway" errors. You can replace this template with your own custom
 HTML file to match your organization's branding or provide custom error handling.
 
-## Overview
-
-The error page system uses Go's `text/template` package to render HTML pages with dynamic content. The template
-receives data through a `VariableData` struct containing:
+zrok uses Go's `text/template` package to render HTML pages with dynamic content. The template receives data through
+a `VariableData` struct containing:
 
 - `Title`: Page title (appears in browser tab)
 - `Banner`: Main heading text
@@ -199,20 +197,24 @@ Here's a simplified version of the default template that you can customize:
 Your template will be used for various error conditions:
 
 ### Share not found (404)
+
 - **Title**: `'<shareToken>' not found!`
 - **Banner**: `share <code><shareToken></code> not found!`
 - **Message**: `are you running <code>zrok2 share</code> for this share?`
 
 ### Unauthorized access (401)
+
 - **Title**: `unauthorized!`
 - **Banner**: `user not authorized!` or `<code><username></code> not authorized!`
 
 ### Bad gateway (502)
+
 - **Title**: Custom title based on the error
 - **Banner**: Custom banner based on the error
 - **Error**: Detailed error information
 
 ### Health check (200)
+
 - **Title**: `healthy`
 - **Banner**: `healthy`
 
