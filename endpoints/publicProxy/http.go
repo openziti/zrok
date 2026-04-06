@@ -113,6 +113,11 @@ func newServiceProxy(cfg *Config, ctx ziti.Context) (*httputil.ReverseProxy, err
 		req.Header.Set("X-Proxy", "zrok")
 	}
 	proxy.ModifyResponse = func(resp *http.Response) error {
+		origin := resp.Request.Header.Get("Origin")
+		// CORS will block the zrok_session cookie for XHR requests if the server sends responds with *
+		if origin != "" && resp.Header.Get("Access-Control-Allow-Origin") == "*" {
+			resp.Header.Set("Access-Control-Allow-Origin", origin)
+		}
 		return nil
 	}
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {

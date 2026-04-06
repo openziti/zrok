@@ -173,13 +173,13 @@ func SetSessionCookie(w http.ResponseWriter, cookieName string, tokenValue strin
 
 	// common cookie attributes
 	cookieAttrs := &http.Cookie{
-		MaxAge:  int(cfg.GetSessionLifetime().Seconds()),
-		Domain:  cfg.GetCookieDomain(),
-		Path:    "/",
-		Expires: time.Now().Add(cfg.GetSessionLifetime()),
-		// Secure:  true, // pending server tls feature https://github.com/openziti/zrok/issues/24
-		HttpOnly: true,                 // enabled because zrok frontend is the only intended consumer of this cookie, not client-side scripts
-		SameSite: http.SameSiteLaxMode, // explicitly set to the default Lax mode which allows the zrok share to be navigated to from another site and receive the cookie
+		MaxAge:   int(cfg.GetSessionLifetime().Seconds()),
+		Domain:   cfg.GetCookieDomain(),
+		Path:     "/",
+		Expires:  time.Now().Add(cfg.GetSessionLifetime()),
+		Secure:   true,
+		HttpOnly: true,                  // enabled because zrok frontend is the only intended consumer of this cookie, not client-side scripts
+		SameSite: http.SameSiteNoneMode, // None required so cross-origin XHR/fetch requests with withCredentials include the cookie
 	}
 
 	// check if we need to stripe the cookie
