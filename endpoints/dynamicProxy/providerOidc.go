@@ -131,7 +131,11 @@ func (p *oidcProvider) authHandler() http.HandlerFunc {
 		}
 		// Add required CORS headers
 		w.Header().Add("Access-Control-Allow-Credentials", "true")
-		w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+		if (r.Header.Get("Origin") != "") && (r.Header.Get("Origin") != "null") {
+			w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+		} else if (r.Header.Get("Referer") != "") && (r.Header.Get("Referer") != "null") {
+			w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Referer"))
+		}
 		rp.AuthURLHandler(state, p.provider, urlOptions...).ServeHTTP(w, r)
 	}
 }
