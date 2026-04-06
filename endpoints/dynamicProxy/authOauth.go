@@ -30,10 +30,16 @@ func (c *zrokClaims) getTargetHost() (jwt.ClaimStrings, error) {
 }
 
 func oauthLoginRequired(w http.ResponseWriter, r *http.Request, cfg *oauthConfig, provider, target string, refreshInterval time.Duration) {
+	// Add required CORS headers
+	w.Header().Add("Access-Control-Allow-Credentials", "true")
+	w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 	http.Redirect(w, r, fmt.Sprintf("%s/%s/login?targetHost=%s&refreshInterval=%s", cfg.EndpointUrl, provider, url.QueryEscape(target), refreshInterval.String()), http.StatusFound)
 }
 
 func oauthRefreshRequired(w http.ResponseWriter, r *http.Request, cfg *oauthConfig, provider, target string) {
+	// Add required CORS headers
+	w.Header().Add("Access-Control-Allow-Credentials", "true")
+	w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 	http.Redirect(w, r, fmt.Sprintf("%s/%s/refresh?targetHost=%s", cfg.EndpointUrl, provider, url.QueryEscape(target)), http.StatusFound)
 }
 
