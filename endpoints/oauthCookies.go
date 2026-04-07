@@ -178,8 +178,8 @@ func SetSessionCookie(w http.ResponseWriter, cookieName string, tokenValue strin
 		Path:     "/",
 		Expires:  time.Now().Add(cfg.GetSessionLifetime()),
 		Secure:   true,
-		HttpOnly: true,                  // enabled because zrok frontend is the only intended consumer of this cookie, not client-side scripts
-		SameSite: http.SameSiteNoneMode, // None required so cross-origin XHR/fetch requests with withCredentials include the cookie
+		HttpOnly: true,                 // enabled because zrok frontend is the only intended consumer of this cookie, not client-side scripts
+		SameSite: http.SameSiteLaxMode, // explicitly set to the default Lax mode which allows the zrok share to be navigated to from another site and receive the cookie
 	}
 
 	// check if we need to stripe the cookie

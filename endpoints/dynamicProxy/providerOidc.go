@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/openziti/zrok/v2/endpoints"
@@ -130,15 +129,6 @@ func (p *oidcProvider) authHandler() http.HandlerFunc {
 			rp.WithResponseModeURLParam("query"),
 			rp.WithURLParam("access_type", "offline"),
 		}
-		// Add required CORS headers
-		w.Header().Add("Access-Control-Allow-Credentials", "true")
-		if (r.Header.Get("Origin") != "") && (r.Header.Get("Origin") != "null") {
-			w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-		} else if (r.Header.Get("Referer") != "") && (r.Header.Get("Referer") != "null") {
-			// need to trim the trailing slash from the referer header, if present
-			referer := strings.TrimSuffix(r.Header.Get("Referer"), "/")
-			w.Header().Add("Access-Control-Allow-Origin", referer)
-		}
 		rp.AuthURLHandler(state, p.provider, urlOptions...).ServeHTTP(w, r)
 	}
 }
@@ -207,9 +197,6 @@ func (p *oidcProvider) refreshHandler() http.HandlerFunc {
 			targetHost:      targetHost,
 		})
 
-		// Add required CORS headers
-		w.Header().Add("Access-Control-Allow-Credentials", "true")
-		w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 		http.Redirect(w, r, fmt.Sprintf("%v://%v", scheme, targetHost), http.StatusFound)
 	}
 }
@@ -251,9 +238,6 @@ func (p *oidcProvider) loginHandler() func(w http.ResponseWriter, r *http.Reques
 		if p.tls {
 			scheme = "https"
 		}
-		// Add required CORS headers
-		w.Header().Add("Access-Control-Allow-Credentials", "true")
-		w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).TargetHost), http.StatusFound)
 	}
 }
