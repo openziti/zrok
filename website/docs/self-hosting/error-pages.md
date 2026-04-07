@@ -1,5 +1,4 @@
 ---
-sidebar_label: Custom error pages
 sidebar_position: 17
 ---
 

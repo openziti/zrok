@@ -5,8 +5,8 @@ sidebar_position: 18
 # Interstitial pages
 
 On large zrok installations that support open registration and shared public frontends, abuse can become an issue. To
-mitigate phishing and other similar forms of abuse, zrok offers an interstitial page that announces to visitors that
-the share is hosted through zrok and probably isn't their financial institution.
+mitigate phishing and other similar forms of abuse, zrok offers an interstitial page that announces to visitors that the
+share is hosted through zrok and probably isn't their financial institution.
 
 Interstitial pages can be enabled on a per-frontend basis. This allows you to enable the interstitial on open public
 frontends but not closed ones (which require a grant to use).
@@ -22,12 +22,12 @@ controller and a frontend:
 
 ![zrok_interstitial_rendezvous](../images/zrok_interstitial_rendezvous.png)
 
-Every zrok share has a _config_ recorded in the underlying OpenZiti network. The config is of type `zrok.proxy.v1`.
-The frontend uses the information in this config to understand the disposition of the share. The config can contain an
+Every zrok share has a *config* recorded in the underlying OpenZiti network. The config is of type `zrok.proxy.v1`. The
+frontend uses the information in this config to understand the disposition of the share. The config can contain an
 `interstitial: true` setting. If the config has this setting and the frontend is configured to enable interstitial
 pages, end users accessing the share will receive the interstitial page on first visit.
 
-By default, the zrok controller will record `interstitial: true` in the share config _unless_ a row is present in the
+By default, the zrok controller will record `interstitial: true` in the share config unless a row is present in the
 `skip_interstitial_grants` table in the underlying database for the account creating the share. The
 `skip_interstitial_grants` table is a basic SQL structure with one row per account:
 
@@ -64,8 +64,8 @@ interstitial:
     - "Mozilla/5.0"
 ```
 
-User agents that match a prefix in the list receive the interstitial; others don't. If `user_agent_prefixes` is
-omitted, all user agents receive the interstitial page.
+User agents that match a prefix in the list receive the interstitial; others don't. If `user_agent_prefixes` is omitted,
+all user agents receive the interstitial page.
 
 ## Bypass the interstitial
 
@@ -73,15 +73,15 @@ The interstitial page is presented unless the client has a `zrok_interstitial` c
 `user_agent_prefixes` configuration). When the user reaches the interstitial page, a button sets the necessary cookie
 and lets them through to the share. The cookie expires after one week.
 
-Typically, the `user_agent_prefixes` list contains `Mozilla/5.0`, which matches all modern mobile and desktop
-browsers. Setting a non-standard `User-Agent` in an interactive browser bypasses the interstitial for frontends
-configured with the usual `Mozilla/5.0` prefix.
+Typically, the `user_agent_prefixes` list contains `Mozilla/5.0`, which matches all modern mobile and desktop browsers.
+Setting a non-standard `User-Agent` in an interactive browser bypasses the interstitial for frontends configured with
+the usual `Mozilla/5.0` prefix.
 
-End users can send a `skip_zrok_interstitial` HTTP header set to any value to bypass the interstitial page. Setting
-this header means the user most likely understands what a zrok share is and hopefully won't fall for a phishing attack.
+End users can send a `skip_zrok_interstitial` HTTP header set to any value to bypass the interstitial page. Setting this
+header means the user most likely understands what a zrok share is and hopefully won't fall for a phishing attack.
 
 The `skip_zrok_interstitial` header is especially useful for API clients (like `curl`) and other types of
 non-interactive clients.
 
-The `drive` backend mode doesn't currently support `GET` requests and can't be accessed with a conventional web
-browser, so it bypasses the interstitial page requirement.
+The `drive` backend mode doesn't currently support `GET` requests and can't be accessed with a conventional web browser,
+so it bypasses the interstitial page requirement.

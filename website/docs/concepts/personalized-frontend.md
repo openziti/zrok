@@ -4,8 +4,8 @@ sidebar_position: 11
 
 # Personalized frontend
 
-This page describes an approach that enables you to use a hosted, shared zrok instance (zrok.io) with your own
-personalized frontend, giving you custom DNS and TLS for your shares.
+This page describes how to use a hosted, shared zrok instance (zrok.io) with your own personalized frontend to get
+custom DNS and TLS for your shares.
 
 To do this, you need a minimal VPS instance or container hosting. The size depends on your workload, but for most
 modest use cases the cheapest VPS option is sufficient.
@@ -55,7 +55,7 @@ You can accomplish this with a cheap VPS (or container hosting). The VPS needs a
 create DNS entries for `example.com`.
 
 To do this, run 3 separate `zrok2 access private` commands on your VPS (see the
-[Agent guide](../how-tos/agent/index.mdx) and the [Linux Agent Service](../how-tos/agent/setup-linux-service.mdx) for
+[zrok agent how-to guides](../how-tos/agent/index.mdx) and the [Linux agent service](../how-tos/agent/setup-linux-service.mdx) for
 details on setting this up). One command each for shares `A`, `B`, and `C`. The command works like this:
 
 ```text

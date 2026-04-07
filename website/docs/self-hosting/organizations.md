@@ -12,8 +12,8 @@ giving them visibility into the environments, shares, and accesses created withi
 
 ## Configure an organization
 
-Managing organizations requires a site-level `ZROK2_ADMIN_TOKEN`. See the
-[self-hosting guide](deployment/linux.mdx#step-2-configure-the-controller) for details on configuring admin tokens.
+Managing organizations requires a site-level `ZROK2_ADMIN_TOKEN`. See the [self-hosting
+guide](deployment/linux.mdx#step-2-configure-the-controller) for details on configuring admin tokens.
 
 ### Create an organization
 
@@ -60,8 +60,8 @@ zrok2 admin list organizations
 ```
 
 ```buttonless title="Output"
- ORGANIZATION TOKEN  DESCRIPTION   
- gK1XRvthq7ci        documentation 
+ ORGANIZATION TOKEN  DESCRIPTION
+ gK1XRvthq7ci        documentation
 ```
 
 ### Add a member to an organization
@@ -107,8 +107,8 @@ zrok2 admin list org-members gK1XRvthq7ci
 ```
 
 ```buttonless title="Output"
- ACCOUNT EMAIL                  ADMIN? 
- michael.quigley@netfoundry.io  false 
+ ACCOUNT EMAIL                  ADMIN?
+ michael.quigley@netfoundry.io  false
 ```
 
 ### Remove organizations and members
@@ -157,6 +157,6 @@ zrok2 organization memberships
 ```
 
 ```buttonless title="Output"
- ORGANIZATION TOKEN  DESCRIPTION    ADMIN? 
- gK1XRvthq7ci        documentation  false  
+ ORGANIZATION TOKEN  DESCRIPTION    ADMIN?
+ gK1XRvthq7ci        documentation  false
 ```

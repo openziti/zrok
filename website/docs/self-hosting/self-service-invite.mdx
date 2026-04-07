@@ -9,7 +9,7 @@ Use self-service invitations to let users create their own accounts on your self
 
 ## The self-service user experience
 
-Your users run the following command:
+Your users run this command:
 
 ```bash
 zrok2 invite
@@ -28,24 +28,26 @@ invitation sent to 'user@domain.com'!
 
 ## How it works
 
-The `zrok2 invite` command presents a small form where the user enters and confirms their email address. Tabbing to
-**[ Submit ]** starts the invitation process.
+The `zrok2 invite` command walks users through these steps:
 
-Next, check the email you provided. You should receive a message asking you to click a link to create your zrok
-account. Clicking that link takes you to a page where you can set a password for your new account.
+1. Enter and confirm your email address in the form, then tab to **[ Submit ]**.
 
-![Enter a Password](../images/zrok_verify.png)
+2. Check the email you provided. Click the link in the message to set a password for your new account.
 
-Enter a password, confirm it, and click **Register Account**. You'll see the following:
+    ![Enter a Password](../images/zrok_verify.png)
 
-![Successful Registration](../images/zrok_registration_success.png)
+3. Enter a password, confirm it, and click **Register Account**.
 
-You can ignore the "enable your shell for zrok" section for now. Click the **zrok web portal** link:
+    ![Successful Registration](../images/zrok_registration_success.png)
 
-![Web Login](../images/zrok_web_login.png)
+    You can ignore the "enable your shell for zrok" section for now.
 
-After clicking **Log In**, you'll be taken to the zrok web console:
+4. Click the **zrok web portal** link.
 
-![Web Console; Empty](../images/zrok_web_console_empty.png)
+    ![Web Login](../images/zrok_web_login.png)
+
+5. Click **Log In** to enter the zrok web console.
+
+    ![Web Console; Empty](../images/zrok_web_console_empty.png)
 
 Congratulations! Your zrok account is ready to go!
