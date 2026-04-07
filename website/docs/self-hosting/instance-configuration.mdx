@@ -1,14 +1,11 @@
----
-title: Use another zrok instance
-sidebar_label: Use another zrok instance
----
+# Use another zrok instance
 
 :::note
 This guide is relevant if you are self-hosting or using a friend's zrok instance instead of using zrok-as-a-service
 from `zrok.io`.
 :::
 
-The `zrok` *command* on your computer uses a `zrok` *instance* over the network.
+The `zrok` command on your computer uses a `zrok` instance over the network.
 
 The default API endpoint for the `zrok` command is `api-v2.zrok.io`. To point to a different instance:
 
@@ -26,7 +23,7 @@ zrok configuration updated
 The `WARNING` about `environment metadata` is expected when you run `zrok2 config set` before `zrok2 enable`.
 :::
 
-Use `zrok2 status` to inspect the state of your local _environment_. In zrok, an _environment_ is each shell where
+Use `zrok2 status` to inspect the state of your local environment. In zrok, an *environment* is each shell where
 you install and `enable` a copy of `zrok`.
 
 ```bash

@@ -1,8 +1,8 @@
 ---
-title: Interstitial pages
-sidebar_label: Interstitial pages
 sidebar_position: 18
 ---
+
+# Interstitial pages
 
 On large zrok installations that support open registration and shared public frontends, abuse can become an issue. To
 mitigate phishing and other similar forms of abuse, zrok offers an interstitial page that announces to visitors that

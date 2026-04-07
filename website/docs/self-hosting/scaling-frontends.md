@@ -1,8 +1,9 @@
 ---
-title: Scaling zrok frontends
 sidebar_label: Scaling frontends
 sidebar_position: 47
 ---
+
+# Scaling zrok frontends
 
 The [Linux](/docs/zrok/self-hosting/deployment/linux/),
 [Docker](/docs/zrok/self-hosting/deployment/docker/), and
