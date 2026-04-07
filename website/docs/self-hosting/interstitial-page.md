@@ -17,7 +17,7 @@ trusted users additional privileges.
 
 By default, if you don't enable interstitial pages on a public frontend, your self-hosted instance won't offer them.
 
-The following diagram shows how the interstitial mechanism works — the share configuration rendezvous between the
+The following diagram shows how the interstitial mechanism works—the share configuration rendezvous between the
 controller and a frontend:
 
 ![zrok_interstitial_rendezvous](../images/zrok_interstitial_rendezvous.png)
@@ -67,7 +67,7 @@ interstitial:
 User agents that match a prefix in the list receive the interstitial; others don't. If `user_agent_prefixes` is
 omitted, all user agents receive the interstitial page.
 
-## Bypassing the interstitial
+## Bypass the interstitial
 
 The interstitial page is presented unless the client has a `zrok_interstitial` cookie (depending on
 `user_agent_prefixes` configuration). When the user reaches the interstitial page, a button sets the necessary cookie

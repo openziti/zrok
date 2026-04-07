@@ -4,14 +4,15 @@ sidebar_label: Use another zrok instance
 ---
 
 :::note
-This guide is relevant if you are self-hosting or using a friend's `zrok` instance instead of using zrok-as-a-service from `zrok.io`.
+This guide is relevant if you are self-hosting or using a friend's zrok instance instead of using zrok-as-a-service
+from `zrok.io`.
 :::
 
 The `zrok` *command* on your computer uses a `zrok` *instance* over the network.
 
-The default instance API endpoint for the `zrok` command is `api-v2.zrok.io`. Set the API endpoint to another instance's API endpoint:
+The default API endpoint for the `zrok` command is `api-v2.zrok.io`. To point to a different instance:
 
-```text
+```bash
 zrok2 config set apiEndpoint https://zrok.example.com
 ```
 
@@ -25,9 +26,10 @@ zrok configuration updated
 The `WARNING` about `environment metadata` is expected when you run `zrok2 config set` before `zrok2 enable`.
 :::
 
-You can use the `zrok2 status` command to inspect the state of your local _environment_. `zrok` refers to each shell where you install and `enable` a copy of `zrok` as an _environment_.
+Use `zrok2 status` to inspect the state of your local _environment_. In zrok, an _environment_ is each shell where
+you install and `enable` a copy of `zrok`.
 
-```text
+```bash
 zrok2 status
 ```
 
@@ -42,5 +44,5 @@ Config:
 To create a local environment use the zrok2 enable command.
 ```
 
-The `zrok2 status` command shows the configured API service that your environment is using, as well as the `SOURCE` where the setting was retrieved. In this case, `config` means that the setting was set into the environment using the `zrok2 config` command.
-
+The `zrok2 status` command shows the API endpoint your environment is using and the `SOURCE` where the value was
+retrieved. Here, `config` means the value was set with the `zrok2 config` command.
