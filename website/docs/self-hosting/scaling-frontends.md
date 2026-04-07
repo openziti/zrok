@@ -1,9 +1,9 @@
 ---
-sidebar_label: Scaling frontends
+sidebar_label: Scale frontends
 sidebar_position: 47
 ---
 
-# Scaling zrok frontends
+# Scale zrok frontends
 
 The [Linux](/docs/zrok/self-hosting/deployment/linux/), [Docker](/docs/zrok/self-hosting/deployment/docker/), and
 [Kubernetes](/docs/zrok/self-hosting/deployment/kubernetes/) deployment guides describe a single-host model where one
