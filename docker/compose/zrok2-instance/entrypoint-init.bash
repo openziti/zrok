@@ -43,6 +43,12 @@ FRONTEND_CONFIG="${CONFIG_DIR}/frontend.yaml"
 ZROK2_DB_PASSWORD="${ZROK2_DB_PASSWORD:-zrok2defaultpw}"
 STORE_TYPE="${ZROK2_STORE_TYPE:-postgres}"
 
+# ── Check: if frontend.yaml already exists - stop script to persist frontend token ──────────────────────────────
+if [[ -f "$FRONTEND_CONFIG" ]]; then
+    echo "frontend.yaml already exists. Skipping zrok2-init"
+    exit 0
+fi
+
 if [[ "$STORE_TYPE" == "postgres" ]]; then
     STORE_PATH="host=postgresql port=5432 user=zrok2 password=${ZROK2_DB_PASSWORD} dbname=zrok2 sslmode=disable"
 else
