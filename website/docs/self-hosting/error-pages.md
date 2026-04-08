@@ -1,16 +1,15 @@
 ---
-title: Custom error pages
-sidebar_label: Custom error pages
 sidebar_position: 17
 ---
 
 # Custom error pages
 
-zrok includes a built-in error page template that displays user-friendly messages for various error conditions like "share not found", "unauthorized access", and "bad gateway" errors. This template can be replaced with your own custom HTML file to match your organization's branding or provide custom error handling.
+zrok includes a built-in error page template that displays user-friendly messages for various error conditions like
+"share not found", "unauthorized access", and "bad gateway" errors. You can replace this template with your own custom
+HTML file to match your organization's branding or provide custom error handling.
 
-## Overview
-
-The error page system uses Go's `text/template` package to render HTML pages with dynamic content. The template receives data through a `VariableData` struct containing:
+zrok uses Go's `text/template` package to render HTML pages with dynamic content. The template receives data through
+a `VariableData` struct containing:
 
 - `Title`: Page title (appears in browser tab)
 - `Banner`: Main heading text
@@ -92,7 +91,7 @@ Here's a simplified version of the default template that you can customize:
             background-color: #f0f0f0;
             color: #333;
         }
-        
+
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -101,38 +100,38 @@ Here's a simplified version of the default template that you can customize:
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             overflow: hidden;
         }
-        
+
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 40px 20px;
             text-align: center;
         }
-        
+
         .header h1 {
             margin: 0;
             font-size: 2.5rem;
             font-weight: bold;
         }
-        
+
         .content {
             padding: 40px 20px;
             text-align: center;
         }
-        
+
         .banner {
             font-size: 1.5rem;
             margin-bottom: 20px;
             color: #333;
         }
-        
+
         .message {
             font-size: 1.1rem;
             line-height: 1.6;
             color: #666;
             margin-bottom: 20px;
         }
-        
+
         .error {
             background-color: #fee;
             border: 1px solid #fcc;
@@ -142,20 +141,20 @@ Here's a simplified version of the default template that you can customize:
             font-family: 'Courier New', monospace;
             text-align: left;
         }
-        
+
         .error strong {
             color: #d00;
         }
-        
+
         @media (max-width: 600px) {
             body {
                 padding: 10px;
             }
-            
+
             .header h1 {
                 font-size: 1.8rem;
             }
-            
+
             .content {
                 padding: 20px;
             }
@@ -167,22 +166,22 @@ Here's a simplified version of the default template that you can customize:
         <div class="header">
             <h1>Your Service</h1>
         </div>
-        
+
         <div class="content">
             <div class="banner">{{.Banner}}</div>
-            
+
             {{if .Message}}
             <div class="message">{{.Message}}</div>
             {{end}}
-            
+
             {{if .Error}}
             <div class="error">
                 <strong>Error:</strong> {{.Error}}
             </div>
             {{end}}
-            
+
             <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-            
+
             <p style="color: #999; font-size: 0.9rem;">
                 Powered by <a href="https://zrok.io" style="color: #667eea;">zrok</a>
             </p>
@@ -197,35 +196,35 @@ Here's a simplified version of the default template that you can customize:
 Your template will be used for various error conditions:
 
 ### Share not found (404)
+
 - **Title**: `'<shareToken>' not found!`
 - **Banner**: `share <code><shareToken></code> not found!`
 - **Message**: `are you running <code>zrok2 share</code> for this share?`
 
 ### Unauthorized access (401)
+
 - **Title**: `unauthorized!`
 - **Banner**: `user not authorized!` or `<code><username></code> not authorized!`
 
 ### Bad gateway (502)
+
 - **Title**: Custom title based on the error
 - **Banner**: Custom banner based on the error
 - **Error**: Detailed error information
 
 ### Health check (200)
+
 - **Title**: `healthy`
 - **Banner**: `healthy`
 
 ## Best practices
 
 1. **Keep it simple**: Error pages should load quickly and not depend on external resources that might also be failing.
-
 2. **Responsive design**: Ensure your template works well on mobile devices.
-
 3. **Clear messaging**: Provide helpful information to users about what went wrong and what they can do.
-
 4. **Consistent branding**: Match your organization's visual identity.
-
-5. **Escape user content**: Be cautious with user-provided content. The `Banner` and `Message` fields may contain HTML from the application.
-
+5. **Escape user content**: Be cautious with user-provided content. The `Banner` and `Message` fields may contain HTML
+   from the application.
 6. **Test thoroughly**: Test your template with different error conditions to ensure it renders correctly.
-
-7. **Fallback styling**: Include all CSS inline or use web fonts with fallbacks to ensure the page displays correctly even if external resources fail.
+7. **Fallback styling**: Include all CSS inline or use web fonts with fallbacks to ensure the page displays correctly
+   even if external resources fail.

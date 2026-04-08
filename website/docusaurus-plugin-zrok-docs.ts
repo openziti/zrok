@@ -52,7 +52,7 @@ export function zrokRedirects(routeBasePath: string = 'docs/zrok'): PluginConfig
                 { to: `${p}/self-hosting/oauth/integrations/google`, from: [`${p}/guides/self-hosting/oauth/integrations/google`] },
                 { to: `${p}/self-hosting/oauth/integrations/oidc`, from: [`${p}/guides/self-hosting/oauth/integrations/oidc`] },
                 { to: `${p}/self-hosting/organizations`, from: [`${p}/guides/self-hosting/organizations`] },
-                { to: `${p}/self-hosting/personalized-frontend`, from: [`${p}/guides/self-hosting/personalized-frontend`] },
+                { to: `${p}/concepts/personalized-frontend`, from: [`${p}/guides/self-hosting/personalized-frontend`, `${p}/self-hosting/personalized-frontend`] },
                 { to: `${p}/self-hosting/self-service-invite`, from: [`${p}/guides/self-hosting/self-service-invite`] },
             ],
         },

@@ -5,20 +5,25 @@ sidebar_label: Organizations
 
 # Organizations
 
-zrok (starting with `v0.4.45`) includes support for "organizations". Organizations are groups of related accounts that are typically centrally managed in some capacity. A zrok account can be a member of multiple organizations. Organization membership can also include an "admin" permission. As of `v0.4.45` organization admins are able to retrieve an "overview" (`zrok overview`) from any other account in the organization, allowing the admin to see the details of the environments, shares, and accesses created within that account.
+zrok (starting with `v0.4.45`) includes support for organizations—groups of related accounts that are typically
+centrally managed. A zrok account can be a member of multiple organizations, and membership can include an admin
+permission. Organization admins can retrieve an overview (`zrok overview`) for any other account in the organization,
+giving them visibility into the environments, shares, and accesses created within that account.
 
-Future zrok releases will include additional organization features, including `--closed` permission sharing functions.
+## Configure an organization
 
-## Configuring an organization
-
-The API endpoints used to manage organizations and their members require a site-level `ZROK2_ADMIN_TOKEN` to access. See the [self-hosting guide](deployment/linux.mdx#step-2-configure-the-controller) for details on configuring admin tokens.
+Managing organizations requires a site-level `ZROK2_ADMIN_TOKEN`. See the [self-hosting
+guide](deployment/linux.mdx#step-2-configure-the-controller) for details on configuring admin tokens.
 
 ### Create an organization
 
-The `zrok2 admin create organization` command is used to create organizations:
+Use `zrok2 admin create organization` to create an organization:
 
+```bash
+zrok2 admin create organization --help
 ```
-$ zrok2 admin create organization --help
+
+```buttonless title="Output"
 Create a new organization
 
 Usage:
@@ -36,33 +41,38 @@ Global Flags:
   -v, --verbose   Enable verbose logging
 ```
 
-Use the `-d` flag to add a description that shows up in end-user membership listings.
+Use the `-d` flag to add a description that shows up in end-user membership listings. For example:
 
-We'll create an example organization:
-
+```bash
+zrok2 admin create organization -d "documentation"
 ```
-$ zrok2 admin create organization -d "documentation"
+
+```buttonless title="Output"
 [   0.006]    INFO main.(*adminCreateOrganizationCommand).run: created new organization with token 'gK1XRvthq7ci'
 ```
 
 ### List organizations
 
-We use the `zrok2 admin list organizations` command to list our organizations:
+Use `zrok2 admin list organizations` to list organizations:
 
+```bash
+zrok2 admin list organizations
 ```
-$ zrok2 admin list organizations
 
- ORGANIZATION TOKEN  DESCRIPTION   
- gK1XRvthq7ci        documentation 
+```buttonless title="Output"
+ ORGANIZATION TOKEN  DESCRIPTION
+ gK1XRvthq7ci        documentation
 ```
 
 ### Add a member to an organization
 
-We use the `zrok2 admin create org-member` command to add members to organizations:
+Use `zrok2 admin create org-member` to add a member to an organization:
 
+```bash
+zrok2 admin create org-member --help
 ```
-$ zrok2 admin create org-member 
-Error: accepts 2 arg(s), received 0
+
+```buttonless title="Output"
 Usage:
   zrok2 admin create org-member <organizationToken> <accountEmail> [flags]
 
@@ -78,34 +88,42 @@ Global Flags:
   -v, --verbose   Enable verbose logging
 ```
 
-Like this:
+Add the `--admin` flag to mark the member as an organization administrator. For example:
 
-```
-$ zrok2 admin create org-member gK1XRvthq7ci michael.quigley@netfoundry.io
-[   0.006]    INFO main.(*adminCreateOrgMemberCommand).run: added 'michael.quigley@netfoundry.io' to organization 'gK1XRvthq7ci
+```bash
+zrok2 admin create org-member gK1XRvthq7ci michael.quigley@netfoundry.io
 ```
 
-The `--admin` flag can be added to the `zrok2 admin create org-member` command to mark the member as an administrator of the organization.
+```buttonless title="Output"
+[   0.006]    INFO main.(*adminCreateOrgMemberCommand).run: added 'michael.quigley@netfoundry.io' to organization 'gK1XRvthq7ci'
+```
 
 ### List members of an organization
 
+Use `zrok2 admin list org-members <organizationToken>` to list the members of an organization:
+
+```bash
+zrok2 admin list org-members gK1XRvthq7ci
 ```
-$ zrok2 admin list org-members gK1XRvthq7ci
 
- ACCOUNT EMAIL                  ADMIN? 
- michael.quigley@netfoundry.io  false 
+```buttonless title="Output"
+ ACCOUNT EMAIL                  ADMIN?
+ michael.quigley@netfoundry.io  false
 ```
 
-### Removing organizations and members
+### Remove organizations and members
 
-The `zrok2 admin delete org-member` and `zrok2 admin delete organization` commands are available to clean up organizations and their membership lists.
+Use `zrok2 admin delete org-member` and `zrok2 admin delete organization` to remove members and organizations.
 
 ## End-user organization administrator commands
 
-When a zrok account is added to an organization as an administrator it allows them to use the `zrok2 organization admin` commands, which include:
+Organization admins can use the `zrok2 organization admin` commands:
 
+```bash
+zrok2 organization admin --help
 ```
-$ zrok2 organization admin
+
+```buttonless title="Output"
 Organization admin commands
 
 Usage:
@@ -125,21 +143,20 @@ Global Flags:
 Use "zrok organization admin [command] --help" for more information about a command.
 ```
 
-The `zrok2 organization admin list` command is used to list the members of an organization.
+Use `zrok2 organization admin list` to list the members of an organization.
 
-The `zrok2 organization admin overview` command is used to retrieve an overview of an organization member account. This is functionally equivalent to what the `zrok2 overview` command does, but it allows an organization admin to retrieve the overview for another zrok account.
+Use `zrok2 organization admin overview` to retrieve an overview of a member account. This works like `zrok2 overview`
+but lets an organization admin retrieve the overview for any member account.
 
 ## End-user organization commands
 
-All zrok accounts can use the `zrok2 organization memberships` command to list the organizations they're a member of:
+Use `zrok2 organization memberships` to list the organizations your account belongs to:
 
-```
-$ zrok2 organization memberships
-
- ORGANIZATION TOKEN  DESCRIPTION    ADMIN? 
- gK1XRvthq7ci        documentation  false  
-
+```bash
+zrok2 organization memberships
 ```
 
-
-
+```buttonless title="Output"
+ ORGANIZATION TOKEN  DESCRIPTION    ADMIN?
+ gK1XRvthq7ci        documentation  false
+```
