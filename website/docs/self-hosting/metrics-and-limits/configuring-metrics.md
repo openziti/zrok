@@ -4,21 +4,9 @@ sidebar_position: 20
 
 # Configure metrics
 
-A fully configured, production-scale zrok service instance looks like this:
-
-![zrok Metrics Architecture](images/metrics-architecture.png)
-
-zrok metrics builds on top of the `fabric.usage` event type from OpenZiti. The OpenZiti controller has a number of ways to emit events. The zrok controller has several ways to consume `fabric.usage` events. Smaller installations could be configured in these ways:
-
-![zrok simplified metrics architecture](images/metrics-architecture-simple.png)
-
-Environments that horizontally scale the zrok control plane with multiple controllers should use an AMQP-based queue to "fan out" the metrics workload across the entire control plane. Simpler installations that use a single zrok controller can collect `fabric.usage` events from the OpenZiti controller by "tailing" the events log file, or collecting them from the OpenZiti controller's websocket implementation.
+Configure the OpenZiti controller, metrics bridge, and zrok controller to collect and store usage metrics in InfluxDB.
 
 ## Configure the OpenZiti controller
-
-:::note
-This requires a version of OpenZiti with a `fabric` dependency of `v0.22.52` or newer, which is satisfied by the `v0.27.6` release of OpenZiti Controller.
-:::
 
 1. Add the following stanza to the OpenZiti controller configuration to append `fabric.usage` events to a file:
 
@@ -119,4 +107,4 @@ The zrok web console should also show activity for your shares:
 
 ![zrok web console activity](images/zrok-console-activity.png)
 
-With metrics configured, you might be interested in [configuring limits](configuring-limits.md).
+With metrics configured, you might be interested in [limits](configuring-limits.md).

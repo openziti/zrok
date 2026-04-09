@@ -2,21 +2,17 @@
 sidebar_position: 40
 ---
 
-# Configuring limits
+# Limits
 
 :::note
-This guide is current as of zrok version `v0.4.31`.
+Configure [metrics](configuring-metrics.md) before setting up limits — the limits agent depends on the metrics infrastructure.
 :::
 
-:::warning
-If you have not yet configured [metrics](configuring-metrics.md), please visit the [metrics guide](configuring-metrics.md) first before working through the limits configuration.
-:::
-
-## Understanding the zrok limits agent
+## The limits agent
 
 The limits agent is a component of the zrok controller. It can be enabled and configured through the zrok controller configuration.
 
-The limits agent is responsible for controlling the number of resources in use (environments, shares, etc.) and also for ensuring that accounts are held below the configured data transfer bandwidth thresholds. The limits agent exists to manage resource consumption for larger, multi-user zrok installations.
+The limits agent is responsible for controlling the number of resources in use (environments, shares, etc.) and for ensuring that accounts stay below the configured data transfer bandwidth thresholds. The limits agent exists to manage resource consumption for larger, multi-user zrok installations.
 
 ### Types of limits
 
@@ -65,32 +61,32 @@ limits:
 ```
 
 :::note
-A value of `-1` appearing in the limits configuration mean the value is _unlimited_.
+A value of `-1` in the limits configuration means the value is _unlimited_.
 :::
 
-The `enforcing` boolean specifies whether or not limits are enabled in the service instance. By default, limits is disabled. No matter what else is configured in this stanza, if `enforcing` is set to `false`, there will be no limits placed on any account in the service instance.
+The `enforcing` boolean specifies whether limits are enabled in the service instance. By default, limits are disabled. No matter what else is configured in this stanza, if `enforcing` is set to `false`, no limits are placed on any account in the service instance.
 
-The `cycle` value controls how frequently the limits agent will evaluate enforced limits. When a user exceeds a limit and has their shares disabled, the limits agent will evaluate their bandwidth usage on this interval looking to "relax" the limit once their usage falls below the threshold.
+The `cycle` value controls how frequently the limits agent evaluates enforced limits. When a user exceeds a limit and has their shares disabled, the limits agent evaluates their bandwidth usage on this interval looking to "relax" the limit once their usage falls below the threshold.
 
 ### Global resource count limits
 
-The `environments`, `shares`, `reserved_shares`, `unique_names`, and `share_frontends` specify the resource count limits, globally for the service instance. 
+The `environments`, `shares`, `reserved_shares`, `unique_names`, and `share_frontends` fields specify the resource count limits globally for the service instance.
 
-These resource counts will be applied to all users in the service instance by default.
+These resource counts apply to all users in the service instance by default.
 
 ### Global bandwidth limits
 
 The `bandwidth` section defines the global bandwidth limits for all users in the service instance.
 
-There are two levels of bandwidth limits that can be specified in the global configuration. The first limit defines a _warning_ threshold where the user will receive an email that they are using increased data transfer amounts and will ultimately be subject to a limit. If you do not want this warning email to be sent, then configure all of the values to `-1` (unlimited).
+There are two levels of bandwidth limits that can be specified in the global configuration. The first defines a _warning_ threshold where the user receives an email that they are using increased data transfer amounts and will ultimately be subject to a limit. To disable this warning email, configure all of the values to `-1` (unlimited).
 
-The second limit defines the the actual _limit_ threshold, where the limits agent will disabled traffic for the account's shares.
+The second defines the actual _limit_ threshold, where the limits agent will disable traffic for the account's shares.
 
-Bandwidth limits can be specified in terms of `tx` (or _transmitted_ data), `rx` (or _received_ data), and the `total` bytes that are sent in either direction. If you only want to set the `total` transferred limit, you can set `rx` and `tx` to `-1` (for _unlimited_). You can configure any combination of these these values at either the limit or warning levels.
+Bandwidth limits can be specified in terms of `tx` (transmitted data), `rx` (received data), and the `total` bytes sent in either direction. To set only the `total` transferred limit, set `rx` and `tx` to `-1` (unlimited). Any combination of these values can be configured at either the limit or warning levels.
 
-The `period` specifies the time window for the bandwidth limit. See the documentation for [`time.Duration.ParseDuration`](https://pkg.go.dev/time#ParseDuration) for details about the format used for these durations. If the `period` is set to 5 minutes, then the limits agent will monitor the transmitted and receivde traffic for the account for the last 5 minutes, and if the amount of data is greater than either the `warning` or the `limit` threshold, action will be taken.
+The `period` specifies the time window for the bandwidth limit. See the documentation for [`time.Duration.ParseDuration`](https://pkg.go.dev/time#ParseDuration) for details about the format used for these durations. If the `period` is set to 5 minutes, the limits agent monitors the transmitted and received traffic for the account for the last 5 minutes, and if the amount of data exceeds either the `warning` or the `limit` threshold, action is taken.
 
-In the global configuration example above users are allowed to transfer a total of `10485760` bytes in a `5m` period, and they will receive a warning email after they transfer more than `7242880` bytes in a `5m` period.
+In the global configuration example above, users are allowed to transfer a total of `10485760` bytes in a `5m` period, and they receive a warning email after transferring more than `7242880` bytes in a `5m` period.
 
 ## Limit classes
 
@@ -139,21 +135,21 @@ Create a row in this table linking the `account_id` to the `limit_class_id` to a
 
 ### Unscoped resource count classes
 
-To support overriding the resource count limits defined in the global limits configuration, a site administrator can create a limit class by inserting a row into the `limit_classes` table structured like this:
+To override the resource count limits defined in the global limits configuration, a site administrator can create a limit class by inserting a row into the `limit_classes` table structured like this:
 
 ```sql
 insert into limit_classes (environments, shares, reserved_shares, unique_names, share_frontends) values (1, 1, 1, 1, 1);
 ```
 
-This creates a limit class that sets the `environments`, `shares`, `reserved_shares`, and `unique_names` all to `1`.
+This creates a limit class that sets `environments`, `shares`, `reserved_shares`, and `unique_names` all to `1`.
 
-When this limit class is applied to a user account those values would override the default resource count values configured globally.
+When this limit class is applied to a user account, those values override the default resource count values configured globally.
 
 Applying an unscoped resource count class _does not_ affect the bandwidth limits (either globally configured, or via a limit class).
 
 ### Unscoped bandwidth classes
 
-To support overriding the bandwidth limits defined in the global configuration, a site administrator can create a limit class by inserting a row into the `limit_classes` table structured like this:
+To override the bandwidth limits defined in the global configuration, a site administrator can create a limit class by inserting a row into the `limit_classes` table structured like this:
 
 ```sql
 insert into limit_classes (period_minutes, total_bytes, limit_action) values (2, 204800, 'limit');
@@ -161,7 +157,7 @@ insert into limit_classes (period_minutes, total_bytes, limit_action) values (2,
 
 This inserts a limit class that allows for a total bandwidth transfer of `204800` bytes every `2` minutes.
 
-When this limit class is applied to a user account, those values would override the default bandwidth values configured globally.
+When this limit class is applied to a user account, those values override the default bandwidth values configured globally.
 
 Applying an unscoped bandwidth class _does not_ affect the resource count limits (either globally configured, or via a limit class).
 
@@ -173,25 +169,25 @@ A scoped limit class specifies _both_ the resource counts (`shares`, `reserved_s
 insert into limit_classes (backend_mode, shares, reserved_shares, unique_names, period_minutes, total_bytes, limit_action) values ('web', 2, 1, 1, 2, 4096000, 'limit');
 ```
 
-Scoped limits are designed to _increase_ the limits for a specific backend mode beyond what the global configuration and the unscoped classes provide. The general approach is to use the global configuration and the unscoped classes to provide the general account limits, and then the scoped classes can be used to further increase (or potentially _decrease_)  the limits for a specific backend mode.
+Scoped limits are designed to _increase_ the limits for a specific backend mode beyond what the global configuration and the unscoped classes provide. The general approach is to use the global configuration and the unscoped classes to provide the general account limits, and then the scoped classes can be used to further increase (or potentially _decrease_) the limits for a specific backend mode.
 
-If a scoped limit class exists for a specific backend mode, then the limits agent will use that limit in making a decision about limiting the resource count or bandwidth. All other types of shares will fall back to the unscoped classes or the global configuration.
+If a scoped limit class exists for a specific backend mode, the limits agent uses that limit when deciding whether to limit the resource count or bandwidth. All other types of shares fall back to the unscoped classes or the global configuration.
 
 ## Limit actions
 
-When an account exceeds a bandwidth limit, the limits agent will seek to limit the affected shares (based on the combination of global configuration, unscoped limit classes, and scoped limit classes). It applies the limit by removing the underlying OpenZiti dial policies for any frontends that are trying to access the share.
+When an account exceeds a bandwidth limit, the limits agent seeks to limit the affected shares (based on the combination of global configuration, unscoped limit classes, and scoped limit classes). It applies the limit by removing the underlying OpenZiti dial policies for any frontends that are trying to access the share.
 
-This means that public frontends will simply return a `404` as if the share is no longer there. Private frontends will also return `404` errors. When the limit is relaxed, the dial policies are put back in place and the share will continue operating normally.
+Public frontends return a `404` as if the share is no longer there. Private frontends also return `404` errors. When the limit is relaxed, the dial policies are restored and the share continues operating normally.
 
 ## Unlimited accounts
 
-The `accounts` table in the database includes a `limitless` column. When this column is set to `true` the account is not subject to any of the limits in the system.
+The `accounts` table in the database includes a `limitless` column. When this column is set to `true`, the account is not subject to any limits in the system.
 
 ## Experimental limits locking
 
-zrok versions prior to `v0.4.31` had a potential race condition when enforcing resource count limits. This usually only manifested in cases where shares or environments were being allocated programmatically (and fast enough to win the limits race). 
+zrok versions prior to `v0.4.31` had a potential race condition when enforcing resource count limits. This usually only manifested in cases where shares or environments were being allocated programmatically (and fast enough to win the limits race).
 
-This occurs due to a lack of transactional database locking around the limited structures. `v0.4.31` includes a pessimistic locking facility that can be enabled _only_ on the PostgreSQL store implemention.
+This occurs due to a lack of transactional database locking around the limited structures. `v0.4.31` includes a pessimistic locking facility that can be enabled _only_ on the PostgreSQL store implementation.
 
 If you're running PostgreSQL for your service instance and you want to enable the new experimental locking facility that eliminates the potential resource count race condition, add the `enable_locking: true` flag to your `store` definition:
 
@@ -202,18 +198,14 @@ store:
 
 ## Caveats
 
-There are a number of caveats that are important to understand when using the limits agent with more complicated limits scenarios:
-
 ### Aggregate bandwidth
 
-The zrok limits agent is a work in progress. The system currently does not track bandwidth individually for each backend mode type, which means all bandwidth values are aggregated between all of the share types that an account might be using. This will likely change in an upcoming release.
+The zrok limits agent does not track bandwidth individually for each backend mode type, which means all bandwidth values are aggregated across all share types an account uses.
 
 ### Administration through SQL
 
-There are currently no administrative API endpoints (or corresponding CLI tools) to support creating and applying limit classes in the current release. The limits agent infrastructure was designed to support software integrations that directly manipulate the underlying database structures.
-
-A future release may provide API and CLI tooling to support the human administration of the limits agent.
+There are currently no administrative API endpoints or CLI tools for creating and applying limit classes. The limits agent infrastructure was designed to support software integrations that directly manipulate the underlying database structures.
 
 ### Performance
 
-Be sure to minimize the number of different periods used for specifying bandwidth limits. Specifying limits in multiple different periods can cause a multiplicity of queries to be executed against the metrics store (InfluxDB). Standardizing on a period like `24h` or `6h` and using that consistently is the best way to to manage the performance of the metrics store.
+Minimize the number of different periods used for specifying bandwidth limits. Specifying limits across multiple different periods causes multiple queries to execute against the metrics store (InfluxDB). Standardizing on a period like `24h` or `6h` and using it consistently is the best way to manage the performance of the metrics store.
