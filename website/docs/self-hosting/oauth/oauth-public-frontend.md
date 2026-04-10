@@ -4,13 +4,17 @@ sidebar_position: 10
 
 # OAuth public frontend
 
-zrok includes OAuth integration for public frontends, allowing you to authenticate users through various OAuth providers before they can access your shared resources. You can configure multiple OAuth providers and restrict access based on email address patterns.
+zrok includes OAuth integration for public frontends, allowing you to authenticate users through various OAuth providers
+before they can access your shared resources. You can configure multiple OAuth providers and restrict access based on
+email address patterns.
 
 ## Prerequisites
 
-The OAuth public frontend uses an HTTP listener with a stable name to handle redirects from OAuth providers. You'll need to configure a DNS name and port for this listener that is accessible by your end users.
+The OAuth public frontend uses an HTTP listener with a stable name to handle redirects from OAuth providers. You'll need
+to configure a DNS name and port for this listener that is accessible by your end users.
 
-The OAuth frontend address will be used as the "redirect URL" when configuring OAuth clients with your providers. Each provider will redirect authenticated users back to this address, which then forwards them to their original destination.
+The OAuth frontend address will be used as the "redirect URL" when configuring OAuth clients with your providers. Each
+provider will redirect authenticated users back to this address, which then forwards them to their original destination.
 
 ## Configure your public frontend
 
@@ -50,13 +54,14 @@ oauth:
 
 ### Configuration parameters
 
-All of the following parameters _must_ be specified in the frontend configuration unless otherwise noted.
+All of the following parameters *must* be specified in the frontend configuration unless otherwise noted.
 
 - **`bind_address`**: IP and port where the OAuth frontend will listen (format: `ip:port`)
 - **`endpoint_url`**: Public base URL where OAuth redirects will be handled
 - **`cookie_name`**: Name for authentication cookies (suggested to use `zrok-auth-session`)
 - **`cookie_domain`**: Domain where authentication cookies should be stored
-- **`max_cookie_chunks`**: Optional maximum number of striped session-cookie chunks to accept or emit (default: `10`, internally capped to a safe maximum)
+- **`max_cookie_chunks`**: Optional maximum number of striped session-cookie chunks to accept or emit (default: `10`,
+  internally capped to a safe maximum)
 - **`session_lifetime`**: How long authentication sessions remain valid (e.g., `6h`, `24h`)
 - **`intermediate_lifetime`**: Lifetime for intermediate OAuth tokens (e.g., `5m`)
 - **`signing_key`**: Unique 32+ character string for securing authentication payloads
@@ -66,15 +71,16 @@ All of the following parameters _must_ be specified in the frontend configuratio
 
 The `providers` array supports multiple OAuth configurations. Each provider requires:
 
-- **`name`**: Unique identifier for this provider configuration; the `name` becomes part of the OAuth URLs for this provider, for example the callback URL becomes `/<name>/auth/callback`
+- **`name`**: Unique identifier for this provider configuration; the `name` becomes part of the OAuth URLs for this
+  provider, for example the callback URL becomes `/<name>/auth/callback`
 - **`type`**: Provider type (`google`, `github`, or `oidc`)
 - **`client_id`** and **`client_secret`**: OAuth client credentials
 
 Providers may also require additional configuration values. For detailed setup instructions for each provider type, see:
 
-- [Google OAuth setup](integrations/google.md)
-- [GitHub OAuth setup](integrations/github.md)
-- [Generic OIDC setup](integrations/oidc.md)
+- [Set up Google OAuth](integrations/google.md)
+- [Set up GitHub OAuth](integrations/github.md)
+- [Set up a generic OIDC provider](integrations/oidc.md)
 
 ## OAuth identity flow
 
@@ -89,27 +95,27 @@ sequenceDiagram
 
     Note over User, Provider: OAuth Identity Flow for zrok Public Shares
 
-    User->>Share: 1. Initial Access<br/>GET /share-url
-    Share->>Share: 2. Authentication Check<br/>Validate session cookie
+    User->>Share: 1. Initial access<br/>GET /share-url
+    Share->>Share: 2. Authentication check<br/>Validate session cookie
 
     alt No valid session
-        Share->>User: 3. Redirect to Provider<br/>302 to OAuth provider login
-        User->>Provider: 4. User Authentication<br/>Login with credentials
-        Provider->>OAuth: 5. Provider Callback<br/>GET /{provider}/auth/callback?code=xyz
-        OAuth->>Provider: 6. Token Exchange<br/>POST /token (exchange code for tokens)
+        Share->>User: 3. Redirect to provider<br/>302 to OAuth provider login
+        User->>Provider: 4. User authentication<br/>Login with credentials
+        Provider->>OAuth: 5. Provider callback<br/>GET /<provider-name>/auth/callback?code=xyz
+        OAuth->>Provider: 6. Token exchange<br/>POST /token (exchange code for tokens)
         Provider->>OAuth: Return access token + user info
-        OAuth->>OAuth: 7. Email Validation<br/>Check email against patterns
+        OAuth->>OAuth: 7. Email validation<br/>Check email against patterns
 
         alt Email validation passes
-            OAuth->>OAuth: 8. Session Creation<br/>Create session + set cookie
-            OAuth->>User: 9. Final Redirect<br/>302 back to original share URL
-            User->>Share: 10. Access Granted<br/>GET /share-url (with valid session)
+            OAuth->>OAuth: 8. Session creation<br/>Create session + set cookie
+            OAuth->>User: 9. Final redirect<br/>302 back to original share URL
+            User->>Share: 10. Access granted<br/>GET /share-url (with valid session)
             Share->>User: Return protected content
         else Email validation fails
-            OAuth->>User: Access Denied<br/>403 Forbidden
+            OAuth->>User: Access denied<br/>403 Forbidden
         end
     else Valid session exists
-        Share->>User: Direct Access<br/>Return protected content
+        Share->>User: Direct access<br/>Return protected content
     end
 
     Note over User, Provider: Session remains valid for configured session_lifetime
@@ -117,29 +123,36 @@ sequenceDiagram
 
 ### Flow steps
 
-1. **Initial Access**: User visits the zrok public share URL
-2. **Authentication Check**: zrok checks for a valid authentication session cookie
-3. **Redirect to Provider**: If no valid session exists, user is redirected to the configured OAuth provider's login page
-4. **User Authentication**: User authenticates with their OAuth provider (Google, GitHub, etc.)
-5. **Provider Callback**: OAuth provider redirects back to zrok's OAuth frontend at `/<provider-name>/auth/callback`
-6. **Token Exchange**: zrok exchanges the authorization code for access tokens and retrieves user information
-7. **Email Validation**: zrok validates the user's email address against any configured `--oauth-email-address-pattern` instances
-8. **Session Creation**: If validation passes, zrok creates an authenticated session and sets a session cookie
-9. **Final Redirect**: User is redirected back to the original zrok share URL
-10. **Access Granted**: User can now access the protected resource
+1. **Initial access**: User visits the zrok public share URL
+2. **Authentication check**: zrok checks for a valid authentication session cookie
+3. **Redirect to provider**: If no valid session exists, user is redirected to the configured OAuth provider's login
+   page
+4. **User authentication**: User authenticates with their OAuth provider (Google, GitHub, etc.)
+5. **Provider callback**: OAuth provider redirects back to zrok's OAuth frontend at `/<provider-name>/auth/callback`
+6. **Token exchange**: zrok exchanges the authorization code for access tokens and retrieves user information
+7. **Email validation**: zrok validates the user's email address against any configured `--oauth-email-address-pattern`
+   instances
+8. **Session creation**: If validation passes, zrok creates an authenticated session and sets a session cookie
+9. **Final redirect**: User is redirected back to the original zrok share URL
+10. **Access granted**: User can now access the protected resource
 
 ### Session management
 
-- **Maximum Session Duration**: Controlled by the `session_lifetime` configuration
-- **Re-authentication**: Users must re-authenticate when sessions expire or when `--oauth-check-interval` is reached. Some providers (like the generic OIDC provider) support token refresh and will attempt to transparently refresh at this interval, rather than requiring re-authentication
-- **Cross-Share Access**: Sessions are not shared between shares using the same provider; switching zrok shares will re-start the authentication flow for the specified provider
+- **Maximum session duration**: Controlled by the `session_lifetime` configuration
+- **Re-authentication**: Users must re-authenticate when sessions expire or when `--oauth-check-interval` is reached.
+  Some providers (like the generic OIDC provider) support token refresh and will attempt to transparently refresh at
+  this interval, rather than requiring re-authentication
+- **Cross-share access**: Sessions are not shared between shares using the same provider; switching zrok shares will
+  re-start the authentication flow for the specified provider
 
-## Using OAuth with public shares
+## Use OAuth with public shares
 
-Once your public frontend is configured with OAuth providers, you can enable authentication on public shares using these command line options:
+Once your public frontend is configured with OAuth providers, you can enable authentication on public shares using these
+command line options:
 
 - **`--oauth-provider <name>`**: Enable OAuth using the specified provider name from your configuration
-- **`--oauth-email-address-pattern <pattern>`**: Restrict access to email addresses matching the glob pattern (use multiple times for multiple patterns)
+- **`--oauth-email-address-pattern <pattern>`**: Restrict access to email addresses matching the glob pattern (use
+  multiple times for multiple patterns)
 - **`--oauth-check-interval <duration>`**: How often to re-verify authentication (default: 3h)
 
 ### Example
@@ -152,25 +165,31 @@ zrok2 share public --backend-mode web \
   ~/public
 ```
 
-This creates a public share that requires Google OAuth authentication and only allows users with `@example.com` email addresses or any `admin@*` email address.
+This creates a public share that requires Google OAuth authentication and only allows users with `@example.com` email
+addresses or any `admin@*` email address.
 
 ## HTTP headers for proxied requests
 
-When zrok successfully authenticates a user via OAuth, it automatically adds authentication headers to all proxied requests sent to your backend application. These headers allow your application to identify the authenticated user and make authorization decisions.
+When zrok successfully authenticates a user via OAuth, it automatically adds authentication headers to all proxied
+requests sent to your backend application. These headers allow your application to identify the authenticated user and
+make authorization decisions.
 
 ### Authentication headers
 
 zrok sets the following HTTP headers on every proxied request after successful OAuth authentication:
 
-- **`zrok-auth-provider`**: The name of the OAuth provider used for authentication (e.g., `google`, `github`, `custom-oidc`)
+- **`zrok-auth-provider`**: The name of the OAuth provider used for authentication (e.g., `google`, `github`,
+  `custom-oidc`)
 - **`zrok-auth-email`**: The authenticated user's email address as provided by the OAuth provider
-- **`zrok-auth-expires`**: The timestamp when the authentication session will expire, formatted as RFC3339 (e.g., `2024-01-15T14:30:00Z`)
+- **`zrok-auth-expires`**: The timestamp when the authentication session will expire, formatted as RFC3339 (e.g.,
+  `2024-01-15T14:30:00Z`)
 
 ### Example usage in backend applications
 
 Your backend application can read these headers to implement user-specific logic:
 
 #### Python/Flask example
+
 ```python
 from flask import Flask, request
 
@@ -186,6 +205,7 @@ def index():
 ```
 
 #### Go example
+
 ```go
 func handler(w http.ResponseWriter, r *http.Request) {
     provider := r.Header.Get("zrok-auth-provider")
@@ -198,6 +218,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 ```
 
 #### Node.js/Express example
+
 ```javascript
 app.get('/', (req, res) => {
     const provider = req.headers['zrok-auth-provider'];
@@ -210,24 +231,28 @@ app.get('/', (req, res) => {
 
 ### Security considerations
 
-- **Trust Boundary**: These headers are only present when requests come through zrok's OAuth-protected frontend. Direct access to your backend would not include these headers.
-- **Header Validation**: Your application should validate that these headers are present when OAuth protection is expected.
-- **Session Expiration**: Use the `zrok-auth-expires` header to implement client-side session warnings or automatic logout.
+- **Trust boundary**: These headers are only present when requests come through zrok's OAuth-protected frontend. Direct
+  access to your backend would not include these headers.
+- **Header validation**: Your application should validate that these headers are present when OAuth protection is
+  expected.
+- **Session expiration**: Use the `zrok-auth-expires` header to implement client-side session warnings or automatic
+  logout.
 
 ## Logout endpoint
 
-Each configured OAuth provider automatically exposes a logout endpoint at `/<providerName>/logout`. This endpoint provides a secure way for users to terminate their authenticated sessions.
+Each configured OAuth provider automatically exposes a logout endpoint at `/<providerName>/logout`. This endpoint
+provides a secure way for users to terminate their authenticated sessions.
 
 ### Logout process
 
 When a user accesses the logout endpoint, zrok performs the following actions:
 
-1. **Token Revocation**: The OAuth access token is revoked with the respective provider:
+1. **Token revocation**: The OAuth access token is revoked with the respective provider:
    - **Google**: Revokes the token via Google's OAuth2 revocation endpoint
    - **GitHub**: Deletes the application token using GitHub's API
    - **OIDC**: Uses the provider's token revocation endpoint (if supported)
 
-2. **Session Clearing**: The local authentication session cookie is cleared by setting it to expire immediately
+2. **Session clearing**: The local authentication session cookie is cleared by setting it to expire immediately
 
 3. **Redirect**: The user is redirected to either:
    - A custom URL specified via the `redirect_url` query parameter
@@ -255,4 +280,4 @@ Logs you out and redirects you to `https://example.com/goodbye`.
 
 - The logout endpoint validates that the session belongs to the correct provider before proceeding.
 - If token revocation fails with the OAuth provider, the logout process will still clear the local session.
-- The logout process is idempotent — calling it multiple times or without an active session will not cause errors.
+- The logout process is idempotent—calling it multiple times or without an active session won't cause errors.

@@ -22,9 +22,12 @@ Configure the OpenZiti controller, metrics bridge, and zrok controller to collec
           path: /tmp/fabric-usage.json
     ```
 
-    Adjust `events/jsonLogger/handler/path` to wherever you want to send these events for ingestion into zrok. Consult the [OpenZiti docs](@openzitidocs/learn/introduction) for additional options that control file rotation.
+    Adjust `events/jsonLogger/handler/path` to wherever you want to send these events for ingestion into zrok. Consult
+    the [OpenZiti docs](@openzitidocs/learn/introduction) for additional options that control file rotation.
 
-2. Add the following to the `network` stanza of the OpenZiti controller configuration to increase the reporting frequency. By default, the OpenZiti events infrastructure reports and batches events in 1-minute buckets—too large an interval for a responsive zrok metrics experience. This increases the frequency to every 5 seconds:
+2. Add the following to the `network` stanza of the OpenZiti controller configuration to increase the reporting
+   frequency. By default, the OpenZiti events infrastructure reports and batches events in 1-minute buckets—too large an
+   interval for a responsive zrok metrics experience. This increases the frequency to every 5 seconds:
 
     ```yaml
     network:
@@ -44,7 +47,8 @@ Configure the OpenZiti controller, metrics bridge, and zrok controller to collec
 
 ## Configure the zrok metrics bridge
 
-zrok uses a metrics bridge component (running as a separate process) to consume `fabric.usage` events from the OpenZiti controller and publish them onto an AMQP queue.
+zrok uses a metrics bridge component (running as a separate process) to consume `fabric.usage` events from the OpenZiti
+controller and publish them onto an AMQP queue.
 
 1. Add this stanza to your zrok controller configuration:
 
@@ -59,7 +63,8 @@ zrok uses a metrics bridge component (running as a separate process) to consume 
         queue_name:     events
     ```
 
-    This consumes `fabric.usage` events from the file specified in the OpenZiti controller configuration and publishes them onto an AMQP queue.
+    This consumes `fabric.usage` events from the file specified in the OpenZiti controller configuration and publishes
+    them onto an AMQP queue.
 
 2. Start RabbitMQ as your AMQP implementation. The default RabbitMQ configuration works as a Docker container:
 
@@ -91,11 +96,13 @@ zrok uses a metrics bridge component (running as a separate process) to consume 
         token:          "<secret token>"
     ```
 
-    This configures the zrok controller to consume usage events from the AMQP queue and write them to InfluxDB. The InfluxDB organization and bucket must be created in advance—the zrok controller won't create them for you.
+    This configures the zrok controller to consume usage events from the AMQP queue and write them to InfluxDB. The
+    InfluxDB organization and bucket must be created in advance—the zrok controller won't create them for you.
 
 ## Test metrics
 
-With all components configured and running, use `zrok test loop` or manually create shares to generate traffic on the zrok instance. If everything is working correctly, log messages from the controller will look like this:
+With all components configured and running, use `zrok test loop` or manually create shares to generate traffic on the
+zrok instance. If everything is working correctly, log messages from the controller will look like this:
 
 ```text
 [5339.658]    INFO zrok/controller/metrics.(*influxWriter).Handle: share: 736z80mr4syu, circuit: Ad1V-6y48 backend {rx: 4.5 kB, tx: 4.6 kB} frontend {rx: 4.6 kB, tx: 4.5 kB}

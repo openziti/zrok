@@ -4,21 +4,23 @@ sidebar_position: 30
 
 # Set up a generic OIDC provider
 
-Configure an OpenID Connect (OIDC) provider as an authentication provider for your zrok public frontend. OIDC is supported by many identity providers including Keycloak, Auth0, Okta, Azure AD, and others.
+Configure an OpenID Connect (OIDC) provider as an authentication provider for your zrok public frontend. OIDC is
+supported by many identity providers including Keycloak, Auth0, Okta, Azure AD, and others.
 
 ## Provider requirements
 
 Your OIDC provider must support:
+
 - Authorization Code flow
 - Discovery endpoint (optional but recommended)
 - PKCE (Proof Key for Code Exchange)—optional but recommended for security
 
 ## Configure an OIDC provider
 
-1. Create a new OAuth/OIDC client in your provider's admin interface
-2. Set the **redirect URI** to `https://your-oauth-frontend-domain:port/<provider-name>/auth/callback`
-3. Configure required scopes: `openid`, `email`, `profile`
-4. Note the **client ID**, **client secret**, and **issuer URL**
+1. Create a new OAuth/OIDC client in your provider's admin interface.
+2. Set the **redirect URI** to `https://your-oauth-frontend-domain:port/<provider-name>/auth/callback`.
+3. Configure required scopes: `openid`, `email`, `profile`.
+4. Note the **client ID**, **client secret**, and **issuer URL**.
 
 ## Add the OIDC provider to your frontend configuration
 
@@ -80,12 +82,12 @@ issuer: "https://your-domain.okta.com/oauth2/default"
 
 For OIDC providers, the redirect URL should use your configured provider name:
 
-```
+```text
 https://your-oauth-frontend-domain:port/<provider-name>/auth/callback
 ```
 
 For example, with the provider name `"my-oidc-provider"`:
 
-```
+```text
 https://your-oauth-frontend-domain:port/my-oidc-provider/auth/callback
 ```

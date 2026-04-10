@@ -59,12 +59,12 @@ oauth:
 
 For Google OAuth with the provider name `"google"`, the redirect URL should be:
 
-```
+```text
 https://your-oauth-frontend-domain:port/google/auth/callback
 ```
 
 If you use a different provider name (e.g., `"google-corp"`), the URL would be:
 
-```
+```text
 https://your-oauth-frontend-domain:port/google-corp/auth/callback
 ```

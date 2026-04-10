@@ -47,7 +47,7 @@ export function zrokRedirects(routeBasePath: string = 'docs/zrok'): PluginConfig
                 { to: `${p}/self-hosting/deployment/linux`, from: [`${p}/guides/self-hosting/nginx_tls_guide/`, `${p}/guides/self-hosting/linux/nginx`] },
                 { to: `${p}/self-hosting/metrics-and-limits/limits`, from: [`${p}/self-hosting/metrics-and-limits/configuring-limits`, `${p}/guides/metrics-and-limits/configuring-limits`, `${p}/guides/self-hosting/metrics-and-limits/configuring-limits`] },
                 { to: `${p}/self-hosting/metrics-and-limits/configure-metrics`, from: [`${p}/self-hosting/metrics-and-limits/configuring-metrics`, `${p}/guides/metrics-and-limits/configuring-metrics`, `${p}/guides/self-hosting/metrics-and-limits/configuring-metrics`] },
-                { to: `${p}/self-hosting/oauth/configuring-oauth`, from: [`${p}/guides/self-hosting/oauth/configuring-oauth`] },
+                { to: `${p}/self-hosting/oauth/oauth-public-frontend`, from: [`${p}/self-hosting/oauth/configuring-oauth`, `${p}/guides/self-hosting/oauth/configuring-oauth`] },
                 { to: `${p}/self-hosting/oauth/integrations/github`, from: [`${p}/guides/self-hosting/oauth/integrations/github`] },
                 { to: `${p}/self-hosting/oauth/integrations/google`, from: [`${p}/guides/self-hosting/oauth/integrations/google`] },
                 { to: `${p}/self-hosting/oauth/integrations/oidc`, from: [`${p}/guides/self-hosting/oauth/integrations/oidc`] },
