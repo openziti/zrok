@@ -80,24 +80,24 @@ controller and publish them onto an AMQP queue.
 
 ## Configure zrok metrics
 
-1. Add this `metrics` section to your zrok controller configuration:
+Add a `metrics` section to your zrok controller configuration:
 
-    ```yaml
-    metrics:
-      agent:
-        source:
-          type:         amqpSource
-          url:          amqp://guest:guest@localhost:5672
-          queue_name:   events
-      influx:
-        url:            "http://127.0.0.1:8086"
-        bucket:         zrok  # the bucket and org must be
-        org:            zrok  # created in advance in InfluxDB
-        token:          "<secret token>"
-    ```
+```yaml
+metrics:
+  agent:
+    source:
+      type:         amqpSource
+      url:          amqp://guest:guest@localhost:5672
+      queue_name:   events
+  influx:
+    url:            "http://127.0.0.1:8086"
+    bucket:         zrok  # the bucket and org must be
+    org:            zrok  # created in advance in InfluxDB
+    token:          "<secret token>"
+```
 
-    This configures the zrok controller to consume usage events from the AMQP queue and write them to InfluxDB. The
-    InfluxDB organization and bucket must be created in advance—the zrok controller won't create them for you.
+This configures the zrok controller to consume usage events from the AMQP queue and write them to InfluxDB. The
+InfluxDB organization and bucket must be created in advance—the zrok controller won't create them for you.
 
 ## Test metrics
 
