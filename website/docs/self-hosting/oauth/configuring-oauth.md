@@ -33,12 +33,12 @@ oauth:
       type:                   "google"
       client_id:              "<google-client-id>"
       client_secret:          "<google-client-secret>"
-      
+
     - name:                   "github"
       type:                   "github"
       client_id:              "<github-client-id>"
       client_secret:          "<github-client-secret>"
-      
+
     - name:                   "custom-oidc"
       type:                   "oidc"
       client_id:              "<oidc-client-id>"
@@ -71,6 +71,7 @@ The `providers` array supports multiple OAuth configurations. Each provider requ
 - **`client_id`** and **`client_secret`**: OAuth client credentials
 
 Providers may also require additional configuration values. For detailed setup instructions for each provider type, see:
+
 - [Google OAuth setup](integrations/google.md)
 - [GitHub OAuth setup](integrations/github.md)
 - [Generic OIDC setup](integrations/oidc.md)
@@ -90,7 +91,7 @@ sequenceDiagram
 
     User->>Share: 1. Initial Access<br/>GET /share-url
     Share->>Share: 2. Authentication Check<br/>Validate session cookie
-    
+
     alt No valid session
         Share->>User: 3. Redirect to Provider<br/>302 to OAuth provider login
         User->>Provider: 4. User Authentication<br/>Login with credentials
@@ -98,7 +99,7 @@ sequenceDiagram
         OAuth->>Provider: 6. Token Exchange<br/>POST /token (exchange code for tokens)
         Provider->>OAuth: Return access token + user info
         OAuth->>OAuth: 7. Email Validation<br/>Check email against patterns
-        
+
         alt Email validation passes
             OAuth->>OAuth: 8. Session Creation<br/>Create session + set cookie
             OAuth->>User: 9. Final Redirect<br/>302 back to original share URL
@@ -180,7 +181,7 @@ def index():
     provider = request.headers.get('zrok-auth-provider')
     email = request.headers.get('zrok-auth-email')
     expires = request.headers.get('zrok-auth-expires')
-    
+
     return f"Welcome {email}! Authenticated via {provider}. Session expires: {expires}"
 ```
 
@@ -190,8 +191,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
     provider := r.Header.Get("zrok-auth-provider")
     email := r.Header.Get("zrok-auth-email")
     expires := r.Header.Get("zrok-auth-expires")
-    
-    fmt.Fprintf(w, "Welcome %s! Authenticated via %s. Session expires: %s", 
+
+    fmt.Fprintf(w, "Welcome %s! Authenticated via %s. Session expires: %s",
                 email, provider, expires)
 }
 ```
@@ -202,7 +203,7 @@ app.get('/', (req, res) => {
     const provider = req.headers['zrok-auth-provider'];
     const email = req.headers['zrok-auth-email'];
     const expires = req.headers['zrok-auth-expires'];
-    
+
     res.send(`Welcome ${email}! Authenticated via ${provider}. Session expires: ${expires}`);
 });
 ```

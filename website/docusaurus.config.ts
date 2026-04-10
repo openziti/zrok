@@ -121,10 +121,9 @@ const config: Config = {
             }
         ],
         [
-            '@docusaurus/plugin-google-gtag',
+            '@docusaurus/plugin-google-tag-manager',
             {
-                trackingID: 'GTM-MDFLZPK8',
-                anonymizeIP: true
+                containerId: 'GTM-MDFLZPK8',
             }
         ],
     ],

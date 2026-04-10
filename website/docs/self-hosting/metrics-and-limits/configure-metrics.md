@@ -8,7 +8,7 @@ Configure the OpenZiti controller, metrics bridge, and zrok controller to collec
 
 ## Configure the OpenZiti controller
 
-1. Add the following stanza to the OpenZiti controller configuration to append `fabric.usage` events to a file:
+1. Add this stanza to the OpenZiti controller configuration to append `fabric.usage` events to a file:
 
     ```yaml
     events:
@@ -22,9 +22,9 @@ Configure the OpenZiti controller, metrics bridge, and zrok controller to collec
           path: /tmp/fabric-usage.json
     ```
 
-    Adjust `events/jsonLogger/handler/path` to wherever you want to send these events for ingestion into zrok. Consult the OpenZiti docs for additional options that control file rotation.
+    Adjust `events/jsonLogger/handler/path` to wherever you want to send these events for ingestion into zrok. Consult the [OpenZiti docs](@openzitidocs/learn/introduction) for additional options that control file rotation.
 
-2. Add the following to the `network` stanza of the OpenZiti controller configuration to increase the reporting frequency. By default, the OpenZiti events infrastructure reports and batches events in 1-minute buckets — too large an interval for a responsive zrok metrics experience. This increases the frequency to every 5 seconds:
+2. Add the following to the `network` stanza of the OpenZiti controller configuration to increase the reporting frequency. By default, the OpenZiti events infrastructure reports and batches events in 1-minute buckets—too large an interval for a responsive zrok metrics experience. This increases the frequency to every 5 seconds:
 
     ```yaml
     network:
@@ -32,7 +32,7 @@ Configure the OpenZiti controller, metrics bridge, and zrok controller to collec
       metricsReportInterval: 5s
     ```
 
-3. Add the following stanza to the router configuration for every router on your OpenZiti network:
+3. Add this stanza to the router configuration for every router on your OpenZiti network:
 
     ```yaml
     metrics:
@@ -46,7 +46,7 @@ Configure the OpenZiti controller, metrics bridge, and zrok controller to collec
 
 zrok uses a metrics bridge component (running as a separate process) to consume `fabric.usage` events from the OpenZiti controller and publish them onto an AMQP queue.
 
-1. Add the following stanza to your zrok controller configuration:
+1. Add this stanza to your zrok controller configuration:
 
     ```yaml
     bridge:
@@ -75,7 +75,7 @@ zrok uses a metrics bridge component (running as a separate process) to consume 
 
 ## Configure zrok metrics
 
-1. Add the following `metrics` section to your zrok controller configuration:
+1. Add this `metrics` section to your zrok controller configuration:
 
     ```yaml
     metrics:
@@ -91,7 +91,7 @@ zrok uses a metrics bridge component (running as a separate process) to consume 
         token:          "<secret token>"
     ```
 
-    This configures the zrok controller to consume usage events from the AMQP queue and write them to InfluxDB. The InfluxDB organization and bucket must be created in advance — the zrok controller will not create them for you.
+    This configures the zrok controller to consume usage events from the AMQP queue and write them to InfluxDB. The InfluxDB organization and bucket must be created in advance—the zrok controller won't create them for you.
 
 ## Test metrics
 
