@@ -183,13 +183,11 @@ Public frontends return a `404` as if the share is no longer there. Private fron
 
 The `accounts` table in the database includes a `limitless` column. When this column is set to `true`, the account is not subject to any limits in the system.
 
-## Experimental limits locking
+## Limits locking
 
-zrok versions prior to `v0.4.31` had a potential race condition when enforcing resource count limits. This usually only manifested in cases where shares or environments were being allocated programmatically (and fast enough to win the limits race).
+zrok supports pessimistic locking on the PostgreSQL store implementation to eliminate potential race conditions when enforcing resource count limits. This is especially relevant when shares or environments are being allocated programmatically at high frequency.
 
-This occurs due to a lack of transactional database locking around the limited structures. `v0.4.31` includes a pessimistic locking facility that can be enabled _only_ on the PostgreSQL store implementation.
-
-If you're running PostgreSQL for your service instance and you want to enable the new experimental locking facility that eliminates the potential resource count race condition, add the `enable_locking: true` flag to your `store` definition:
+To enable locking, add the `enable_locking: true` flag to your `store` definition:
 
 ```yaml
 store:
@@ -204,7 +202,7 @@ The zrok limits agent does not track bandwidth individually for each backend mod
 
 ### Administration through SQL
 
-There are currently no administrative API endpoints or CLI tools for creating and applying limit classes. The limits agent infrastructure was designed to support software integrations that directly manipulate the underlying database structures.
+zrok v2 includes administrative API endpoints for many operations, but creating and applying limit classes still requires direct database access. The limits agent infrastructure was designed to support software integrations that directly manipulate the underlying database structures.
 
 ### Performance
 

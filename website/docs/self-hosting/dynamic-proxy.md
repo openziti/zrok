@@ -811,7 +811,7 @@ This allows you to isolate mapping updates between different deployment environm
 Integrate with your monitoring stack:
 
 1. **RabbitMQ metrics**: Use the management plugin to monitor queue depth, message rates, and connections
-2. **zrok controller metrics**: if you've configured InfluxDB metrics (see [Configuring Metrics](metrics-and-limits/configuring-metrics.md)), monitor:
+2. **zrok controller metrics**: if you've configured InfluxDB metrics (see [Configuring Metrics](metrics-and-limits/configure-metrics.md)), monitor:
    - Frontend registration count
    - Mapping update frequency
    - gRPC request latency
@@ -820,7 +820,7 @@ Integrate with your monitoring stack:
 ## Additional resources
 
 - [OAuth Configuration Guide](oauth/configuring-oauth.md) - detailed OAuth provider setup
-- [Configuring Metrics](metrics-and-limits/configuring-metrics.md) - InfluxDB integration for monitoring
+- [Configuring Metrics](metrics-and-limits/configure-metrics.md) - InfluxDB integration for monitoring
 - [Interstitial Page Configuration](interstitial-page.md) - customizing the interstitial page
 - [Error Pages](error-pages.md) - customizing error pages
 

@@ -228,8 +228,8 @@ Save the `--token` value—you'll need it for the controller configuration.
 
 - See the [reference configuration at `etc/ctrl.yml`](https://github.com/openziti/zrok/blob/main/etc/ctrl.yml) for all
 configuration options.
-- See the separate guides on [Configure metrics](@zrokdocs/self-hosting/metrics-and-limits/configuring-metrics) and
-[Configure limits](@zrokdocs/self-hosting/metrics-and-limits/configuring-limits) for details about these specialized
+- See the separate guides on [Configure metrics](@zrokdocs/self-hosting/metrics-and-limits/configure-metrics) and
+[Configure limits](@zrokdocs/self-hosting/metrics-and-limits/limits) for details about these specialized
 areas of service instance configuration.
 
 :::
@@ -524,7 +524,7 @@ The zrok metrics pipeline starts at the OpenZiti controller, which emits `fabric
 
 3. Restart the OpenZiti controller and routers.
 
-For more details, see [Configure metrics](@zrokdocs/self-hosting/metrics-and-limits/configuring-metrics).
+For more details, see [Configure metrics](@zrokdocs/self-hosting/metrics-and-limits/configure-metrics).
 
 ### Step 13: Start the metrics bridge
 
@@ -559,7 +559,7 @@ metrics agent picks them up and writes them to InfluxDB.
 Once traffic flows through shares, you should see log output from the controller confirming metrics are being written to
 InfluxDB.
 
-See [Configure limits](@zrokdocs/self-hosting/metrics-and-limits/configuring-limits) to enforce bandwidth and resource
+See [Configure limits](@zrokdocs/self-hosting/metrics-and-limits/limits) to enforce bandwidth and resource
 limits based on these metrics.
 
 ## Create a user account
@@ -701,4 +701,4 @@ For dynamic frontend troubleshooting (AMQP connectivity, gRPC errors, mapping is
 migration guide](@zrokdocs/self-hosting/dynamic-proxy#troubleshooting).
 
 For metrics troubleshooting (InfluxDB connectivity, AMQP queues, event flow), see [Configure
-metrics](@zrokdocs/self-hosting/metrics-and-limits/configuring-metrics).
+metrics](@zrokdocs/self-hosting/metrics-and-limits/configure-metrics).
