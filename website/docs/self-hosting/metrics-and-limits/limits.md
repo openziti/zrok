@@ -5,7 +5,7 @@ sidebar_position: 40
 # Limits
 
 :::note
-Configure [metrics](configuring-metrics.md) before setting up limits — the limits agent depends on the metrics infrastructure.
+[Configure metrics](configure-metrics.md) before setting up limits—the limits agent depends on the metrics infrastructure.
 :::
 
 ## The limits agent

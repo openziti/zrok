@@ -107,4 +107,4 @@ The zrok web console should also show activity for your shares:
 
 ![zrok web console activity](images/zrok-console-activity.png)
 
-With metrics configured, you might be interested in [limits](configuring-limits.md).
+With metrics configured, you might be interested in [limits](limits.md).

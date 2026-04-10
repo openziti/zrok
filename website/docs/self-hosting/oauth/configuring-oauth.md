@@ -2,17 +2,17 @@
 sidebar_position: 10
 ---
 
-# OAuth public frontend configuration
+# OAuth public frontend
 
 zrok includes OAuth integration for public frontends, allowing you to authenticate users through various OAuth providers before they can access your shared resources. You can configure multiple OAuth providers and restrict access based on email address patterns.
 
-## Planning for the OAuth frontend
+## Prerequisites
 
 The OAuth public frontend uses an HTTP listener with a stable name to handle redirects from OAuth providers. You'll need to configure a DNS name and port for this listener that is accessible by your end users.
 
 The OAuth frontend address will be used as the "redirect URL" when configuring OAuth clients with your providers. Each provider will redirect authenticated users back to this address, which then forwards them to their original destination.
 
-## Configuring your public frontend
+## Configure your public frontend
 
 Add an `oauth` section to your frontend configuration:
 
@@ -50,7 +50,7 @@ oauth:
 
 ### Configuration parameters
 
-All of the following parmeters _must_ be specified in the frontend configuration unless otherwise noted.
+All of the following parameters _must_ be specified in the frontend configuration unless otherwise noted.
 
 - **`bind_address`**: IP and port where the OAuth frontend will listen (format: `ip:port`)
 - **`endpoint_url`**: Public base URL where OAuth redirects will be handled
@@ -71,9 +71,9 @@ The `providers` array supports multiple OAuth configurations. Each provider requ
 - **`client_id`** and **`client_secret`**: OAuth client credentials
 
 Providers may also require additional configuration values. For detailed setup instructions for each provider type, see:
-- [Google OAuth Setup](integrations/google.md)
-- [GitHub OAuth Setup](integrations/github.md)  
-- [Generic OIDC Setup](integrations/oidc.md)
+- [Google OAuth setup](integrations/google.md)
+- [GitHub OAuth setup](integrations/github.md)
+- [Generic OIDC setup](integrations/oidc.md)
 
 ## OAuth identity flow
 
@@ -130,8 +130,8 @@ sequenceDiagram
 ### Session management
 
 - **Maximum Session Duration**: Controlled by the `session_lifetime` configuration
-- **Re-authentication**: Users must re-authenticate when sessions expire or when `--oauth-check-interval` is reached. Some providers (like the generic OIDC provider) support token refresh and will attempt to transparently refresh at this interval, rather than provoking the user to re-authenticate
-- **Cross-Share Access**: Sessions are not shared between shares using the same provider; switching zrok shares will re-start the authentication flow for the specified provider 
+- **Re-authentication**: Users must re-authenticate when sessions expire or when `--oauth-check-interval` is reached. Some providers (like the generic OIDC provider) support token refresh and will attempt to transparently refresh at this interval, rather than requiring re-authentication
+- **Cross-Share Access**: Sessions are not shared between shares using the same provider; switching zrok shares will re-start the authentication flow for the specified provider
 
 ## Using OAuth with public shares
 
@@ -232,22 +232,26 @@ When a user accesses the logout endpoint, zrok performs the following actions:
    - A custom URL specified via the `redirect_url` query parameter
    - The provider's login page (default behavior)
 
-#### Usage examples
+### Examples
 
-##### Basic logout
+**Basic logout**:
+
 ```
 GET https://oauth.your-domain.com/google/logout
 ```
-This logs the user out and redirects them to the Google OAuth login page.
 
-##### Logout with custom redirect
+Logs you out and redirects you to the Google OAuth login page.
+
+**Logout with custom redirect**:
+
 ```
 GET https://oauth.your-domain.com/github/logout?redirect_url=https://example.com/goodbye
 ```
-This logs the user out and redirects them to `https://example.com/goodbye`.
 
-#### Implementation notes
+Logs you out and redirects you to `https://example.com/goodbye`.
 
-- The logout endpoint validates that the session belongs to the correct provider before proceeding
-- If token revocation fails with the OAuth provider, the logout process will still clear the local session
-- The logout process is idempotent - calling it multiple times or without an active session will not cause errors
+### Implementation notes
+
+- The logout endpoint validates that the session belongs to the correct provider before proceeding.
+- If token revocation fails with the OAuth provider, the logout process will still clear the local session.
+- The logout process is idempotent — calling it multiple times or without an active session will not cause errors.

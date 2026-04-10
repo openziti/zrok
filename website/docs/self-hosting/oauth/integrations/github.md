@@ -2,29 +2,29 @@
 sidebar_position: 20
 ---
 
-# GitHub OAuth setup
+# Set up GitHub OAuth
 
-This guide covers setting up GitHub OAuth for your zrok public frontend.
+Configure GitHub OAuth as an authentication provider for your zrok public frontend.
 
 ## Register OAuth application
 
-Navigate to your GitHub account settings: **Settings > Developer Settings > OAuth Apps > Register a new application**
+1. Go to **Settings > Developer Settings > OAuth Apps**.
 
-![](images/github_create_oauth_application_1.png)
+   ![](images/github_create_oauth_application_1.png)
 
-![](images/github_create_oauth_application_2.png)
+2. Click **Register a new application** and fill in the application details, setting the **Authorization callback URL** to match your OAuth frontend address with `/<provider-name>/auth/callback` appended.
 
-Configure the **Authorization callback URL** to match your OAuth frontend address with `/<provider-name>/auth/callback` appended:
+   ![](images/github_create_oauth_application_2.png)
 
-![](images/github_create_oauth_application_3.png)
+3. Click **Register application**. On the settings page, click **Generate a new client secret**.
 
-Create a new client secret:
+   ![](images/github_create_oauth_application_3.png)
 
-![](images/github_create_oauth_application_4.png)
+4. Save the client ID and client secret for your frontend configuration.
 
-Save the client ID and client secret for your frontend configuration.
+   ![](images/github_create_oauth_application_4.png)
 
-## Frontend configuration
+## Add GitHub to your frontend configuration
 
 Add the GitHub provider to your `frontend.yml`:
 
@@ -40,11 +40,13 @@ oauth:
 ## Redirect URL format
 
 For GitHub OAuth with the provider name `"github"`, the redirect URL should be:
+
 ```
 https://your-oauth-frontend-domain:port/github/auth/callback
 ```
 
 If you use a different provider name (e.g., `"gh-enterprise"`), the URL would be:
+
 ```
 https://your-oauth-frontend-domain:port/gh-enterprise/auth/callback
 ```
