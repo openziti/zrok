@@ -95,7 +95,7 @@ sequenceDiagram
     alt No valid session
         Share->>User: 3. Redirect to Provider<br/>302 to OAuth provider login
         User->>Provider: 4. User Authentication<br/>Login with credentials
-        Provider->>OAuth: 5. Provider Callback<br/>GET /<provider-name>/auth/callback?code=xyz
+        Provider->>OAuth: 5. Provider Callback<br/>GET /{provider}/auth/callback?code=xyz
         OAuth->>Provider: 6. Token Exchange<br/>POST /token (exchange code for tokens)
         Provider->>OAuth: Return access token + user info
         OAuth->>OAuth: 7. Email Validation<br/>Check email against patterns

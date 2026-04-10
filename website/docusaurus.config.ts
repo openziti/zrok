@@ -57,7 +57,6 @@ const config: Config = {
     },
 
     themes: [
-        '@docusaurus/theme-mermaid',
         [
             '@docusaurus/theme-classic',
             {
@@ -65,6 +64,7 @@ const config: Config = {
             }
         ],
         '@netfoundry/docusaurus-theme',
+        '@docusaurus/theme-mermaid',
     ],
 
     // GitHub pages deployment config.
