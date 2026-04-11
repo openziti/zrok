@@ -7,6 +7,7 @@ package davServer
 import (
 	"context"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -510,6 +511,13 @@ func testFS(t *testing.T, fs FileSystem) {
 	}
 }
 
+func symlinkOrSkip(t *testing.T, target, name string) {
+	t.Helper()
+	if err := os.Symlink(target, name); err != nil {
+		t.Skipf("symlinks unavailable: %v", err)
+	}
+}
+
 func TestDir(t *testing.T) {
 	switch runtime.GOOS {
 	case "nacl":
@@ -524,6 +532,168 @@ func TestDir(t *testing.T) {
 	}
 	defer os.RemoveAll(td)
 	testFS(t, Dir(td))
+}
+
+func TestDirRejectsSymlinkEscape(t *testing.T) {
+	ctx := context.Background()
+	root := t.TempDir()
+	outside := t.TempDir()
+
+	secretName := filepath.Join(outside, "secret.txt")
+	if err := os.WriteFile(secretName, []byte("secret"), 0600); err != nil {
+		t.Fatalf("WriteFile: %v", err)
+	}
+	symlinkOrSkip(t, secretName, filepath.Join(root, "escape.txt"))
+
+	fs := Dir(root)
+
+	if _, err := fs.Stat(ctx, "/escape.txt"); !errors.Is(err, os.ErrPermission) {
+		t.Fatalf("Stat: got %v, want permission error", err)
+	}
+
+	if _, err := fs.OpenFile(ctx, "/escape.txt", os.O_RDONLY, 0); !errors.Is(err, os.ErrPermission) {
+		t.Fatalf("OpenFile: got %v, want permission error", err)
+	}
+}
+
+func TestDirRejectsSymlinkParentEscape(t *testing.T) {
+	ctx := context.Background()
+	root := t.TempDir()
+	outside := t.TempDir()
+
+	if err := os.WriteFile(filepath.Join(root, "source.txt"), []byte("source"), 0600); err != nil {
+		t.Fatalf("WriteFile source: %v", err)
+	}
+
+	victimName := filepath.Join(outside, "victim.txt")
+	if err := os.WriteFile(victimName, []byte("victim"), 0600); err != nil {
+		t.Fatalf("WriteFile victim: %v", err)
+	}
+
+	symlinkOrSkip(t, outside, filepath.Join(root, "escape"))
+
+	fs := Dir(root)
+
+	if _, err := fs.OpenFile(ctx, "/escape/created.txt", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600); !errors.Is(err, os.ErrPermission) {
+		t.Fatalf("OpenFile create: got %v, want permission error", err)
+	}
+	if _, err := os.Stat(filepath.Join(outside, "created.txt")); !os.IsNotExist(err) {
+		t.Fatalf("outside create: got %v, want not exist", err)
+	}
+
+	if err := fs.Mkdir(ctx, "/escape/subdir", 0755); !errors.Is(err, os.ErrPermission) {
+		t.Fatalf("Mkdir: got %v, want permission error", err)
+	}
+	if _, err := os.Stat(filepath.Join(outside, "subdir")); !os.IsNotExist(err) {
+		t.Fatalf("outside mkdir: got %v, want not exist", err)
+	}
+
+	if err := fs.Rename(ctx, "/source.txt", "/escape/renamed.txt"); !errors.Is(err, os.ErrPermission) {
+		t.Fatalf("Rename: got %v, want permission error", err)
+	}
+	if _, err := os.Stat(filepath.Join(outside, "renamed.txt")); !os.IsNotExist(err) {
+		t.Fatalf("outside rename: got %v, want not exist", err)
+	}
+	if _, err := os.Stat(filepath.Join(root, "source.txt")); err != nil {
+		t.Fatalf("source retained: %v", err)
+	}
+
+	if err := fs.RemoveAll(ctx, "/escape/victim.txt"); !errors.Is(err, os.ErrPermission) {
+		t.Fatalf("RemoveAll: got %v, want permission error", err)
+	}
+	if _, err := os.Stat(victimName); err != nil {
+		t.Fatalf("victim retained: %v", err)
+	}
+}
+
+func TestDirAllowsInternalSymlinks(t *testing.T) {
+	ctx := context.Background()
+	root := t.TempDir()
+
+	targetName := filepath.Join(root, "target.txt")
+	if err := os.WriteFile(targetName, []byte("target"), 0600); err != nil {
+		t.Fatalf("WriteFile target: %v", err)
+	}
+
+	symlinkOrSkip(t, "target.txt", filepath.Join(root, "link.txt"))
+
+	fs := Dir(root)
+
+	stat, err := fs.Stat(ctx, "/link.txt")
+	if err != nil {
+		t.Fatalf("Stat: %v", err)
+	}
+	if stat.Name() != "link.txt" {
+		t.Fatalf("Stat.Name: got %q, want %q", stat.Name(), "link.txt")
+	}
+
+	f, err := fs.OpenFile(ctx, "/link.txt", os.O_RDONLY, 0)
+	if err != nil {
+		t.Fatalf("OpenFile: %v", err)
+	}
+	defer f.Close()
+
+	info, err := f.Stat()
+	if err != nil {
+		t.Fatalf("file Stat: %v", err)
+	}
+	if info.Name() != "link.txt" {
+		t.Fatalf("file Stat.Name: got %q, want %q", info.Name(), "link.txt")
+	}
+
+	data, err := io.ReadAll(f)
+	if err != nil {
+		t.Fatalf("ReadAll: %v", err)
+	}
+	if got := string(data); got != "target" {
+		t.Fatalf("ReadAll: got %q, want %q", got, "target")
+	}
+
+	actualDir := filepath.Join(root, "actual")
+	if err := os.Mkdir(actualDir, 0755); err != nil {
+		t.Fatalf("Mkdir actual: %v", err)
+	}
+	symlinkOrSkip(t, "actual", filepath.Join(root, "nested"))
+
+	g, err := fs.OpenFile(ctx, "/nested/created.txt", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		t.Fatalf("OpenFile nested: %v", err)
+	}
+	if _, err := g.Write([]byte("created")); err != nil {
+		t.Fatalf("Write nested: %v", err)
+	}
+	if err := g.Close(); err != nil {
+		t.Fatalf("Close nested: %v", err)
+	}
+
+	created, err := os.ReadFile(filepath.Join(actualDir, "created.txt"))
+	if err != nil {
+		t.Fatalf("ReadFile created: %v", err)
+	}
+	if got := string(created); got != "created" {
+		t.Fatalf("ReadFile created: got %q, want %q", got, "created")
+	}
+
+	symlinkOrSkip(t, "created-via-link.txt", filepath.Join(root, "new-link.txt"))
+
+	h, err := fs.OpenFile(ctx, "/new-link.txt", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		t.Fatalf("OpenFile broken link: %v", err)
+	}
+	if _, err := h.Write([]byte("via-link")); err != nil {
+		t.Fatalf("Write broken link: %v", err)
+	}
+	if err := h.Close(); err != nil {
+		t.Fatalf("Close broken link: %v", err)
+	}
+
+	viaLink, err := os.ReadFile(filepath.Join(root, "created-via-link.txt"))
+	if err != nil {
+		t.Fatalf("ReadFile broken link target: %v", err)
+	}
+	if got := string(viaLink); got != "via-link" {
+		t.Fatalf("ReadFile broken link target: got %q, want %q", got, "via-link")
+	}
 }
 
 func TestMemFS(t *testing.T) {
