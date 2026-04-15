@@ -1,5 +1,6 @@
 ---
 title: Custom domains
+sidebar_position: 120
 ---
 
 ## Overview
@@ -33,7 +34,7 @@ domain with zrok.
 
 Log into the myzrok console and access the domains page by clicking on the globe icon in the left navigation menu.
 
-![myzrok_domains_page](images/myzrok_domains_page.png)
+![myzrok_domains_page](custom-domains/images/myzrok_domains_page.png)
 
 
 Click the CREATE button on the top right of the page to get started.
@@ -41,7 +42,7 @@ When you click the create button you’ll be presented with a form to allow you 
 Enter your domain into the form field and click CREATE. This will begin the process for setting up your custom domain.
 A new managed TLS certificate will be created to host traffic on your domain's behalf.
 
-![myzrok_add_domain](images/myzrok_add_domain.png)
+![myzrok_add_domain](custom-domains/images/myzrok_add_domain.png)
 
 This may take a few minutes.
 You may close the form at this time and come back when your domain is *pending validation.*
@@ -53,15 +54,15 @@ zrok will host and manage a TLS certificate for the custom domain on your behalf
 This process requires a DNS validation record to be created in order to prove ownership of the domain.
 Follow the prompts in the UI to create a CNAME DNS record with the name and value specified in the UI.
 
-![myzrok_add_cname](images/myzrok_add_cname.png)
+![myzrok_add_cname](custom-domains/images/myzrok_add_cname.png)
 
 Next, create an A record to direct all DNS requests for your domain to a set of static IPs that are hosted by zrok.
 
-![myzrok_add_a_record](images/myzrok_add_a_record.png)
+![myzrok_add_a_record](custom-domains/images/myzrok_add_a_record.png)
 
 After you’ve created your records, you can verify that they are configured properly using the instructions provided in the form.
 
-![myzrok_verify_dns](images/myzrok_verify_dns.png)
+![myzrok_verify_dns](custom-domains/images/myzrok_verify_dns.png)
 
 If the `nslookup` command returns the IP addresses supplied for the A-record entry, then DNS for your domain is resolving properly.
 
@@ -84,7 +85,7 @@ You can safely close the form until your certificate has been issued.
 
 After your records have been validated and your certificate has been issued, click the FINALIZE button within 72 hours to complete your custom domain setup.
 
-![myzrok_finalize](images/myzrok_finalize.png)
+![myzrok_finalize](custom-domains/images/myzrok_finalize.png)
 
 From here, myzrok.io will complete the last few steps of creating your custom domain.
 This should only take a minute, but if you need to close the form you can find the instructions on how to share your frontend when you return.
@@ -107,4 +108,4 @@ zrok2 config set defaultNamespace foo-example--goPIhgtJtz
 
 To validate which frontend is being used, use the `zrok2 status` command, which will identify the default frontend being used:
 
-![zrok_status](images/zrok_status.png)
+![zrok_status](custom-domains/images/zrok_status.png)
