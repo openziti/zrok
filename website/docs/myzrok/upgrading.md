@@ -1,51 +1,60 @@
 ---
-title: Upgrading from 0.4 to 1.0
+title: Upgrade from 0.4 to 1.0
 ---
 
-## Upgrading an existing 0.4 environment
-If you have not already, [install the latest 1.x zrok binary](../how-tos/install/index.mdx) into your environment.
-
 :::note
-As of zrok `1.0.2`, the zrok rebase is automatic and the configuration will automatically be updated to the v1 API.
-No action is necessary.
+- zrok is now on version 2.0. This guide is for users migrating from 0.4 to an older 1.x release.
+- As of zrok `1.0.2`, the rebase is automatic and the configuration updates to the v1 API with no action required.
 :::
 
-If you are running version `1.0.0` or `1.0.1`, you can run the following to rebase your environment to use the new versioned API:
-```
-  zrok2 rebase apiEndpoint https://api-v1.zrok.io
-```
+## Rebase your environment
 
-Resume zrok API interactions as normal!
+If you're running version `1.0.0` or `1.0.1`, rebase your environment to use the new versioned API:
 
-
-## Trouble after upgrade?
-
-If you run into any issues after upgrading your environment, first verify your zrok version and review your current zrok configuration:
-
-```
-zrok2 version
-```
-Review the `apiEndpoint` configuration, if you are running version `1.0` or later, the `apiEndpoint` should be `https://api-v1.zrok.io`
-```
-zrok2 status
+```shell
+zrok rebase apiEndpoint https://api-v1.zrok.io
 ```
 
-If you're still having issues, we recommend you reach out to our community support team at our [zrok discourse](https://openziti.discourse.group/c/zrok/24) forum.
+You can now resume normal zrok API interactions.
 
-If you prefer to do a hard reset of your environment, you can also run the commands below:
+## Troubleshoot after upgrade
+
+If you run into issues, first verify your zrok version:
+
+```shell
+zrok version
+```
+
+Then review your configuration. If you're running version `1.0` or later, `apiEndpoint` should be `https://api-v1.zrok.io`:
+
+```shell
+zrok status
+```
+
+If you're still having issues, visit the [zrok discourse forum](https://openziti.discourse.group/c/zrok/24).
+
+### Reset your environment
+
+If you prefer to reset your environment from scratch:
 
 :::warning
-Running `zrok2 disable` will delete any running environments or shares, and will release any reserved shares
+Running `zrok disable` deletes any running environments and shares, and releases any reserved shares.
 :::
-```
-zrok2 disable
-```
 
-Reset the config back to the default API endpoint for the binary version
-```
-zrok2 config unset apiEndpoint
-```
-Create a fresh environment
-```
-zrok2 enable <your account token>
-```
+1. Disable your current environment:
+
+    ```shell
+    zrok disable
+    ```
+
+2. Reset the API endpoint to the default:
+
+    ```shell
+    zrok config unset apiEndpoint
+    ```
+
+3. Create a fresh environment:
+
+    ```shell
+    zrok enable <your account token>
+    ```

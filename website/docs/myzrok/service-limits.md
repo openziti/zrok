@@ -1,32 +1,29 @@
 ---
-title: Limits
+title: Service limits
 ---
 
-NetFoundry's public zrok instance implements various limits based on pricing tier,
-as well as rate limits in order to protect the service for all users.
+NetFoundry's public zrok instance implements limits based on pricing tier, as well as rate limits to protect the service for all users.
 
-### Limits on shares, environments, or bandwidth
+## Limits on shares, environments, or bandwidth
 
-The number of shares, enviroments, or allowed bandwidth is based on the limits outlined within your myzrok subscription.
+The number of shares, environments, or allowed bandwidth is based on your myzrok subscription.
 These limits are defined on the [zrok pricing](https://zrok.io/pricing/) page.
-Bandwidth limitations are based on a rolling 24 hour window. Note that if you exceed the daily bandwidth of your plan,
-any running shares will be disabled, and the zrok API will prevent any new shares from being created until the bandwidth
-falls back below the 24 hour limit.
+Bandwidth limits are based on a rolling 24-hour window.
 
-### Rate limitations for public shares
-Public shares are subject to API rate limiting, both by IP address, as well as the individual share token.
-These limits exist to protect the zrok service so that one user does not negatively impact the experience for others.
-The rate limits for public shares are defined below:
+:::warning
+If you exceed the daily bandwidth of your plan, any running shares are disabled and the zrok API prevents new shares
+from being created until bandwidth falls below the 24-hour limit.
+:::
 
-#### Per IP address
-2000 requests per 300 seconds (average of 6.66 requests per second)
+## Rate limits for public shares
 
-The rate limiter will allow a burst of requests in a shorter timespan up to 2000 requests, but once the rate limit has been exceeded,
-new requests will be blocked until the request rate falls below the limit of the 300 second window.
+Public shares are subject to API rate limiting by IP address and by individual share token, to protect the zrok service
+so that one user doesn't negatively impact others.
 
-#### Per Share
-7500 requests per 300 seconds from *any number of IP addresses* (average of 25 requests per second)
+| Scope | Requests per 300 seconds | Average |
+|-------|--------------------------|---------|
+| Per IP address | 2,000 | 6.66 req/sec |
+| Per share (any number of IPs) | 7,500 | 25 req/sec |
 
-
-
-
+The rate limiter allows bursts up to the limit within a shorter timespan. Once exceeded, new requests are blocked until
+the rate falls below the 300-second window threshold.
