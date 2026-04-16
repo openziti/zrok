@@ -2,8 +2,10 @@
 title: Upgrade from 0.4 to 1.0
 ---
 
+This guide is for users migrating from 0.4 to an older 1.x release.
+
 :::note
-- zrok is now on version 2.0. This guide is for users migrating from 0.4 to an older 1.x release.
+- For the latest zrok version, see [Install zrok](../how-tos/install/index.mdx).
 - As of zrok `1.0.2`, the rebase is automatic and the configuration updates to the v1 API with no action required.
 :::
 
