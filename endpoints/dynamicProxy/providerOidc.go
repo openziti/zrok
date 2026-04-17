@@ -178,6 +178,13 @@ func (p *oidcProvider) refreshHandler() http.HandlerFunc {
 			return
 		}
 
+		cookieDomain, ok := resolveCookieDomain(targetHost)
+		if !ok {
+			dl.Errorf("targetHost '%v' does not map to a known namespace on this frontend", targetHost)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unknown namespace for target host")))
+			return
+		}
+
 		newTokens, err := rp.RefreshTokens[*oidc.IDTokenClaims](context.Background(), p.provider, accessToken, "", "")
 		if err != nil {
 			dl.Errorf("unable to refresh tokens: %v", err)
@@ -195,6 +202,7 @@ func (p *oidcProvider) refreshHandler() http.HandlerFunc {
 			signingKey:      p.signingKey,
 			encryptionKey:   p.encryptionKey,
 			targetHost:      targetHost,
+			cookieDomain:    cookieDomain,
 		})
 
 		http.Redirect(w, r, fmt.Sprintf("%v://%v", scheme, targetHost), http.StatusFound)
@@ -222,6 +230,14 @@ func (p *oidcProvider) loginHandler() func(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
+		targetHost := token.Claims.(*IntermediateJWT).TargetHost
+		cookieDomain, ok := resolveCookieDomain(targetHost)
+		if !ok {
+			dl.Errorf("targetHost '%v' does not map to a known namespace on this frontend", targetHost)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(info.Email).WithError(errors.New("unknown namespace for target host")))
+			return
+		}
+
 		setSessionCookie(w, sessionCookieRequest{
 			oauthCfg:        p.oauthCfg,
 			supportsRefresh: true,
@@ -231,14 +247,15 @@ func (p *oidcProvider) loginHandler() func(w http.ResponseWriter, r *http.Reques
 			refreshInterval: refreshInterval,
 			signingKey:      p.signingKey,
 			encryptionKey:   p.encryptionKey,
-			targetHost:      token.Claims.(*IntermediateJWT).TargetHost,
+			targetHost:      targetHost,
+			cookieDomain:    cookieDomain,
 		})
 
 		scheme := "http"
 		if p.tls {
 			scheme = "https"
 		}
-		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).TargetHost), http.StatusFound)
+		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, targetHost), http.StatusFound)
 	}
 }
 
@@ -246,44 +263,53 @@ func (p *oidcProvider) loginHandler() func(w http.ResponseWriter, r *http.Reques
 func (p *oidcProvider) logoutHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := getSessionCookie(r, p.oauthCfg)
-		if err == nil {
-			tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
-				return p.signingKey, nil
-			})
-			if err == nil {
-				claims := tkn.Claims.(*zrokClaims)
-				if claims.Provider == p.config.Name {
-					accessToken, err := endpoints.DecryptToken(claims.AccessToken, p.encryptionKey)
-					if err == nil {
-						if err := rp.RevokeToken(context.Background(), p.provider, accessToken, "access_token"); err == nil {
-							dl.Infof("revoked access token for '%v'", claims.Email)
-						} else {
-							dl.Errorf("access token revocation failed: %v", err)
-							proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("access token revocation failed")))
-							return
-						}
-					} else {
-						dl.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
-						proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to decrypt access token")))
-						return
-					}
-				} else {
-					dl.Errorf("expected provider name '%v' got '%v'", p.config.Name, claims.Provider)
-					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("provider mismatch")))
-					return
-				}
-			} else {
-				dl.Errorf("invalid jwt; unable to parse: %v", err)
-				proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid jwt; unable to parse")))
-				return
-			}
-		} else {
+		if err != nil {
 			dl.Errorf("error getting cookie '%v': %v", p.oauthCfg.CookieName, err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid cookie")))
 			return
 		}
 
-		clearSessionCookies(w, r, p.oauthCfg.CookieName, p.oauthCfg)
+		tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
+			return p.signingKey, nil
+		})
+		if err != nil {
+			dl.Errorf("invalid jwt; unable to parse: %v", err)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid jwt; unable to parse")))
+			return
+		}
+
+		claims := tkn.Claims.(*zrokClaims)
+		if claims.Provider != p.config.Name {
+			dl.Errorf("expected provider name '%v' got '%v'", p.config.Name, claims.Provider)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("provider mismatch")))
+			return
+		}
+
+		// Trade-off: if the mapping was unbound after login, logout rejects instead of
+		// clearing. Clearing requires the original Domain attribute to match, and we
+		// won't issue cookie operations for a namespace no longer on this frontend.
+		cookieDomain, ok := resolveCookieDomain(claims.TargetHost)
+		if !ok {
+			dl.Errorf("targetHost '%v' does not map to a known namespace on this frontend", claims.TargetHost)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unknown namespace for target host")))
+			return
+		}
+
+		accessToken, err := endpoints.DecryptToken(claims.AccessToken, p.encryptionKey)
+		if err != nil {
+			dl.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to decrypt access token")))
+			return
+		}
+
+		if err := rp.RevokeToken(context.Background(), p.provider, accessToken, "access_token"); err != nil {
+			dl.Errorf("access token revocation failed: %v", err)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("access token revocation failed")))
+			return
+		}
+		dl.Infof("revoked access token for '%v'", claims.Email)
+
+		clearSessionCookies(w, r, p.oauthCfg.CookieName, cookieDomain, p.oauthCfg)
 
 		redirectURL := r.URL.Query().Get("redirect_url")
 		if redirectURL == "" {

@@ -170,6 +170,14 @@ func (p *googleProvider) loginHandler() func(w http.ResponseWriter, r *http.Requ
 			return
 		}
 
+		targetHost := token.Claims.(*IntermediateJWT).TargetHost
+		cookieDomain, ok := resolveCookieDomain(targetHost)
+		if !ok {
+			dl.Errorf("targetHost '%v' does not map to a known namespace on this frontend", targetHost)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(data.Email).WithError(errors.New("unknown namespace for target host")))
+			return
+		}
+
 		// set session cookie
 		setSessionCookie(w, sessionCookieRequest{
 			oauthCfg:        p.oauthCfg,
@@ -180,14 +188,15 @@ func (p *googleProvider) loginHandler() func(w http.ResponseWriter, r *http.Requ
 			refreshInterval: refreshInterval,
 			signingKey:      p.signingKey,
 			encryptionKey:   p.encryptionKey,
-			targetHost:      token.Claims.(*IntermediateJWT).TargetHost,
+			targetHost:      targetHost,
+			cookieDomain:    cookieDomain,
 		})
 
 		scheme := "http"
 		if p.tls {
 			scheme = "https"
 		}
-		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).TargetHost), http.StatusFound)
+		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, targetHost), http.StatusFound)
 	}
 }
 
@@ -195,56 +204,64 @@ func (p *googleProvider) loginHandler() func(w http.ResponseWriter, r *http.Requ
 func (p *googleProvider) logoutHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := getSessionCookie(r, p.oauthCfg)
-		if err == nil {
-			tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
-				return p.signingKey, nil
-			})
-			if err == nil {
-				claims := tkn.Claims.(*zrokClaims)
-				if claims.Provider == p.config.Name {
-					accessToken, err := endpoints.DecryptToken(claims.AccessToken, p.encryptionKey)
-					if err == nil {
-						// revoke google token
-						revokeURL := "https://oauth2.googleapis.com/revoke"
-						resp, err := http.PostForm(revokeURL, url.Values{
-							"token": {accessToken},
-						})
-						if err == nil {
-							defer resp.Body.Close()
-							if resp.StatusCode == http.StatusOK {
-								dl.Infof("revoked google token for '%v'", claims.Email)
-							} else {
-								dl.Errorf("access token revocation failed with status: %v", resp.StatusCode)
-								proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("access token revocation failed")))
-								return
-							}
-						} else {
-							dl.Errorf("unable to revoke access token for '%v': %v", claims.Email, err)
-							proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to post access token revocation")))
-							return
-						}
-					} else {
-						dl.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
-						proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to decrypt access token")))
-						return
-					}
-				} else {
-					dl.Errorf("expected provider name '%v' got '%v'", p.config.Name, claims.Provider)
-					proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("provider name mismatch")))
-					return
-				}
-			} else {
-				dl.Errorf("invalid jwt; unable to parse: %v", err)
-				proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid jwt; unable to parse")))
-				return
-			}
-		} else {
+		if err != nil {
 			dl.Errorf("error getting cookie '%v': %v", p.oauthCfg.CookieName, err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("error getting cookie")))
 			return
 		}
 
-		clearSessionCookies(w, r, p.oauthCfg.CookieName, p.oauthCfg)
+		tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
+			return p.signingKey, nil
+		})
+		if err != nil {
+			dl.Errorf("invalid jwt; unable to parse: %v", err)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("invalid jwt; unable to parse")))
+			return
+		}
+
+		claims := tkn.Claims.(*zrokClaims)
+		if claims.Provider != p.config.Name {
+			dl.Errorf("expected provider name '%v' got '%v'", p.config.Name, claims.Provider)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("provider name mismatch")))
+			return
+		}
+
+		// Trade-off: if the mapping was unbound after login, logout rejects instead of
+		// clearing. Clearing requires the original Domain attribute to match, and we
+		// won't issue cookie operations for a namespace no longer on this frontend.
+		cookieDomain, ok := resolveCookieDomain(claims.TargetHost)
+		if !ok {
+			dl.Errorf("targetHost '%v' does not map to a known namespace on this frontend", claims.TargetHost)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unknown namespace for target host")))
+			return
+		}
+
+		accessToken, err := endpoints.DecryptToken(claims.AccessToken, p.encryptionKey)
+		if err != nil {
+			dl.Errorf("unable to decrypt access token for '%v': %v", claims.Email, err)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to decrypt access token")))
+			return
+		}
+
+		// revoke google token
+		revokeURL := "https://oauth2.googleapis.com/revoke"
+		resp, err := http.PostForm(revokeURL, url.Values{
+			"token": {accessToken},
+		})
+		if err != nil {
+			dl.Errorf("unable to revoke access token for '%v': %v", claims.Email, err)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("unable to post access token revocation")))
+			return
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			dl.Errorf("access token revocation failed with status: %v", resp.StatusCode)
+			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(claims.Email).WithError(errors.New("access token revocation failed")))
+			return
+		}
+		dl.Infof("revoked google token for '%v'", claims.Email)
+
+		clearSessionCookies(w, r, p.oauthCfg.CookieName, cookieDomain, p.oauthCfg)
 
 		redirectURL := r.URL.Query().Get("redirect_url")
 		if redirectURL == "" {

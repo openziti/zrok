@@ -22,6 +22,30 @@ type sessionCookieRequest struct {
 	signingKey      []byte
 	encryptionKey   []byte
 	targetHost      string
+	cookieDomain    string
+}
+
+// perRequestOauthCfg adapts oauthConfig to override GetCookieDomain with a value
+// derived from the incoming request (the namespace name).
+type perRequestOauthCfg struct {
+	*oauthConfig
+	cookieDomain string
+}
+
+func (c *perRequestOauthCfg) GetCookieDomain() string { return c.cookieDomain }
+
+// resolveCookieDomain derives the cookie domain for a host. Returns false if the host
+// has no mapping on this frontend, meaning auth must be rejected rather than issuing
+// a cookie scoped to an untrusted domain.
+func resolveCookieDomain(host string) (string, bool) {
+	if globalOAuthRouter == nil {
+		return "", false
+	}
+	h := host
+	if i := strings.Index(h, "/"); i >= 0 {
+		h = h[:i]
+	}
+	return globalOAuthRouter.getNamespaceForHost(hostOnly(h))
 }
 
 // getSessionCookie retrieves and reassembles a session cookie using the shared endpoints package
@@ -65,17 +89,21 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 		return
 	}
 
+	adapted := &perRequestOauthCfg{oauthConfig: req.oauthCfg, cookieDomain: req.cookieDomain}
 	// use the shared endpoints package to set the cookie with compression and striping
-	if err := endpoints.SetSessionCookie(w, req.oauthCfg.CookieName, sTkn, req.oauthCfg); err != nil {
+	if err := endpoints.SetSessionCookie(w, req.oauthCfg.CookieName, sTkn, adapted); err != nil {
 		dl.Errorf("failed to set session cookie: %v", err)
 		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(req.email).WithError(errors.New("failed to set session cookie")))
 		return
 	}
 }
 
-// clearSessionCookies clears all session cookies using the shared endpoints package
-func clearSessionCookies(w http.ResponseWriter, r *http.Request, cookieName string, cfg *oauthConfig) {
-	endpoints.ClearSessionCookies(w, r, cookieName, cfg)
+// clearSessionCookies clears all session cookies using the shared endpoints package.
+// The cookieDomain must match the Domain attribute used when the cookies were set,
+// otherwise browsers will not clear them.
+func clearSessionCookies(w http.ResponseWriter, r *http.Request, cookieName, cookieDomain string, cfg *oauthConfig) {
+	adapted := &perRequestOauthCfg{oauthConfig: cfg, cookieDomain: cookieDomain}
+	endpoints.ClearSessionCookies(w, r, cookieName, adapted)
 }
 
 // filterSessionCookies strips out the configured session cookie and also any `pkce` cookie
