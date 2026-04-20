@@ -45,6 +45,7 @@ export function zrokRedirects(routeBasePath: string = 'docs/zrok'): PluginConfig
                 { to: `${p}/self-hosting/deployment/kubernetes`, from: [`${p}/guides/self-hosting/kubernetes`, `${p}/self-hosting/kubernetes`] },
                 { to: `${p}/self-hosting/deployment/linux`, from: [`${p}/guides/self-hosting/self_hosting_guide`, `${p}/guides/self-hosting/linux`, `${p}/self-hosting/linux/`] },
                 { to: `${p}/self-hosting/deployment/linux`, from: [`${p}/guides/self-hosting/nginx_tls_guide/`, `${p}/guides/self-hosting/linux/nginx`] },
+                { to: `${p}/myzrok/service-limits`, from: [`${p}/myzrok/limits`] },
                 { to: `${p}/self-hosting/metrics-and-limits/limits`, from: [`${p}/self-hosting/metrics-and-limits/configuring-limits`, `${p}/guides/metrics-and-limits/configuring-limits`, `${p}/guides/self-hosting/metrics-and-limits/configuring-limits`] },
                 { to: `${p}/self-hosting/metrics-and-limits/configure-metrics`, from: [`${p}/self-hosting/metrics-and-limits/configuring-metrics`, `${p}/guides/metrics-and-limits/configuring-metrics`, `${p}/guides/self-hosting/metrics-and-limits/configuring-metrics`] },
                 { to: `${p}/self-hosting/oauth/oauth-public-frontend`, from: [`${p}/self-hosting/oauth/configuring-oauth`, `${p}/guides/self-hosting/oauth/configuring-oauth`] },
