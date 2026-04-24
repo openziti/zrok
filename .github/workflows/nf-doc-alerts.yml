@@ -26,9 +26,8 @@ jobs:
           SERVER_URL: ${{ github.server_url }}
         run: |
           FIRST_LINE=$(printf '%s' "$COMMIT_MSG" | head -1)
-          TEXT="📤 **Push** to \`${REPO}\` / \`${BRANCH}\` by @${ACTOR}
-> ${FIRST_LINE}
-[View commit](${SERVER_URL}/${REPO}/commit/${SHA}) | [Compare](${COMPARE_URL})"
+          TEXT=$(printf '📤 **Push** to `%s` / `%s` by @%s\n> %s\n[View commit](%s/%s/commit/%s) | [Compare](%s)' \
+            "$REPO" "$BRANCH" "$ACTOR" "$FIRST_LINE" "$SERVER_URL" "$REPO" "$SHA" "$COMPARE_URL")
           jq -n --arg text "$TEXT" '{text: $text}' | \
             curl -s -X POST "$WEBHOOK" -H 'Content-Type: application/json' -d @-
 
@@ -47,7 +46,7 @@ jobs:
           BRANCH: ${{ github.event.deployment.ref }}
           PREVIEW_URL: ${{ github.event.deployment_status.environment_url }}
         run: |
-          TEXT="🔍 **Vercel preview ready** — \`${REPO}\` / \`${BRANCH}\`
-[Open preview](${PREVIEW_URL})"
+          TEXT=$(printf '🔍 **Vercel preview ready** — `%s` / `%s`\n[Open preview](%s)' \
+            "$REPO" "$BRANCH" "$PREVIEW_URL")
           jq -n --arg text "$TEXT" '{text: $text}' | \
             curl -s -X POST "$WEBHOOK" -H 'Content-Type: application/json' -d @-
