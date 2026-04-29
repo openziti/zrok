@@ -253,6 +253,7 @@ func handleInterstitial(w http.ResponseWriter, r *http.Request, pcfg *config, cf
 
 	sendInterstitial := true
 	if len(pcfg.Interstitial.UserAgentPrefixes) > 0 {
+		sendInterstitial = false
 		ua := r.Header.Get("User-Agent")
 		for _, prefix := range pcfg.Interstitial.UserAgentPrefixes {
 			if strings.HasPrefix(ua, prefix) {
@@ -260,7 +261,6 @@ func handleInterstitial(w http.ResponseWriter, r *http.Request, pcfg *config, cf
 				break
 			}
 		}
-		sendInterstitial = false
 	}
 
 	if sendInterstitial {
