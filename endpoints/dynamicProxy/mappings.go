@@ -2,6 +2,7 @@ package dynamicProxy
 
 import (
 	"context"
+	"strings"
 	"sync"
 	"time"
 
@@ -41,6 +42,24 @@ func (m *mappings) getMapping(name string) (*dynamicProxyController.FrontendMapp
 
 	mapping, exists := m.nameMap[name]
 	return mapping, exists
+}
+
+// getNamespaceForHost returns the namespace portion of a mapped host, or false if the
+// host has no mapping on this frontend. The controller composes mapping names as
+// "{name}.{namespace}" via util.NameInNamespace, where {name} is a single DNS label
+// (enforced by util.IsValidNameInNamespace), so the namespace is everything after the
+// first '.'. A mapping only exists when its namespace is bound to this frontend, so
+// presence of a mapping proves the namespace is on this frontend.
+func (m *mappings) getNamespaceForHost(host string) (string, bool) {
+	mapping, exists := m.getMapping(host)
+	if !exists {
+		return "", false
+	}
+	idx := strings.Index(mapping.Name, ".")
+	if idx <= 0 || idx == len(mapping.Name)-1 {
+		return "", false
+	}
+	return mapping.Name[idx+1:], true
 }
 
 func (m *mappings) Link(c *da.Container) error {

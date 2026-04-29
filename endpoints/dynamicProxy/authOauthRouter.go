@@ -41,6 +41,27 @@ type oauthRouter struct {
 	cancel    context.CancelFunc
 	mu        sync.RWMutex
 	providers map[string]oauthProvider
+	mappings  *mappings
+}
+
+// Link resolves the mappings dependency from the container. Populated after all
+// factories have built, so request-time handlers can look up namespaces per-host.
+func (r *oauthRouter) Link(c *da.Container) error {
+	m, found := da.Get[*mappings](c)
+	if !found {
+		return errors.New("mappings not found")
+	}
+	r.mappings = m
+	return nil
+}
+
+// getNamespaceForHost resolves the namespace for a request host. Returns false when
+// no mapping exists on this frontend for that host (no namespace present).
+func (r *oauthRouter) getNamespaceForHost(host string) (string, bool) {
+	if r.mappings == nil {
+		return "", false
+	}
+	return r.mappings.getNamespaceForHost(host)
 }
 
 // oauthProvider interface for OAuth providers that can register their own routes

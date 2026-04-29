@@ -2,25 +2,27 @@
 sidebar_position: 30
 ---
 
-# Generic OIDC setup
+# Set up a generic OIDC provider
 
-This guide covers setting up OpenID Connect (OIDC) providers for your zrok public frontend. OIDC is supported by many identity providers including Keycloak, Auth0, Okta, Azure AD, and others.
+Configure an OpenID Connect (OIDC) provider as an authentication provider for your zrok public frontend. OIDC is
+supported by many identity providers including Keycloak, Auth0, Okta, Azure AD, and others.
 
 ## Provider requirements
 
 Your OIDC provider must support:
+
 - Authorization Code flow
 - Discovery endpoint (optional but recommended)
-- PKCE (Proof Key for Code Exchange) - optional but recommended for security
+- PKCE (Proof Key for Code Exchange)—optional but recommended for security
 
-## Configure OIDC provider
+## Configure an OIDC provider
 
-1. Create a new OAuth/OIDC client in your provider's admin interface
-2. Set the **redirect URI** to: `https://your-oauth-frontend-domain:port/<provider-name>/auth/callback`
-3. Configure required scopes: `openid`, `email`, `profile`
-4. Note the **client ID**, **client secret**, and **issuer URL**
+1. Create a new OAuth/OIDC client in your provider's admin interface.
+2. Set the **redirect URI** to `https://your-oauth-frontend-domain:port/<provider-name>/auth/callback`.
+3. Configure required scopes: `openid`, `email`, `profile`.
+4. Note the **client ID**, **client secret**, and **issuer URL**.
 
-## Frontend configuration
+## Add the OIDC provider to your frontend configuration
 
 Add the OIDC provider to your `frontend.yml`:
 
@@ -50,22 +52,28 @@ oauth:
 
 ## Common OIDC providers
 
+These are the `issuer` URLs for popular OIDC providers.
+
 ### Keycloak
+
 ```yaml
 issuer: "https://your-keycloak.com/realms/your-realm"
 ```
 
 ### Auth0
+
 ```yaml
 issuer: "https://your-domain.auth0.com/"
 ```
 
 ### Azure AD
+
 ```yaml
 issuer: "https://login.microsoftonline.com/<tenant-id>/v2.0"
 ```
 
 ### Okta
+
 ```yaml
 issuer: "https://your-domain.okta.com/oauth2/default"
 ```
@@ -73,11 +81,13 @@ issuer: "https://your-domain.okta.com/oauth2/default"
 ## Redirect URL format
 
 For OIDC providers, the redirect URL should use your configured provider name:
-```
+
+```text
 https://your-oauth-frontend-domain:port/<provider-name>/auth/callback
 ```
 
 For example, with the provider name `"my-oidc-provider"`:
-```
+
+```text
 https://your-oauth-frontend-domain:port/my-oidc-provider/auth/callback
 ```
