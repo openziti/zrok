@@ -1,0 +1,35 @@
+name: mattermost-doc-alerts
+on:
+  issues:
+  issue_comment:
+  pull_request_review:
+    types: [submitted]
+  pull_request_review_comment:
+  pull_request:
+    types: [opened, reopened, ready_for_review, closed]
+  push:
+    paths:
+      - docs/**
+  fork:
+  release:
+    types: [released]
+  workflow_dispatch:
+  watch:
+    types: [started]
+
+jobs:
+  mattermost-doc-alerts:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    name: POST to doc-alerts
+    steps:
+      - uses: openziti/ziti-mattermost-action-py@v1
+        if: |
+          github.repository_owner == 'openziti'
+          && ((github.event_name != 'pull_request_review')
+          || (github.event_name == 'pull_request_review' && github.event.review.state == 'approved'))
+        with:
+          zitiId: ${{ secrets.ZITI_MATTERMOST_IDENTITY }}
+          webhookUrl: ${{ secrets.ZHOOK_URL_DOC_NOTIFICATIONS }}
+          eventJson: ${{ toJson(github.event) }}
+          senderUsername: "GitHubZ"
