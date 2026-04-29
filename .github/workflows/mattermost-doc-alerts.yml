@@ -14,8 +14,6 @@ on:
   release:
     types: [released]
   workflow_dispatch:
-  watch:
-    types: [started]
 
 jobs:
   mattermost-doc-alerts:
