@@ -1,6 +1,7 @@
-name: mattermost-doc-alerts
+name: mattermost-ziti-webhook
 on:
   issues:
+    types: [opened, closed]
   issue_comment:
   pull_request_review:
     types: [submitted]
@@ -16,10 +17,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  mattermost-doc-alerts:
-    continue-on-error: true
+  mattermost-ziti-webhook:
     runs-on: ubuntu-latest
-    name: POST to doc-alerts
+    name: POST Webhook
     steps:
       - uses: openziti/ziti-mattermost-action-py@v1
         if: |
