@@ -31,6 +31,8 @@ type httpListener struct {
 	server     *http.Server
 }
 
+var getRefreshedService = endpoints.GetRefreshedService
+
 func buildHttpListener(app *da.Application[*config]) error {
 	hl, err := newHttpListener(app.Cfg)
 	if err != nil {
@@ -157,7 +159,7 @@ func hostTargetReverseProxy(cfg *config, ctx ziti.Context, mappings *mappings) *
 	director := func(req *http.Request) {
 		targetMapping, found := mappings.getMapping(hostOnly(req.Host))
 		if found {
-			if svc, found := endpoints.GetRefreshedService(targetMapping.ShareToken, ctx); found {
+			if svc, found := getRefreshedService(targetMapping.ShareToken, ctx); found {
 				if cfg, found := svc.Config[sdk.ZrokProxyConfig]; found {
 					dl.Debugf("auth model: %v", cfg)
 				} else {
@@ -199,7 +201,7 @@ func shareHandler(handler http.Handler, cfg *config, signingKey []byte, ctx ziti
 			return
 		}
 
-		svc, found := endpoints.GetRefreshedService(mapping.ShareToken, ctx)
+		svc, found := getRefreshedService(mapping.ShareToken, ctx)
 		if !found {
 			dl.Warnf("%v -> service '%v' not found", r.RemoteAddr, mapping.ShareToken)
 			proxyUi.WriteNotFound(w, proxyUi.NotFoundData(mapping.ShareToken))
@@ -214,6 +216,12 @@ func shareHandler(handler http.Handler, cfg *config, signingKey []byte, ctx ziti
 		}
 
 		if handleInterstitial(w, r, cfg, svcCfg) {
+			return
+		}
+
+		if r.Method == http.MethodOptions {
+			filterSessionCookies(w, r, cfg)
+			handler.ServeHTTP(w, r)
 			return
 		}
 
