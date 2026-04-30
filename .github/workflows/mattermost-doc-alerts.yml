@@ -8,7 +8,7 @@ on:
   pull_request:
     types: [opened, reopened, ready_for_review, closed]
     paths:
-      - docs/**
+      - website/**
   fork:
   release:
     types: [released]
