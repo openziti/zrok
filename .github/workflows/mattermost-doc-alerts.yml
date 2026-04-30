@@ -7,7 +7,6 @@ on:
   pull_request_review_comment:
   pull_request:
     types: [opened, reopened, ready_for_review, closed]
-  push:
     paths:
       - docs/**
   fork:
