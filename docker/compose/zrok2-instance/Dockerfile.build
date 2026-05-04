@@ -11,7 +11,7 @@
 
 # ── Stage 1a: Build main UI assets ───────────────────────────────────────────
 
-FROM node:20-bookworm-slim AS ui-builder
+FROM node:25-bookworm-slim AS ui-builder
 WORKDIR /src/ui
 COPY ui/package.json ui/package-lock.json* ./
 RUN --mount=type=cache,target=/root/.npm \
@@ -21,7 +21,7 @@ RUN npx vite build
 
 # ── Stage 1b: Build agent UI assets ──────────────────────────────────────────
 
-FROM node:20-bookworm-slim AS agent-ui-builder
+FROM node:25-bookworm-slim AS agent-ui-builder
 WORKDIR /src/agent/agentUi
 COPY agent/agentUi/package.json agent/agentUi/package-lock.json* ./
 RUN --mount=type=cache,target=/root/.npm \
@@ -53,7 +53,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 # ── Stage 3: Final image (matches published openziti/zrok2 layout) ───────────
 
-FROM docker.io/openziti/ziti-cli:1.6.14
+FROM docker.io/openziti/ziti-cli:1.7.2
 
 LABEL name="openziti/zrok2" \
       maintainer="support@zrok.io" \
