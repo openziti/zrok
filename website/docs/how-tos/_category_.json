@@ -1,0 +1,8 @@
+{
+  "label": "How-to guides",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Step-by-step guides for installing zrok, sharing resources, and using advanced features."
+  }
+}

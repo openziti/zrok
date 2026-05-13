@@ -143,8 +143,8 @@ func (p *githubProvider) loginHandler() func(w http.ResponseWriter, r *http.Requ
 		if v, err := time.ParseDuration(token.Claims.(*IntermediateJWT).RefreshInterval); err == nil {
 			refreshInterval = v
 		} else {
-			errOut := errors.Wrapf(err, "unable to parse authorization check interval '%v'", token.Claims.(*IntermediateJWT).RefreshInterval)
-			dl.Error(errOut)
+			errOut := errors.New("unable to parse authorization check interval")
+			dl.Errorf("unable to parse authorization check interval '%v': %v", token.Claims.(*IntermediateJWT).RefreshInterval, err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errOut))
 			return
 		}
@@ -223,7 +223,7 @@ func (p *githubProvider) loginHandler() func(w http.ResponseWriter, r *http.Requ
 // logoutHandler creates the logout handler for revoking GitHub tokens and clearing cookies
 func (p *githubProvider) logoutHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := getSessionCookie(r, p.oauthCfg.CookieName)
+		cookie, err := getSessionCookie(r, p.oauthCfg)
 		if err == nil {
 			tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 				return p.signingKey, nil

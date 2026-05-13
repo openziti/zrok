@@ -2363,10 +2363,10 @@
   dependencies:
     langium "3.3.1"
 
-"@netfoundry/docusaurus-theme@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@netfoundry/docusaurus-theme/-/docusaurus-theme-0.4.0.tgz#61359c04bad77a1d0abb749299962c94af042800"
-  integrity sha512-kLIXzCB9OfuawQhQsa8HSPXYjVQ/sFnF9ke+c5zp7MSv3iZhbp/TfJwdktVBd2415M76sDa4FtSDwR7TFOXP6Q==
+"@netfoundry/docusaurus-theme@0.7.4":
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/@netfoundry/docusaurus-theme/-/docusaurus-theme-0.7.4.tgz#b43ff4b0dfd7814724ee3170e009728d77b26fbd"
+  integrity sha512-LV5tbuJT/mYxuPlOtXP/HuJc/Ft90j4mH6mzcKBOvX/iWZy04N7zcU4EPHHn5BuqGpcGxauqO3bxvgoBjwB4hQ==
   dependencies:
     "@docsearch/react" "^3"
     algoliasearch "^5"

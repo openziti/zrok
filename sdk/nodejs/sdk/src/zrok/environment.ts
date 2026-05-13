@@ -1,66 +1,117 @@
-import {environmentFile, identityFile, metadataFile} from "./paths";
+import {configFile, environmentFile, identitiesDir, identityFile, metadataFile, rootDir} from "./paths";
 import * as fs from "node:fs";
-import {Configuration} from "../api";
+import * as path from "node:path";
+import {Configuration, MetadataApi} from "../api";
 
 const ENVIRONMENT_V = "v0.4";
+const CLIENT_V = "v2.0";
 
 export class Root {
-	metadata: Metadata;
-    config: Config|undefined;
-    environment: Environment|undefined;
+    metadata: Metadata;
+    config: Config | undefined;
+    environment: Environment | undefined;
 
-    constructor(metadata: Metadata, environment: Environment|undefined) {
+    constructor(metadata: Metadata, environment: Environment | undefined, config?: Config) {
         this.metadata = metadata;
-        this.config = undefined;
+        this.config = config;
         this.environment = environment;
     }
 
-    public apiConfiguration = (): Configuration => {
-        let apiEndpoint = this.apiEndpoint();
-        if(this.isEnabled()) {
-            return new Configuration({basePath: apiEndpoint.endpoint + "/api/v2", apiKey: this.environment?.accountToken})
+    async client(): Promise<Configuration> {
+        const apiEndpoint = this.apiEndpoint();
+        let cfg: Configuration;
+        if (this.isEnabled()) {
+            cfg = new Configuration({basePath: apiEndpoint.endpoint + "/api/v2", apiKey: this.environment?.accountToken});
         } else {
-            return new Configuration({basePath: apiEndpoint.endpoint + "/api/v2"});
+            cfg = new Configuration({basePath: apiEndpoint.endpoint + "/api/v2"});
         }
+
+        const api = new MetadataApi(cfg);
+        await api.clientVersionCheck({body: {clientVersion: CLIENT_V}})
+            .catch(err => {
+                throw new Error("client version check failed: " + err);
+            });
+
+        return cfg;
     }
 
-    public apiEndpoint = (): ApiEndpoint => {
+    apiEndpoint(): ApiEndpoint {
         let endpoint = "https://api-v2.zrok.io";
         let from = "binary";
 
-        if(this.config?.apiEndpoint !== "") {
-            endpoint = this.config?.apiEndpoint!;
+        if (this.config?.apiEndpoint && this.config.apiEndpoint !== "") {
+            endpoint = this.config.apiEndpoint;
             from = "config";
         }
 
-        let env = process.env.ZROK_API_ENDPOINT;
-        if(env != null) {
-            endpoint = env;
-            from = "ZROK_API_ENDPOINT";
+        const env2 = process.env.ZROK2_API_ENDPOINT;
+        if (env2 != null && env2 !== "") {
+            endpoint = env2;
+            from = "ZROK2_API_ENDPOINT";
+        } else {
+            const env = process.env.ZROK_API_ENDPOINT;
+            if (env != null && env !== "") {
+                endpoint = env;
+                from = "ZROK_API_ENDPOINT";
+                console.warn("WARNING: ZROK_API_ENDPOINT is deprecated, use ZROK2_API_ENDPOINT instead");
+            }
         }
 
-        if(this.isEnabled()) {
+        if (this.isEnabled()) {
             endpoint = this.environment?.apiEndpoint!;
             from = "env";
         }
 
+        endpoint = endpoint.replace(/\/+$/, "");
+
         return new ApiEndpoint(endpoint, from);
     }
 
-    public hasConfig = (): boolean => {
+    hasConfig(): boolean {
         return this.config !== undefined;
     }
 
-    public isEnabled = (): boolean => {
+    isEnabled(): boolean {
         return this.environment !== undefined;
     }
 
-    public environmentIdentityName = (): string => {
+    environmentIdentityName(): string {
         return "environment";
     }
 
-    public zitiIdentityName = (name: string): string => {
+    zitiIdentityName(name: string): string {
         return identityFile(name);
+    }
+
+    setEnvironment(env: Environment): void {
+        const ef = environmentFile();
+        fs.mkdirSync(path.dirname(ef), {recursive: true});
+        const data = {
+            zrok_token: env.accountToken,
+            ziti_identity: env.zId,
+            api_endpoint: env.apiEndpoint,
+        };
+        fs.writeFileSync(ef, JSON.stringify(data, null, 2));
+        this.environment = env;
+    }
+
+    saveZitiIdentityNamed(name: string, cfg: string): void {
+        const idd = identitiesDir();
+        fs.mkdirSync(idd, {recursive: true});
+        const idf = identityFile(name);
+        fs.writeFileSync(idf, cfg);
+    }
+
+    deleteEnvironment(): void {
+        const ef = environmentFile();
+        if (fs.existsSync(ef)) {
+            fs.unlinkSync(ef);
+        }
+        const idf = identityFile(this.environmentIdentityName());
+        if (fs.existsSync(idf)) {
+            fs.unlinkSync(idf);
+        }
+        this.environment = undefined;
     }
 }
 
@@ -88,9 +139,11 @@ export class Environment {
 
 export class Config {
     apiEndpoint: string;
+    defaultFrontend: string;
 
-    constructor(apiEndpoint: string) {
+    constructor(apiEndpoint: string, defaultFrontend: string = "") {
         this.apiEndpoint = apiEndpoint;
+        this.defaultFrontend = defaultFrontend;
     }
 }
 
@@ -104,13 +157,28 @@ export class ApiEndpoint {
     }
 }
 
-export const loadRoot = (): Root => {
-	if(rootExists()) {
-        let metadata = loadMetadata();
-        let environment = loadEnvironment();
-        return new Root(metadata, environment);
+export const defaultRoot = (): Root => {
+    const root = rootDir();
+    const metadata = new Metadata(ENVIRONMENT_V, root);
+    return new Root(metadata, undefined);
+}
+
+export const assertRoot = (): boolean => {
+    if (rootExists()) {
+        const metadata = loadMetadata();
+        return metadata.v === ENVIRONMENT_V;
     }
-    throw new Error("unable to load root; did you 'zrok enable'?");
+    return false;
+}
+
+export const loadRoot = (): Root => {
+    if (rootExists()) {
+        const metadata = loadMetadata();
+        const config = loadConfig();
+        const environment = loadEnvironment();
+        return new Root(metadata, environment, config);
+    }
+    return defaultRoot();
 };
 
 export const rootExists = (): boolean => {
@@ -118,21 +186,32 @@ export const rootExists = (): boolean => {
 }
 
 const loadMetadata = (): Metadata => {
-    let f = metadataFile();
-    let data = fs.readFileSync(f);
-    let obj = JSON.parse(data.toString());
-    if(obj.v != ENVIRONMENT_V) {
+    const f = metadataFile();
+    const data = fs.readFileSync(f);
+    const obj = JSON.parse(data.toString());
+    if (obj.v != ENVIRONMENT_V) {
         throw new Error("invalid environment version! got version '" + obj.v + "' expected '" + ENVIRONMENT_V + "'");
     }
     return new Metadata(obj.v, f);
 }
 
-const loadEnvironment = (): Environment|undefined => {
-	let f = environmentFile();
-    if(!fs.existsSync(f)) {
+const loadConfig = (): Config | undefined => {
+    const f = configFile();
+    try {
+        const data = fs.readFileSync(f);
+        const obj = JSON.parse(data.toString());
+        return new Config(obj.api_endpoint || "", obj.default_frontend || "");
+    } catch {
         return undefined;
     }
-    let data = fs.readFileSync(f);
-    let obj = JSON.parse(data.toString());
+}
+
+const loadEnvironment = (): Environment | undefined => {
+    const f = environmentFile();
+    if (!fs.existsSync(f)) {
+        return undefined;
+    }
+    const data = fs.readFileSync(f);
+    const obj = JSON.parse(data.toString());
     return new Environment(obj.zrok_token, obj.ziti_identity, obj.api_endpoint);
 }

@@ -122,32 +122,23 @@ func (h *unshareHandler) deallocateResources(shrToken string) error {
 }
 
 func (h *unshareHandler) cleanupShareNameMappings(shareId int, trx *sqlx.Tx) error {
-	// find all share name mappings for this share
-	mappings, err := str.FindShareNameMappingsByShareId(shareId, trx)
+	details, err := str.FindShareNameCleanupDetailsByShareId(shareId, trx)
 	if err != nil {
-		return errors.Wrapf(err, "error finding share name mappings for share '%v'", shareId)
+		return errors.Wrapf(err, "error finding share name cleanup details for share '%v'", shareId)
 	}
 
-	// delete each name that was dynamically allocated (not reserved)
-	for _, mapping := range mappings {
-		name, err := str.GetName(mapping.NameId, trx)
-		if err != nil {
-			dl.Warnf("error getting name '%v' for cleanup: %v", mapping.NameId, err)
-			continue
-		}
-
-		// only delete names that are not reserved (dynamically allocated by share12)
-		if !name.Reserved {
-			if err := str.DeleteName(name.Id, trx); err != nil {
-				dl.Warnf("error deleting name '%v': %v", name.Name, err)
-			} else {
-				dl.Debugf("deleted dynamically allocated name '%v'", name.Name)
+	for _, detail := range details {
+		// only delete names that are not reserved and are not already deleted
+		if !detail.Reserved && !detail.NameDeleted {
+			if err := str.DeleteName(detail.NameId, trx); err != nil {
+				return errors.Wrapf(err, "error deleting dynamically allocated name '%v'", detail.Name)
 			}
+			dl.Debugf("deleted dynamically allocated name '%v'", detail.Name)
 		}
 
 		// delete the share name mapping
-		if err := str.DeleteShareNameMapping(mapping.Id, trx); err != nil {
-			dl.Warnf("error deleting share name mapping '%v': %v", mapping.Id, err)
+		if err := str.DeleteShareNameMapping(detail.MappingId, trx); err != nil {
+			return errors.Wrapf(err, "error deleting share name mapping '%v'", detail.MappingId)
 		}
 	}
 
@@ -160,37 +151,27 @@ func (h *unshareHandler) processDynamicMappings(shareId int, trx *sqlx.Tx) error
 		return nil
 	}
 
-	// find all share name mappings for this share
-	mappings, err := str.FindShareNameMappingsByShareId(shareId, trx)
+	details, err := str.FindShareNameCleanupDetailsByShareId(shareId, trx)
 	if err != nil {
-		return errors.Wrapf(err, "error finding share name mappings for share '%v'", shareId)
+		return errors.Wrapf(err, "error finding share name cleanup details for share '%v'", shareId)
 	}
 
-	for _, mapping := range mappings {
-		// find name record to get the name and namespace
-		name, err := str.GetName(mapping.NameId, trx)
-		if err != nil {
-			dl.Warnf("error finding name with id '%v' for unbind update: %v", mapping.NameId, err)
-			continue
-		}
-
-		// find namespace
-		ns, err := str.GetNamespace(name.NamespaceId, trx)
-		if err != nil {
-			dl.Warnf("error finding namespace with id '%v' for unbind update: %v", name.NamespaceId, err)
+	for _, detail := range details {
+		if detail.NamespaceDeleted {
+			dl.Warnf("namespace '%v' is deleted while unbinding share name mapping '%v'", detail.NamespaceName, detail.MappingId)
 			continue
 		}
 
 		// find dynamic frontends for this namespace
-		frontends, err := str.FindDynamicFrontendsForNamespace(ns.Id, trx)
+		frontends, err := str.FindDynamicFrontendsForNamespace(detail.NamespaceID, trx)
 		if err != nil {
-			dl.Warnf("error finding dynamic frontends for namespace '%v': %v", ns.Token, err)
+			dl.Warnf("error finding dynamic frontends for namespace '%v': %v", detail.NamespaceName, err)
 			continue
 		}
 
 		// send unbind mapping updates to each dynamic frontend
 		for _, frontend := range frontends {
-			frontendName := util.NameInNamespace(name.Name, ns.Name)
+			frontendName := util.NameInNamespace(detail.Name, detail.NamespaceName)
 
 			if err := dPCtrl.UnbindFrontendMapping(frontend.Token, frontendName, trx); err != nil {
 				dl.Errorf("error unbinding frontend mapping from frontend '%v': %v", frontend.Token, err)

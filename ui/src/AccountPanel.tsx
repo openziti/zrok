@@ -1,5 +1,5 @@
 import {Node} from "@xyflow/react";
-import {Button, Grid2, Tooltip, Typography} from "@mui/material";
+import {Box, Button, Grid2, Tooltip, Typography} from "@mui/material";
 import AccountIcon from "@mui/icons-material/Person4";
 import PropertyTable from "./PropertyTable.tsx";
 import SecretToggle from "./SecretToggle.tsx";
@@ -43,6 +43,8 @@ const AccountPanel = ({ account }: AccountPanelProps) => {
         setRegenerateOpen(false);
     }
 
+    if (!user) return null;
+
     const customProperties = {
         token: row => <Grid2 container><SecretToggle secret={row.value} /><ClipboardText text={row.value} /></Grid2>
     }
@@ -59,18 +61,18 @@ const AccountPanel = ({ account }: AccountPanelProps) => {
                     <Grid2 display="flex" component="h3">{String(account.data.label)}</Grid2>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2 }} alignItems="center">
-                    <h5 style={{ margin: 0 }}>Your zrok account <code>{user.email}</code></h5>
+                    <Box component="h5" sx={{ m: 0 }}>Your zrok account <code>{user.email}</code></Box>
                 </Grid2>
                 { limited ? <BandwidthLimitedWarning /> : null }
                 <Grid2 container sx={{ flexGrow: 1, mb: 3 }} alignItems="left">
                     <Tooltip title="Account Metrics">
-                        <Button variant="contained" onClick={openAccountMetrics}><MetricsIcon /></Button>
+                        <Button variant="contained" aria-label="Account Metrics" onClick={openAccountMetrics}><MetricsIcon /></Button>
                     </Tooltip>
                     <Tooltip title="Change Password" sx={{ ml: 1 }}>
-                        <Button variant="contained" color="error" onClick={openChangePassword}><PasswordIcon /></Button>
+                        <Button variant="contained" color="error" aria-label="Change Password" onClick={openChangePassword}><PasswordIcon /></Button>
                     </Tooltip>
                     <Tooltip title="Regenerate Account Token" sx={{ ml: 1 }}>
-                        <Button variant="contained" color="error" onClick={openRegenerate}><TokenIcon /></Button>
+                        <Button variant="contained" color="error" aria-label="Regenerate Account Token" onClick={openRegenerate}><TokenIcon /></Button>
                     </Tooltip>
                 </Grid2>
                 <Grid2 container sx={{ flexGrow: 1 }}>

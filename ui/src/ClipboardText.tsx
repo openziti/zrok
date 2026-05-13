@@ -1,6 +1,6 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckMarkIcon from "@mui/icons-material/Check";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {Button, Popover, Typography} from "@mui/material";
 
 interface ClipboardTextProps {
@@ -9,25 +9,37 @@ interface ClipboardTextProps {
 
 const ClipboardText = ({ text }: ClipboardTextProps) => {
     const [copied, setCopied] = useState<boolean>(false);
-    const [control, setControl] = useState<React.JSX.Element>(<ContentCopyIcon />);
+    const resetTimerRef = useRef<number | null>(null);
 
     useEffect(() => {
-        if(copied) {
-            setControl(<CheckMarkIcon />);
-        } else {
-            setControl(<ContentCopyIcon />);
+        return () => {
+            if (resetTimerRef.current !== null) {
+                window.clearTimeout(resetTimerRef.current);
+            }
+        };
+    }, []);
+
+    const scheduleReset = () => {
+        if (resetTimerRef.current !== null) {
+            window.clearTimeout(resetTimerRef.current);
         }
-    }, [copied]);
+        resetTimerRef.current = window.setTimeout(() => {
+            setCopied(false);
+            resetTimerRef.current = null;
+        }, 2000);
+    };
 
     const copy = async () => {
         await navigator.clipboard.writeText(text);
         setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        scheduleReset();
     }
 
     return (
         <>
-            <Button onClick={copy} sx={{ minWidth: "30px" }} style={{ color: "black" }}>{control}</Button>
+            <Button onClick={copy} sx={{ minWidth: "30px", color: 'common.black' }}>
+                {copied ? <CheckMarkIcon /> : <ContentCopyIcon />}
+            </Button>
             <Popover anchorOrigin={{ vertical: "top", horizontal: "right" }} open={copied}><Typography sx={{ p: 2 }}>Copied!</Typography></Popover>
         </>
     );

@@ -1,4 +1,4 @@
-import {Box, Button, Checkbox, Container, FormControlLabel, Grid2, Paper, TextField, Typography} from "@mui/material";
+import {Box, Button, Checkbox, CircularProgress, Container, FormControlLabel, Grid2, Paper, TextField, Typography} from "@mui/material";
 import zrokLogo from "./assets/zrok-1.0.0-rocket-purple.svg";
 import {useParams} from "react-router";
 import {useFormik} from "formik";
@@ -6,17 +6,26 @@ import * as Yup from 'yup';
 import {useEffect, useRef, useState} from "react";
 import {AccountApi, MetadataApi} from "./api";
 import ClipboardText from "./ClipboardText.tsx";
+import {sanitizeHtml} from "./model/html.ts";
+import {extractErrorMessage} from "./model/errors.ts";
+import {isAbortError} from "./model/errors.ts";
+
+interface SetPasswordValues {
+    password: string;
+    confirm: string;
+}
 
 interface SetPasswordFormProps {
     email: string;
     touLink: string;
-    register: (v) => void;
+    register: (v: SetPasswordValues) => void;
 }
 
 const SetPasswordForm = ({ email, touLink, register }: SetPasswordFormProps) => {
     const [checked, setChecked] = useState<boolean>(false);
     const checkedRef = useRef<boolean>();
     checkedRef.current = checked;
+    const requiresTouAcceptance = (touLink ?? "").trim() !== "";
     const toggleChecked = () => { setChecked(!checkedRef.current) }
 
     const form = useFormik({
@@ -25,7 +34,6 @@ const SetPasswordForm = ({ email, touLink, register }: SetPasswordFormProps) => 
             confirm: "",
         },
         onSubmit: v => {
-            console.log(v);
             register(v);
         },
         validationSchema: Yup.object({
@@ -81,8 +89,20 @@ const SetPasswordForm = ({ email, touLink, register }: SetPasswordFormProps) => 
                 helperText={form.errors.confirm}
                 sx={{ mt: 2 }}
             />
-            <FormControlLabel control={<Checkbox checked={checked} onChange={toggleChecked} />} label={<p>I accept the <span dangerouslySetInnerHTML={{__html: touLink as string}}></span></p>} sx={{ mt: 2 }} />
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} style={{ color: "#9bf316" }} disabled={!checked}>
+            {requiresTouAcceptance ? (
+                <FormControlLabel
+                    control={<Checkbox checked={checked} onChange={toggleChecked} />}
+                    label={<p>I accept the <span dangerouslySetInnerHTML={{__html: sanitizeHtml(touLink ?? "")}}></span></p>}
+                    sx={{ mt: 2 }}
+                />
+            ) : null}
+            <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2, color: 'secondary.main' }}
+                disabled={requiresTouAcceptance && !checked}
+            >
                 Register Account
             </Button>
         </Box>
@@ -158,7 +178,7 @@ const InvalidToken = () => {
             <Box component="div">
                 <Container>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography component="div"><h2 style={{ color: "red" }} align="center">Invalid registration token?!</h2></Typography>
+                        <Typography component="div"><Box component="h2" sx={{ color: 'error.main', textAlign: 'center' }}>Invalid registration token?!</Box></Typography>
                     </Box>
                 </Container>
                 <Container>
@@ -181,67 +201,76 @@ const InvalidToken = () => {
 
 const Register = () => {
     const { regToken } = useParams();
-    const [component, setComponent] = useState<React.JSX.Element>(null);
+    const [view, setView] = useState<"loading" | "form" | "complete" | "invalidToken">("loading");
+    const [accountToken, setAccountToken] = useState<string>("");
     const [error, setError] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>("");
     const [email, setEmail] = useState<string>();
-    const [touLink, setTouLink] = useState<string>();
+    const [touLink, setTouLink] = useState<string | null>(null);
 
-    const doRegistration = (v) => {
+    const doRegistration = (v: SetPasswordValues) => {
+        setErrorMessage("");
         new AccountApi().register({body: {registerToken: regToken, password: v.password}})
             .then(d => {
-                console.log(d);
-                setComponent(<RegistrationComplete token={d.accountToken!} />);
+                setAccountToken(d.accountToken!);
+                setView("complete");
             })
-            .catch(e => {
-                console.log("doRegistration", e);
+            .catch(async (e) => {
+                const msg = await extractErrorMessage(e, "registration failed");
+                setErrorMessage(msg);
             });
     }
 
     useEffect(() => {
         if(regToken) {
-            new AccountApi().verify({body: {registerToken: regToken}})
+            const controller = new AbortController();
+            new AccountApi().verify({body: {registerToken: regToken}}, { signal: controller.signal })
                 .then((d) => {
-                    console.log(d);
                     setEmail(d.email);
                 })
-                .catch(e => {
+                .catch((e) => {
+                    if (isAbortError(e)) {
+                        return;
+                    }
                     setError(true);
-                    console.log("error", e);
                 });
+            return () => controller.abort();
         }
     }, [regToken]);
 
     useEffect(() => {
         if(email) {
-            new MetadataApi()._configuration()
+            const controller = new AbortController();
+            new MetadataApi()._configuration({ signal: controller.signal })
                 .then(d => {
-                    setTouLink(d.touLink);
+                    setTouLink(d.touLink ?? "");
                 })
-                .catch(e => {
-                    e.response.json().then(ex => {
-                        console.log("register", ex.message);
-                    })
-                });
+                .catch(() => {});
+            return () => controller.abort();
         }
     }, [email]);
 
     useEffect(() => {
-        if(!error && email && touLink) {
-            setComponent(<SetPasswordForm email={email!} touLink={touLink!} register={doRegistration} />);
+        if(!error && email && touLink !== null) {
+            setView("form");
         } else {
             if(error) {
-                setComponent(<InvalidToken />);
+                setView("invalidToken");
             }
         }
-    }, [touLink, error]);
+    }, [email, touLink, error]);
 
     return (
         <Typography component="div">
             <Container maxWidth="sm">
                 <Box sx={{marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
-                    <img src={zrokLogo} height="300"/>
-                    <h1 style={{ color: "#241775" }}>z r o k</h1>
-                    {component}
+                    <img src={zrokLogo} height="300" alt="zrok logo"/>
+                    <Box component="h1" sx={{ color: 'primary.main' }}>z r o k</Box>
+                    { errorMessage && <Typography color="error">{errorMessage}</Typography> }
+                    {view === "loading" && <Grid2 container sx={{ justifyContent: "center", mt: 4 }}><CircularProgress /></Grid2>}
+                    {view === "form" && <SetPasswordForm email={email!} touLink={touLink!} register={doRegistration} />}
+                    {view === "complete" && <RegistrationComplete token={accountToken} />}
+                    {view === "invalidToken" && <InvalidToken />}
                 </Box>
             </Container>
         </Typography>

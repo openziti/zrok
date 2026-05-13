@@ -1,4 +1,4 @@
-import {Box, Paper} from "@mui/material";
+import {Box} from "@mui/material";
 import useApiConsoleStore from "./model/store.ts";
 import {
     MaterialReactTable,
@@ -8,14 +8,19 @@ import {
     MRT_SortingState,
     useMaterialReactTable
 } from "material-react-table";
-import {useEffect, useMemo, useRef, useState} from "react";
-import {Node} from "@xyflow/react";
+import {useEffect, useMemo, useState} from "react";
 import {bytesToSize} from "./model/util.ts";
+import {COLORS} from "./styling/theme.ts";
+
+interface TableRow {
+    id: string;
+    label: string;
+    type: string;
+    activity?: number[];
+}
 
 const TabularView = () => {
     const nodes = useApiConsoleStore((state) => state.nodes);
-    const nodesRef = useRef<Node[]>();
-    nodesRef.current = nodes;
     const updateNodes = useApiConsoleStore((state) => state.updateNodes);
     const selectedNode = useApiConsoleStore((state) => state.selectedNode);
     const updateSelectedNode = useApiConsoleStore((state) => state.updateSelectedNode);
@@ -27,23 +32,19 @@ const TabularView = () => {
     const [pagination, setPagination] = useState<MRT_PaginationState>({} as MRT_PaginationState);
     const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
     const [sorting, setSorting] = useState<MRT_SortingState>([{id: "data.label", desc: false}] as MRT_SortingState);
-    const [combined, setCombined] = useState<Node[]>([]);
 
-    useEffect(() => {
-        let outNodes = new Array<Node>();
-        nodesRef.current.forEach(node => {
-            let outNode = {
-                ...node
-            };
-            outNode.data.activity = sparkdata.get(node.id);
-            outNodes.push(outNode);
-        });
-        setCombined(outNodes);
+    const rows = useMemo<TableRow[]>(() => {
+        return nodes.map(node => ({
+            id: node.id,
+            label: String(node.data.label ?? node.id),
+            type: node.type ?? "",
+            activity: sparkdata.get(node.id),
+        }));
     }, [nodes, sparkdata]);
 
     useEffect(() => {
         if(selectedNode) {
-            let selection = {};
+            const selection = {};
             selection[selectedNode.id] = true;
             setRowSelection(selection);
         }
@@ -60,48 +61,49 @@ const TabularView = () => {
     }, [sorting]);
 
     useEffect(() => {
-        let sn = nodes.find(node => Object.keys(rowSelection).includes(node.id));
-        updateSelectedNode(sn);
+        const sn = nodes.find(node => Object.keys(rowSelection).includes(node.id));
+        updateSelectedNode(sn ?? null);
         updateNodes(nodes.map(node => (sn && node.id === sn.id) ? { ...node, selected: true } : { ...node, selected: false }));
     }, [rowSelection]);
 
-    const sparkdataTip = (row) => {
-        if(row.data && row.data.activity) {
+    const sparkdataTip = (row: TableRow): number => {
+        if(row.activity) {
             // - 2; - 1 is sometimes undefined?
-            return row.data.activity[row.data.activity.length - 2];
+            return row.activity[row.activity.length - 2];
         }
         return 0;
-    }
+    };
 
-    const sparkdataTipFmt = (row) => {
-        let tip = sparkdataTip(row);
+    const sparkdataTipFmt = (row: TableRow): string => {
+        const tip = sparkdataTip(row);
         if(tip > 0) {
             return bytesToSize(tip);
         }
         return "";
     };
 
-    const sparkdataAverage = (row) => {
-        if(row.data && row.data.activity) {
-            let average = row.data.activity.reduce((acc, curr) => { return acc + curr }, 0);
-            average /= row.data.activity.length;
+    const sparkdataAverage = (row: TableRow): number => {
+        if(row.activity) {
+            let average = row.activity.reduce((acc, curr) => { return acc + curr }, 0);
+            average /= row.activity.length;
             return average;
         }
         return 0;
-    }
+    };
 
-    const sparkdataAverageFmt = (row) => {
-        let average = sparkdataAverage(row);
+    const sparkdataAverageFmt = (row: TableRow): string => {
+        const average = sparkdataAverage(row);
         if(average > 0) {
             return bytesToSize(average);
         }
         return "";
     }
 
-    const columns = useMemo<MRT_ColumnDef<Node>[]>(
+    const columns = useMemo<MRT_ColumnDef<TableRow>[]>(
         () => [
             {
-                accessorKey: 'data.label',
+                id: "data.label",
+                accessorFn: row => row.label,
                 header: 'Label'
             },
             {
@@ -112,8 +114,8 @@ const TabularView = () => {
                 accessorFn: sparkdataTipFmt,
                 header: 'Activity',
                 sortingFn: (rowA, rowB) => {
-                    let tipA = sparkdataTip(rowA.original);
-                    let tipB = sparkdataTip(rowB.original);
+                    const tipA = sparkdataTip(rowA.original);
+                    const tipB = sparkdataTip(rowB.original);
                     return tipA > tipB ? 1 : tipA < tipB ? -1 : 0;
                 },
                 sortDescFirst: true
@@ -122,8 +124,8 @@ const TabularView = () => {
                 accessorFn: sparkdataAverageFmt,
                 header: 'Activity 5m',
                 sortingFn: (rowA, rowB) => {
-                    let avgA = sparkdataAverage(rowA.original);
-                    let avgB = sparkdataAverage(rowB.original);
+                    const avgA = sparkdataAverage(rowA.original);
+                    const avgB = sparkdataAverage(rowB.original);
                     return avgA > avgB ? 1 : avgA < avgB ? -1 : 0;
                 },
                 sortDescFirst: true
@@ -134,7 +136,8 @@ const TabularView = () => {
 
     const table = useMaterialReactTable({
         columns: columns,
-        data: combined,
+        data: rows,
+        enableStickyHeader: true,
         enableRowSelection: false,
         enableMultiRowSelection: false,
         getRowId: r => r.id,
@@ -158,21 +161,32 @@ const TabularView = () => {
         }),
         muiToolbarAlertBannerProps: {
             sx: {
-                color: "#241775",
-                backgroundColor: "#f5fde7",
+                color: COLORS.primary,
+                backgroundColor: COLORS.alertBannerBg,
+            }
+        },
+        muiTableContainerProps: {
+            sx: {
+                flex: 1,
+                minHeight: 0,
+            }
+        },
+        muiTablePaperProps: {
+            sx: {
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
             }
         },
         positionToolbarAlertBanner: "bottom",
-        mrtTheme: (theme) => ({
-            matchHighlightColor: 'rgba(155, 243, 22, 1)'
+        mrtTheme: () => ({
+            matchHighlightColor: COLORS.secondary
         }),
     });
 
     return (
-        <Box sx={{ width: "100%", mt: 2 }} height={{ xs: 400, sm: 600, md: 800 }}>
-            <Paper>
-                <MaterialReactTable table={table} />
-            </Paper>
+        <Box sx={{ width: "100%", height: "100%", minHeight: 0 }}>
+            <MaterialReactTable table={table} />
         </Box>
     );
 };

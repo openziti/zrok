@@ -25,8 +25,8 @@ type sessionCookieRequest struct {
 }
 
 // getSessionCookie retrieves and reassembles a session cookie using the shared endpoints package
-func getSessionCookie(r *http.Request, cookieName string) (*http.Cookie, error) {
-	return endpoints.GetSessionCookie(r, cookieName)
+func getSessionCookie(r *http.Request, cfg *OauthConfig) (*http.Cookie, error) {
+	return endpoints.GetSessionCookie(r, cfg)
 }
 
 func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {

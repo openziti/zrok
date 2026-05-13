@@ -1,8 +1,0 @@
-{
-  "label": "Install",
-  "position": 10,
-  "link": {
-    "type": "doc",
-    "id": "guides/install/index"
-  }
-}

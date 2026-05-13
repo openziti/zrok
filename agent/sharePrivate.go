@@ -24,11 +24,13 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 	}
 
 	shr := &share{
-		shareMode:   sdk.PrivateShareMode,
-		backendMode: sdk.BackendMode(req.BackendMode),
-		request:     req,
-		sub:         subordinate.NewMessageHandler(),
-		agent:       a,
+		shareMode: sdk.PrivateShareMode,
+		request:   req,
+		sub:       subordinate.NewMessageHandler(),
+		agent:     a,
+	}
+	if req.PrivateShareToken == "" {
+		shr.backendMode = sdk.BackendMode(req.BackendMode)
 	}
 	shr.sub.MessageHandler = func(msg subordinate.Message) {
 		dl.Info(msg)
@@ -39,8 +41,11 @@ func (a *Agent) SharePrivate(req *SharePrivateRequest) (shareToken string, err e
 	shr.sub.MalformedHandler = bootHandler.HandleMalformed
 
 	// build command using CommandBuilder
-	shrCmd := NewSharePrivateCommand().
-		BackendMode(req.BackendMode).
+	builder := NewSharePrivateCommand()
+	if req.PrivateShareToken == "" {
+		builder = builder.BackendMode(req.BackendMode)
+	}
+	shrCmd := builder.
 		ShareToken(req.PrivateShareToken).
 		Insecure(req.Insecure).
 		Open(!req.Closed).

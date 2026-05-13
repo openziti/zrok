@@ -123,7 +123,7 @@ func (c *oidcConfig) configure(cfg *OauthConfig, tls bool) error {
 			return
 		}
 
-		cookie, err := getSessionCookie(r, cfg.CookieName)
+		cookie, err := getSessionCookie(r, cfg)
 		if err != nil {
 			dl.Errorf("unable to get auth session cookie: %v", err)
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to get auth session cookie")))
@@ -212,7 +212,7 @@ func (c *oidcConfig) configure(cfg *OauthConfig, tls bool) error {
 	http.Handle(fmt.Sprintf("/%v/auth/callback", c.Name), rp.CodeExchangeHandler(rp.UserinfoCallback(login), provider))
 
 	logout := func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := getSessionCookie(r, cfg.CookieName)
+		cookie, err := getSessionCookie(r, cfg)
 		if err == nil {
 			tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 				return signingKey, nil

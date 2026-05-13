@@ -111,6 +111,48 @@ func (lc LimitClass) GetLimitAction() LimitAction {
 	return lc.LimitAction
 }
 
+func (lc LimitClass) IsResourceCountClass() bool {
+	if lc.BackendMode != nil {
+		return false
+	}
+	if lc.Environments == Unlimited && lc.Shares == Unlimited && lc.ReservedShares == Unlimited && lc.UniqueNames == Unlimited && lc.ShareFrontends == Unlimited {
+		return false
+	}
+	return true
+}
+
+func (lc LimitClass) IsUnscopedBandwidthClass() bool {
+	if lc.BackendMode != nil {
+		return false
+	}
+	if lc.Environments > Unlimited || lc.Shares > Unlimited || lc.ReservedShares > Unlimited || lc.UniqueNames > Unlimited || lc.ShareFrontends > Unlimited {
+		return false
+	}
+	if lc.PeriodMinutes < 1 {
+		return false
+	}
+	if lc.RxBytes == Unlimited && lc.TxBytes == Unlimited && lc.TotalBytes == Unlimited {
+		return false
+	}
+	return true
+}
+
+func (lc LimitClass) IsScopedBandwidthClass() bool {
+	if lc.BackendMode == nil {
+		return false
+	}
+	if lc.Environments > Unlimited {
+		return false
+	}
+	if lc.PeriodMinutes < 1 {
+		return false
+	}
+	if lc.RxBytes == Unlimited && lc.TxBytes == Unlimited && lc.TotalBytes == Unlimited {
+		return false
+	}
+	return true
+}
+
 func (lc LimitClass) String() string {
 	out := "LimitClass<"
 	if lc.Label != nil && *lc.Label != "" {
@@ -172,4 +214,20 @@ func (str *Store) GetLimitClass(lcId int, trx *sqlx.Tx) (*LimitClass, error) {
 		return nil, errors.Wrap(err, "error selecting limit_class by id")
 	}
 	return lc, nil
+}
+
+func (str *Store) FindLimitClassesByLabel(label string, trx *sqlx.Tx) ([]*LimitClass, error) {
+	rows, err := trx.Queryx("select * from limit_classes where label = $1 and not deleted", label)
+	if err != nil {
+		return nil, errors.Wrap(err, "error finding limit classes by label")
+	}
+	var lcs []*LimitClass
+	for rows.Next() {
+		lc := &LimitClass{}
+		if err := rows.StructScan(lc); err != nil {
+			return nil, errors.Wrap(err, "error scanning limit_classes")
+		}
+		lcs = append(lcs, lc)
+	}
+	return lcs, nil
 }

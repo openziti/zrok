@@ -24,6 +24,9 @@ func NewService(cfgPath string) (*Service, error) {
 	if svc.app.Cfg.Oauth != nil && svc.app.Cfg.Oauth.MaxCookieSize == 0 {
 		svc.app.Cfg.Oauth.MaxCookieSize = 3072
 	}
+	if svc.app.Cfg.Oauth != nil && svc.app.Cfg.Oauth.MaxCookieChunks == 0 {
+		svc.app.Cfg.Oauth.MaxCookieChunks = 10
+	}
 	dl.Info(dd.MustInspect(svc.app.Cfg))
 	return svc, nil
 }

@@ -66,10 +66,11 @@ jobs:
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: '~> v2'
+          version: '~> v2.14'
           args: release --skip=publish --config .goreleaser-linux-${{ matrix.arch.goreleaser }}.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ github.ref_name }}
 
       - uses: actions/upload-artifact@v4
         with:
@@ -97,9 +98,14 @@ jobs:
           else
             SEMVER_PRE=${SEMVER#*-}
           fi
-          # for PAX in zrok2{,-agent,-controller,-frontend,-metrics}; do
-          for PAX in zrok2{,-agent}; do
+          BINARY_PACKAGES=(zrok2)
+          META_PACKAGES=(zrok2-agent zrok2-controller zrok2-frontend zrok2-metrics-bridge)
+          for PAX in "${BINARY_PACKAGES[@]}" "${META_PACKAGES[@]}"; do
             _pattern="./dist/${PAX}-${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*.${ARCH}.rpm"
+            if ! compgen -G "$_pattern" > /dev/null && [[ " ${META_PACKAGES[*]} " == *" ${PAX} "* ]]; then
+              # Fall back to noarch for meta packages
+              _pattern="./dist/${PAX}-${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*.noarch.rpm"
+            fi
             if ! compgen -G "$_pattern" > /dev/null; then
               echo "ERROR: No RPM files found matching pattern '${_pattern}'" >&2
               ls -1 ./dist/
@@ -134,9 +140,14 @@ jobs:
           else
             SEMVER_PRE=${SEMVER#*-}
           fi
-          # for PAX in zrok2{,-agent,-controller,-frontend,-metrics}; do
-          for PAX in zrok2{,-agent}; do
+          BINARY_PACKAGES=(zrok2)
+          META_PACKAGES=(zrok2-agent zrok2-controller zrok2-frontend zrok2-metrics-bridge)
+          for PAX in "${BINARY_PACKAGES[@]}" "${META_PACKAGES[@]}"; do
             _pattern="./dist/${PAX}_${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*_${ARCH}.deb"
+            if ! compgen -G "$_pattern" > /dev/null && [[ " ${META_PACKAGES[*]} " == *" ${PAX} "* ]]; then
+              # Fall back to all for meta packages
+              _pattern="./dist/${PAX}_${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*_all.deb"
+            fi
             if ! compgen -G "$_pattern" > /dev/null; then
               echo "ERROR: No DEB files found matching pattern '${_pattern}'" >&2
               ls -1 ./dist/
@@ -160,7 +171,7 @@ jobs:
 
   build-darwin:
     if: github.repository_owner == 'openziti' || vars.ZROK_SKIP_MACOS_BUILD == 'false'
-    runs-on: macos-14
+    runs-on: macos-15-intel
     steps:
       - name: import distribution cert
         uses: apple-actions/import-codesign-certs@v3
@@ -202,10 +213,11 @@ jobs:
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: '~> v2'
+          version: '~> v2.14'
           args: release --skip=publish --config .goreleaser-darwin.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ github.ref_name }}
           AC_USERNAME: ${{ secrets.AC_USERNAME }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
 
@@ -255,10 +267,11 @@ jobs:
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: '~> v2'
+          version: '~> v2.14'
           args: release --skip=publish --config .goreleaser-windows.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ github.ref_name }}
 
       - uses: actions/upload-artifact@v4
         with:
@@ -334,7 +347,8 @@ jobs:
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: '~> v2'
+          version: '~> v2.14'
           args: release --config .goreleaser-release.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ github.ref_name }}

@@ -15,6 +15,7 @@ models/AddFrontendGrantRequest.ts
 models/AddNamespaceFrontendMappingRequest.ts
 models/AddNamespaceGrantRequest.ts
 models/AddOrganizationMemberRequest.ts
+models/ApplyLimitClassesRequest.ts
 models/AuthUser.ts
 models/ChangePasswordRequest.ts
 models/ClientVersionCheckRequest.ts
@@ -37,12 +38,15 @@ models/EnvironmentAndResources.ts
 models/EnvironmentSummary.ts
 models/EnvironmentsList.ts
 models/Frontend.ts
+models/GetSkipInterstitialGrant200Response.ts
 models/GetSparklines200Response.ts
 models/GetSparklinesRequest.ts
 models/InviteRequest.ts
 models/InviteTokenGenerateRequest.ts
+models/LimitClass.ts
 models/ListFrontendNamespaceMappings200ResponseInner.ts
 models/ListFrontends200ResponseInner.ts
+models/ListLimitClassesRequest.ts
 models/ListMemberships200Response.ts
 models/ListMemberships200ResponseMembershipsInner.ts
 models/ListNamespaces200ResponseInner.ts

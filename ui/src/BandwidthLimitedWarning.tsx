@@ -1,10 +1,10 @@
-import {Grid2} from "@mui/material";
+import {Box, Grid2} from "@mui/material";
 import React from "react";
 
 const BandwidthLimitedWarning = () => {
     return (
         <Grid2 container sx={{ flexGrow: 1, mt: 0, mb: 2 }} alignItems="center">
-            <h5 style={{ margin: 0, color: "red" }}>Your account is currently over the assigned bandwidth limit!</h5>
+            <Box component="h5" sx={{ m: 0, color: 'error.main' }}>Your account is currently over the assigned bandwidth limit!</Box>
         </Grid2>
     );
 }

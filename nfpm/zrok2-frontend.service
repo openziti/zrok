@@ -1,0 +1,19 @@
+# /lib/systemd/system/zrok2-frontend.service
+
+[Unit]
+Description=zrok2 frontend service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=zrok2-frontend
+Group=zrok2-frontend
+WorkingDirectory=/var/lib/zrok2-frontend
+UMask=0007
+ExecStart=/usr/bin/zrok2-frontend.bash dynamicProxy /etc/zrok2/frontend.yml
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

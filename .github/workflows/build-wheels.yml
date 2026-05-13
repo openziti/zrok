@@ -43,7 +43,7 @@ jobs:
       - name: Build Python distributions
         env:
           ZROK_VERSION: ${{ github.event.release.tag_name }}
-          ZROK_PY_NAME: ${{ vars.ZROK_PY_NAME || null }}
+          ZROK_PY_NAME: ${{ vars.ZROK_PY_NAME || 'zrok2' }}
         shell: bash
         run: |
 

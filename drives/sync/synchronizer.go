@@ -49,8 +49,13 @@ func OneWay(src, dst Target, sync bool) error {
 			if err != nil {
 				return err
 			}
-			if err := dst.WriteStreamWithModTime(copyPath.Path, ss, os.ModePerm, copyPath.Modified); err != nil {
-				return err
+			writeErr := dst.WriteStreamWithModTime(copyPath.Path, ss, os.ModePerm, copyPath.Modified)
+			closeErr := ss.Close()
+			if writeErr != nil {
+				return writeErr
+			}
+			if closeErr != nil {
+				return closeErr
 			}
 		}
 		dl.Infof("=> %v", copyPath.Path)

@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {Link, useParams} from "react-router";
 import {useFormik} from "formik";
 import * as Yup from "yup";
@@ -7,7 +7,7 @@ import zrokLogo from "./assets/zrok-1.0.0-rocket-purple.svg";
 import {AccountApi} from "./api";
 
 interface ResetPasswordFormProps {
-    resetPassword: (v) => void;
+    resetPassword: (v: { password: string; confirm: string }) => void;
 }
 
 const ResetPasswordForm = ({ resetPassword }: ResetPasswordFormProps) => {
@@ -24,7 +24,7 @@ const ResetPasswordForm = ({ resetPassword }: ResetPasswordFormProps) => {
                 .min(8, "Password must be at least 8 characters")
                 .max(64, "Password must be less than 64 characters")
                 .matches(
-                    /^.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?].*$/,
+                    /^.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?].*$/,
                     "Password requires at least one special character"
                 )
                 .matches(
@@ -71,7 +71,7 @@ const ResetPasswordForm = ({ resetPassword }: ResetPasswordFormProps) => {
                 helperText={form.errors.confirm}
                 sx={{ mt: 2 }}
             />
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} style={{ color: "#9bf316" }}>
+            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2, color: 'secondary.main' }}>
                 Set New Password
             </Button>
         </form>
@@ -110,7 +110,7 @@ const ResetFailed = () => {
             <Container>
                 <Box sx={{ display: "flex", alignItems: "center" }} >
                     <Typography component="div">
-                        <h2 style={{ color: "red" }}>Password Reset Failed!</h2>
+                        <Box component="h2" sx={{ color: 'error.main' }}>Password Reset Failed!</Box>
                     </Typography>
                 </Box>
             </Container>
@@ -135,32 +135,46 @@ const ResetFailed = () => {
     );
 }
 
-const ResetPassword = () => {
-    const { resetToken } = useParams();
-    const [component, setComponent] = useState<React.JSX.Element>();
+type ResetPasswordStatus = "form" | "complete" | "failed";
 
-    const doReset = (v) => {
+interface ResetPasswordContentProps {
+    resetToken: string | undefined;
+}
+
+const ResetPasswordContent = ({ resetToken }: ResetPasswordContentProps) => {
+    const [status, setStatus] = useState<ResetPasswordStatus>("form");
+
+    const doReset = (v: { password: string; confirm: string }) => {
         new AccountApi().resetPassword({body: {resetToken: resetToken, password: v.password}})
             .then(() => {
-                setComponent(<ResetComplete />);
+                setStatus("complete");
             })
-            .catch(e => {
-                setComponent(<ResetFailed />);
-                console.log("doReset", e);
+            .catch(() => {
+                setStatus("failed");
             });
     }
 
-    useEffect(() => {
-        setComponent(<ResetPasswordForm resetPassword={doReset} />);
-    }, [resetToken]);
+    if (status === "complete") {
+        return <ResetComplete />;
+    }
+
+    if (status === "failed") {
+        return <ResetFailed />;
+    }
+
+    return <ResetPasswordForm resetPassword={doReset} />;
+}
+
+const ResetPassword = () => {
+    const { resetToken } = useParams();
 
     return (
         <Typography component="div">
             <Container maxWidth="sm">
                 <Box sx={{marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center"}}>
-                    <img src={zrokLogo} height="300"/>
-                    <h1 style={{ color: "#241775" }}>z r o k</h1>
-                    {component}
+                    <img src={zrokLogo} height="300" alt="zrok logo"/>
+                    <Box component="h1" sx={{ color: 'primary.main' }}>z r o k</Box>
+                    <ResetPasswordContent key={resetToken ?? "missing"} resetToken={resetToken} />
                 </Box>
             </Container>
         </Typography>

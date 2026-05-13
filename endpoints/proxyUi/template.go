@@ -3,9 +3,9 @@ package proxyUi
 import (
 	"bytes"
 	"fmt"
+	"html/template"
 	"net/http"
 	"os"
-	"text/template"
 
 	"github.com/michaelquigley/df/dl"
 	"github.com/pkg/errors"
@@ -26,8 +26,8 @@ func init() {
 
 type VariableData struct {
 	Title   string
-	Banner  string
-	Message string
+	Banner  template.HTML
+	Message template.HTML
 	Error   error
 }
 
@@ -52,11 +52,11 @@ func WriteBadGateway(w http.ResponseWriter, variableData VariableData) {
 }
 
 func RequiredData(title, banner string) VariableData {
-	return VariableData{Title: title, Banner: banner}
+	return VariableData{Title: title, Banner: template.HTML(banner)}
 }
 
 func (vd VariableData) WithMessage(msg string) VariableData {
-	vd.Message = msg
+	vd.Message = template.HTML(msg)
 	return vd
 }
 

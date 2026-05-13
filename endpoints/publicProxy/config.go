@@ -38,6 +38,7 @@ type OauthConfig struct {
 	CookieName           string
 	CookieDomain         string
 	MaxCookieSize        int
+	MaxCookieChunks      int
 	SessionLifetime      time.Duration
 	IntermediateLifetime time.Duration
 	SigningKey           string       `dd:"+secret"`
@@ -55,6 +56,10 @@ func (c *OauthConfig) GetCookieDomain() string {
 
 func (c *OauthConfig) GetMaxCookieSize() int {
 	return c.MaxCookieSize
+}
+
+func (c *OauthConfig) GetMaxCookieChunks() int {
+	return c.MaxCookieChunks
 }
 
 func (c *OauthConfig) GetSessionLifetime() time.Duration {
@@ -84,6 +89,9 @@ func (c *Config) Load(path string) error {
 	}
 	if c.Oauth != nil && c.Oauth.MaxCookieSize == 0 {
 		c.Oauth.MaxCookieSize = 3072
+	}
+	if c.Oauth != nil && c.Oauth.MaxCookieChunks == 0 {
+		c.Oauth.MaxCookieChunks = 10
 	}
 	return nil
 }

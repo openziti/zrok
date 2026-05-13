@@ -11,9 +11,12 @@ This example demonstrates how to:
 
 import argparse
 import logging
+import sys
+import os
 
-import zrok
-from zrok.proxy import ProxyShare
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from common import get_root  # noqa: E402
+from zrok2.proxy import ProxyShare  # noqa: E402
 
 # Setup logging
 logging.basicConfig(
@@ -39,8 +42,7 @@ def main():
     logger.info(f"Target URL: {args.target_url}")
     logger.info(f"Share mode: {args.share_mode}")
 
-    # Load environment and create proxy share
-    root = zrok.environment.root.Load()
+    root = get_root()
     proxy_share = ProxyShare.create(
         root=root,
         target=args.target_url,
@@ -52,7 +54,7 @@ def main():
 
     # Log access information and start the proxy
     if args.share_mode == "public":
-        logger.info(f"Access proxy at: {', '.join(proxy_share.endpoints)}")
+        logger.info(f"Access proxy at: {', '.join(proxy_share.endpoints or [])}")
     elif args.share_mode == "private":
         logger.info(f"Run a private access frontend: 'zrok access private {proxy_share.token}'")
     proxy_share.run()

@@ -1,6 +1,6 @@
 {
-  "name": "@openziti/zrok",
-  "version": "1.0.0",
+  "name": "@openziti/zrok2",
+  "version": "2.0.0",
   "description": "SDK to allow interaction with the zrok service from Node.js applications",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -39,7 +39,7 @@
     "vitest": "^3.0.7"
   },
   "dependencies": {
-    "@openziti/ziti-sdk-nodejs": "^0.20.0",
+    "@openziti/ziti-sdk-nodejs": "^0.29.0",
     "express": "^4.21.2"
   }
 }

@@ -1,10 +1,11 @@
 import {User} from "./model/user.ts";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {modalStyle} from "./styling/theme.ts";
 import {Box, Button, Grid2, Modal, TextField, Typography} from "@mui/material";
 import {useFormik} from "formik";
 import * as Yup from 'yup';
 import {getAccountApi} from "./model/api.ts";
+import {extractErrorMessage} from "./model/errors.ts";
 
 interface AccountPasswordChangeModalProps {
     close: () => void;
@@ -12,10 +13,19 @@ interface AccountPasswordChangeModalProps {
     user: User;
 }
 
+type PasswordChangeStatus = "editing" | "success";
+
 const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChangeModalProps) => {
-    const [errorMessage, setErrorMessage] = useState<React.JSX.Element>(null);
-    const submitButton = <Button color="primary" variant="contained" type="submit" sx={{ mt: 2 }}>Change Password</Button>;
-    const [bottomControl, setBottomControl] = useState<React.JSX.Element>(submitButton);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [status, setStatus] = useState<PasswordChangeStatus>("editing");
+    const closeTimerRef = useRef<number | null>(null);
+
+    const clearCloseTimer = () => {
+        if (closeTimerRef.current !== null) {
+            window.clearTimeout(closeTimerRef.current);
+            closeTimerRef.current = null;
+        }
+    };
 
     const passwordChangeForm = useFormik({
         initialValues: {
@@ -23,8 +33,9 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
             newPassword: "",
             duplicateNewPassword: "",
         },
-        onSubmit: v => {
+        onSubmit: (v: typeof passwordChangeForm.initialValues) => {
             setErrorMessage(null);
+            setStatus("editing");
             getAccountApi(user).changePassword({
                 body: {
                     email: user.email,
@@ -33,11 +44,17 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
                 }
             })
                 .then(() => {
-                    setBottomControl(<Typography>Your password has been changed!</Typography>);
-                    setTimeout(() => { close() }, 3000);
+                    setStatus("success");
+                    clearCloseTimer();
+                    closeTimerRef.current = window.setTimeout(() => {
+                        closeTimerRef.current = null;
+                        close();
+                    }, 3000);
                 })
-                .catch(e => {
-                    setErrorMessage(<Typography color="red">Password change failed! Check your current password!</Typography>);
+                .catch(async (e) => {
+                    const msg = await extractErrorMessage(e, "password change failed");
+                    clearCloseTimer();
+                    setErrorMessage(msg);
                 })
         },
         validationSchema: Yup.object({
@@ -47,7 +64,7 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
                 .min(8, "Password must be at least 8 characters")
                 .max(64, "Password must be less than 64 characters")
                 .matches(
-                    /^.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?].*$/,
+                    /^.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?].*$/,
                     "Password requires at least one special character"
                 )
                 .matches(
@@ -64,20 +81,24 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
                 .test("password-matches", "Password confirmation does not match", v => v === passwordChangeForm.values.newPassword)
         }),
     });
+    const { resetForm } = passwordChangeForm;
 
     useEffect(() => {
-        passwordChangeForm.values.currentPassword = "";
-        passwordChangeForm.values.newPassword = "";
-        passwordChangeForm.values.duplicateNewPassword = "";
+        clearCloseTimer();
+        resetForm();
         setErrorMessage(null);
-        setBottomControl(submitButton);
-    }, [isOpen]);
+        setStatus("editing");
+
+        return () => {
+            clearCloseTimer();
+        };
+    }, [isOpen, resetForm]);
 
     return (
-        <Modal open={isOpen} onClose={close}>
+        <Modal open={isOpen} onClose={close} aria-labelledby="modal-title-change-password">
             <Box sx={{ ...modalStyle }}>
                 <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                    <Typography variant="h5"><strong>Change Password</strong></Typography>
+                    <Typography variant="h5" id="modal-title-change-password"><strong>Change Password</strong></Typography>
                 </Grid2>
                 <form onSubmit={passwordChangeForm.handleSubmit}>
                     <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
@@ -121,9 +142,11 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
                             sx={{ mt: 2 }}
                         />
                     </Grid2>
-                    { errorMessage ? <Grid2 container sx={{ mt: 2, p: 1}}><Typography>{errorMessage}</Typography></Grid2> : null}
+                    {errorMessage ? <Grid2 container sx={{ mt: 2, p: 1}}><Typography color="error">{errorMessage}</Typography></Grid2> : null}
                     <Grid2 container sx={{ flexGrow: 1, p: 1 }} alignItems="center">
-                        {bottomControl}
+                        {status === "success"
+                            ? <Typography>Your password has been changed!</Typography>
+                            : <Button color="primary" variant="contained" type="submit" sx={{ mt: 2 }}>Change Password</Button>}
                     </Grid2>
                 </form>
             </Box>

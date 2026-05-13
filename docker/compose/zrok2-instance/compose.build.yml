@@ -1,0 +1,22 @@
+# compose.build.yml — build zrok2 from source overlay
+#
+# Use with the base compose.yml to build the zrok2 image from source
+# instead of pulling a published image:
+#
+#   COMPOSE_FILE=compose.yml:compose.build.yml docker compose up -d --build --wait
+#
+# The build context is the repository root (three levels up from this file).
+
+services:
+  zrok2-init:
+    build:
+      context: ../../..
+      dockerfile: docker/compose/zrok2-instance/Dockerfile.build
+  zrok2-controller:
+    build:
+      context: ../../..
+      dockerfile: docker/compose/zrok2-instance/Dockerfile.build
+  zrok2-frontend:
+    build:
+      context: ../../..
+      dockerfile: docker/compose/zrok2-instance/Dockerfile.build

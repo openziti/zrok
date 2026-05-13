@@ -1,8 +1,7 @@
 import {Root} from "./environment";
 // @ts-ignore
 import ziti from "@openziti/ziti-sdk-nodejs";
-import {Share} from "../api";
-import {Access} from "./access";
+import {Share, Access} from "./model";
 
 export const init = (root: Root): Promise<any> => {
     return ziti.init(root.zitiIdentityName(root.environmentIdentityName()))

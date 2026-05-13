@@ -1,5 +1,43 @@
 # CHANGELOG
 
+## v2.0.3
+
+FIX: The Python SDK `ProxyShare` now rejects absolute proxy request paths before forwarding. This prevents a viewer from using an absolute URL path to make the proxy host request arbitrary internal or loopback services instead of the configured target.
+
+FIX: Updated Python SDK unit tests to patch `zrok2.*` modules instead of the legacy `zrok.*` package path, allowing the non-integration test suite to pass against the v2 Python package layout.
+
+FIX: The zrok2 Docker Compose self-hosting metrics service now defaults to `influxdb:2.8-alpine` instead of the floating `influxdb:2-alpine` tag to avoid upstream image regressions. Docker Compose integration test failures now also include compose service status, container health details, and focused InfluxDB logs for faster diagnosis.
+
+FIX: The `zrok2 copy` drive sync path now rejects unsafe WebDAV and zrok drive paths before writing to a local filesystem target. Local drive sync operations are root-confined to prevent attacker-controlled paths or symlinks from writing, removing, moving, or timestamping files outside the selected destination while still allowing symlinks that resolve within the destination tree.
+
+FIX: Frontends configured with `interstitial.user_agent_prefixes` no longer suppress the interstitial page for all requests. The prefix list is now correctly evaluated as an allow-list of User-Agents that should receive the page; if the list is empty all User-Agents receive it, matching the documented behavior.
+
+FIX: Updated `github.com/shoenig/go-m1cpu` to v0.2.1 to correct segmentation violation on M5 macos systems.
+
+## v2.0.2
+
+FIX: The `drive` backend mode WebDAV implementation now prevents symlink traversal outside the configured shared directory. `Stat`, `OpenFile`, `Mkdir`, `RemoveAll`, and `Rename` now reject symlinks that resolve outside the drive root while continuing to allow symlinks that resolve within that tree. This fixes GHSA-74m3-9qvm-rp9h.
+
+## v2.0.1
+
+FEATURE: Added several new `admin` API endpoints for interfacing with additional management controls: finding limit classes by label, finding applied/applying/removing limit classes from accounts, getting/setting skip interstitial status for an account (https://github.com/openziti/zrok/issues/1210)
+
+CHANGE: Removed the legacy `admin` `/grants` endpoint. Its prior synchronization behavior is now replaced by the new skip interstitial grant management endpoints. (https://github.com/openziti/zrok/issues/726)
+
+CHANGE: Applying limit classes now validates requested assignments to prevent conflicting effective limit class combinations on an account (https://github.com/openziti/zrok/issues/726)
+
+FIX: Escaped proxyUi output by switching to html/template and removed reflected refreshInterval values from github oauth error pages.
+
+FIX: Users could get into a state where an allocated name returns a `500` error; this happened by various combinations of abnormal share termination, or deleting a name from underneath a live share... both resulted in bad frontend mappings that prevented proper share operation. The `zrok2 delete name` now refuses to delete names with an active share (`zrok2 delete share` first). The `zrok2 create name` now includes "healing" functionality that removes extraneous frontend mapping rows for the newly created namespace. Users can `zrok2 delete name` and `zrok2 create name` to fix any old issues around this. (https://github.com/openziti/zrok/issues/1219)
+
+FIX: Configurable upper limit on the number of cookie stripes allowed for the OAuth session cookie; includes hard limit on upper number of stripes at 32. Defaults to 10. (https://github.com/openziti/zrok/issues/1217)
+
+FEATURE: New `zrok2 delete access` subcommand that allows end users to clean up stale access frontends from the command line.
+
+FIX: Security hardening for the `/unaccess` endpoint.
+
+FIX: Always return success on reset password request, even if account not found... unless there was actually an error.
+
 ## v2.0.0
 
 FEATURE: Major changes to how "unique names" and "reserved sharing" work. See the [zrok v2 Migration Guide](https://docs.zrok.io) for details. Reserved sharing, including the `zrok reserve`, `zrok release` and `zrok share reserved` commands have been removed. Namespaces and reserved names replace these concepts in a much more powerful, flexible way which can accomplish what reserved sharing did in a much better way. (https://github.com/openziti/zrok/issues/726)
@@ -47,6 +85,14 @@ CHANGE: Updated `github.com/openziti/sdk-golang` to `v1.2.4`.
 CHANGE: All logging migrated from `githhub.com/michaelquigley/pfxlog` and `github.com/sirupsen/logrus` to `github.com/michaelquigley/df/dl` and `log/slog`. Use environment variable `DL_USE_JSON=true` to force JSON output. Use `DL_USE_COLOR` to force colorized output. (https://github.com/openziti/zrok/issues/1078)
 
 FIX: Updated the unique constraint on the `accounts.email` column to only be unique when `is not deleted`. This only fixes PostgreSQL databases; fixing SQLite databases effectively requires rebuilding the entire database, see the comment in the issue for details. (https://github.com/openziti/zrok/issues/1109)
+
+FEATURE: Added configuration option for OIDC authentication prompts.
+
+FEATURE: New `names`>`disable_share_token_profanity_check` and `names`>`disable_namespace_name_profanity_check` configuration options to disable profanity checking for share tokens and namespace names. (https://github.com/openziti/zrok/issues/1152)
+
+FEATURE: `zrok2 admin update password`; adminstrative password change function (https://github.com/openziti/zrok/issues/1129)
+
+FIX: Improved ipv6 address parsing in `realRemoteAddress` in the `controller` package.
 
 ## v1.1.11
 

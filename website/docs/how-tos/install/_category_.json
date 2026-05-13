@@ -1,0 +1,8 @@
+{
+  "label": "Install zrok",
+  "position": 1,
+  "link": {
+    "type": "doc",
+    "id": "how-tos/install/index"
+  }
+}

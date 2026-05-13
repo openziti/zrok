@@ -3,12 +3,13 @@ package sync
 import (
 	"context"
 	"fmt"
-	"github.com/openziti/zrok/v2/drives/davServer"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/openziti/zrok/v2/drives/davServer"
 )
 
 type FilesystemTargetConfig struct {
@@ -24,6 +25,31 @@ type FilesystemTarget struct {
 func NewFilesystemTarget(cfg *FilesystemTargetConfig) *FilesystemTarget {
 	root := os.DirFS(cfg.Root)
 	return &FilesystemTarget{cfg: cfg, root: root}
+}
+
+type filesystemReadCloser struct {
+	io.ReadCloser
+	root *os.Root
+}
+
+func (rc *filesystemReadCloser) Close() error {
+	err := rc.ReadCloser.Close()
+	rootErr := rc.root.Close()
+	if err != nil {
+		return err
+	}
+	return rootErr
+}
+
+func (t *FilesystemTarget) openRoot() (*os.Root, error) {
+	return os.OpenRoot(t.cfg.Root)
+}
+
+func (t *FilesystemTarget) ensureRoot(mode os.FileMode) (*os.Root, error) {
+	if err := os.MkdirAll(t.cfg.Root, mode); err != nil {
+		return nil, err
+	}
+	return os.OpenRoot(t.cfg.Root)
 }
 
 func (t *FilesystemTarget) Inventory() ([]*Object, error) {
@@ -74,7 +100,18 @@ func (t *FilesystemTarget) Dir(path string) ([]*Object, error) {
 }
 
 func (t *FilesystemTarget) Mkdir(path string) error {
-	return os.MkdirAll(filepath.Join(t.cfg.Root, path), os.ModePerm)
+	localName, err := localNameFromVirtualPath(path)
+	if err != nil {
+		return err
+	}
+
+	root, err := t.ensureRoot(os.ModePerm)
+	if err != nil {
+		return err
+	}
+	defer root.Close()
+
+	return root.MkdirAll(localName, os.ModePerm)
 }
 
 func (t *FilesystemTarget) recurse(path string, d fs.DirEntry, err error) error {
@@ -111,16 +148,39 @@ func (t *FilesystemTarget) recurse(path string, d fs.DirEntry, err error) error 
 }
 
 func (t *FilesystemTarget) ReadStream(path string) (io.ReadCloser, error) {
-	return os.Open(filepath.Join(t.cfg.Root, path))
+	localName, err := localNameFromVirtualPath(path)
+	if err != nil {
+		return nil, err
+	}
+
+	root, err := t.openRoot()
+	if err != nil {
+		return nil, err
+	}
+	f, err := root.Open(localName)
+	if err != nil {
+		root.Close()
+		return nil, err
+	}
+	return &filesystemReadCloser{ReadCloser: f, root: root}, nil
 }
 
 func (t *FilesystemTarget) WriteStream(path string, stream io.Reader, mode os.FileMode) error {
-	targetPath := filepath.Join(t.cfg.Root, path)
-
-	if err := os.MkdirAll(filepath.Dir(targetPath), mode); err != nil {
+	localName, err := localNameFromVirtualPath(path)
+	if err != nil {
 		return err
 	}
-	f, err := os.Create(targetPath)
+
+	root, err := t.ensureRoot(mode)
+	if err != nil {
+		return err
+	}
+	defer root.Close()
+
+	if err := root.MkdirAll(filepath.Dir(localName), mode); err != nil {
+		return err
+	}
+	f, err := root.Create(localName)
 	if err != nil {
 		return err
 	}
@@ -133,20 +193,75 @@ func (t *FilesystemTarget) WriteStream(path string, stream io.Reader, mode os.Fi
 }
 
 func (t *FilesystemTarget) WriteStreamWithModTime(path string, stream io.Reader, mode os.FileMode, modTime time.Time) error {
-	return t.WriteStream(path, stream, mode)
+	if err := t.WriteStream(path, stream, mode); err != nil {
+		return err
+	}
+	return t.SetModificationTime(path, modTime)
 }
 
 func (t *FilesystemTarget) Move(src, dest string) error {
-	return os.Rename(filepath.Join(t.cfg.Root, src), filepath.Join(filepath.Dir(t.cfg.Root), dest))
+	srcName, err := localNameFromVirtualPath(src)
+	if err != nil {
+		return err
+	}
+	destName, err := localNameFromVirtualPath(dest)
+	if err != nil {
+		return err
+	}
+
+	if srcName == "." {
+		parent := filepath.Dir(t.cfg.Root)
+		parentRoot, err := os.OpenRoot(parent)
+		if err != nil {
+			return err
+		}
+		defer parentRoot.Close()
+
+		rootName, err := filepath.Localize(filepath.Base(t.cfg.Root))
+		if err != nil {
+			return unsafePathError(t.cfg.Root)
+		}
+		return parentRoot.Rename(rootName, destName)
+	}
+
+	root, err := t.openRoot()
+	if err != nil {
+		return err
+	}
+	defer root.Close()
+	return root.Rename(srcName, destName)
 }
 
 func (t *FilesystemTarget) Rm(path string) error {
-	return os.RemoveAll(filepath.Join(t.cfg.Root, path))
+	localName, err := localNameFromVirtualPath(path)
+	if err != nil {
+		return err
+	}
+	if localName == "." {
+		return os.RemoveAll(t.cfg.Root)
+	}
+
+	root, err := t.openRoot()
+	if err != nil {
+		return err
+	}
+	defer root.Close()
+	return root.RemoveAll(localName)
 }
 
 func (t *FilesystemTarget) SetModificationTime(path string, mtime time.Time) error {
-	targetPath := filepath.Join(t.cfg.Root, path)
-	if err := os.Chtimes(targetPath, time.Now(), mtime); err != nil {
+	localName, err := localNameFromVirtualPath(path)
+	if err != nil {
+		return err
+	}
+
+	root, err := t.openRoot()
+	if err != nil {
+		return err
+	}
+	defer root.Close()
+
+	if err := root.Chtimes(localName, time.Now(), mtime); err != nil {
 		return err
 	}
 	return nil

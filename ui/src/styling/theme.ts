@@ -1,5 +1,12 @@
 import {createTheme} from "@mui/material";
 
+export const COLORS = {
+    primary: '#241775',
+    secondary: '#9bf316',
+    metrics: '#04adef',
+    alertBannerBg: '#f5fde7',
+} as const;
+
 const componentOptions = {
     MuiCard: {
         styleOverrides: {
@@ -24,10 +31,10 @@ export const theme = createTheme({
     palette: {
         mode: 'light',
         primary: {
-            main: '#241775',
+            main: COLORS.primary,
         },
         secondary: {
-            main: '#9bf316',
+            main: COLORS.secondary,
         },
     },
     typography: {

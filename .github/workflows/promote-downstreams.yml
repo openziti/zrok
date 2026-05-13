@@ -63,6 +63,9 @@ jobs:
         package_name:
           - zrok2
           - zrok2-agent
+          - zrok2-controller
+          - zrok2-frontend
+          - zrok2-metrics-bridge
         arch:
           - deb: amd64
             rpm: x86_64
@@ -88,21 +91,35 @@ jobs:
       - name: Copy RPM from test repo to stable repo with jFrog CLI
         if: matrix.packager == 'rpm'
         shell: bash
-        run: >
-          jf rt copy
-          --recursive=false
-          --flat=true
-          --fail-no-op=true
-          ${{ env.ZITI_RPM_TEST_REPO }}/redhat/${{ matrix.arch.rpm }}/${{ matrix.package_name }}-${{ needs.enforce_stable_semver.outputs.version }}-1.${{ matrix.arch.rpm }}.rpm
-          ${{ env.ZITI_RPM_PROD_REPO }}/redhat/${{ matrix.arch.rpm }}/
+        run: |
+          # meta packages produce noarch RPMs; binary packages use the target arch
+          META_PACKAGES=(zrok2-agent zrok2-controller zrok2-frontend zrok2-metrics-bridge)
+          if [[ " ${META_PACKAGES[*]} " == *" ${{ matrix.package_name }} "* ]]; then
+            _rpm_arch="noarch"
+          else
+            _rpm_arch="${{ matrix.arch.rpm }}"
+          fi
+          jf rt copy \
+            --recursive=false \
+            --flat=true \
+            --fail-no-op=true \
+            "${{ env.ZITI_RPM_TEST_REPO }}/redhat/${{ matrix.arch.rpm }}/${{ matrix.package_name }}-${{ needs.enforce_stable_semver.outputs.version }}-1.${_rpm_arch}.rpm" \
+            "${{ env.ZITI_RPM_PROD_REPO }}/redhat/${{ matrix.arch.rpm }}/"
 
       - name: Copy DEB from test repo to stable repo with jFrog CLI
         if: matrix.packager == 'deb'
         shell: bash
-        run: >
-          jf rt copy
-          --recursive=false
-          --flat=true
-          --fail-no-op=true
-          ${{ env.ZITI_DEB_TEST_REPO }}/pool/${{ matrix.package_name }}/${{ matrix.arch.deb }}/${{ matrix.package_name }}_${{ needs.enforce_stable_semver.outputs.version }}-1_${{ matrix.arch.deb }}.deb
-          ${{ env.ZITI_DEB_PROD_REPO }}/pool/${{ matrix.package_name }}/${{ matrix.arch.deb }}/
+        run: |
+          # meta packages produce arch-independent (all) DEBs; binary packages use the target arch
+          META_PACKAGES=(zrok2-agent zrok2-controller zrok2-frontend zrok2-metrics-bridge)
+          if [[ " ${META_PACKAGES[*]} " == *" ${{ matrix.package_name }} "* ]]; then
+            _deb_arch="all"
+          else
+            _deb_arch="${{ matrix.arch.deb }}"
+          fi
+          jf rt copy \
+            --recursive=false \
+            --flat=true \
+            --fail-no-op=true \
+            "${{ env.ZITI_DEB_TEST_REPO }}/pool/${{ matrix.package_name }}/${{ matrix.arch.deb }}/${{ matrix.package_name }}_${{ needs.enforce_stable_semver.outputs.version }}-1_${_deb_arch}.deb" \
+            "${{ env.ZITI_DEB_PROD_REPO }}/pool/${{ matrix.package_name }}/${{ matrix.arch.deb }}/"

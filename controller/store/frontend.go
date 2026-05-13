@@ -64,6 +64,14 @@ func (str *Store) FindFrontendWithToken(token string, trx *sqlx.Tx) (*Frontend, 
 	return i, nil
 }
 
+func (str *Store) FindFrontendWithTokenAndEnvironment(token string, envId int, trx *sqlx.Tx) (*Frontend, error) {
+	i := &Frontend{}
+	if err := trx.QueryRowx("select frontends.* from frontends where token = $1 and environment_id = $2 and not deleted", token, envId).StructScan(i); err != nil {
+		return nil, errors.Wrap(err, "error selecting frontend by token and environment")
+	}
+	return i, nil
+}
+
 func (str *Store) FindFrontendWithZId(zId string, trx *sqlx.Tx) (*Frontend, error) {
 	i := &Frontend{}
 	if err := trx.QueryRowx("select frontends.* from frontends where z_id = $1 and not deleted", zId).StructScan(i); err != nil {

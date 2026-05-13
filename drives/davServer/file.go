@@ -57,6 +57,28 @@ type File interface {
 	io.Writer
 }
 
+type namedFileInfo struct {
+	os.FileInfo
+	name string
+}
+
+func (fi namedFileInfo) Name() string {
+	return fi.name
+}
+
+type osDirFile struct {
+	*os.File
+	statName string
+}
+
+func (f *osDirFile) Stat() (os.FileInfo, error) {
+	info, err := f.File.Stat()
+	if err != nil {
+		return nil, err
+	}
+	return namedFileInfo{FileInfo: info, name: f.statName}, nil
+}
+
 type webdavFile struct {
 	File
 	name string
@@ -130,54 +152,195 @@ func (d Dir) resolve(name string) string {
 	return filepath.Join(dir, filepath.FromSlash(slashClean(name)))
 }
 
+func (d Dir) rootPath() (string, error) {
+	dir := string(d)
+	if dir == "" {
+		dir = "."
+	}
+	root, err := filepath.Abs(dir)
+	if err != nil {
+		return "", err
+	}
+	return filepath.EvalSymlinks(root)
+}
+
+func splitVirtualPath(name string) []string {
+	switch name {
+	case "", ".", "/":
+		return nil
+	}
+	name = strings.TrimPrefix(name, "/")
+	if name == "" {
+		return nil
+	}
+	return strings.Split(name, "/")
+}
+
+func joinVirtualPath(base string, segments []string) string {
+	for _, segment := range segments {
+		base = filepath.Join(base, filepath.FromSlash(segment))
+	}
+	return base
+}
+
+func isWithinRoot(root, target string) bool {
+	rel, err := filepath.Rel(root, target)
+	if err != nil {
+		return false
+	}
+	return rel == "." || (rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)))
+}
+
+func virtualName(name string) string {
+	return path.Base(slashClean(name))
+}
+
+func (d Dir) resolveBoundedPath(name string, followLeaf, allowMissingLeaf, allowMissingTail bool) (string, error) {
+	if d.resolve(name) == "" {
+		return "", os.ErrNotExist
+	}
+	root, err := d.rootPath()
+	if err != nil {
+		return "", err
+	}
+
+	current := root
+	segments := splitVirtualPath(slashClean(name))
+	symlinks := 0
+
+	for len(segments) > 0 {
+		segment := segments[0]
+		segments = segments[1:]
+
+		next := filepath.Join(current, filepath.FromSlash(segment))
+		final := len(segments) == 0
+
+		info, err := os.Lstat(next)
+		if err != nil {
+			if os.IsNotExist(err) && (allowMissingTail || (allowMissingLeaf && final)) {
+				return joinVirtualPath(current, append([]string{segment}, segments...)), nil
+			}
+			return "", err
+		}
+
+		if info.Mode()&os.ModeSymlink == 0 {
+			current = next
+			continue
+		}
+
+		if !followLeaf && final {
+			return next, nil
+		}
+
+		symlinks++
+		if symlinks > 255 {
+			return "", os.ErrInvalid
+		}
+
+		target, err := os.Readlink(next)
+		if err != nil {
+			return "", err
+		}
+		if !filepath.IsAbs(target) {
+			target = filepath.Join(current, target)
+		}
+		target = filepath.Clean(target)
+
+		if !isWithinRoot(root, target) {
+			return "", os.ErrPermission
+		}
+
+		relTarget, err := filepath.Rel(root, target)
+		if err != nil {
+			return "", os.ErrPermission
+		}
+		targetSegments := splitVirtualPath(filepath.ToSlash(relTarget))
+
+		current = root
+		segments = append(targetSegments, segments...)
+	}
+
+	return current, nil
+}
+
 func (d Dir) Mkdir(ctx context.Context, name string, perm os.FileMode) error {
-	if name = d.resolve(name); name == "" {
-		return os.ErrNotExist
+	name, err := d.resolveBoundedPath(name, false, true, false)
+	if err != nil {
+		return err
 	}
 	return os.Mkdir(name, perm)
 }
 
 func (d Dir) OpenFile(ctx context.Context, name string, flag int, perm os.FileMode) (File, error) {
-	if name = d.resolve(name); name == "" {
-		return nil, os.ErrNotExist
-	}
-	f, err := os.OpenFile(name, flag, perm)
+	resolvedName, err := d.resolveBoundedPath(name, true, flag&os.O_CREATE != 0, false)
 	if err != nil {
 		return nil, err
 	}
-	return &webdavFile{f, name}, nil
+	f, err := os.OpenFile(resolvedName, flag, perm)
+	if err != nil {
+		return nil, err
+	}
+	return &webdavFile{
+		File: &osDirFile{
+			File:     f,
+			statName: virtualName(name),
+		},
+		name: resolvedName,
+	}, nil
 }
 
 func (d Dir) RemoveAll(ctx context.Context, name string) error {
-	if name = d.resolve(name); name == "" {
+	resolvedName := d.resolve(name)
+	if resolvedName == "" {
 		return os.ErrNotExist
 	}
-	if name == filepath.Clean(string(d)) {
+	if resolvedName == filepath.Clean(string(d)) {
 		// Prohibit removing the virtual root directory.
 		return os.ErrInvalid
 	}
-	return os.RemoveAll(name)
+	var err error
+	resolvedName, err = d.resolveBoundedPath(name, false, false, true)
+	if err != nil {
+		return err
+	}
+	return os.RemoveAll(resolvedName)
 }
 
 func (d Dir) Rename(ctx context.Context, oldName, newName string) error {
-	if oldName = d.resolve(oldName); oldName == "" {
+	resolvedOldName := d.resolve(oldName)
+	if resolvedOldName == "" {
 		return os.ErrNotExist
 	}
-	if newName = d.resolve(newName); newName == "" {
+	resolvedNewName := d.resolve(newName)
+	if resolvedNewName == "" {
 		return os.ErrNotExist
 	}
-	if root := filepath.Clean(string(d)); root == oldName || root == newName {
+	if root := filepath.Clean(string(d)); root == resolvedOldName || root == resolvedNewName {
 		// Prohibit renaming from or to the virtual root directory.
 		return os.ErrInvalid
 	}
-	return os.Rename(oldName, newName)
+	var err error
+	resolvedOldName, err = d.resolveBoundedPath(oldName, false, false, false)
+	if err != nil {
+		return err
+	}
+	resolvedNewName, err = d.resolveBoundedPath(newName, false, true, false)
+	if err != nil {
+		return err
+	}
+	return os.Rename(resolvedOldName, resolvedNewName)
 }
 
 func (d Dir) Stat(ctx context.Context, name string) (os.FileInfo, error) {
-	if name = d.resolve(name); name == "" {
-		return nil, os.ErrNotExist
+	resolvedName, err := d.resolveBoundedPath(name, true, false, false)
+	if err != nil {
+		return nil, err
 	}
-	return os.Stat(name)
+	info, err := os.Stat(resolvedName)
+	if err != nil {
+		return nil, err
+	}
+	return namedFileInfo{FileInfo: info, name: virtualName(name)}, nil
 }
 
 // NewMemFS returns a new in-memory FileSystem implementation.

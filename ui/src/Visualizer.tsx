@@ -6,8 +6,10 @@ import {
     Controls,
     MiniMap,
     Node,
+    NodeChange,
     ReactFlow,
     ReactFlowProvider,
+    useNodesInitialized,
     useOnViewportChange,
     Viewport
 } from "@xyflow/react";
@@ -16,11 +18,17 @@ import EnvironmentNode from "./EnvironmentNode.tsx";
 import AccountNode from "./AccountNode.tsx";
 import AccessNode from "./AccessNode.tsx";
 import {Box} from "@mui/material";
+import {alpha} from "@mui/material/styles";
+import {COLORS} from "./styling/theme.ts";
+import {useEffect, useRef} from "react";
 import useApiConsoleStore from "./model/store.ts";
+import {layout} from "./model/graph.ts";
 import AccessEdge from "./AccessEdge.tsx";
+import HierarchyEdge from "./HierarchyEdge.tsx";
 
 const edgeTypes = {
-    access: AccessEdge
+    access: AccessEdge,
+    hierarchy: HierarchyEdge,
 };
 
 const nodeTypes = {
@@ -34,11 +42,29 @@ const Visualizer = () => {
     const updateSelectedNode = useApiConsoleStore((state) => state.updateSelectedNode);
     const viewport = useApiConsoleStore((state) => state.viewport);
     const updateViewport = useApiConsoleStore((state) => state.updateViewport);
+    const selectedNode = useApiConsoleStore((state) => state.selectedNode);
+    const focusNodeId = useApiConsoleStore((state) => state.focusNodeId);
     const nodes = useApiConsoleStore((state) => state.nodes);
     const updateNodes = useApiConsoleStore((state) => state.updateNodes);
     const edges = useApiConsoleStore((state) => state.edges);
+    const updateEdges = useApiConsoleStore((state) => state.updateEdges);
+    const nodesInitialized = useNodesInitialized();
+    const prevInitialized = useRef(false);
 
-    const onNodesChange = (changes) => {
+    // re-layout once after React Flow measures node dimensions for tighter spacing
+    useEffect(() => {
+        if(nodesInitialized && !prevInitialized.current && nodes.length > 0) {
+            const laidOut = layout(nodes, edges);
+            updateNodes(laidOut.nodes.map((n) => ({
+                ...n,
+                selected: selectedNode ? selectedNode.id === n.id : false,
+            })));
+            updateEdges(laidOut.edges);
+        }
+        prevInitialized.current = nodesInitialized;
+    }, [nodesInitialized]);
+
+    const onNodesChange = (changes: NodeChange[]) => {
         updateNodes(applyNodeChanges(changes, nodes));
     }
 
@@ -48,19 +74,19 @@ const Visualizer = () => {
         }
     });
 
-    const onSelectionChange = ({ nodes }) => {
+    const onSelectionChange = ({ nodes }: { nodes: Node[] }) => {
         if(nodes.length > 0) {
             updateSelectedNode(nodes[0]);
         } else {
-            updateSelectedNode(null as Node);
+            updateSelectedNode(null);
         }
     };
 
-    const nodeColor = (node) => {
+    const nodeColor = (node: Node) => {
         if(node.selected) {
-            return "#9bf316";
+            return COLORS.secondary;
         }
-        return "#241775";
+        return COLORS.primary;
     }
 
     let fitView = false;
@@ -81,11 +107,30 @@ const Visualizer = () => {
             defaultViewport={viewport}
             fitView={fitView}
         >
+            {focusNodeId && (
+                <Box sx={{
+                    position: "absolute",
+                    top: 10,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: alpha(COLORS.primary, 0.85),
+                    color: 'common.white',
+                    padding: "4px 14px",
+                    borderRadius: 6,
+                    fontFamily: "Poppins",
+                    fontSize: 13,
+                    zIndex: 5,
+                    pointerEvents: "none",
+                    whiteSpace: "nowrap",
+                }}>
+                    Focus mode — press f or Esc to exit
+                </Box>
+            )}
             <Background  />
             <Controls position="bottom-left" orientation="horizontal" showInteractive={false} />
             <MiniMap
                 nodeColor={nodeColor}
-                maskColor="rgb(36, 23, 117, 0.5)"
+                maskColor={alpha(COLORS.primary, 0.5)}
                 pannable={true}
                 position="bottom-right"
             />
@@ -95,7 +140,7 @@ const Visualizer = () => {
 
 export default () => {
     return (
-        <Box sx={{ width: "100%", mt: 2 }} height={{ xs: 400, sm: 600, md: 800 }}>
+        <Box sx={{ width: "100%", height: "100%", minHeight: 0 }}>
             <ReactFlowProvider>
                 <Visualizer />
             </ReactFlowProvider>

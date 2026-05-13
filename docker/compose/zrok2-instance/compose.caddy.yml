@@ -1,0 +1,58 @@
+# zrok2 Docker Compose — Caddy TLS overlay
+#
+# Usage:
+#   COMPOSE_FILE=compose.yml:compose.caddy.yml docker compose up -d
+#
+# Caddy acquires a wildcard certificate for *.${ZROK2_DNS_ZONE} via DNS
+# challenge. Configure CADDY_DNS_PLUGIN and CADDY_DNS_PLUGIN_TOKEN in .env.
+#
+# Caddy plugins are built at startup using xcaddy. The first start takes a
+# few minutes while the binary is compiled with the DNS provider plugin.
+
+services:
+  caddy:
+    image: caddy:2-builder
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        xcaddy build \
+          --with "github.com/caddy-dns/${CADDY_DNS_PLUGIN:?Set CADDY_DNS_PLUGIN in .env}" \
+          --output /usr/bin/caddy
+        exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+    environment:
+      ZROK2_DNS_ZONE: ${ZROK2_DNS_ZONE:?err}
+      ZITI_CTRL_PORT: ${ZITI_CTRL_PORT:-1280}
+      ZROK2_CTRL_PORT: ${ZROK2_CTRL_PORT:-18080}
+      ZROK2_FRONTEND_PORT: ${ZROK2_FRONTEND_PORT:-8080}
+      CADDY_DNS_PLUGIN: ${CADDY_DNS_PLUGIN:?err}
+      CADDY_DNS_PLUGIN_TOKEN: ${CADDY_DNS_PLUGIN_TOKEN:?err}
+      CADDY_ACME_API: ${CADDY_ACME_API:-https://acme-v02.api.letsencrypt.org/directory}
+    depends_on:
+      zrok2-controller:
+        condition: service_healthy
+    ports:
+      - "${CADDY_INTERFACE:-0.0.0.0}:443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - zrok2
+    restart: unless-stopped
+
+  # Override insecure port bindings — Caddy handles all external traffic.
+  ziti-controller:
+    ports: !override
+      - "127.0.0.1:${ZITI_CTRL_PORT:-1280}:${ZITI_CTRL_PORT:-1280}"
+
+  zrok2-controller:
+    ports: !override
+      - "127.0.0.1:${ZROK2_CTRL_PORT:-18080}:${ZROK2_CTRL_PORT:-18080}"
+
+  zrok2-frontend:
+    ports: !override
+      - "127.0.0.1:${ZROK2_FRONTEND_PORT:-8080}:${ZROK2_FRONTEND_PORT:-8080}"
+
+volumes:
+  caddy-data:
+  caddy-config:

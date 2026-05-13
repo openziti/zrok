@@ -556,7 +556,7 @@ func TestMemPS(t *testing.T) {
 			sort.Sort(byStatus(propstats))
 			sort.Sort(byStatus(op.wantPropstats))
 			if !reflect.DeepEqual(propstats, op.wantPropstats) {
-				t.Errorf("%s: propstat\ngot  %q\nwant %q", desc, propstats, op.wantPropstats)
+				t.Errorf("%s: propstat\ngot  %v\nwant %v", desc, propstats, op.wantPropstats)
 			}
 		}
 	}

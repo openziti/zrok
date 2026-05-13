@@ -9,20 +9,20 @@ import {
     PUBLIC_SHARE_MODE,
     setLogLevel,
     ShareRequest
-} from "@openziti/zrok";
+} from "@openziti/zrok2";
 
 const httpServer = async () => {
-    let root = loadRoot();
+    const root = loadRoot();
     setLogLevel(0);
     await init(root)
         .catch((err: Error) => {
             console.log(err);
             return process.exit(1);
         });
-    let shr = await createShare(root, new ShareRequest(PUBLIC_SHARE_MODE, PROXY_BACKEND_MODE, "http-server"));
+    const shr = await createShare(root, new ShareRequest(PUBLIC_SHARE_MODE, PROXY_BACKEND_MODE, "http-server"));
 
-    let app = express(shr);
-    app.get("/", (r: Request, res: any) => {
+    const app = express(shr);
+    app.get("/", (_req: any, res: any) => {
         res.write("hello, world!\n");
         res.end();
     });
@@ -31,7 +31,8 @@ const httpServer = async () => {
     });
 
     process.on("SIGINT", async () => {
-        deleteShare(root, shr);
+        await deleteShare(root, shr);
+        process.exit(0);
     });
 }
 

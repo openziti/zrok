@@ -1,0 +1,44 @@
+name: mattermost-doc-alerts
+on:
+  issues:
+    types: [opened, closed, reopened]
+  issue_comment:
+  pull_request_review:
+    types: [submitted]
+  pull_request_review_comment:
+  pull_request:
+    types: [opened, reopened, ready_for_review, closed]
+    paths:
+      - website/**
+  release:
+    types: [released]
+  workflow_dispatch:
+
+jobs:
+  mattermost-doc-alerts:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    name: POST to doc-alerts
+    steps:
+      - name: Strip Vercel HTML from event JSON
+        id: preprocess
+        run: |
+          CLEANED_JSON=$(jq -c 'if .comment.body then .comment.body |= gsub("\\s*<a\\b[^>]*vercel\\.com[^>]*>.*?</a>"; ""; "ig") else . end' "$GITHUB_EVENT_PATH")
+          echo "event_json<<DELIM" >> "$GITHUB_OUTPUT"
+          echo "$CLEANED_JSON" >> "$GITHUB_OUTPUT"
+          echo "DELIM" >> "$GITHUB_OUTPUT"
+      - uses: openziti/ziti-mattermost-action-py@v1
+        if: |
+          github.repository_owner == 'openziti'
+          && ((github.event_name != 'pull_request_review')
+          || (github.event_name == 'pull_request_review' && github.event.review.state == 'approved'))
+          && !(
+            github.event_name == 'issue_comment'
+            && github.event.sender.login == 'vercel[bot]'
+            && (contains(github.event.comment.body, 'Building') || contains(github.event.comment.body, 'Ignored'))
+          )
+        with:
+          zitiId: ${{ secrets.ZITI_MATTERMOST_IDENTITY }}
+          webhookUrl: ${{ secrets.ZHOOK_URL_DOC_NOTIFICATIONS }}
+          eventJson: ${{ steps.preprocess.outputs.event_json }}
+          senderUsername: "GitHubZ"

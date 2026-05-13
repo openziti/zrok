@@ -2,18 +2,19 @@ package sync
 
 import (
 	"context"
-	"github.com/openziti/zrok/v2/drives/davClient"
-	"github.com/openziti/zrok/v2/environment/env_core"
-	"github.com/openziti/zrok/v2/sdk/golang/sdk"
-	"github.com/pkg/errors"
 	"io"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
+	pathpkg "path"
 	"strings"
 	"time"
+
+	"github.com/openziti/zrok/v2/drives/davClient"
+	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
+	"github.com/pkg/errors"
 )
 
 type ZrokTargetConfig struct {
@@ -48,31 +49,47 @@ func NewZrokTarget(cfg *ZrokTargetConfig) (*ZrokTarget, error) {
 }
 
 func (t *ZrokTarget) Inventory() ([]*Object, error) {
-	rootFi, err := t.dc.Stat(context.Background(), t.cfg.URL.Path)
+	rootPath, err := cleanVirtualPath(t.cfg.URL.Path)
+	if err != nil {
+		return nil, err
+	}
+
+	rootFi, err := t.dc.Stat(context.Background(), rootPath)
 	if err != nil {
 		return nil, err
 	}
 
 	if !rootFi.IsDir {
-		base := filepath.Base(t.cfg.URL.Path)
-		t.cfg.URL.Path = filepath.Dir(t.cfg.URL.Path)
+		objectPath, err := remoteFileObjectPath(rootPath, rootFi.Path)
+		if err != nil {
+			return nil, err
+		}
+		t.cfg.URL.Path = pathpkg.Dir(rootPath)
 		return []*Object{{
-			Path:     "/" + base,
+			Path:     objectPath,
 			IsDir:    false,
 			Size:     rootFi.Size,
 			Modified: rootFi.ModTime,
 		}}, nil
 	}
 
-	fis, err := t.dc.Readdir(context.Background(), t.cfg.URL.Path, true)
+	if _, err := remoteObjectPath(rootPath, rootFi.Path, true); err != nil {
+		return nil, err
+	}
+
+	fis, err := t.dc.Readdir(context.Background(), rootPath, true)
 	if err != nil {
 		return nil, err
 	}
 	var objects []*Object
 	for _, fi := range fis {
-		if fi.Path != "/" {
+		objectPath, err := remoteObjectPath(rootPath, fi.Path, fi.IsDir)
+		if err != nil {
+			return nil, err
+		}
+		if objectPath != "/" {
 			objects = append(objects, &Object{
-				Path:     fi.Path,
+				Path:     objectPath,
 				IsDir:    fi.IsDir,
 				Size:     fi.Size,
 				Modified: fi.ModTime,
@@ -92,7 +109,7 @@ func (t *ZrokTarget) Dir(path string) ([]*Object, error) {
 	for _, fi := range fis {
 		if fi.Path != "/" && fi.Path != t.cfg.URL.Path+"/" {
 			objects = append(objects, &Object{
-				Path:     filepath.Base(fi.Path),
+				Path:     pathpkg.Base(fi.Path),
 				IsDir:    fi.IsDir,
 				Size:     fi.Size,
 				Modified: fi.ModTime,
@@ -103,22 +120,36 @@ func (t *ZrokTarget) Dir(path string) ([]*Object, error) {
 }
 
 func (t *ZrokTarget) Mkdir(path string) error {
-	fi, err := t.dc.Stat(context.Background(), filepath.Join(t.cfg.URL.Path, path))
+	targetPath, err := joinRemotePath(t.cfg.URL.Path, path)
+	if err != nil {
+		return err
+	}
+
+	fi, err := t.dc.Stat(context.Background(), targetPath)
 	if err == nil {
 		if fi.IsDir {
 			return nil
 		}
 		return errors.Errorf("'%v' already exists; not directory", path)
 	}
-	return t.dc.Mkdir(context.Background(), filepath.Join(t.cfg.URL.Path, path))
+	return t.dc.Mkdir(context.Background(), targetPath)
 }
 
 func (t *ZrokTarget) ReadStream(path string) (io.ReadCloser, error) {
-	return t.dc.Open(context.Background(), filepath.Join(t.cfg.URL.Path, path))
+	targetPath, err := joinRemotePath(t.cfg.URL.Path, path)
+	if err != nil {
+		return nil, err
+	}
+	return t.dc.Open(context.Background(), targetPath)
 }
 
 func (t *ZrokTarget) WriteStream(path string, rs io.Reader, _ os.FileMode) error {
-	ws, err := t.dc.Create(context.Background(), filepath.Join(t.cfg.URL.Path, path))
+	targetPath, err := joinRemotePath(t.cfg.URL.Path, path)
+	if err != nil {
+		return err
+	}
+
+	ws, err := t.dc.Create(context.Background(), targetPath)
 	if err != nil {
 		return err
 	}
@@ -131,7 +162,12 @@ func (t *ZrokTarget) WriteStream(path string, rs io.Reader, _ os.FileMode) error
 }
 
 func (t *ZrokTarget) WriteStreamWithModTime(path string, rs io.Reader, _ os.FileMode, modTime time.Time) error {
-	ws, err := t.dc.CreateWithModTime(context.Background(), filepath.Join(t.cfg.URL.Path, path), modTime)
+	targetPath, err := joinRemotePath(t.cfg.URL.Path, path)
+	if err != nil {
+		return err
+	}
+
+	ws, err := t.dc.CreateWithModTime(context.Background(), targetPath, modTime)
 	if err != nil {
 		return err
 	}
@@ -144,13 +180,25 @@ func (t *ZrokTarget) WriteStreamWithModTime(path string, rs io.Reader, _ os.File
 }
 
 func (t *ZrokTarget) Move(src, dest string) error {
-	return t.dc.MoveAll(context.Background(), filepath.Join(t.cfg.URL.Path, src), dest, true)
+	sourcePath, err := joinRemotePath(t.cfg.URL.Path, src)
+	if err != nil {
+		return err
+	}
+	return t.dc.MoveAll(context.Background(), sourcePath, dest, true)
 }
 
 func (t *ZrokTarget) Rm(path string) error {
-	return t.dc.RemoveAll(context.Background(), filepath.Join(t.cfg.URL.Path, path))
+	targetPath, err := joinRemotePath(t.cfg.URL.Path, path)
+	if err != nil {
+		return err
+	}
+	return t.dc.RemoveAll(context.Background(), targetPath)
 }
 
 func (t *ZrokTarget) SetModificationTime(path string, mtime time.Time) error {
-	return t.dc.Touch(context.Background(), filepath.Join(t.cfg.URL.Path, path), mtime)
+	targetPath, err := joinRemotePath(t.cfg.URL.Path, path)
+	if err != nil {
+		return err
+	}
+	return t.dc.Touch(context.Background(), targetPath, mtime)
 }

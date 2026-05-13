@@ -44,11 +44,11 @@ func (s *Status) UnmarshalText(b []byte) error {
 
 	parts := strings.SplitN(string(b), " ", 3)
 	if len(parts) != 3 {
-		return fmt.Errorf("webdav: invalid HTTP status %q: expected 3 fields", s)
+		return fmt.Errorf("webdav: invalid HTTP status %q: expected 3 fields", string(b))
 	}
 	code, err := strconv.Atoi(parts[1])
 	if err != nil {
-		return fmt.Errorf("webdav: invalid HTTP status %q: failed to parse code: %v", s, err)
+		return fmt.Errorf("webdav: invalid HTTP status %q: failed to parse code: %v", string(b), err)
 	}
 
 	s.Code = code

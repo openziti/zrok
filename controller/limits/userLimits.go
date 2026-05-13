@@ -56,15 +56,15 @@ func (a *Agent) getUserLimits(acctId int, trx *sqlx.Tx) (*userLimits, error) {
 		return nil, errors.Wrapf(err, "error finding applied limit classes for account '%d'", acctId)
 	}
 	for _, alc := range alcs {
-		if a.isResourceCountClass(alc) {
+		if alc.IsResourceCountClass() {
 			resource = alc
-		} else if a.isUnscopedBandwidthClass(alc) {
+		} else if alc.IsUnscopedBandwidthClass() {
 			if alc.LimitAction == store.WarningLimitAction {
 				bwWarning = alc
 			} else {
 				bwLimit = alc
 			}
-		} else if a.isScopedLimitClass(alc) {
+		} else if alc.IsScopedBandwidthClass() {
 			scopes[*alc.BackendMode] = alc
 		} else {
 			dl.Warnf("unknown type of limit class '%v' for account '#%d'", alc, acctId)
@@ -78,46 +78,4 @@ func (a *Agent) getUserLimits(acctId int, trx *sqlx.Tx) (*userLimits, error) {
 	}
 
 	return userLimits, nil
-}
-
-func (a *Agent) isResourceCountClass(alc *store.LimitClass) bool {
-	if alc.BackendMode != nil {
-		return false
-	}
-	if alc.Environments == store.Unlimited && alc.Shares == store.Unlimited && alc.ReservedShares == store.Unlimited && alc.UniqueNames == store.Unlimited && alc.ShareFrontends == store.Unlimited {
-		return false
-	}
-	return true
-}
-
-func (a *Agent) isUnscopedBandwidthClass(alc *store.LimitClass) bool {
-	if alc.BackendMode != nil {
-		return false
-	}
-	if alc.Environments > store.Unlimited || alc.Shares > store.Unlimited || alc.ReservedShares > store.Unlimited || alc.UniqueNames > store.Unlimited || alc.ShareFrontends > store.Unlimited {
-		return false
-	}
-	if alc.PeriodMinutes < 1 {
-		return false
-	}
-	if alc.RxBytes == store.Unlimited && alc.TxBytes == store.Unlimited && alc.TotalBytes == store.Unlimited {
-		return false
-	}
-	return true
-}
-
-func (a *Agent) isScopedLimitClass(alc *store.LimitClass) bool {
-	if alc.BackendMode == nil {
-		return false
-	}
-	if alc.Environments > store.Unlimited {
-		return false
-	}
-	if alc.PeriodMinutes < 1 {
-		return false
-	}
-	if alc.RxBytes == store.Unlimited && alc.TxBytes == store.Unlimited && alc.TotalBytes == store.Unlimited {
-		return false
-	}
-	return true
 }
