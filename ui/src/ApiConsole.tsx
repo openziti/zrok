@@ -18,6 +18,9 @@ import {Node} from "@xyflow/react";
 import {getMetadataApi} from "./model/api.ts";
 import {User} from "./model/user.ts";
 import {isAbortError} from "./model/errors.ts";
+import {PanelWrapper} from "./extensions/PanelWrapper.tsx";
+import {Slot} from "./extensions/SlotRenderer.tsx";
+import {SLOTS} from "./extensions/types.ts";
 
 interface ApiConsoleProps {
     logout: () => void;
@@ -170,10 +173,30 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const renderSidePanel = () => {
         if (!selectedNode) return null;
         switch (selectedNode.type) {
-            case "account": return <AccountPanel account={selectedNode} />;
-            case "environment": return <EnvironmentPanel environment={selectedNode} />;
-            case "share": return <SharePanel share={selectedNode} />;
-            case "access": return <AccessPanel access={selectedNode} />;
+            case "account":
+                return (
+                    <PanelWrapper nodeType="account" node={selectedNode}>
+                        <AccountPanel account={selectedNode} />
+                    </PanelWrapper>
+                );
+            case "environment":
+                return (
+                    <PanelWrapper nodeType="environment" node={selectedNode}>
+                        <EnvironmentPanel environment={selectedNode} />
+                    </PanelWrapper>
+                );
+            case "share":
+                return (
+                    <PanelWrapper nodeType="share" node={selectedNode}>
+                        <SharePanel share={selectedNode} />
+                    </PanelWrapper>
+                );
+            case "access":
+                return (
+                    <PanelWrapper nodeType="access" node={selectedNode}>
+                        <AccessPanel access={selectedNode} />
+                    </PanelWrapper>
+                );
             default: return null;
         }
     };
@@ -274,6 +297,8 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
             }}
         >
             <NavBar logout={logout} visualizer={visualizerEnabled} toggleMode={setVisualizerEnabled} />
+            {/* Extension slot: top of console area */}
+            <Slot name={SLOTS.CONSOLE_TOP} user={user} selectedNode={selectedNode} />
             <Box sx={{ position: "relative", flex: 1, minHeight: 0, overflow: "hidden" }}>
                 <Box
                     sx={{
@@ -306,6 +331,8 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                         </Box>
                     ) : null}
                 </Box>
+                {/* Extension slot: sidebar area */}
+                <Slot name={SLOTS.CONSOLE_SIDEBAR} user={user} selectedNode={selectedNode} />
                 {visualizerEnabled && selectedNode && !panelMinimized ? (
                     <Box
                         sx={{
@@ -348,6 +375,8 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                     </Box>
                 ) : null}
             </Box>
+            {/* Extension slot: bottom of console area */}
+            <Slot name={SLOTS.CONSOLE_BOTTOM} user={user} selectedNode={selectedNode} />
         </Box>
     );
 }
