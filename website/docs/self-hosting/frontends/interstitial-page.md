@@ -20,7 +20,7 @@ By default, if you don't enable interstitial pages on a public frontend, your se
 The following diagram shows how the interstitial mechanism works—the share configuration rendezvous between the
 controller and a frontend:
 
-![zrok_interstitial_rendezvous](../images/zrok_interstitial_rendezvous.png)
+![zrok_interstitial_rendezvous](../../images/zrok_interstitial_rendezvous.png)
 
 Every zrok share has a *config* recorded in the underlying OpenZiti network. The config is of type `zrok.proxy.v1`. The
 frontend uses the information in this config to understand the disposition of the share. The config can contain an

@@ -1,0 +1,8 @@
+{
+  "label": "Migration",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Guides for migrating from older versions of zrok and transitioning away from removed features."
+  }
+}

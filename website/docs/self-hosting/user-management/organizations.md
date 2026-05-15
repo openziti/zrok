@@ -13,7 +13,7 @@ giving them visibility into the environments, shares, and accesses created withi
 ## Configure an organization
 
 Managing organizations requires a site-level `ZROK2_ADMIN_TOKEN`. See the [self-hosting
-guide](deployment/linux.mdx#step-2-configure-the-controller) for details on configuring admin tokens.
+guide](../deployment/linux.mdx#step-2-configure-the-controller) for details on configuring admin tokens.
 
 ### Create an organization
 

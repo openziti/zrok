@@ -1,0 +1,8 @@
+{
+  "label": "Frontends",
+  "position": 20,
+  "link": {
+    "type": "generated-index",
+    "description": "Configure and operate zrok frontends, including error pages, interstitial pages, dynamic proxy, and horizontal scaling."
+  }
+}
