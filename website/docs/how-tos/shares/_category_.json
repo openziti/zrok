@@ -1,4 +1,8 @@
 {
   "label": "Shares",
-  "position": 2
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "How-to guides for creating and managing shares — HTTP proxies, file sharing, TCP/UDP tunnels, SOCKS proxying, permission modes, and reserved names."
+  }
 }
