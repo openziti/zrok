@@ -12,7 +12,7 @@ frontend, and metrics bridge. This is the simplest production-ready configuratio
 
 :::info Single-host deployment
 To scale the frontend for higher throughput or availability, see
-[Scaling frontends](@zrokdocs/self-hosting/scaling-frontends).
+[Scaling frontends](@zrokdocs/self-hosting/frontends/scaling-frontends).
 :::
 
 ## Prerequisites
@@ -519,7 +519,7 @@ Replace `<frontend-token>` with the token from [Step 6](#step-6-create-a-dynamic
     ```
 
 For a complete reference of all frontend options including OAuth, see the
-[Dynamic proxy frontend migration guide](@zrokdocs/self-hosting/dynamic-proxy).
+[Dynamic proxy frontend migration guide](@zrokdocs/self-hosting/frontends/dynamic-proxy).
 
 ### Step 11: Start the frontend
 
@@ -746,7 +746,7 @@ sudo journalctl -u zrok2-controller --since "5 minutes ago"
 If a service fails to start, verify the configuration file syntax and that the OpenZiti network is reachable.
 
 For dynamic frontend troubleshooting (AMQP connectivity, gRPC errors, mapping issues), see [Dynamic proxy frontend
-migration guide](@zrokdocs/self-hosting/dynamic-proxy#troubleshooting).
+migration guide](@zrokdocs/self-hosting/frontends/dynamic-proxy#troubleshooting).
 
 For metrics troubleshooting (InfluxDB connectivity, AMQP queues, event flow), see [Configure
 metrics](@zrokdocs/self-hosting/metrics-and-limits/configure-metrics).

@@ -1,0 +1,8 @@
+{
+  "label": "User management",
+  "position": 80,
+  "link": {
+    "type": "generated-index",
+    "description": "Manage user accounts on your self-hosted zrok instance, including organizations and self-service invitations."
+  }
+}

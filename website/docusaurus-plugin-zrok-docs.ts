@@ -10,8 +10,8 @@ export function zrokRedirects(routeBasePath: string = 'docs/zrok'): PluginConfig
             redirects: [
                 // getting-started → get-started
                 { to: `${p}/get-started/`, from: [`${p}/getting-started`] },
-                // category/guides → category/how-to-guides
-                { to: `${p}/category/how-to-guides`, from: [`${p}/category/guides`] },
+                // category/guides → intro (how-to-guides category no longer exists)
+                { to: `${p}/intro`, from: [`${p}/category/guides`, `${p}/category/how-to-guides`] },
                 // guides/* → how-tos/*
                 { to: `${p}/how-tos/agent/`, from: [`${p}/guides/agent/`] },
                 { to: `${p}/how-tos/agent/configure-http-healthcheck`, from: [`${p}/guides/agent/http-healthcheck`, `${p}/how-tos/agent/http-healthcheck`] },
@@ -26,9 +26,9 @@ export function zrokRedirects(routeBasePath: string = 'docs/zrok'): PluginConfig
                 { to: `${p}/how-tos/install/linux`, from: [`${p}/guides/install/linux`] },
                 { to: `${p}/how-tos/install/macos`, from: [`${p}/guides/install/macos`] },
                 { to: `${p}/how-tos/install/windows`, from: [`${p}/guides/install/windows`] },
-                { to: `${p}/how-tos/configure-permission-modes`, from: [`${p}/guides/permission-modes`, `${p}/how-tos/permission-modes`] },
-                { to: `${p}/how-tos/migrate-v1-to-v2`, from: [`${p}/guides/v2-migration-guide`, `${p}/how-tos/v2-migration-guide`] },
-                { to: `${p}/how-tos/migrate-from-vpn`, from: [`${p}/guides/vpn`, `${p}/how-tos/vpn`] },
+                { to: `${p}/how-tos/shares/configure-permission-modes`, from: [`${p}/guides/permission-modes`, `${p}/how-tos/permission-modes`, `${p}/how-tos/configure-permission-modes`] },
+                { to: `${p}/how-tos/migration/migrate-v1-to-v2`, from: [`${p}/guides/v2-migration-guide`, `${p}/how-tos/v2-migration-guide`, `${p}/how-tos/migrate-v1-to-v2`] },
+                { to: `${p}/how-tos/migration/migrate-from-vpn`, from: [`${p}/guides/vpn`, `${p}/how-tos/vpn`, `${p}/how-tos/migrate-from-vpn`] },
                 // concepts/* → concepts/*
                 { to: `${p}/concepts/private-shares`, from: [`${p}/concepts/private`, `${p}/concepts/sharing-private`, `${p}/concepts/shares/private`] },
                 { to: `${p}/concepts/public-shares`, from: [`${p}/concepts/public`, `${p}/concepts/sharing-public`, `${p}/concepts/shares/public`] },
@@ -38,10 +38,10 @@ export function zrokRedirects(routeBasePath: string = 'docs/zrok'): PluginConfig
                 { to: `${p}/concepts/namespaces`, from: [`${p}/concepts/sharing-reserved`] },
                 // guides/self-hosting/* → self-hosting/*
                 { to: `${p}/self-hosting/deployment/docker`, from: [`${p}/guides/self-hosting/docker`, `${p}/self-hosting/docker`] },
-                { to: `${p}/self-hosting/dynamic-proxy`, from: [`${p}/guides/self-hosting/dynamicProxy`] },
-                { to: `${p}/self-hosting/error-pages`, from: [`${p}/guides/self-hosting/error-pages`] },
+                { to: `${p}/self-hosting/frontends/dynamic-proxy`, from: [`${p}/guides/self-hosting/dynamicProxy`, `${p}/self-hosting/dynamic-proxy`] },
+                { to: `${p}/self-hosting/frontends/error-pages`, from: [`${p}/guides/self-hosting/error-pages`, `${p}/self-hosting/error-pages`] },
                 { to: `${p}/self-hosting/instance-configuration`, from: [`${p}/guides/self-hosting/instance-configuration`] },
-                { to: `${p}/self-hosting/interstitial-page`, from: [`${p}/guides/self-hosting/interstitial-page`] },
+                { to: `${p}/self-hosting/frontends/interstitial-page`, from: [`${p}/guides/self-hosting/interstitial-page`, `${p}/self-hosting/interstitial-page`] },
                 { to: `${p}/self-hosting/deployment/kubernetes`, from: [`${p}/guides/self-hosting/kubernetes`, `${p}/self-hosting/kubernetes`] },
                 { to: `${p}/self-hosting/deployment/linux`, from: [`${p}/guides/self-hosting/self_hosting_guide`, `${p}/guides/self-hosting/linux`, `${p}/self-hosting/linux/`] },
                 { to: `${p}/self-hosting/deployment/linux`, from: [`${p}/guides/self-hosting/nginx_tls_guide/`, `${p}/guides/self-hosting/linux/nginx`] },
@@ -52,9 +52,10 @@ export function zrokRedirects(routeBasePath: string = 'docs/zrok'): PluginConfig
                 { to: `${p}/self-hosting/oauth/integrations/github`, from: [`${p}/guides/self-hosting/oauth/integrations/github`] },
                 { to: `${p}/self-hosting/oauth/integrations/google`, from: [`${p}/guides/self-hosting/oauth/integrations/google`] },
                 { to: `${p}/self-hosting/oauth/integrations/oidc`, from: [`${p}/guides/self-hosting/oauth/integrations/oidc`] },
-                { to: `${p}/self-hosting/organizations`, from: [`${p}/guides/self-hosting/organizations`] },
+                { to: `${p}/category/host-your-own-zrok`, from: [`${p}/category/self-hosting`] },
+                { to: `${p}/self-hosting/user-management/organizations`, from: [`${p}/guides/self-hosting/organizations`, `${p}/self-hosting/organizations`] },
                 { to: `${p}/concepts/personalized-frontend`, from: [`${p}/guides/self-hosting/personalized-frontend`, `${p}/self-hosting/personalized-frontend`] },
-                { to: `${p}/self-hosting/self-service-invite`, from: [`${p}/guides/self-hosting/self-service-invite`] },
+                { to: `${p}/self-hosting/user-management/self-service-invite`, from: [`${p}/guides/self-hosting/self-service-invite`, `${p}/self-hosting/self-service-invite`] },
             ],
         },
     ];

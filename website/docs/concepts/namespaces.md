@@ -6,7 +6,7 @@ sidebar_position: 10
 
 :::info v2.0 feature
 This page describes the v2.0 namespace and name system. If you're migrating from v1.x, see the [v2 migration
-guide](/how-tos/migrate-v1-to-v2.md) for details on how this replaces the old `zrok reserve` workflow.
+guide](/how-tos/migration/migrate-v1-to-v2.md) for details on how this replaces the old `zrok reserve` workflow.
 :::
 
 By default, when you create a public or private share using `zrok2 share`, zrok assigns it a randomly generated _share
@@ -15,7 +15,7 @@ token_. When you terminate the `zrok2 share` command, the share is deleted and t
 
 In v2.0, zrok introduces a more powerful system for creating persistent shares through **namespaces** and **names**.
 
-To create and manage reserved names, see [Manage reserved names](../how-tos/manage-reserved-names.md).
+To create and manage reserved names, see [Manage reserved names](../how-tos/shares/manage-reserved-names.md).
 
 ## Understand namespaces and names
 
