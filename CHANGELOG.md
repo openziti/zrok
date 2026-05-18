@@ -4,6 +4,10 @@
 
 FIX: The agent no longer deletes reserved shares from the controller during graceful shutdown or after an abnormal subordinate process exit. Previously, a `SIGTERM`/`SIGINT` (e.g., on system reboot) caused the agent to issue an unconditional `DeleteShare` against the controller for every active share, destroying the reservation for private shares created with `--share-token` and for public shares with reserved names. The reservation is now preserved unless the user explicitly released the share via `zrok2 agent release`, allowing the agent to reattach on the next start. (https://github.com/openziti/zrok/issues/1251)
 
+CHANGE: Resolved the outstanding `go vet` findings across `cmd/zrok2`, `drives/davClient`, and the pastebin SDK example. Signal-notification channels passed to `signal.Notify` are now buffered (size 1) so that signals delivered before the receiver is ready are not dropped, unkeyed `xml.Name`/`xml.StartElement` composite literals were converted to keyed form, and the `testCanary` enabler/public-proxy commands now `defer` their snapshot-streamer `context.CancelFunc` to avoid leaking the cancellation.
+
+CHANGE: Updated `ui` and `agent/agentUi` npm dependencies to current versions.
+
 ## v2.0.3
 
 FIX: The Python SDK `ProxyShare` now rejects absolute proxy request paths before forwarding. This prevents a viewer from using an absolute URL path to make the proxy host request arbitrary internal or loopback services instead of the configured target.

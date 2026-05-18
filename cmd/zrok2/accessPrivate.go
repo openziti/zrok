@@ -250,7 +250,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 		}()
 	}
 
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGQUIT)
 	go func() {
 		<-c

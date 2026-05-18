@@ -72,6 +72,7 @@ func (cmd *testCanaryEnabler) run(_ *cobra.Command, _ []string) {
 			panic(err)
 		}
 		snsCtx, snsCancel = context.WithCancel(context.Background())
+		defer snsCancel()
 		sns, err = canary.NewSnapshotStreamer(snsCtx, cfg)
 		if err != nil {
 			panic(err)
