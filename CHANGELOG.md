@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v2.0.4
+
+FIX: The agent no longer deletes reserved shares from the controller during graceful shutdown or after an abnormal subordinate process exit. Previously, a `SIGTERM`/`SIGINT` (e.g., on system reboot) caused the agent to issue an unconditional `DeleteShare` against the controller for every active share, destroying the reservation for private shares created with `--share-token` and for public shares with reserved names. The reservation is now preserved unless the user explicitly released the share via `zrok2 agent release`, allowing the agent to reattach on the next start. (https://github.com/openziti/zrok/issues/1251)
+
 ## v2.0.3
 
 FIX: The Python SDK `ProxyShare` now rejects absolute proxy request paths before forwarding. This prevents a viewer from using an absolute URL path to make the proxy host request arbitrary internal or loopback services instead of the configured target.
