@@ -1,7 +1,5 @@
 name: mattermost-doc-alerts
 on:
-  issues:
-    types: [opened, closed, reopened]
   issue_comment:
   pull_request_review:
     types: [submitted]
@@ -23,7 +21,7 @@ jobs:
       - name: Strip Vercel HTML from event JSON
         id: preprocess
         run: |
-          CLEANED_JSON=$(jq -c 'if .comment.body then .comment.body |= gsub("\\s*<a\\b[^>]*vercel\\.com[^>]*>.*?</a>"; ""; "ig") else . end' "$GITHUB_EVENT_PATH")
+          CLEANED_JSON=$(jq -c 'if .comment.body then .comment.body |= (gsub("\\s*<a\\b[^>]*vercel\\.com[^>]*>.*?</a>"; ""; "ig") | gsub("\\[vc\\]: #[^\\n]*\\n?"; "")) else . end' "$GITHUB_EVENT_PATH")
           echo "event_json<<DELIM" >> "$GITHUB_OUTPUT"
           echo "$CLEANED_JSON" >> "$GITHUB_OUTPUT"
           echo "DELIM" >> "$GITHUB_OUTPUT"
