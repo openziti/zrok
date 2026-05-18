@@ -106,6 +106,7 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 			panic(err)
 		}
 		snsCtx, snsCancel = context.WithCancel(context.Background())
+		defer snsCancel()
 		sns, err = canary.NewSnapshotStreamer(snsCtx, cfg)
 		if err != nil {
 			panic(err)
@@ -172,7 +173,7 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 		go looper.Run()
 	}
 
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
