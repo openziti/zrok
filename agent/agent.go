@@ -385,8 +385,26 @@ func (a *Agent) manager() {
 				if err := proctree.WaitChild(shr.process); err != nil {
 					dl.Errorf("error joining share '%v': %v", shr.token, err)
 				}
-				if err := a.deleteShare(shr.token); err != nil {
-					dl.Errorf("error deleting share '%v': %v", shr.token, err)
+				// only delete from controller if the user explicitly released the share,
+				// or if it's an ephemeral (non-reserved) share. reserved shares must
+				// survive shutdown/crash so the agent can reattach on next start.
+				shouldDelete := outShare.releaseRequested
+				if !shouldDelete {
+					switch req := outShare.request.(type) {
+					case *SharePublicRequest:
+						shouldDelete = !req.hasReservedName()
+					case *SharePrivateRequest:
+						shouldDelete = !req.hasReservedToken()
+					default:
+						shouldDelete = true
+					}
+				}
+				if shouldDelete {
+					if err := a.deleteShare(shr.token); err != nil {
+						dl.Errorf("error deleting share '%v': %v", shr.token, err)
+					}
+				} else {
+					dl.Infof("preserving reserved share '%v' on controller for reattach", shr.token)
 				}
 				delete(a.shares, shr.token)
 
