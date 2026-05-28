@@ -280,10 +280,14 @@ func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontend
 		authUsers = append(authUsers, &sdk.AuthUserConfig{Username: authUser.Username, Password: authUser.Password})
 	}
 
-	// parse auth scheme
-	authScheme, err := sdk.ParseAuthScheme(params.Body.AuthScheme)
-	if err != nil {
-		return "", nil, errors.Wrap(err, "error parsing auth scheme")
+	// infer auth scheme from request fields when not explicitly provided
+	authScheme, _ := sdk.ParseAuthScheme(params.Body.AuthScheme)
+	if authScheme == sdk.None {
+		if params.Body.OauthProvider != "" {
+			authScheme = sdk.Oauth
+		} else if len(params.Body.BasicAuthUsers) > 0 {
+			authScheme = sdk.Basic
+		}
 	}
 
 	// prepare oauth config
@@ -443,10 +447,14 @@ func (h *shareHandler) allocatePrivateResources(envZId, shrToken string, fronten
 		authUsers = append(authUsers, &sdk.AuthUserConfig{Username: authUser.Username, Password: authUser.Password})
 	}
 
-	// parse auth scheme
-	authScheme, err := sdk.ParseAuthScheme(params.Body.AuthScheme)
-	if err != nil {
-		return "", nil, errors.Wrap(err, "error parsing auth scheme")
+	// infer auth scheme from request fields when not explicitly provided
+	authScheme, _ := sdk.ParseAuthScheme(params.Body.AuthScheme)
+	if authScheme == sdk.None {
+		if params.Body.OauthProvider != "" {
+			authScheme = sdk.Oauth
+		} else if len(params.Body.BasicAuthUsers) > 0 {
+			authScheme = sdk.Basic
+		}
 	}
 
 	// prepare oauth config
