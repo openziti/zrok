@@ -107,6 +107,7 @@ type OauthConfig struct {
 	Provider                   string   `json:"provider"`
 	EmailDomains               []string `json:"email_domains"`
 	AuthorizationCheckInterval string   `json:"authorization_check_interval"`
+	NoRedirect                 bool     `json:"no_redirect,omitempty"`
 }
 
 func OauthConfigFromMap(m map[string]interface{}) (*OauthConfig, error) {
@@ -134,6 +135,13 @@ func OauthConfigFromMap(m map[string]interface{}) (*OauthConfig, error) {
 	if v, found := m["authorization_check_interval"]; found {
 		if vStr, ok := v.(string); ok {
 			oac.AuthorizationCheckInterval = vStr
+		} else {
+			return nil, errors.Errorf("unexpected type '%v'", reflect.TypeOf(v))
+		}
+	}
+	if v, found := m["no_redirect"]; found {
+		if vBool, ok := v.(bool); ok {
+			oac.NoRedirect = vBool
 		} else {
 			return nil, errors.Errorf("unexpected type '%v'", reflect.TypeOf(v))
 		}

@@ -80,12 +80,14 @@ func (c *oidcConfig) configure(cfg *OauthConfig, tls bool) error {
 			proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("unable to unescape targetHost")))
 			return
 		}
+		returnToken := r.URL.Query().Get("return_token") == "true"
 		state := func() string {
 			id := uuid.New().String()
 			t := jwt.NewWithClaims(jwt.SigningMethodHS256, IntermediateJWT{
 				State:           id,
 				TargetHost:      targetHost,
 				RefreshInterval: r.URL.Query().Get("refreshInterval"),
+				ReturnToken:     returnToken,
 				RegisteredClaims: jwt.RegisteredClaims{
 					ExpiresAt: jwt.NewNumericDate(time.Now().Add(cfg.IntermediateLifetime)),
 					IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -195,7 +197,8 @@ func (c *oidcConfig) configure(cfg *OauthConfig, tls bool) error {
 			return
 		}
 
-		setSessionCookie(w, sessionCookieRequest{
+		intermediateJWT := token.Claims.(*IntermediateJWT)
+		sTkn := setSessionCookie(w, sessionCookieRequest{
 			oauthCfg:        cfg,
 			supportsRefresh: true,
 			email:           info.Email,
@@ -204,10 +207,19 @@ func (c *oidcConfig) configure(cfg *OauthConfig, tls bool) error {
 			refreshInterval: refreshInterval,
 			signingKey:      signingKey,
 			encryptionKey:   encryptionKey,
-			targetHost:      token.Claims.(*IntermediateJWT).TargetHost,
+			targetHost:      intermediateJWT.TargetHost,
 		})
+		if sTkn == "" {
+			return
+		}
 
-		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).TargetHost), http.StatusFound)
+		if intermediateJWT.ReturnToken {
+			expiry := time.Now().Add(cfg.SessionLifetime)
+			proxyUi.WriteTokenDisplay(w, sTkn, expiry)
+			return
+		}
+
+		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, intermediateJWT.TargetHost), http.StatusFound)
 	}
 	http.Handle(fmt.Sprintf("/%v/auth/callback", c.Name), rp.CodeExchangeHandler(rp.UserinfoCallback(login), provider))
 
@@ -260,7 +272,50 @@ func (c *oidcConfig) configure(cfg *OauthConfig, tls bool) error {
 	}
 	http.HandleFunc(fmt.Sprintf("/%v/logout", c.Name), logout)
 
+	// register for inline token refresh
+	oidcProviderRegistry[c.Name] = &oidcProviderRefresher{
+		name:          c.Name,
+		cfg:           cfg,
+		provider:      provider,
+		signingKey:    signingKey,
+		encryptionKey: encryptionKey,
+	}
+
 	dl.Infof("configured oidc provider at '/%v'", c.Name)
 
 	return nil
+}
+
+// oidcProviderRefresher implements sessionRefresher for publicProxy OIDC providers.
+type oidcProviderRefresher struct {
+	name          string
+	cfg           *OauthConfig
+	provider      rp.RelyingParty
+	signingKey    []byte
+	encryptionKey []byte
+}
+
+// RefreshSessionJWT performs an inline OIDC token refresh and returns a new signed JWT.
+func (p *oidcProviderRefresher) RefreshSessionJWT(claims *zrokClaims) (string, error) {
+	accessToken, err := endpoints.DecryptToken(claims.AccessToken, p.encryptionKey)
+	if err != nil {
+		return "", fmt.Errorf("unable to decrypt access token: %w", err)
+	}
+
+	newTokens, err := rp.RefreshTokens[*oidc.IDTokenClaims](context.Background(), p.provider, accessToken, "", "")
+	if err != nil {
+		return "", fmt.Errorf("unable to refresh tokens: %w", err)
+	}
+
+	return buildSessionJWT(sessionCookieRequest{
+		oauthCfg:        p.cfg,
+		supportsRefresh: true,
+		email:           claims.Email,
+		accessToken:     newTokens.AccessToken,
+		provider:        p.name,
+		refreshInterval: claims.RefreshInterval,
+		signingKey:      p.signingKey,
+		encryptionKey:   p.encryptionKey,
+		targetHost:      claims.TargetHost,
+	})
 }

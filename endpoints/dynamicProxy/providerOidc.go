@@ -98,12 +98,14 @@ func (p *oidcProvider) authHandler() http.HandlerFunc {
 			return
 		}
 
+		returnToken := r.URL.Query().Get("return_token") == "true"
 		state := func() string {
 			id := uuid.New().String()
 			t := jwt.NewWithClaims(jwt.SigningMethodHS256, IntermediateJWT{
 				State:           id,
 				TargetHost:      targetHost,
 				RefreshInterval: r.URL.Query().Get("refreshInterval"),
+				ReturnToken:     returnToken,
 				RegisteredClaims: jwt.RegisteredClaims{
 					ExpiresAt: jwt.NewNumericDate(time.Now().Add(p.oauthCfg.IntermediateLifetime)),
 					IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -222,7 +224,8 @@ func (p *oidcProvider) loginHandler() func(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
-		setSessionCookie(w, sessionCookieRequest{
+		intermediateJWT := token.Claims.(*IntermediateJWT)
+		sTkn := setSessionCookie(w, sessionCookieRequest{
 			oauthCfg:        p.oauthCfg,
 			supportsRefresh: true,
 			email:           info.Email,
@@ -233,6 +236,15 @@ func (p *oidcProvider) loginHandler() func(w http.ResponseWriter, r *http.Reques
 			encryptionKey:   p.encryptionKey,
 			targetHost:      token.Claims.(*IntermediateJWT).TargetHost,
 		})
+		if sTkn == "" {
+			return
+		}
+
+		if intermediateJWT.ReturnToken {
+			expiry := time.Now().Add(p.oauthCfg.SessionLifetime)
+			proxyUi.WriteTokenDisplay(w, sTkn, expiry)
+			return
+		}
 
 		scheme := "http"
 		if p.tls {
@@ -240,6 +252,31 @@ func (p *oidcProvider) loginHandler() func(w http.ResponseWriter, r *http.Reques
 		}
 		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).TargetHost), http.StatusFound)
 	}
+}
+
+// RefreshSessionJWT performs an inline OIDC token refresh and returns a new signed JWT.
+func (p *oidcProvider) RefreshSessionJWT(claims *zrokClaims) (string, error) {
+	accessToken, err := endpoints.DecryptToken(claims.AccessToken, p.encryptionKey)
+	if err != nil {
+		return "", fmt.Errorf("unable to decrypt access token: %w", err)
+	}
+
+	newTokens, err := rp.RefreshTokens[*oidc.IDTokenClaims](context.Background(), p.provider, accessToken, "", "")
+	if err != nil {
+		return "", fmt.Errorf("unable to refresh tokens: %w", err)
+	}
+
+	return buildSessionJWT(sessionCookieRequest{
+		oauthCfg:        p.oauthCfg,
+		supportsRefresh: true,
+		email:           claims.Email,
+		accessToken:     newTokens.AccessToken,
+		provider:        p.config.Name,
+		refreshInterval: claims.RefreshInterval,
+		signingKey:      p.signingKey,
+		encryptionKey:   p.encryptionKey,
+		targetHost:      claims.TargetHost,
+	})
 }
 
 // logoutHandler creates the logout handler for revoking OIDC tokens and clearing cookies

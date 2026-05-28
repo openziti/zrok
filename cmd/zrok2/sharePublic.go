@@ -46,6 +46,7 @@ type sharePublicCommand struct {
 	oauthProvider        string
 	oauthEmailDomains    []string
 	oauthRefreshInterval time.Duration
+	oauthNoRedirect      bool
 	open                 bool
 	accessGrants         []string
 	cmd                  *cobra.Command
@@ -82,6 +83,7 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Select named OAuth provider (configured in selected frontend)")
 	cmd.Flags().StringArrayVar(&command.oauthEmailDomains, "oauth-email-domain", []string{}, "Allow only email addresses matching this glob to access")
 	cmd.Flags().DurationVar(&command.oauthRefreshInterval, "oauth-refresh-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; refresh after expiry")
+	cmd.Flags().BoolVar(&command.oauthNoRedirect, "oauth-no-redirect", false, "Return 401 with login URL instead of redirecting (for API/non-browser clients)")
 	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
 
 	cmd.Run = command.run
@@ -153,6 +155,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 		req.OauthProvider = cmd.oauthProvider
 		req.OauthEmailAddressPatterns = cmd.oauthEmailDomains
 		req.OauthRefreshInterval = cmd.oauthRefreshInterval
+		req.OauthNoRedirect = cmd.oauthNoRedirect
 
 		for _, g := range cmd.oauthEmailDomains {
 			_, err := glob.Compile(g)
@@ -410,6 +413,7 @@ func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
 		OauthProvider:        cmd.oauthProvider,
 		OauthEmailDomains:    cmd.oauthEmailDomains,
 		OauthRefreshInterval: cmd.oauthRefreshInterval.String(),
+		OauthNoRedirect:      cmd.oauthNoRedirect,
 		Closed:               !cmd.open,
 		AccessGrants:         cmd.accessGrants,
 	}

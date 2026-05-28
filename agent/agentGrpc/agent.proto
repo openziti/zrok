@@ -145,6 +145,7 @@ message SharePublicRequest {
 	string oauthRefreshInterval = 8;
 	bool closed = 9;
 	repeated string accessGrants = 10;
+	bool oauthNoRedirect = 11;
 }
 
 message SharePublicResponse {

@@ -29,21 +29,18 @@ func getSessionCookie(r *http.Request, cfg *oauthConfig) (*http.Cookie, error) {
 	return endpoints.GetSessionCookie(r, cfg)
 }
 
-func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
+// buildSessionJWT creates and signs the session JWT from a sessionCookieRequest.
+// Returns the signed JWT string or an error.
+func buildSessionJWT(req sessionCookieRequest) (string, error) {
 	targetHost := strings.TrimSpace(req.targetHost)
 	if targetHost == "" {
-		err := errors.New("targetHost claim must not be empty")
-		dl.Error(err)
-		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(err))
-		return
+		return "", errors.New("targetHost claim must not be empty")
 	}
 	targetHost = strings.Split(targetHost, "/")[0]
 
 	encryptedAccessToken, err := endpoints.EncryptToken(req.accessToken, req.encryptionKey)
 	if err != nil {
-		dl.Errorf("failed to encrypt access token: %v", err)
-		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("failed to encrypt access token")))
-		return
+		return "", errors.Wrap(err, "failed to encrypt access token")
 	}
 
 	tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, &zrokClaims{
@@ -58,19 +55,28 @@ func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) {
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(req.oauthCfg.SessionLifetime)),
 		},
 	})
-	sTkn, err := tkn.SignedString(req.signingKey)
+	return tkn.SignedString(req.signingKey)
+}
+
+// setSessionCookie builds, signs, and sets the session cookie. Returns the signed
+// JWT string so callers can inspect it (e.g. for the ReturnToken display path).
+// On error the response is written and "" is returned.
+func setSessionCookie(w http.ResponseWriter, req sessionCookieRequest) string {
+	sTkn, err := buildSessionJWT(req)
 	if err != nil {
-		dl.Errorf("error signing jwt: %v", err)
-		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(req.email).WithError(errors.New("error signing jwt")))
-		return
+		dl.Errorf("error building session jwt: %v", err)
+		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(errors.New("error building session jwt")))
+		return ""
 	}
 
 	// use the shared endpoints package to set the cookie with compression and striping
 	if err := endpoints.SetSessionCookie(w, req.oauthCfg.CookieName, sTkn, req.oauthCfg); err != nil {
 		dl.Errorf("failed to set session cookie: %v", err)
 		proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedUser(req.email).WithError(errors.New("failed to set session cookie")))
-		return
+		return ""
 	}
+
+	return sTkn
 }
 
 // clearSessionCookies clears all session cookies using the shared endpoints package
@@ -78,7 +84,8 @@ func clearSessionCookies(w http.ResponseWriter, r *http.Request, cookieName stri
 	endpoints.ClearSessionCookies(w, r, cookieName, cfg)
 }
 
-// filterSessionCookies strips out the configured session cookie and also any `pkce` cookie
+// filterSessionCookies strips out the configured session cookie, any pkce cookie,
+// and the X-Zrok-Session header from the request before proxying to the backend.
 func filterSessionCookies(w http.ResponseWriter, r *http.Request, cfg *config) {
 	cookies := r.Cookies()
 	r.Header.Del("Cookie")
@@ -98,4 +105,6 @@ func filterSessionCookies(w http.ResponseWriter, r *http.Request, cfg *config) {
 			r.AddCookie(cookie)
 		}
 	}
+
+	endpoints.StripSessionHeader(r)
 }

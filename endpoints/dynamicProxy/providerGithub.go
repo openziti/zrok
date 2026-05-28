@@ -102,12 +102,14 @@ func (p *githubProvider) authHandler() http.Handler {
 			return
 		}
 
+		returnToken := r.URL.Query().Get("return_token") == "true"
 		rp.AuthURLHandler(func() string {
 			id := uuid.New().String()
 			t := jwt.NewWithClaims(jwt.SigningMethodHS256, IntermediateJWT{
 				State:           id,
 				TargetHost:      targetHost,
 				RefreshInterval: r.URL.Query().Get("refreshInterval"),
+				ReturnToken:     returnToken,
 				RegisteredClaims: jwt.RegisteredClaims{
 					ExpiresAt: jwt.NewNumericDate(time.Now().Add(p.oauthCfg.IntermediateLifetime)),
 					IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -200,7 +202,8 @@ func (p *githubProvider) loginHandler() func(w http.ResponseWriter, r *http.Requ
 		}
 
 		// set session cookie
-		setSessionCookie(w, sessionCookieRequest{
+		intermediateJWT := token.Claims.(*IntermediateJWT)
+		sTkn := setSessionCookie(w, sessionCookieRequest{
 			oauthCfg:        p.oauthCfg,
 			supportsRefresh: false,
 			email:           primaryEmail,
@@ -211,6 +214,15 @@ func (p *githubProvider) loginHandler() func(w http.ResponseWriter, r *http.Requ
 			encryptionKey:   p.encryptionKey,
 			targetHost:      token.Claims.(*IntermediateJWT).TargetHost,
 		})
+		if sTkn == "" {
+			return
+		}
+
+		if intermediateJWT.ReturnToken {
+			expiry := time.Now().Add(p.oauthCfg.SessionLifetime)
+			proxyUi.WriteTokenDisplay(w, sTkn, expiry)
+			return
+		}
 
 		scheme := "http"
 		if p.tls {

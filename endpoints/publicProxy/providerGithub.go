@@ -85,12 +85,14 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 				proxyUi.WriteUnauthorized(w, proxyUi.UnauthorizedData().WithError(err))
 				return
 			}
+			returnToken := r.URL.Query().Get("return_token") == "true"
 			rp.AuthURLHandler(func() string {
 				id := uuid.New().String()
 				t := jwt.NewWithClaims(jwt.SigningMethodHS256, IntermediateJWT{
 					State:           id,
 					TargetHost:      targetHost,
 					RefreshInterval: r.URL.Query().Get("refreshInterval"),
+					ReturnToken:     returnToken,
 					RegisteredClaims: jwt.RegisteredClaims{
 						ExpiresAt: jwt.NewNumericDate(time.Now().Add(cfg.IntermediateLifetime)),
 						IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -178,7 +180,8 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 			}
 		}
 
-		setSessionCookie(w, sessionCookieRequest{
+		intermediateJWT := token.Claims.(*IntermediateJWT)
+		sTkn := setSessionCookie(w, sessionCookieRequest{
 			oauthCfg:        cfg,
 			supportsRefresh: false,
 			email:           primaryEmail,
@@ -187,10 +190,19 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 			refreshInterval: refreshInterval,
 			signingKey:      signingKey,
 			encryptionKey:   encryptionKey,
-			targetHost:      token.Claims.(*IntermediateJWT).TargetHost,
+			targetHost:      intermediateJWT.TargetHost,
 		})
+		if sTkn == "" {
+			return
+		}
 
-		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, token.Claims.(*IntermediateJWT).TargetHost), http.StatusFound)
+		if intermediateJWT.ReturnToken {
+			expiry := time.Now().Add(cfg.SessionLifetime)
+			proxyUi.WriteTokenDisplay(w, sTkn, expiry)
+			return
+		}
+
+		http.Redirect(w, r, fmt.Sprintf("%s://%s", scheme, intermediateJWT.TargetHost), http.StatusFound)
 	}
 	http.Handle(fmt.Sprintf("/%v/auth/callback", c.Name), rp.CodeExchangeHandler(login, provider))
 

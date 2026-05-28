@@ -78,6 +78,7 @@ type ShareRequest struct {
 	OauthProvider             string
 	OauthEmailAddressPatterns []string
 	OauthRefreshInterval      time.Duration
+	OauthNoRedirect           bool
 	PermissionMode            PermissionMode
 	AccessGrants              []string
 }

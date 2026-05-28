@@ -138,6 +138,14 @@ func (cb *CommandBuilder) OauthRefreshInterval(interval string) *CommandBuilder 
 	return cb
 }
 
+// OauthNoRedirect adds the --oauth-no-redirect flag when true
+func (cb *CommandBuilder) OauthNoRedirect(v bool) *CommandBuilder {
+	if v {
+		return cb.AddFlag("--oauth-no-redirect")
+	}
+	return cb
+}
+
 // AccessGrants adds multiple --access-grant options
 func (cb *CommandBuilder) AccessGrants(grants []string) *CommandBuilder {
 	return cb.AddMultipleOptions("--access-grant", grants)

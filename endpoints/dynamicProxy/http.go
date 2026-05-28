@@ -235,6 +235,7 @@ func shareHandler(handler http.Handler, cfg *config, signingKey []byte, ctx ziti
 		case string(sdk.Oauth):
 			dl.Debugf("auth scheme oauth '%v'", mapping.ShareToken)
 			if auth.handleOAuth(w, r, svcCfg, mapping.ShareToken) {
+				filterSessionCookies(w, r, cfg)
 				handler.ServeHTTP(w, r)
 			}
 

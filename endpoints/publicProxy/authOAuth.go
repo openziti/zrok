@@ -9,6 +9,7 @@ import (
 	"github.com/gobwas/glob"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/zrok/v2/endpoints"
 	"github.com/openziti/zrok/v2/endpoints/proxyUi"
 )
 
@@ -35,6 +36,15 @@ func oauthRefreshRequired(w http.ResponseWriter, r *http.Request, cfg *OauthConf
 	http.Redirect(w, r, fmt.Sprintf("%s/%s/refresh?targetHost=%s", cfg.EndpointUrl, provider, url.QueryEscape(target)), http.StatusFound)
 }
 
+func oauthUnauthorized(w http.ResponseWriter, cfg *OauthConfig, provider, target string, refreshInterval time.Duration) {
+	loginURL := fmt.Sprintf("%s/%s/login?targetHost=%s&refreshInterval=%s&return_token=true",
+		cfg.EndpointUrl, provider, url.QueryEscape(target), refreshInterval.String())
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Location", loginURL)
+	w.WriteHeader(http.StatusUnauthorized)
+	_, _ = fmt.Fprintf(w, `{"login_url":%q}`, loginURL)
+}
+
 func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg map[string]interface{}, shrToken string) bool {
 	oauthCfg, found := cfg["oauth"]
 	if !found {
@@ -43,30 +53,40 @@ func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg ma
 	}
 
 	oauthMap := oauthCfg.(map[string]interface{})
-	provider := oauthMap["provider"].(string)
+	providerName := oauthMap["provider"].(string)
 	refreshInterval := getRefreshInterval(oauthMap)
+	noRedirect, _ := oauthMap["no_redirect"].(bool)
 	target := fmt.Sprintf("%s%s", r.Host, r.URL.Path)
 
-	cookie, err := getSessionCookie(r, h.cfg.Oauth)
-	if err != nil {
-		dl.Errorf("unable to get '%v' cookie: %v", h.cfg.Oauth.CookieName, err)
-		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
+	jwtString := endpoints.GetSessionHeader(r)
+	fromHeader := jwtString != ""
+	if !fromHeader {
+		cookie, err := getSessionCookie(r, h.cfg.Oauth)
+		if err != nil {
+			dl.Errorf("unable to get '%v' session: %v", h.cfg.Oauth.CookieName, err)
+			if noRedirect {
+				oauthUnauthorized(w, h.cfg.Oauth, providerName, target, refreshInterval)
+			} else {
+				oauthLoginRequired(w, r, h.cfg.Oauth, providerName, target, refreshInterval)
+			}
+			return false
+		}
+		jwtString = cookie.Value
+	}
+
+	if !h.validateOAuthToken(w, r, jwtString, fromHeader, noRedirect, providerName, refreshInterval, target) {
 		return false
 	}
 
-	if !h.validateOAuthToken(w, r, cookie, provider, refreshInterval, target) {
-		return false
-	}
-
-	if !h.validateEmailDomain(w, oauthMap, cookie) {
+	if !h.validateEmailDomain(w, oauthMap, jwtString) {
 		return false
 	}
 
 	return true
 }
 
-func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request, cookie *http.Cookie, provider string, refreshInterval time.Duration, target string) bool {
-	tkn, err := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
+func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request, jwtString string, fromHeader bool, noRedirect bool, provider string, refreshInterval time.Duration, target string) bool {
+	tkn, err := jwt.ParseWithClaims(jwtString, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if h.cfg.Oauth == nil {
 			return nil, fmt.Errorf("missing oauth configuration for access point; unable to parse jwt")
 		}
@@ -74,26 +94,59 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 	})
 	if err != nil {
 		dl.Errorf("unable to parse jwt: %v", err)
-		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
+		if fromHeader {
+			oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
+		} else if noRedirect {
+			oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
+		} else {
+			oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
+		}
 		return false
 	}
 
 	claims := tkn.Claims.(*zrokClaims)
 	if claims.Provider != provider || claims.RefreshInterval != refreshInterval || claims.TargetHost != r.Host {
 		dl.Errorf("token validation failed; restarting auth flow (email: '%v', target: '%v')", claims.Email, target)
-		oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
+		if fromHeader {
+			oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
+		} else if noRedirect {
+			oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
+		} else {
+			oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
+		}
 		return false
 	}
 
 	if time.Now().After(claims.NextRefresh) {
-		if claims.SupportsRefresh {
-			dl.Infof("oauth session expired; refreshing tokens (email: '%v', target: '%v')", claims.Email, target)
-			oauthRefreshRequired(w, r, h.cfg.Oauth, provider, target)
+		if fromHeader {
+			if claims.SupportsRefresh {
+				if newJWT, err := h.tryInlineRefresh(claims); err == nil {
+					dl.Infof("inline oidc token refresh succeeded for '%v'", claims.Email)
+					w.Header().Set(endpoints.SessionHeaderName, newJWT)
+					// fall through — request is still authorized with the original claims
+				} else {
+					dl.Warnf("inline oidc token refresh failed for '%v': %v", claims.Email, err)
+					oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
+					return false
+				}
+			} else {
+				dl.Warnf("oauth session expired; re-authentication required (email: '%v', target: '%v')", claims.Email, target)
+				oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
+				return false
+			}
 		} else {
-			dl.Warnf("oauth session expired; re-login (email: '%v', target: '%v')", claims.Email, target)
-			oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
+			if claims.SupportsRefresh {
+				dl.Infof("oauth session expired; refreshing tokens (email: '%v', target: '%v')", claims.Email, target)
+				oauthRefreshRequired(w, r, h.cfg.Oauth, provider, target)
+			} else if noRedirect {
+				dl.Warnf("oauth session expired; re-authentication required (email: '%v', target: '%v')", claims.Email, target)
+				oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
+			} else {
+				dl.Warnf("oauth session expired; re-login (email: '%v', target: '%v')", claims.Email, target)
+				oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
+			}
+			return false
 		}
-		return false
 	} else {
 		dl.Debugf("%v until next refresh", time.Until(claims.NextRefresh))
 	}
@@ -105,9 +158,17 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 	return true
 }
 
-func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[string]interface{}, cookie *http.Cookie) bool {
+func (h *authHandler) tryInlineRefresh(claims *zrokClaims) (string, error) {
+	refresher, ok := oidcProviderRegistry[claims.Provider]
+	if !ok {
+		return "", fmt.Errorf("provider '%v' not found in registry", claims.Provider)
+	}
+	return refresher.RefreshSessionJWT(claims)
+}
+
+func (h *authHandler) validateEmailDomain(w http.ResponseWriter, oauthCfg map[string]interface{}, jwtString string) bool {
 	if patterns, found := oauthCfg["email_domains"].([]interface{}); found && len(patterns) > 0 {
-		tkn, _ := jwt.ParseWithClaims(cookie.Value, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
+		tkn, _ := jwt.ParseWithClaims(jwtString, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 			return h.signingKey, nil
 		})
 		claims := tkn.Claims.(*zrokClaims)

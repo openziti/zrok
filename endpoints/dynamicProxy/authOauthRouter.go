@@ -63,6 +63,14 @@ func newOAuthRouter(cfg *oauthConfig) *oauthRouter {
 	}
 }
 
+// GetProvider returns the registered provider with the given name, if any.
+func (r *oauthRouter) GetProvider(name string) (oauthProvider, bool) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	p, ok := r.providers[name]
+	return p, ok
+}
+
 // registerProvider registers an OAuth provider with the router
 func (r *oauthRouter) registerProvider(provider oauthProvider) error {
 	r.mu.Lock()

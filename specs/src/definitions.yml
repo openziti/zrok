@@ -387,6 +387,8 @@ shareRequest:
         type: string
     oauthRefreshInterval:
       type: string
+    oauthNoRedirect:
+      type: boolean
     permissionMode:
       type: string
       enum: ["open", "closed"]

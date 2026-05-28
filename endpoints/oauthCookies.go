@@ -246,6 +246,19 @@ func ClearSessionCookies(w http.ResponseWriter, r *http.Request, cookieName stri
 	}
 }
 
+const SessionHeaderName = "X-Zrok-Session"
+
+// GetSessionHeader returns the X-Zrok-Session header value, or "" if absent.
+func GetSessionHeader(r *http.Request) string {
+	return r.Header.Get(SessionHeaderName)
+}
+
+// StripSessionHeader removes X-Zrok-Session from the request before proxying
+// to the backend, mirroring how session cookies are stripped.
+func StripSessionHeader(r *http.Request) {
+	r.Header.Del(SessionHeaderName)
+}
+
 // FilterSessionCookies filters out session cookies and their striped chunks from a cookie list
 func FilterSessionCookies(cookies []*http.Cookie, cookieName string) []*http.Cookie {
 	filtered := make([]*http.Cookie, 0, len(cookies))

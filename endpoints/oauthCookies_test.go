@@ -201,6 +201,38 @@ func requestWithStripedSessionCookie(t *testing.T, cfg testOAuthCookieConfig, to
 	return req
 }
 
+func TestGetSessionHeaderPresent(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "https://example.com", nil)
+	req.Header.Set(SessionHeaderName, "test-jwt-value")
+	if got := GetSessionHeader(req); got != "test-jwt-value" {
+		t.Fatalf("expected 'test-jwt-value', got %q", got)
+	}
+}
+
+func TestGetSessionHeaderAbsent(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "https://example.com", nil)
+	if got := GetSessionHeader(req); got != "" {
+		t.Fatalf("expected empty string, got %q", got)
+	}
+}
+
+func TestStripSessionHeaderRemoves(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "https://example.com", nil)
+	req.Header.Set(SessionHeaderName, "some-token")
+	StripSessionHeader(req)
+	if got := req.Header.Get(SessionHeaderName); got != "" {
+		t.Fatalf("expected header removed, still got %q", got)
+	}
+}
+
+func TestStripSessionHeaderNoOp(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "https://example.com", nil)
+	StripSessionHeader(req) // must not panic when header is absent
+	if got := req.Header.Get(SessionHeaderName); got != "" {
+		t.Fatalf("expected empty, got %q", got)
+	}
+}
+
 func repeatedToken(size int) string {
 	var b strings.Builder
 	b.Grow(size)

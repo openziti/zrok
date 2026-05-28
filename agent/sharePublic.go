@@ -47,6 +47,7 @@ func (a *Agent) SharePublic(req *SharePublicRequest) (shareToken string, fronten
 		OauthProvider(req.OauthProvider).
 		OauthEmailDomains(req.OauthEmailDomains).
 		OauthRefreshInterval(req.OauthRefreshInterval).
+		OauthNoRedirect(req.OauthNoRedirect).
 		Open(!req.Closed).
 		AccessGrants(req.AccessGrants).
 		Target(req.Target).
@@ -93,6 +94,7 @@ func (i *agentGrpcImpl) SharePublic(_ context.Context, req *agentGrpc.SharePubli
 		OauthProvider:        req.OauthProvider,
 		OauthEmailDomains:    req.OauthEmailDomains,
 		OauthRefreshInterval: req.OauthRefreshInterval,
+		OauthNoRedirect:      req.OauthNoRedirect,
 		Closed:               req.Closed,
 		AccessGrants:         req.AccessGrants,
 	}
