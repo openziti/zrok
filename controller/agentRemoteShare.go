@@ -76,6 +76,7 @@ func (h *agentRemoteShareHandler) publicShare(params agent.RemoteShareParams, cl
 		OauthProvider:        params.Body.OauthProvider,
 		OauthEmailDomains:    params.Body.OauthEmailDomains,
 		OauthRefreshInterval: params.Body.OauthRefreshInterval,
+		OauthNoRedirect:      params.Body.OauthNoRedirect,
 		Closed:               !params.Body.Open,
 		AccessGrants:         params.Body.AccessGrants,
 	}

@@ -268,7 +268,6 @@ func (h *shareHandler) processNameSelections(selections []*rest_model_zrok.NameS
 }
 
 func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontendEndpoints []string, params share.ShareParams, interstitial bool, trx interface{}) (string, []string, error) {
-	dl.Infof("allocatePublicResources: called with authScheme=%q oauthProvider=%q oauthNoRedirect=%v", params.Body.AuthScheme, params.Body.OauthProvider, params.Body.OauthNoRedirect)
 	// get shared automation client
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
@@ -308,7 +307,6 @@ func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontend
 			AuthorizationCheckInterval: params.Body.OauthRefreshInterval,
 			NoRedirect:                 params.Body.OauthNoRedirect,
 		}
-		dl.Infof("allocatePublicResources: authScheme='%v' provider='%v' noRedirect=%v", authScheme, oauthCfg.Provider, oauthCfg.NoRedirect)
 	}
 
 	// create frontend config
