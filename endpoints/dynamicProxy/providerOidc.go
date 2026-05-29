@@ -242,7 +242,7 @@ func (p *oidcProvider) loginHandler() func(w http.ResponseWriter, r *http.Reques
 
 		if intermediateJWT.ReturnToken {
 			expiry := time.Now().Add(p.oauthCfg.SessionLifetime)
-			proxyUi.WriteTokenDisplay(w, sTkn, expiry)
+			proxyUi.WriteTokenDisplay(w, sTkn, expiry, intermediateJWT.TargetHost)
 			return
 		}
 

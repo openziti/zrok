@@ -23,16 +23,18 @@ func init() {
 }
 
 type tokenDisplayData struct {
-	Token  string
-	Expiry string
+	Token      string
+	Expiry     string
+	TargetHost string
 }
 
 // WriteTokenDisplay renders the session token display page. The token value is
 // HTML-escaped by html/template, so arbitrary JWT content is safe to render.
-func WriteTokenDisplay(w http.ResponseWriter, token string, expiry time.Time) {
+func WriteTokenDisplay(w http.ResponseWriter, token string, expiry time.Time, targetHost string) {
 	data := tokenDisplayData{
-		Token:  token,
-		Expiry: expiry.UTC().Format(time.RFC1123),
+		Token:      token,
+		Expiry:     expiry.UTC().Format(time.RFC1123),
+		TargetHost: targetHost,
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)

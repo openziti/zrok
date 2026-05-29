@@ -191,7 +191,7 @@ func (p *googleProvider) loginHandler() func(w http.ResponseWriter, r *http.Requ
 
 		if intermediateJWT.ReturnToken {
 			expiry := time.Now().Add(p.oauthCfg.SessionLifetime)
-			proxyUi.WriteTokenDisplay(w, sTkn, expiry)
+			proxyUi.WriteTokenDisplay(w, sTkn, expiry, intermediateJWT.TargetHost)
 			return
 		}
 

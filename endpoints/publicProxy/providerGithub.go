@@ -198,7 +198,7 @@ func (c *githubConfig) configure(cfg *OauthConfig, tls bool) error {
 
 		if intermediateJWT.ReturnToken {
 			expiry := time.Now().Add(cfg.SessionLifetime)
-			proxyUi.WriteTokenDisplay(w, sTkn, expiry)
+			proxyUi.WriteTokenDisplay(w, sTkn, expiry, intermediateJWT.TargetHost)
 			return
 		}
 

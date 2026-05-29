@@ -140,5 +140,12 @@
         </div>
     </div>
 </div>
+{{if .TargetHost}}
+<script>
+    if (window.opener) {
+        window.opener.postMessage({ xZrokSession: document.getElementById('token').value }, 'https://{{.TargetHost}}');
+    }
+</script>
+{{end}}
 </body>
 </html>
