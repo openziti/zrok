@@ -307,6 +307,7 @@ func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontend
 			AuthorizationCheckInterval: params.Body.OauthRefreshInterval,
 			NoRedirect:                 params.Body.OauthNoRedirect,
 		}
+		dl.Infof("allocatePublicResources: authScheme='%v' provider='%v' noRedirect=%v", authScheme, oauthCfg.Provider, oauthCfg.NoRedirect)
 	}
 
 	// create frontend config
