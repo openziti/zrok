@@ -305,7 +305,6 @@ func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontend
 			Provider:                   params.Body.OauthProvider,
 			EmailDomains:               params.Body.OauthEmailDomains,
 			AuthorizationCheckInterval: params.Body.OauthRefreshInterval,
-			NoRedirect:                 params.Body.OauthNoRedirect,
 		}
 	}
 
@@ -480,7 +479,6 @@ func (h *shareHandler) allocatePrivateResources(envZId, shrToken string, fronten
 			Provider:                   params.Body.OauthProvider,
 			EmailDomains:               params.Body.OauthEmailDomains,
 			AuthorizationCheckInterval: params.Body.OauthRefreshInterval,
-			NoRedirect:                 params.Body.OauthNoRedirect,
 		}
 	}
 

@@ -103,9 +103,6 @@ type RemoteShareBody struct {
 	// oauth email domains
 	OauthEmailDomains []string `json:"oauthEmailDomains"`
 
-	// oauth no redirect
-	OauthNoRedirect bool `json:"oauthNoRedirect,omitempty"`
-
 	// oauth provider
 	OauthProvider string `json:"oauthProvider,omitempty"`
 

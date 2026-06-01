@@ -77,23 +77,16 @@ func newPrivateShare(root env_core.Root, request *ShareRequest) *share.SharePara
 }
 
 func newPublicShare(root env_core.Root, request *ShareRequest) *share.ShareParams {
-	authScheme := None
-	if request.OauthProvider != "" {
-		authScheme = Oauth
-	} else if len(request.BasicAuth) > 0 {
-		authScheme = Basic
-	}
 	req := share.NewShareParams()
 	req.Body = &rest_model_zrok.ShareRequest{
 		EnvZID:               root.Environment().ZitiIdentity,
 		ShareMode:            string(request.ShareMode),
 		BackendMode:          string(request.BackendMode),
 		Target:               request.Target,
-		AuthScheme:           string(authScheme),
+		AuthScheme:           string(None),
 		OauthEmailDomains:    request.OauthEmailAddressPatterns,
 		OauthProvider:        request.OauthProvider,
 		OauthRefreshInterval: request.OauthRefreshInterval.String(),
-		OauthNoRedirect:      request.OauthNoRedirect,
 		PermissionMode:       string(request.PermissionMode),
 		AccessGrants:         request.AccessGrants,
 	}

@@ -21,9 +21,9 @@ design adds:
 
 1. **Header-based session presentation** — clients may send
    `X-Zrok-Session: <jwt>` instead of (or alongside) the cookie.
-2. **API-friendly failure mode** — a per-share option to return `401
-   Unauthorized` with a `Location` header pointing to the login URL instead of
-   issuing a browser redirect.
+2. **API-friendly failure mode** — when `X-Zrok-Session` is present and
+   authentication fails, the proxy returns `401 Unauthorized` with a `Location`
+   header pointing to the login URL instead of issuing a browser redirect.
 3. **Token retrieval flow** — a way for a user to complete the OIDC login in a
    browser and then copy the resulting session token for use in API clients.
 4. **Inline token refresh** — when an OIDC token is refreshed mid-session for a
@@ -35,14 +35,13 @@ design adds:
 ## Decisions
 
 | # | Question | Decision |
-|---|---|---|
+| --- | --- | --- |
 | 1 | Header name | `X-Zrok-Session` |
 | 2 | Token format in header | Raw JWT string (no gzip compression, no cookie striping) |
 | 3 | Login flow for non-browser clients | 401 + `Location` header; OIDC callback page shows the token for copying |
-| 4 | 401 configuration scope | Per-share, via `no_redirect: true` in the share's oauth config element |
-| 5 | Which proxies | Both `dynamicProxy` and `publicProxy` |
-| 6 | Strip header before proxying to backend | Yes — same as session cookies are currently stripped |
-| 7 | Token refresh | Inline OIDC refresh; new JWT echoed in `X-Zrok-Session` response header |
+| 4 | Which proxies | Both `dynamicProxy` and `publicProxy` |
+| 5 | Strip header before proxying to backend | Yes — same as session cookies are currently stripped |
+| 6 | Token refresh | Inline OIDC refresh; new JWT echoed in `X-Zrok-Session` response header |
 
 ---
 
@@ -50,9 +49,9 @@ design adds:
 
 The existing flow redirects to the OIDC provider whenever no valid session is
 found. The new flow adds header reading, a 401 path, and inline refresh. The
-cookie path is unchanged when `no_redirect` is false (the default).
+cookie path is unchanged.
 
-```
+```text
 Request arrives
 ├── X-Zrok-Session header present?
 │   ├── YES → parse raw JWT
@@ -62,26 +61,16 @@ Request arrives
 │   │       ├── GitHub or Google (no refresh support) → 401 + Location
 │   │       └── NextRefresh not yet passed → continue
 │   └── NO → read session cookie (existing behavior)
-│       ├── cookie absent or invalid
-│       │   ├── no_redirect: true  → 401 + Location
-│       │   └── no_redirect: false → 302 redirect to OIDC login (unchanged)
+│       ├── cookie absent or invalid → 302 redirect to OIDC login (unchanged)
 │       └── cookie valid; NextRefresh passed?
 │           ├── OIDC provider → 302 to refresh endpoint (unchanged)
-│           ├── GitHub or Google + no_redirect: true  → 401 + Location
-│           └── GitHub or Google + no_redirect: false → 302 to login (unchanged)
+│           └── GitHub or Google → 302 to login (unchanged)
 ```
 
 ### Header precedence
 
 When both `X-Zrok-Session` header and a session cookie are present, the header
 takes precedence and the cookie is ignored.
-
-### `no_redirect` behavior
-
-`no_redirect` only affects the cookie path. When a request carries
-`X-Zrok-Session`, the response is always `401` on failure — regardless of
-`no_redirect` — because an API client cannot usefully follow a browser
-redirect.
 
 ---
 
@@ -108,7 +97,7 @@ copy the token from the resulting page.
 The `return_token=true` query parameter propagates through the OIDC flow via
 the intermediate JWT state claim:
 
-```
+```text
 1. API client makes request → 401 + Location: .../oidc/login?...&return_token=true
 2. User opens Location URL in a browser
 3. Login handler reads return_token=true → encodes ReturnToken: true in IntermediateJWT
@@ -129,7 +118,7 @@ the intermediate JWT state claim:
 
 When a request carries `X-Zrok-Session` and `NextRefresh` has passed:
 
-```
+```text
 handleOAuth detects header-based request + NextRefresh elapsed
   → looks up OIDC provider (via globalOAuthRouter.GetProvider in dynamicProxy,
     or providerRegistry in publicProxy)
@@ -150,60 +139,6 @@ providers, the client receives `401 + Location` and must re-authenticate.
 
 ---
 
-## Per-share configuration
-
-`no_redirect` is a per-share setting stored in the share's oauth config map
-(not in the proxy-level config). It travels from the CLI through the full stack
-to the OpenZiti proxy config where the proxy reads it at request time.
-
-### CLI
-
-```
-zrok2 share public --oauth-provider oidc --oauth-no-redirect <target>
-```
-
-Default: `false` (existing redirect behavior is preserved).
-
-### Agent API (`agent.SharePublicRequest`)
-
-```go
-SharePublicRequest{
-    OauthProvider:   "oidc",
-    OauthNoRedirect: true,
-    ...
-}
-```
-
-### Wire format
-
-The field flows through the stack as follows:
-
-```
-CLI flag --oauth-no-redirect
-  → sdk.ShareRequest.OauthNoRedirect (bool)
-  → REST body oauthNoRedirect (bool)
-  → controller reads params.Body.OauthNoRedirect
-  → sdk.OauthConfig{NoRedirect: true}
-  → serialised as "no_redirect": true in the OpenZiti proxy config map
-  → proxy reads oauthMap["no_redirect"].(bool) at request time
-```
-
-### Proxy config map (what the proxy reads)
-
-```json
-{
-  "auth_scheme": "oauth",
-  "oauth": {
-    "provider": "oidc",
-    "authorization_check_interval": "1h",
-    "email_domains": ["*.example.com"],
-    "no_redirect": true
-  }
-}
-```
-
----
-
 ## Changes required
 
 ### New shared utilities — `endpoints/oauthCookies.go`
@@ -220,7 +155,7 @@ CLI flag --oauth-no-redirect
 ### New token display page — `endpoints/proxyUi/`
 
 | File | Purpose |
-|---|---|
+| --- | --- |
 | `endpoints/proxyUi/token.go` | `WriteTokenDisplay(w, token, expiry, targetHost)` — renders the token page |
 | `endpoints/proxyUi/token.html` | HTML template: token text box, copy button, usage instructions, expiry |
 
@@ -328,27 +263,23 @@ New method `RefreshSessionJWT` (same contract as the `dynamicProxy` version).
 **`handleOAuth`** (in `dynamicProxy/authOauth.go` and
 `publicProxy/authOAuth.go`):
 
-- Reads `no_redirect` from `oauthMap["no_redirect"].(bool)`.
 - Tries `GetSessionHeader` first; sets `fromHeader = true` if found.
 - Falls back to `getSessionCookie` when no header is present.
-- Calls the new `oauthUnauthorized` (or existing `oauthLoginRequired`)
-  based on `fromHeader` and `noRedirect`.
-- Passes `jwtString string`, `fromHeader bool`, `noRedirect bool` to
-  `validateOAuthToken`.
+- Calls `oauthUnauthorized` (401) when `fromHeader` is true and auth fails,
+  or `oauthLoginRequired` (302) when falling back to cookie-based flow.
+- Passes `jwtString string`, `fromHeader bool` to `validateOAuthToken`.
 
 **`validateOAuthToken`** — signature change from `cookie *http.Cookie` to
-`jwtString string, fromHeader bool, noRedirect bool`:
+`jwtString string, fromHeader bool`:
 
 | Condition | Behavior |
-|---|---|
+| --- | --- |
 | JWT parse/validation failure + `fromHeader` | `oauthUnauthorized` (401) |
-| JWT parse/validation failure + `!fromHeader && noRedirect` | `oauthUnauthorized` (401) |
-| JWT parse/validation failure + `!fromHeader && !noRedirect` | `oauthLoginRequired` (302) |
+| JWT parse/validation failure + `!fromHeader` | `oauthLoginRequired` (302) |
 | `NextRefresh` passed + `fromHeader` + OIDC | inline refresh → `X-Zrok-Session` response header → continue |
 | `NextRefresh` passed + `fromHeader` + GitHub/Google | `oauthUnauthorized` (401) |
 | `NextRefresh` passed + `!fromHeader` + OIDC | `oauthRefreshRequired` (302, unchanged) |
-| `NextRefresh` passed + `!fromHeader` + GitHub/Google + `noRedirect` | `oauthUnauthorized` (401) |
-| `NextRefresh` passed + `!fromHeader` + GitHub/Google + `!noRedirect` | `oauthLoginRequired` (302, unchanged) |
+| `NextRefresh` passed + `!fromHeader` + GitHub/Google | `oauthLoginRequired` (302, unchanged) |
 
 **`validateEmailDomain`** — signature change from `cookie *http.Cookie` to
 `jwtString string`.
@@ -402,7 +333,7 @@ case string(sdk.Oauth):
 ## File change summary
 
 | File | Type of change |
-|---|---|
+| --- | --- |
 | `endpoints/oauthCookies.go` | Add `SessionHeaderName`, `GetSessionHeader`, `StripSessionHeader` |
 | `endpoints/proxyUi/token.go` | **New** — `WriteTokenDisplay(w, token, expiry, targetHost)` function |
 | `endpoints/proxyUi/token.html` | **New** — token display page template (styled to match `template.html`); conditional `postMessage` script scoped to share host |
@@ -422,20 +353,7 @@ case string(sdk.Oauth):
 | `endpoints/publicProxy/providerOidc.go` | Add `ReturnToken` handling; add `RefreshSessionJWT`; register in `oidcProviderRegistry`; pass `targetHost` to `WriteTokenDisplay` |
 | `endpoints/publicProxy/providerGithub.go` | Add `ReturnToken` handling; pass `targetHost` to `WriteTokenDisplay` |
 | `endpoints/publicProxy/providerGoogle.go` | Add `ReturnToken` handling; pass `targetHost` to `WriteTokenDisplay` |
-| `sdk/golang/sdk/config.go` | Add `NoRedirect bool` to `OauthConfig`; add `"no_redirect"` case in `OauthConfigFromMap` |
-| `sdk/golang/sdk/model.go` | Add `OauthNoRedirect bool` to `ShareRequest` |
-| `sdk/golang/sdk/share.go` | Pass `OauthNoRedirect` to REST body in `newPublicShare` |
-| `specs/src/definitions.yml` | Add `oauthNoRedirect: boolean` to `shareRequest` definition |
-| `rest_model_zrok/share_request.go` | Add `OauthNoRedirect bool` field |
-| `rest_server_zrok/operations/agent/remote_share.go` | **Bug fix** — add `OauthNoRedirect bool` to `RemoteShareBody` (was missing, causing `/api/v2/agent/share` to silently drop the flag) |
-| `controller/share.go` | Read `OauthNoRedirect` in both create-share and update-share paths; infer `authScheme` from `oauthProvider`/`basicAuthUsers` when absent |
-| `controller/agentRemoteShare.go` | **Bug fix** — map `OauthNoRedirect` from request body to gRPC call in the `/api/v2/agent/share` handler |
-| `cmd/zrok2/sharePublic.go` | Add `--oauth-no-redirect` flag; pass through local SDK and agent gRPC paths |
-| `agent/share.go` | Add `OauthNoRedirect bool` to `SharePublicRequest` |
-| `agent/commandBuilder.go` | Add `OauthNoRedirect()` builder method |
-| `agent/sharePublic.go` | Wire through command builder and gRPC→agent mapping |
-| `agent/agentGrpc/agent.proto` | Add `bool oauthNoRedirect = 11` to `SharePublicRequest` |
-| `agent/agentGrpc/agent.pb.go` | Regenerated — field 11 present with updated wire descriptor |
+| `controller/share.go` | Infer `authScheme` from `oauthProvider`/`basicAuthUsers` when absent |
 
 ---
 
@@ -444,7 +362,7 @@ case string(sdk.Oauth):
 ### `endpoints/oauthCookies_test.go` — extended
 
 | Test | Behavior |
-|---|---|
+| --- | --- |
 | `TestGetSessionHeaderPresent` | Header present → returns value |
 | `TestGetSessionHeaderAbsent` | No header → returns `""` |
 | `TestStripSessionHeaderRemoves` | Header present → removed from request |
@@ -461,10 +379,9 @@ A `mintSessionJWT` helper signs a `zrokClaims` JWT with a caller-supplied
 New standalone tests:
 
 | Test | Behavior |
-|---|---|
+| --- | --- |
 | `TestShareHandlerGetWithValidHeaderBypassesRedirect` | Valid `X-Zrok-Session` JWT → auth passes, request reaches upstream |
 | `TestShareHandlerXZrokSessionStrippedBeforeProxy` | Valid header + auth passes → `X-Zrok-Session` absent in proxied request |
-| `TestShareHandlerNoRedirectReturns401` | No session, `no_redirect: true` → `401`, `application/json`, `Location` header, `{"login_url":...}` body |
 | `TestShareHandlerOptionsStripsSessionHeaderBeforeProxy` | OPTIONS with `X-Zrok-Session` → header stripped before upstream, no auth challenge |
 
 ---
@@ -472,7 +389,7 @@ New standalone tests:
 ### `endpoints/publicProxy/http_test.go` — extended
 
 Mirror of the `dynamicProxy` tests above, adjusted for `publicProxy` types
-(`Config`, `OauthConfig`, `stubPublicProxyService`). Same four tests, same
+(`Config`, `OauthConfig`, `stubPublicProxyService`). Same three tests, same
 `mintSessionJWT` helper.
 
 ---
@@ -480,7 +397,7 @@ Mirror of the `dynamicProxy` tests above, adjusted for `publicProxy` types
 ### `endpoints/proxyUi/token_test.go` — new file
 
 | Test | Behavior |
-|---|---|
+| --- | --- |
 | `TestWriteTokenDisplayStatusOK` | Returns HTTP 200 |
 | `TestWriteTokenDisplayContainsToken` | Token value appears in response body |
 | `TestWriteTokenDisplayEscapesHTML` | Token containing `<script>` is HTML-escaped (XSS) |
@@ -493,7 +410,7 @@ Mirror of the `dynamicProxy` tests above, adjusted for `publicProxy` types
 ### `endpoints/dynamicProxy/cookies_test.go` — new file
 
 | Test | Behavior |
-|---|---|
+| --- | --- |
 | `TestBuildSessionJWTRejectsEmptyTargetHost` | Empty `targetHost` → error returned |
 | `TestBuildSessionJWTRoundTrip` | Valid inputs → non-empty signed JWT string returned |
 | `TestBuildSessionJWTStripsPathFromTargetHost` | `host/path` input → path component stripped from `TargetHost` claim |
@@ -503,9 +420,9 @@ Mirror of the `dynamicProxy` tests above, adjusted for `publicProxy` types
 ### Test file summary
 
 | File | New / Extended | Covers |
-|---|---|---|
+| --- | --- | --- |
 | `endpoints/oauthCookies_test.go` | Extended | `GetSessionHeader`, `StripSessionHeader` |
-| `endpoints/dynamicProxy/http_test.go` | Extended | Header auth, 401 path, header stripping before proxy, OPTIONS + header stripping |
+| `endpoints/dynamicProxy/http_test.go` | Extended | Header auth, 401 on header-based failure, header stripping before proxy, OPTIONS + header stripping |
 | `endpoints/publicProxy/http_test.go` | Extended | Same for `publicProxy` |
 | `endpoints/proxyUi/token_test.go` | **New** | `WriteTokenDisplay` rendering, XSS escaping, `postMessage` script conditional |
 | `endpoints/dynamicProxy/cookies_test.go` | **New** | `buildSessionJWT` error and round-trip cases |
@@ -514,28 +431,12 @@ Mirror of the `dynamicProxy` tests above, adjusted for `publicProxy` types
 
 ## Post-implementation fixes
 
-### `/api/v2/agent/share` — `oauthNoRedirect` silently dropped
-
-The `/api/v2/agent/share` endpoint (`controller/agentRemoteShare.go`) proxies
-share creation requests through the agent gRPC layer rather than calling
-`allocatePublicResources` directly. Two gaps caused `oauthNoRedirect` to be
-silently dropped for all requests via this path:
-
-1. `RemoteShareBody` (the inline request struct in
-   `rest_server_zrok/operations/agent/remote_share.go`) was missing the
-   `OauthNoRedirect bool` field, so the value was never parsed from the JSON
-   body.
-2. The `publicShare` helper in `agentRemoteShare.go` was not mapping
-   `params.Body.OauthNoRedirect` into the `agentGrpc.SharePublicRequest`.
-
-Both gaps are now closed.
-
 ### `controller/share.go` — `authScheme` inference
 
 The standard share endpoint requires `authScheme` to be set explicitly. The
 `zrok-connector` and other API clients send `oauthProvider` without
 `authScheme`, which previously caused `ParseAuthScheme("")` to return an error
-and the oauth config (including `no_redirect`) to be silently omitted.
+and the oauth config to be silently omitted.
 
 The controller now infers the auth scheme when `authScheme` is absent:
 
@@ -555,8 +456,3 @@ typos still surface as errors rather than silently defaulting.
   in `validateOAuthToken`; the browser redirect path is unchanged.
 - No changes to GitHub or Google provider refresh behavior (neither supports
   token refresh; clients must re-authenticate when `NextRefresh` passes).
-- `no_redirect` is not currently exposed in the zrok web console UI; it is
-  CLI/API only. It should be added to the console for consistency with the other
-  oauth settings (`email_domains`, `authorization_check_interval`), ideally in
-  an "advanced" collapsible section to avoid cluttering the default share
-  creation form.

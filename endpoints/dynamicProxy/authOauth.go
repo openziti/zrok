@@ -57,7 +57,6 @@ func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg ma
 	oauthMap := oauthCfg.(map[string]interface{})
 	providerName := oauthMap["provider"].(string)
 	refreshInterval := getRefreshInterval(oauthMap)
-	noRedirect, _ := oauthMap["no_redirect"].(bool)
 	target := fmt.Sprintf("%s%s", r.Host, r.URL.Path)
 
 	jwtString := endpoints.GetSessionHeader(r)
@@ -66,17 +65,13 @@ func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg ma
 		cookie, err := getSessionCookie(r, h.cfg.Oauth)
 		if err != nil {
 			dl.Errorf("unable to get '%v' session: %v", h.cfg.Oauth.CookieName, err)
-			if noRedirect {
-				oauthUnauthorized(w, h.cfg.Oauth, providerName, target, refreshInterval)
-			} else {
-				oauthLoginRequired(w, r, h.cfg.Oauth, providerName, target, refreshInterval)
-			}
+			oauthLoginRequired(w, r, h.cfg.Oauth, providerName, target, refreshInterval)
 			return false
 		}
 		jwtString = cookie.Value
 	}
 
-	if !h.validateOAuthToken(w, r, jwtString, fromHeader, noRedirect, providerName, refreshInterval, target) {
+	if !h.validateOAuthToken(w, r, jwtString, fromHeader, providerName, refreshInterval, target) {
 		return false
 	}
 
@@ -87,7 +82,7 @@ func (h *authHandler) handleOAuth(w http.ResponseWriter, r *http.Request, cfg ma
 	return true
 }
 
-func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request, jwtString string, fromHeader bool, noRedirect bool, provider string, refreshInterval time.Duration, target string) bool {
+func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request, jwtString string, fromHeader bool, provider string, refreshInterval time.Duration, target string) bool {
 	tkn, err := jwt.ParseWithClaims(jwtString, &zrokClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if h.cfg.Oauth == nil {
 			return nil, fmt.Errorf("missing oauth configuration for access point; unable to parse jwt")
@@ -97,8 +92,6 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 	if err != nil {
 		dl.Errorf("unable to parse jwt: %v", err)
 		if fromHeader {
-			oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
-		} else if noRedirect {
 			oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
 		} else {
 			oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
@@ -110,8 +103,6 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 	if claims.Provider != provider || claims.RefreshInterval != refreshInterval || claims.TargetHost != r.Host {
 		dl.Errorf("token validation failed; restarting auth flow (email: '%v', target: '%v')", claims.Email, target)
 		if fromHeader {
-			oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
-		} else if noRedirect {
 			oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
 		} else {
 			oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
@@ -140,9 +131,6 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 			if claims.SupportsRefresh {
 				dl.Infof("oauth session expired; refreshing tokens (email: '%v', target: '%v')", claims.Email, target)
 				oauthRefreshRequired(w, r, h.cfg.Oauth, provider, target)
-			} else if noRedirect {
-				dl.Warnf("oauth session expired; re-authentication required (email: '%v', target: '%v')", claims.Email, target)
-				oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
 			} else {
 				dl.Warnf("oauth session expired; re-login (email: '%v', target: '%v')", claims.Email, target)
 				oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)

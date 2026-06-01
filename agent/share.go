@@ -36,7 +36,6 @@ type SharePublicRequest struct {
 	OauthProvider        string          `json:"oauth_provider"`
 	OauthEmailDomains    []string        `json:"oauth_email_domains"`
 	OauthRefreshInterval string          `json:"oauth_refresh_interval"`
-	OauthNoRedirect      bool            `json:"oauth_no_redirect"`
 	Closed               bool            `json:"closed"`
 	AccessGrants         []string        `json:"access_grants"`
 }
