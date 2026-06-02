@@ -259,6 +259,20 @@ func StripSessionHeader(r *http.Request) {
 	r.Header.Del(SessionHeaderName)
 }
 
+// AppendSessionCORSHeaders ensures X-Zrok-Session appears in both
+// Access-Control-Allow-Headers and Access-Control-Expose-Headers, appending
+// to any values already set by the upstream rather than overwriting them.
+func AppendSessionCORSHeaders(h http.Header) {
+	for _, key := range []string{"Access-Control-Allow-Headers", "Access-Control-Expose-Headers"} {
+		existing := h.Get(key)
+		if existing == "" {
+			h.Set(key, SessionHeaderName)
+		} else if !strings.Contains(existing, SessionHeaderName) {
+			h.Set(key, existing+", "+SessionHeaderName)
+		}
+	}
+}
+
 // FilterSessionCookies filters out session cookies and their striped chunks from a cookie list
 func FilterSessionCookies(cookies []*http.Cookie, cookieName string) []*http.Cookie {
 	filtered := make([]*http.Cookie, 0, len(cookies))

@@ -233,6 +233,42 @@ func TestStripSessionHeaderNoOp(t *testing.T) {
 	}
 }
 
+func TestAppendSessionCORSHeadersSetsWhenAbsent(t *testing.T) {
+	h := http.Header{}
+	AppendSessionCORSHeaders(h)
+	for _, key := range []string{"Access-Control-Allow-Headers", "Access-Control-Expose-Headers"} {
+		if got := h.Get(key); got != SessionHeaderName {
+			t.Fatalf("%v: expected %q, got %q", key, SessionHeaderName, got)
+		}
+	}
+}
+
+func TestAppendSessionCORSHeadersAppendsWhenPresent(t *testing.T) {
+	h := http.Header{}
+	h.Set("Access-Control-Allow-Headers", "Content-Type")
+	h.Set("Access-Control-Expose-Headers", "X-Request-Id")
+	AppendSessionCORSHeaders(h)
+	for _, tc := range []struct{ key, want string }{
+		{"Access-Control-Allow-Headers", "Content-Type, " + SessionHeaderName},
+		{"Access-Control-Expose-Headers", "X-Request-Id, " + SessionHeaderName},
+	} {
+		if got := h.Get(tc.key); got != tc.want {
+			t.Fatalf("%v: expected %q, got %q", tc.key, tc.want, got)
+		}
+	}
+}
+
+func TestAppendSessionCORSHeadersIdempotent(t *testing.T) {
+	h := http.Header{}
+	AppendSessionCORSHeaders(h)
+	AppendSessionCORSHeaders(h)
+	for _, key := range []string{"Access-Control-Allow-Headers", "Access-Control-Expose-Headers"} {
+		if got := h.Get(key); got != SessionHeaderName {
+			t.Fatalf("%v: expected single entry %q after double call, got %q", key, SessionHeaderName, got)
+		}
+	}
+}
+
 func repeatedToken(size int) string {
 	var b strings.Builder
 	b.Grow(size)

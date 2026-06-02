@@ -42,6 +42,7 @@ design adds:
 | 4 | Which proxies | Both `dynamicProxy` and `publicProxy` |
 | 5 | Strip header before proxying to backend | Yes — same as session cookies are currently stripped |
 | 6 | Token refresh | Inline OIDC refresh; new JWT echoed in `X-Zrok-Session` response header |
+| 7 | CORS exposure | Proxy appends `X-Zrok-Session` to `Access-Control-Allow-Headers` and `Access-Control-Expose-Headers` on every upstream response |
 
 ---
 
@@ -312,6 +313,48 @@ add `endpoints.StripSessionHeader(r)`.
 **`publicProxy`** — add `endpoints.StripSessionHeader(r)` at the same call
 site where session cookies are currently filtered.
 
+### CORS headers — expose `X-Zrok-Session` to browser clients
+
+Browser-based API clients that open the OIDC login in a popup and read the
+refreshed JWT from the response header require two CORS changes:
+
+- **`Access-Control-Allow-Headers: X-Zrok-Session`** — without this, the
+  browser's preflight check blocks cross-origin requests that carry the header.
+- **`Access-Control-Expose-Headers: X-Zrok-Session`** — without this, the
+  browser hides the response header from JavaScript even when the server sets
+  it (e.g. during inline OIDC refresh).
+
+Both are injected via `ModifyResponse` on the reverse proxy so they are added
+to every upstream response. The proxy appends to any values the upstream
+already set rather than overwriting them, and the append is idempotent.
+
+**`endpoints/oauthCookies.go`** — new helper:
+
+```go
+func AppendSessionCORSHeaders(h http.Header) {
+    for _, key := range []string{
+        "Access-Control-Allow-Headers",
+        "Access-Control-Expose-Headers",
+    } {
+        existing := h.Get(key)
+        if existing == "" {
+            h.Set(key, SessionHeaderName)
+        } else if !strings.Contains(existing, SessionHeaderName) {
+            h.Set(key, existing+", "+SessionHeaderName)
+        }
+    }
+}
+```
+
+**`dynamicProxy/http.go`** and **`publicProxy/http.go`** — `ModifyResponse`:
+
+```go
+proxy.ModifyResponse = func(resp *http.Response) error {
+    endpoints.AppendSessionCORSHeaders(resp.Header)
+    return nil
+}
+```
+
 ### Bug fix — `filterSessionCookies` missing from OAuth auth-success path
 
 **`dynamicProxy/http.go`** and **`publicProxy/http.go`**: `filterSessionCookies`
@@ -334,21 +377,21 @@ case string(sdk.Oauth):
 
 | File | Type of change |
 | --- | --- |
-| `endpoints/oauthCookies.go` | Add `SessionHeaderName`, `GetSessionHeader`, `StripSessionHeader` |
+| `endpoints/oauthCookies.go` | Add `SessionHeaderName`, `GetSessionHeader`, `StripSessionHeader`, `AppendSessionCORSHeaders` |
 | `endpoints/proxyUi/token.go` | **New** — `WriteTokenDisplay(w, token, expiry, targetHost)` function |
 | `endpoints/proxyUi/token.html` | **New** — token display page template (styled to match `template.html`); conditional `postMessage` script scoped to share host |
 | `endpoints/dynamicProxy/auth.go` | Add `ReturnToken` to `IntermediateJWT`; add `sessionRefresher` interface |
 | `endpoints/dynamicProxy/authOauth.go` | Rewrite `handleOAuth`, `validateOAuthToken`, `validateEmailDomain`; add `oauthUnauthorized`, `tryInlineRefresh` |
 | `endpoints/dynamicProxy/authOauthRouter.go` | Add `GetProvider()` method |
 | `endpoints/dynamicProxy/cookies.go` | Add `buildSessionJWT`; update `setSessionCookie` to return JWT string; update `filterSessionCookies` to strip header |
-| `endpoints/dynamicProxy/http.go` | **Bug fix** — add `filterSessionCookies` call on OAuth auth-success path |
+| `endpoints/dynamicProxy/http.go` | **Bug fix** — add `filterSessionCookies` call on OAuth auth-success path; add OPTIONS bypass; inject CORS headers in `ModifyResponse` |
 | `endpoints/dynamicProxy/providerOidc.go` | Add `ReturnToken` handling; add `RefreshSessionJWT`; pass `targetHost` to `WriteTokenDisplay` |
 | `endpoints/dynamicProxy/providerGithub.go` | Add `ReturnToken` handling; pass `targetHost` to `WriteTokenDisplay` |
 | `endpoints/dynamicProxy/providerGoogle.go` | Add `ReturnToken` handling; pass `targetHost` to `WriteTokenDisplay` |
 | `endpoints/publicProxy/auth.go` | Add `ReturnToken` to `IntermediateJWT`; add `sessionRefresher` interface |
 | `endpoints/publicProxy/authOAuth.go` | Same changes as `dynamicProxy/authOauth.go` |
 | `endpoints/publicProxy/cookies.go` | Add `buildSessionJWT`; update `setSessionCookie` to return JWT string; strip `X-Zrok-Session` header in `filterSessionCookies` |
-| `endpoints/publicProxy/http.go` | **Bug fix** — add `filterSessionCookies` call on OAuth auth-success path |
+| `endpoints/publicProxy/http.go` | **Bug fix** — add `filterSessionCookies` call on OAuth auth-success path; add OPTIONS bypass; inject CORS headers in `ModifyResponse` |
 | `endpoints/publicProxy/oidcRegistry.go` | **New** — package-level `oidcProviderRegistry` map for inline refresh lookups |
 | `endpoints/publicProxy/providerOidc.go` | Add `ReturnToken` handling; add `RefreshSessionJWT`; register in `oidcProviderRegistry`; pass `targetHost` to `WriteTokenDisplay` |
 | `endpoints/publicProxy/providerGithub.go` | Add `ReturnToken` handling; pass `targetHost` to `WriteTokenDisplay` |
@@ -367,30 +410,30 @@ case string(sdk.Oauth):
 | `TestGetSessionHeaderAbsent` | No header → returns `""` |
 | `TestStripSessionHeaderRemoves` | Header present → removed from request |
 | `TestStripSessionHeaderNoOp` | No header → no panic |
+| `TestAppendSessionCORSHeadersSetsWhenAbsent` | No existing CORS headers → both set to `X-Zrok-Session` |
+| `TestAppendSessionCORSHeadersAppendsWhenPresent` | Existing values → `X-Zrok-Session` appended with comma-space separator |
+| `TestAppendSessionCORSHeadersIdempotent` | Called twice → header value unchanged on second call |
 
 ---
 
-### `endpoints/dynamicProxy/http_test.go` — extended
+### `endpoints/dynamicProxy/http_test.go` — new file
 
-A `mintSessionJWT` helper signs a `zrokClaims` JWT with a caller-supplied
-`[]byte` key. The key must match the `signingKey` argument passed to
-`shareHandler`.
-
-New standalone tests:
+A `stubDynamicProxyService` helper replaces the `getRefreshedService` package
+variable for the duration of each test, returning a synthetic `ServiceDetail`
+with the caller-supplied proxy config map.
 
 | Test | Behavior |
 | --- | --- |
-| `TestShareHandlerGetWithValidHeaderBypassesRedirect` | Valid `X-Zrok-Session` JWT → auth passes, request reaches upstream |
-| `TestShareHandlerXZrokSessionStrippedBeforeProxy` | Valid header + auth passes → `X-Zrok-Session` absent in proxied request |
-| `TestShareHandlerOptionsStripsSessionHeaderBeforeProxy` | OPTIONS with `X-Zrok-Session` → header stripped before upstream, no auth challenge |
+| `TestShareHandlerOptionsBypassesFrontendAuth` | OPTIONS request → reaches upstream without auth challenge; session cookie stripped for OAuth scheme |
+| `TestShareHandlerGetStillRedirectsForOAuth` | GET without session, OAuth scheme → 302 redirect to provider login |
+| `TestShareHandlerGetStillChallengesBasicAuth` | GET without credentials, Basic scheme → 401 |
 
 ---
 
-### `endpoints/publicProxy/http_test.go` — extended
+### `endpoints/publicProxy/http_test.go` — new file
 
 Mirror of the `dynamicProxy` tests above, adjusted for `publicProxy` types
-(`Config`, `OauthConfig`, `stubPublicProxyService`). Same three tests, same
-`mintSessionJWT` helper.
+(`Config`, `OauthConfig`, `stubPublicProxyService`). Same three tests.
 
 ---
 
@@ -421,9 +464,9 @@ Mirror of the `dynamicProxy` tests above, adjusted for `publicProxy` types
 
 | File | New / Extended | Covers |
 | --- | --- | --- |
-| `endpoints/oauthCookies_test.go` | Extended | `GetSessionHeader`, `StripSessionHeader` |
-| `endpoints/dynamicProxy/http_test.go` | Extended | Header auth, 401 on header-based failure, header stripping before proxy, OPTIONS + header stripping |
-| `endpoints/publicProxy/http_test.go` | Extended | Same for `publicProxy` |
+| `endpoints/oauthCookies_test.go` | Extended | `GetSessionHeader`, `StripSessionHeader`, `AppendSessionCORSHeaders` |
+| `endpoints/dynamicProxy/http_test.go` | **New** | OPTIONS bypass, OAuth redirect, Basic auth challenge |
+| `endpoints/publicProxy/http_test.go` | **New** | Same for `publicProxy` |
 | `endpoints/proxyUi/token_test.go` | **New** | `WriteTokenDisplay` rendering, XSS escaping, `postMessage` script conditional |
 | `endpoints/dynamicProxy/cookies_test.go` | **New** | `buildSessionJWT` error and round-trip cases |
 

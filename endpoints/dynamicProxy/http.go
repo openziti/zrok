@@ -117,6 +117,7 @@ func newServiceProxy(cfg *config, ctx ziti.Context, mappings *mappings) (*httput
 		req.Header.Set("X-Proxy", "zrok")
 	}
 	proxy.ModifyResponse = func(resp *http.Response) error {
+		endpoints.AppendSessionCORSHeaders(resp.Header)
 		return nil
 	}
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
