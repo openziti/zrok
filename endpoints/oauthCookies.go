@@ -259,6 +259,29 @@ func StripSessionHeader(r *http.Request) {
 	r.Header.Del(SessionHeaderName)
 }
 
+// StripSessionFromACRH removes SessionHeaderName from the Access-Control-Request-Headers
+// field on CORS preflights. Backends that don't recognise this header would reject the
+// preflight; AppendSessionCORSHeaders adds it back to Access-Control-Allow-Headers in
+// the response so the browser still knows it may send the header on the real request.
+func StripSessionFromACRH(r *http.Request) {
+	acrh := r.Header.Get("Access-Control-Request-Headers")
+	if acrh == "" {
+		return
+	}
+	parts := strings.Split(acrh, ",")
+	filtered := make([]string, 0, len(parts))
+	for _, p := range parts {
+		if !strings.EqualFold(strings.TrimSpace(p), SessionHeaderName) {
+			filtered = append(filtered, strings.TrimSpace(p))
+		}
+	}
+	if len(filtered) == 0 {
+		r.Header.Del("Access-Control-Request-Headers")
+	} else {
+		r.Header.Set("Access-Control-Request-Headers", strings.Join(filtered, ", "))
+	}
+}
+
 // AppendSessionCORSHeaders ensures X-Zrok-Session appears in both
 // Access-Control-Allow-Headers and Access-Control-Expose-Headers, appending
 // to any values already set by the upstream rather than overwriting them.

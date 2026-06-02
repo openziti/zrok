@@ -269,6 +269,33 @@ func TestAppendSessionCORSHeadersIdempotent(t *testing.T) {
 	}
 }
 
+func TestStripSessionFromACRHRemovesSessionHeader(t *testing.T) {
+	req := httptest.NewRequest(http.MethodOptions, "/", nil)
+	req.Header.Set("Access-Control-Request-Headers", "x-zrok-session, zt-session")
+	StripSessionFromACRH(req)
+	if got := req.Header.Get("Access-Control-Request-Headers"); got != "zt-session" {
+		t.Fatalf("expected %q, got %q", "zt-session", got)
+	}
+}
+
+func TestStripSessionFromACRHRemovesOnlyEntry(t *testing.T) {
+	req := httptest.NewRequest(http.MethodOptions, "/", nil)
+	req.Header.Set("Access-Control-Request-Headers", "X-Zrok-Session")
+	StripSessionFromACRH(req)
+	if got := req.Header.Get("Access-Control-Request-Headers"); got != "" {
+		t.Fatalf("expected header deleted, got %q", got)
+	}
+}
+
+func TestStripSessionFromACRHNoopWhenAbsent(t *testing.T) {
+	req := httptest.NewRequest(http.MethodOptions, "/", nil)
+	req.Header.Set("Access-Control-Request-Headers", "authorization, zt-session")
+	StripSessionFromACRH(req)
+	if got := req.Header.Get("Access-Control-Request-Headers"); got != "authorization, zt-session" {
+		t.Fatalf("expected unchanged %q, got %q", "authorization, zt-session", got)
+	}
+}
+
 func repeatedToken(size int) string {
 	var b strings.Builder
 	b.Grow(size)

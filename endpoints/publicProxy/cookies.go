@@ -107,4 +107,5 @@ func filterSessionCookies(w http.ResponseWriter, r *http.Request, cfg *Config) {
 	}
 
 	endpoints.StripSessionHeader(r)
+	endpoints.StripSessionFromACRH(r)
 }
