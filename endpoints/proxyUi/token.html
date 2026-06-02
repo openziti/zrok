@@ -142,7 +142,9 @@
 </div>
 <script>
     if (window.opener) {
+        // Popup context (e.g. Angular console): deliver token silently and close.
         window.opener.postMessage({ xZrokSession: document.getElementById('token').value }, '*');
+        window.close();
     }
 </script>
 </body>
