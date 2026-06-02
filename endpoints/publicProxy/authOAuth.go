@@ -36,9 +36,14 @@ func oauthRefreshRequired(w http.ResponseWriter, r *http.Request, cfg *OauthConf
 	http.Redirect(w, r, fmt.Sprintf("%s/%s/refresh?targetHost=%s", cfg.EndpointUrl, provider, url.QueryEscape(target)), http.StatusFound)
 }
 
-func oauthUnauthorized(w http.ResponseWriter, cfg *OauthConfig, provider, target string, refreshInterval time.Duration) {
+func oauthUnauthorized(w http.ResponseWriter, r *http.Request, cfg *OauthConfig, provider, target string, refreshInterval time.Duration) {
 	loginURL := fmt.Sprintf("%s/%s/login?targetHost=%s&refreshInterval=%s&return_token=true",
 		cfg.EndpointUrl, provider, url.QueryEscape(target), refreshInterval.String())
+	if origin := r.Header.Get("Origin"); origin != "" {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Add("Vary", "Origin")
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Location", loginURL)
 	w.WriteHeader(http.StatusUnauthorized)
@@ -90,7 +95,7 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 	if err != nil {
 		dl.Errorf("unable to parse jwt: %v", err)
 		if fromHeader {
-			oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
+			oauthUnauthorized(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		} else {
 			oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		}
@@ -101,7 +106,7 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 	if claims.Provider != provider || claims.RefreshInterval != refreshInterval || claims.TargetHost != r.Host {
 		dl.Errorf("token validation failed; restarting auth flow (email: '%v', target: '%v')", claims.Email, target)
 		if fromHeader {
-			oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
+			oauthUnauthorized(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		} else {
 			oauthLoginRequired(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 		}
@@ -117,12 +122,12 @@ func (h *authHandler) validateOAuthToken(w http.ResponseWriter, r *http.Request,
 					// fall through — request is still authorized with the original claims
 				} else {
 					dl.Warnf("inline oidc token refresh failed for '%v': %v", claims.Email, err)
-					oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
+					oauthUnauthorized(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 					return false
 				}
 			} else {
 				dl.Warnf("oauth session expired; re-authentication required (email: '%v', target: '%v')", claims.Email, target)
-				oauthUnauthorized(w, h.cfg.Oauth, provider, target, refreshInterval)
+				oauthUnauthorized(w, r, h.cfg.Oauth, provider, target, refreshInterval)
 				return false
 			}
 		} else {
