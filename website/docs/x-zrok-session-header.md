@@ -165,11 +165,12 @@ Mono fonts from Google Fonts, dark purple (`#241775`) background, the zrok SVG
 logo banner, and a centered white card for the content area.
 
 When `targetHost` is non-empty, the page emits a small script that calls
-`window.opener.postMessage({ xZrokSession: <token> }, 'https://<targetHost>')`
+`window.opener.postMessage({ xZrokSession: <token> }, '*')`
 so that browser-based clients that open the login in a popup can receive the
 token automatically. The script is suppressed entirely when `targetHost` is
-empty. The `postMessage` origin is scoped to the share's host — not `'*'` — to
-prevent token leakage to unrelated windows.
+empty. The `'*'` target origin is used because the opener's origin is unknown
+at the time the page is rendered; the token itself is the credential and is
+already visible on the page, so the broadcast does not increase exposure.
 
 ---
 
@@ -397,7 +398,7 @@ case string(sdk.Oauth):
 | --- | --- |
 | `endpoints/oauthCookies.go` | Add `SessionHeaderName`, `GetSessionHeader`, `StripSessionHeader`, `StripSessionFromACRH`, `AppendSessionCORSHeaders` |
 | `endpoints/proxyUi/token.go` | **New** — `WriteTokenDisplay(w, token, expiry, targetHost)` function |
-| `endpoints/proxyUi/token.html` | **New** — token display page template (styled to match `template.html`); conditional `postMessage` script scoped to share host |
+| `endpoints/proxyUi/token.html` | **New** — token display page template (styled to match `template.html`); conditional `postMessage` script using `'*'` target origin, suppressed when `targetHost` is empty |
 | `endpoints/dynamicProxy/auth.go` | Add `ReturnToken` to `IntermediateJWT`; add `sessionRefresher` interface |
 | `endpoints/dynamicProxy/authOauth.go` | Rewrite `handleOAuth`, `validateOAuthToken`, `validateEmailDomain`; add `oauthUnauthorized`, `tryInlineRefresh` |
 | `endpoints/dynamicProxy/authOauthRouter.go` | Add `GetProvider()` method |
@@ -414,7 +415,6 @@ case string(sdk.Oauth):
 | `endpoints/publicProxy/providerOidc.go` | Add `ReturnToken` handling; add `RefreshSessionJWT`; register in `oidcProviderRegistry`; pass `targetHost` to `WriteTokenDisplay` |
 | `endpoints/publicProxy/providerGithub.go` | Add `ReturnToken` handling; pass `targetHost` to `WriteTokenDisplay` |
 | `endpoints/publicProxy/providerGoogle.go` | Add `ReturnToken` handling; pass `targetHost` to `WriteTokenDisplay` |
-| `controller/share.go` | Infer `authScheme` from `oauthProvider`/`basicAuthUsers` when absent |
 
 ---
 
@@ -491,26 +491,6 @@ Mirror of the `dynamicProxy` tests above, adjusted for `publicProxy` types
 | `endpoints/publicProxy/http_test.go` | **New** | Same for `publicProxy` |
 | `endpoints/proxyUi/token_test.go` | **New** | `WriteTokenDisplay` rendering, XSS escaping, `postMessage` script conditional |
 | `endpoints/dynamicProxy/cookies_test.go` | **New** | `buildSessionJWT` error and round-trip cases |
-
----
-
-## Post-implementation fixes
-
-### `controller/share.go` — `authScheme` inference
-
-The standard share endpoint requires `authScheme` to be set explicitly. The
-`zrok-connector` and other API clients send `oauthProvider` without
-`authScheme`, which previously caused `ParseAuthScheme("")` to return an error
-and the oauth config to be silently omitted.
-
-The controller now infers the auth scheme when `authScheme` is absent:
-
-- `oauthProvider` non-empty → `oauth`
-- `basicAuthUsers` non-empty → `basic`
-- otherwise → `none`
-
-Explicitly-set but unrecognized `authScheme` values are still rejected, so
-typos still surface as errors rather than silently defaulting.
 
 ---
 
