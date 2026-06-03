@@ -269,6 +269,18 @@ func TestAppendSessionCORSHeadersIdempotent(t *testing.T) {
 	}
 }
 
+func TestAppendSessionCORSHeadersIdempotentLowercase(t *testing.T) {
+	h := http.Header{}
+	h.Set("Access-Control-Allow-Headers", "x-zrok-session")
+	h.Set("Access-Control-Expose-Headers", "x-zrok-session")
+	AppendSessionCORSHeaders(h)
+	for _, key := range []string{"Access-Control-Allow-Headers", "Access-Control-Expose-Headers"} {
+		if got := h.Get(key); got != "x-zrok-session" {
+			t.Fatalf("%v: expected no duplicate when lowercase variant present, got %q", key, got)
+		}
+	}
+}
+
 func TestStripSessionFromACRHRemovesSessionHeader(t *testing.T) {
 	req := httptest.NewRequest(http.MethodOptions, "/", nil)
 	req.Header.Set("Access-Control-Request-Headers", "x-zrok-session, zt-session")

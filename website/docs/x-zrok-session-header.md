@@ -288,7 +288,7 @@ New method `RefreshSessionJWT` (same contract as the `dynamicProxy` version).
 **New `oauthUnauthorized`** alongside existing `oauthLoginRequired`:
 
 ```go
-func oauthUnauthorized(w http.ResponseWriter, cfg *oauthConfig,
+func oauthUnauthorized(w http.ResponseWriter, r *http.Request, cfg *oauthConfig,
     provider, target string, refreshInterval time.Duration) {
 
     loginURL := fmt.Sprintf(
@@ -296,6 +296,11 @@ func oauthUnauthorized(w http.ResponseWriter, cfg *oauthConfig,
         cfg.EndpointUrl, provider,
         url.QueryEscape(target), refreshInterval.String(),
     )
+    if origin := r.Header.Get("Origin"); origin != "" {
+        w.Header().Set("Access-Control-Allow-Origin", origin)
+        w.Header().Set("Access-Control-Allow-Credentials", "true")
+        w.Header().Add("Vary", "Origin")
+    }
     w.Header().Set("Content-Type", "application/json")
     w.Header().Set("Location", loginURL)
     w.WriteHeader(http.StatusUnauthorized)
@@ -303,15 +308,28 @@ func oauthUnauthorized(w http.ResponseWriter, cfg *oauthConfig,
 }
 ```
 
+The `r *http.Request` parameter is used to echo the request's `Origin` back as
+`Access-Control-Allow-Origin` so that browser-based clients using the
+`X-Zrok-Session` header can read the 401 JSON body across origins. Without this,
+the browser's CORS policy would block the response entirely.
+
 ---
 
 ### Cookie filtering — strip `X-Zrok-Session` from proxied requests
 
-**`dynamicProxy/cookies.go`** — `filterSessionCookies()`:
-add `endpoints.StripSessionHeader(r)`.
+**`dynamicProxy/cookies.go`** and **`publicProxy/cookies.go`** —
+`filterSessionCookies()`:
 
-**`publicProxy`** — add `endpoints.StripSessionHeader(r)` at the same call
-site where session cookies are currently filtered.
+- `endpoints.StripSessionHeader(r)` — removes the `X-Zrok-Session` request
+  header before the request is forwarded to the backend, so the backend never
+  sees the zrok session token.
+- `endpoints.StripSessionFromACRH(r)` — removes `X-Zrok-Session` from the
+  `Access-Control-Request-Headers` field of CORS preflights before forwarding
+  to the backend. Backends that do not recognise this header would otherwise
+  reject the preflight with a 4xx response. `AppendSessionCORSHeaders` in
+  `ModifyResponse` adds `X-Zrok-Session` back to `Access-Control-Allow-Headers`
+  in the response, so the browser still knows it may send the header on the
+  real request.
 
 ### CORS headers — expose `X-Zrok-Session` to browser clients
 
@@ -377,20 +395,20 @@ case string(sdk.Oauth):
 
 | File | Type of change |
 | --- | --- |
-| `endpoints/oauthCookies.go` | Add `SessionHeaderName`, `GetSessionHeader`, `StripSessionHeader`, `AppendSessionCORSHeaders` |
+| `endpoints/oauthCookies.go` | Add `SessionHeaderName`, `GetSessionHeader`, `StripSessionHeader`, `StripSessionFromACRH`, `AppendSessionCORSHeaders` |
 | `endpoints/proxyUi/token.go` | **New** — `WriteTokenDisplay(w, token, expiry, targetHost)` function |
 | `endpoints/proxyUi/token.html` | **New** — token display page template (styled to match `template.html`); conditional `postMessage` script scoped to share host |
 | `endpoints/dynamicProxy/auth.go` | Add `ReturnToken` to `IntermediateJWT`; add `sessionRefresher` interface |
 | `endpoints/dynamicProxy/authOauth.go` | Rewrite `handleOAuth`, `validateOAuthToken`, `validateEmailDomain`; add `oauthUnauthorized`, `tryInlineRefresh` |
 | `endpoints/dynamicProxy/authOauthRouter.go` | Add `GetProvider()` method |
-| `endpoints/dynamicProxy/cookies.go` | Add `buildSessionJWT`; update `setSessionCookie` to return JWT string; update `filterSessionCookies` to strip header |
+| `endpoints/dynamicProxy/cookies.go` | Add `buildSessionJWT`; update `setSessionCookie` to return JWT string; update `filterSessionCookies` to strip header and ACRH |
 | `endpoints/dynamicProxy/http.go` | **Bug fix** — add `filterSessionCookies` call on OAuth auth-success path; add OPTIONS bypass; inject CORS headers in `ModifyResponse` |
 | `endpoints/dynamicProxy/providerOidc.go` | Add `ReturnToken` handling; add `RefreshSessionJWT`; pass `targetHost` to `WriteTokenDisplay` |
 | `endpoints/dynamicProxy/providerGithub.go` | Add `ReturnToken` handling; pass `targetHost` to `WriteTokenDisplay` |
 | `endpoints/dynamicProxy/providerGoogle.go` | Add `ReturnToken` handling; pass `targetHost` to `WriteTokenDisplay` |
 | `endpoints/publicProxy/auth.go` | Add `ReturnToken` to `IntermediateJWT`; add `sessionRefresher` interface |
 | `endpoints/publicProxy/authOAuth.go` | Same changes as `dynamicProxy/authOauth.go` |
-| `endpoints/publicProxy/cookies.go` | Add `buildSessionJWT`; update `setSessionCookie` to return JWT string; strip `X-Zrok-Session` header in `filterSessionCookies` |
+| `endpoints/publicProxy/cookies.go` | Add `buildSessionJWT`; update `setSessionCookie` to return JWT string; strip `X-Zrok-Session` header and ACRH in `filterSessionCookies` |
 | `endpoints/publicProxy/http.go` | **Bug fix** — add `filterSessionCookies` call on OAuth auth-success path; add OPTIONS bypass; inject CORS headers in `ModifyResponse` |
 | `endpoints/publicProxy/oidcRegistry.go` | **New** — package-level `oidcProviderRegistry` map for inline refresh lookups |
 | `endpoints/publicProxy/providerOidc.go` | Add `ReturnToken` handling; add `RefreshSessionJWT`; register in `oidcProviderRegistry`; pass `targetHost` to `WriteTokenDisplay` |
@@ -413,6 +431,10 @@ case string(sdk.Oauth):
 | `TestAppendSessionCORSHeadersSetsWhenAbsent` | No existing CORS headers → both set to `X-Zrok-Session` |
 | `TestAppendSessionCORSHeadersAppendsWhenPresent` | Existing values → `X-Zrok-Session` appended with comma-space separator |
 | `TestAppendSessionCORSHeadersIdempotent` | Called twice → header value unchanged on second call |
+| `TestAppendSessionCORSHeadersIdempotentLowercase` | Lowercase variant already present → no duplicate appended |
+| `TestStripSessionFromACRHRemovesSessionHeader` | `x-zrok-session,zt-session` → `zt-session` after stripping |
+| `TestStripSessionFromACRHRemovesOnlyEntry` | `X-Zrok-Session` only → header deleted |
+| `TestStripSessionFromACRHNoopWhenAbsent` | No `X-Zrok-Session` in list → list unchanged |
 
 ---
 

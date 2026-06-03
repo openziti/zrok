@@ -286,11 +286,12 @@ func StripSessionFromACRH(r *http.Request) {
 // Access-Control-Allow-Headers and Access-Control-Expose-Headers, appending
 // to any values already set by the upstream rather than overwriting them.
 func AppendSessionCORSHeaders(h http.Header) {
+	lowerName := strings.ToLower(SessionHeaderName)
 	for _, key := range []string{"Access-Control-Allow-Headers", "Access-Control-Expose-Headers"} {
 		existing := h.Get(key)
 		if existing == "" {
 			h.Set(key, SessionHeaderName)
-		} else if !strings.Contains(existing, SessionHeaderName) {
+		} else if !strings.Contains(strings.ToLower(existing), lowerName) {
 			h.Set(key, existing+", "+SessionHeaderName)
 		}
 	}
