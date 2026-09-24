@@ -17,7 +17,7 @@ interface ReleaseEnvironmentProps {
 
 const ReleaseEnvironmentModal = ({ close, isOpen, user, environment, detail }: ReleaseEnvironmentProps) => {
     const [errorMessage, setErrorMessage] = useState<React.JSX.Element>(null);
-    const [description, setDescription] = useState<String>("");
+    const [description, setDescription] = useState<string>("");
     const [checked, setChecked] = useState<boolean>(false);
     const checkedRef = useRef<boolean>();
     checkedRef.current = checked;

@@ -21,7 +21,7 @@ const NewAccessModal = ({ close, isOpen }: NewAccessModalProps) => {
         onSubmit: v => {
             setErrorMessage(null as React.JSX.Element);
             GetAgentApi().agentAccessPrivate(v)
-                .then(r => {
+                .then(() => {
                     close();
                 })
                 .catch(e => {
