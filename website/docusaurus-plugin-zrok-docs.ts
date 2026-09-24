@@ -36,6 +36,8 @@ export function zrokRedirects(routeBasePath: string = 'docs/zrok'): PluginConfig
                 { to: `${p}/how-tos/shares/share-tcp-udp`, from: [`${p}/how-tos/share-tcp-udp`, `${p}/concepts/tunnels`, `${p}/concepts/shares/tunnels`] },
                 { to: `${p}/how-tos/shares/share-websites-and-files`, from: [`${p}/concepts/backend-modes/files`, `${p}/concepts/files`, `${p}/concepts/shares/files`] },
                 { to: `${p}/concepts/namespaces`, from: [`${p}/concepts/sharing-reserved`] },
+                // concepts landing page removed in #1272 — it was orphaned, nothing linked to it
+                { to: `${p}/category/share-types/`, from: [`${p}/concepts/`] },
                 // guides/self-hosting/* → self-hosting/*
                 { to: `${p}/self-hosting/deployment/docker`, from: [`${p}/guides/self-hosting/docker`, `${p}/self-hosting/docker`] },
                 { to: `${p}/self-hosting/frontends/dynamic-proxy`, from: [`${p}/guides/self-hosting/dynamicProxy`, `${p}/self-hosting/dynamic-proxy`] },
