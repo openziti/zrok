@@ -18,7 +18,7 @@ const AccountMetricsModal = ({ close, isOpen, user }: AccountMetricsModalProps) 
     const [metrics1, setMetrics1] = useState(buildMetrics([]));
 
     useEffect(() => {
-        let metadataApi = getMetadataApi(user);
+        const metadataApi = getMetadataApi(user);
         metadataApi.getAccountMetrics()
             .then(d => {
                 setMetrics30(buildMetrics(d));

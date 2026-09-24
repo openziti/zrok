@@ -25,7 +25,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const updateGraph = useApiConsoleStore((state) => state.updateGraph);
     const oldGraph = useRef<Graph>(graph);
     const sparkdata = useApiConsoleStore((state) => state.sparkdata);
-    const sparkdataRef = useRef<Map<string, Number[]>>();
+    const sparkdataRef = useRef<Map<string, number[]>>();
     sparkdataRef.current = sparkdata;
     const updateSparkdata = useApiConsoleStore((state) => state.updateSparkdata);
     const nodes = useApiConsoleStore((state) => state.nodes);
@@ -55,14 +55,14 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         getMetadataApi(userRef.current).overview()
             .then(d => {
                 updateLimited(d.accountLimited!);
-                let newVov = mergeGraph(oldGraph.current, user, d.accountLimited!, d);
+                const newVov = mergeGraph(oldGraph.current, user, d.accountLimited!, d);
                 if(!nodesEqual(oldGraph.current.nodes, newVov.nodes)) {
                     console.log("refreshed vov", oldGraph.current.nodes, newVov.nodes);
                     updateGraph(newVov);
                     oldGraph.current = newVov;
 
-                    let laidOut = layout(newVov.nodes, newVov.edges);
-                    let selected = laidOut.nodes.map((n) => ({
+                    const laidOut = layout(newVov.nodes, newVov.edges);
+                    const selected = laidOut.nodes.map((n) => ({
                         ...n,
                         selected: selectedNode ? selectedNode.id === n.id : false,
                     }));
@@ -76,8 +76,8 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     }
 
     const retrieveSparklines = () => {
-        let environments: string[] = [];
-        let shares: string[] = [];
+        const environments: string[] = [];
+        const shares: string[] = [];
         if(nodesRef.current) {
             nodesRef.current.map(node => {
                 if(node.type === "environment") {
@@ -92,9 +92,9 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         getMetadataApi(user).getSparklines({body: {environments: environments, shares: shares}})
             .then(d => {
                 if(d.sparklines) {
-                    let sparkdataIn = new Map<string, Number[]>();
+                    const sparkdataIn = new Map<string, number[]>();
                     d.sparklines!.forEach(s => {
-                        let activity = new Array<Number>(31);
+                        const activity = new Array<number>(31);
                         if(s.samples) {
                             s.samples?.forEach((sample, i) => {
                                 let v = 0;
@@ -107,7 +107,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                     });
                     updateSparkdata(sparkdataIn);
                 } else {
-                    updateSparkdata(new Map<string, Number[]>());
+                    updateSparkdata(new Map<string, number[]>());
                 }
             })
             .catch(e => {
@@ -134,7 +134,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     useEffect(() => {
         retrieveOverview();
         let mounted = true;
-        let interval = setInterval(() => {
+        const interval = setInterval(() => {
             if(mounted) {
                 retrieveOverview();
             }
@@ -146,7 +146,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     }, []);
 
     useEffect(() => {
-        let interval = setInterval(() => {
+        const interval = setInterval(() => {
             retrieveSparklines();
         }, 5000);
         return () => {

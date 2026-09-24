@@ -16,7 +16,7 @@ interface ReleaseShareProps {
 
 const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareProps) => {
     const [errorMessage, setErrorMessage] = useState<React.JSX.Element>(null);
-    const [shareToken, setShareToken] = useState<String>("");
+    const [shareToken, setShareToken] = useState<string>("");
     const [checked, setChecked] = useState<boolean>(false);
     const checkedRef = useRef<boolean>();
     checkedRef.current = checked;
@@ -45,7 +45,7 @@ const ReleaseShareModal = ({ close, isOpen, user, share, detail }: ReleaseShareP
                     reserved: detail.reserved
                 }
             })
-                .then(d => {
+                .then(() => {
                     close();
                 })
                 .catch(e => {

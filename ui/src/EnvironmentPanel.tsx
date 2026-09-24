@@ -49,7 +49,7 @@ const EnvironmentPanel = ({environment}: EnvironmentPanelProps) => {
     useEffect(() => {
         getMetadataApi(user).getEnvironmentDetail({envZId: environment.data!.envZId! as string})
             .then(d => {
-                let env = d.environment!;
+                const env = d.environment!;
                 delete env.activity;
                 delete env.limited;
                 delete env.zId;

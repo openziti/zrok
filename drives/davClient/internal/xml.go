@@ -22,7 +22,7 @@ type RawXMLValue struct {
 
 // NewRawXMLElement creates a new RawXMLValue for an element.
 func NewRawXMLElement(name xml.Name, attr []xml.Attr, children []RawXMLValue) *RawXMLValue {
-	return &RawXMLValue{tok: xml.StartElement{name, attr}, children: children}
+	return &RawXMLValue{tok: xml.StartElement{Name: name, Attr: attr}, children: children}
 }
 
 // EncodeRawXMLElement encodes a value into a new RawXMLValue. The XML value
@@ -171,5 +171,5 @@ func valueXMLName(v interface{}) (xml.Name, error) {
 	if len(nameParts) != 2 {
 		return xml.Name{}, fmt.Errorf("webdav: expected a namespace and local name in %T.XMLName's xml tag", v)
 	}
-	return xml.Name{nameParts[0], nameParts[1]}, nil
+	return xml.Name{Space: nameParts[0], Local: nameParts[1]}, nil
 }

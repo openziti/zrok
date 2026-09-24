@@ -12,7 +12,7 @@ interface OverviewProps {
 }
 
 const Overview = ({ overview, shareClick, accessClick }: OverviewProps) => {
-    let cards = [];
+    const cards = [];
     if(overview.length > 0) {
         overview.forEach(row => {
             switch(row.type) {

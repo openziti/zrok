@@ -1,5 +1,5 @@
 export const objectToRows = (obj) => {
-    let rows = [];
+    const rows = [];
     let count = 0;
     for(const key in obj) {
         rows.push({
@@ -25,7 +25,7 @@ export const bytesToSize = (bytes: number): string => {
 }
 
 export const buildMetrics = (m) => {
-    let metrics = {
+    const metrics = {
         data: m.samples,
         rx: 0,
         tx: 0

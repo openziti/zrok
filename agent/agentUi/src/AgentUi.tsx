@@ -7,7 +7,7 @@ import NewShareModal from "./NewShareModal.tsx";
 import NewAccessModal from "./NewAccessModal.tsx";
 
 const AgentUi = () => {
-    const [version, setVersion] = useState("unset");
+    const [, setVersion] = useState("unset");
     const [overview, setOverview] = useState(new Array<AgentObject>());
     const [newShareOpen, setNewShareOpen] = useState(false);
     const [newAccessOpen, setNewAccessOpen] = useState(false);
@@ -41,7 +41,7 @@ const AgentUi = () => {
     }, []);
 
     useEffect(() => {
-        let interval = setInterval(() => {
+        const interval = setInterval(() => {
             GetAgentApi().agentStatus()
                 .then(r => {
                     setOverview(buildOverview(r));

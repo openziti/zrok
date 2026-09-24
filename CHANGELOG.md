@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Unreleased
+
+CHANGE: Added a `Makefile` following the shared convention: `make` builds (frontends first, then `go install ./...` for the whole module), `make test` is the full repository gate (frontend builds and lints, `go test`, `go vet`), and `make clean` resets the project-owned `GOBIN` and the frontend build products. The `ui` and `agent/agentUi` lint scripts are part of the gate, and the lint errors they reported (`prefer-const`, wrapper object types, unnecessary regex escapes, unused variables, non-null-asserted optional chains, `any` props) are fixed.
+
+CHANGE: Resolved the `go vet` findings that the new gate surfaced, matching the v2.0.4 fixes: signal-notification channels passed to `signal.Notify` are buffered (size 1), unkeyed `xml.Name`/`xml.StartElement` composite literals in the WebDAV client are keyed, and the `testCanary enabler` command defers its snapshot-streamer `CancelFunc`. The WebDAV server prefix test accepts the 307 trailing-slash redirect that `http.ServeMux` issues from Go 1.25 on, alongside the 301 issued by the pinned Go 1.24 toolchain.
+
 ## v1.1.11
 
 CHANGE: The `vpn` backend mode has been removed from zrok due to dependency management issues. The underlying TUN device libraries created conflicts that prevented updates to critical dependencies. See the [VPN removal guide](https://docs.zrok.io/docs/guides/vpn/) for migration alternatives and future plans.

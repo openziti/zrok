@@ -161,7 +161,7 @@ func (cmd *testCanaryPublicProxy) run(_ *cobra.Command, _ []string) {
 		go looper.Run()
 	}
 
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c

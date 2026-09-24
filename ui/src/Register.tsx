@@ -1,4 +1,4 @@
-import {Box, Button, Checkbox, Container, FormControlLabel, Grid2, Paper, TextField, Typography} from "@mui/material";
+import {Box, Button, Checkbox, Container, FormControlLabel, Paper, TextField, Typography} from "@mui/material";
 import zrokLogo from "./assets/zrok-1.0.0-rocket-purple.svg";
 import {useParams} from "react-router";
 import {useFormik} from "formik";
@@ -33,7 +33,7 @@ const SetPasswordForm = ({ email, touLink, register }: SetPasswordFormProps) => 
                 .min(8, "Password must be at least 8 characters")
                 .max(64, "Password must be less than 64 characters")
                 .matches(
-                    /^.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?].*$/,
+                    /^.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?].*$/,
                     "Password requires at least one special character"
                 )
                 .matches(

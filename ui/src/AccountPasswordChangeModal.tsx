@@ -36,7 +36,7 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
                     setBottomControl(<Typography>Your password has been changed!</Typography>);
                     setTimeout(() => { close() }, 3000);
                 })
-                .catch(e => {
+                .catch(() => {
                     setErrorMessage(<Typography color="red">Password change failed! Check your current password!</Typography>);
                 })
         },
@@ -47,7 +47,7 @@ const AccountPasswordChangeModal =({ close, isOpen, user }: AccountPasswordChang
                 .min(8, "Password must be at least 8 characters")
                 .max(64, "Password must be less than 64 characters")
                 .matches(
-                    /^.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?].*$/,
+                    /^.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?].*$/,
                     "Password requires at least one special character"
                 )
                 .matches(

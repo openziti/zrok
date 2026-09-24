@@ -14,14 +14,14 @@ import (
 const Namespace = "DAV:"
 
 var (
-	ResourceTypeName     = xml.Name{Namespace, "resourcetype"}
-	DisplayNameName      = xml.Name{Namespace, "displayname"}
-	GetContentLengthName = xml.Name{Namespace, "getcontentlength"}
-	GetContentTypeName   = xml.Name{Namespace, "getcontenttype"}
-	GetLastModifiedName  = xml.Name{Namespace, "getlastmodified"}
-	GetETagName          = xml.Name{Namespace, "getetag"}
+	ResourceTypeName     = xml.Name{Space: Namespace, Local: "resourcetype"}
+	DisplayNameName      = xml.Name{Space: Namespace, Local: "displayname"}
+	GetContentLengthName = xml.Name{Space: Namespace, Local: "getcontentlength"}
+	GetContentTypeName   = xml.Name{Space: Namespace, Local: "getcontenttype"}
+	GetLastModifiedName  = xml.Name{Space: Namespace, Local: "getlastmodified"}
+	GetETagName          = xml.Name{Space: Namespace, Local: "getetag"}
 
-	CurrentUserPrincipalName = xml.Name{Namespace, "current-user-principal"}
+	CurrentUserPrincipalName = xml.Name{Space: Namespace, Local: "current-user-principal"}
 )
 
 type Status struct {
@@ -332,7 +332,7 @@ func (t *ResourceType) Is(name xml.Name) bool {
 	return false
 }
 
-var CollectionName = xml.Name{Namespace, "collection"}
+var CollectionName = xml.Name{Space: Namespace, Local: "collection"}
 
 // https://tools.ietf.org/html/rfc4918#section-15.4
 type GetContentLength struct {

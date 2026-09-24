@@ -11,8 +11,8 @@ interface ShareCardProps {
 }
 
 const ShareCard = ({ shareObject }: ShareCardProps) => {
-    let frontends = new Array<React.JSX.Element>();
-    let share = (shareObject.v as ShareDetail);
+    const frontends = new Array<React.JSX.Element>();
+    const share = (shareObject.v as ShareDetail);
     share.frontendEndpoint!.map(fe => {
         frontends.push(<a key={share.token} href={fe} target="_">{fe}</a>);
     });

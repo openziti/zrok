@@ -9,9 +9,9 @@ export class Graph {
 }
 
 export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Overview): Graph => {
-    let newVov = new Graph();
+    const newVov = new Graph();
 
-    let accountNode = {
+    const accountNode = {
         id: u.token,
         data: {
             label: u.email,
@@ -24,14 +24,14 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
     newVov.edges = [];
 
     if(newOv) {
-        let allShares = {};
-        let allFrontends = [];
+        const allShares = {};
+        const allFrontends = [];
         newOv.environments?.forEach(env => {
-            let envNode = {
-                id: env.environment?.zId!,
+            const envNode = {
+                id: env.environment?.zId as string,
                 data: {
                     label: env.environment?.description,
-                    envZId: env.environment?.zId!,
+                    envZId: env.environment?.zId as string,
                     limited: limited,
                     empty: true
                 },
@@ -52,12 +52,12 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
                     if(shr.backendProxyEndpoint !== "") {
                         shrLabel = shr.backendProxyEndpoint!;
                     }
-                    let shrNode = {
+                    const shrNode = {
                         id: shr.shareToken!,
                         data: {
                             label: shrLabel,
                             shareToken: shr.shareToken!,
-                            envZId: env.environment?.zId!,
+                            envZId: env.environment?.zId as string,
                             limited: limited,
                             accessed: false,
                         },
@@ -77,7 +77,7 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
             if(env.frontends) {
                 envNode.data.empty = false;
                 env.frontends.forEach(fe => {
-                    let feNode = {
+                    const feNode = {
                         id: fe.frontendToken!,
                         data: {
                             label: fe.frontendToken!,
@@ -102,11 +102,11 @@ export const mergeGraph = (oldVov: Graph, u: User, limited: boolean, newOv: Over
             }
         });
         allFrontends.forEach(fe => {
-            let target = allShares[fe.data.target];
+            const target = allShares[fe.data.target];
             if(target) {
                 target.data.accessed = true;
                 fe.data.ownedShare = true;
-                let edge: Edge = {
+                const edge: Edge = {
                     id: target.id + "-" + fe.id,
                     source: fe.id!,
                     sourceHandle: "share",
@@ -179,7 +179,7 @@ export const layout = (nodes, edges): Graph => {
     if(!nodes) {
         return { nodes: [], edges: [] };
     }
-    let g = tree();
+    const g = tree();
     if(nodes.length === 0) return { nodes, edges };
     const width = 100;
     const height = 75;

@@ -7,11 +7,11 @@ export class AgentObject {
 }
 
 export function buildOverview(status: StatusResponse): Array<AgentObject> {
-    let out = new Array<AgentObject>();
+    const out = new Array<AgentObject>();
     if(status) {
         if(status.accesses) {
             status.accesses.forEach(acc => {
-                let accObj = new AgentObject();
+                const accObj = new AgentObject();
                 accObj.type = "access";
                 accObj.id = acc.frontendToken!;
                 accObj.v = acc;
@@ -20,7 +20,7 @@ export function buildOverview(status: StatusResponse): Array<AgentObject> {
         }
         if(status.shares) {
             status.shares.forEach(shr => {
-               let shrObj = new AgentObject();
+               const shrObj = new AgentObject();
                shrObj.type = "share";
                shrObj.id = shr.token!;
                shrObj.v = shr;

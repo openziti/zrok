@@ -1,11 +1,17 @@
-import {useEffect, useState} from "react";
+import {ReactNode, useEffect, useState} from "react";
 import {camelToWords, objectToRows} from "./model/util.ts";
 import {Paper, Table, TableBody, TableCell, TableRow} from "@mui/material";
 
+type PropertyRow = {
+    id: number;
+    property: string;
+    value: unknown;
+}
+
 type PropertyTableProps = {
-    object: any;
-    custom: any;
-    labels: any;
+    object: object;
+    custom?: Record<string, (row: PropertyRow) => ReactNode>;
+    labels?: Record<string, string>;
 }
 
 const PropertyTable = ({ object, custom, labels }: PropertyTableProps) => {

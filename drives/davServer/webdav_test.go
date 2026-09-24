@@ -55,7 +55,11 @@ func TestPrefix(t *testing.T) {
 		}
 		defer res.Body.Close()
 		if res.StatusCode != wantStatusCode {
-			return nil, fmt.Errorf("got status code %d, want %d", res.StatusCode, wantStatusCode)
+			// http.ServeMux's trailing-slash redirect is 301 in Go 1.24 and 307 from Go 1.25 on;
+			// accept either so the test passes on both the pinned and a newer toolchain.
+			if !(wantStatusCode == http.StatusMovedPermanently && res.StatusCode == http.StatusTemporaryRedirect) {
+				return nil, fmt.Errorf("got status code %d, want %d", res.StatusCode, wantStatusCode)
+			}
 		}
 		return res.Header, nil
 	}

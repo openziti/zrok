@@ -10,7 +10,7 @@ interface AccessCardProps {
 }
 
 const AccessCard = ({ accessObject }: AccessCardProps) => {
-    let access = (accessObject.v as AccessDetail);
+    const access = (accessObject.v as AccessDetail);
 
     const releaseAccess = () => {
         GetAgentApi().agentReleaseAccess({frontendToken: access.frontendToken})

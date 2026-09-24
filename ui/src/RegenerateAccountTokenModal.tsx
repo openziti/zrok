@@ -36,7 +36,7 @@ const RegenerateAccountTokenModal = ({ close, isOpen, user }: RegenerateAccountT
     const regenerateToken = () => {
         getAccountApi(user).regenerateAccountToken({body: {emailAddress: user.email}})
             .then(d => {
-                let newUser = {
+                const newUser = {
                     email: user.email!,
                     token: d.accountToken!,
                 }

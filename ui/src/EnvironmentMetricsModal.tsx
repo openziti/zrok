@@ -20,7 +20,7 @@ const EnvironmentMetricsModal = ({ close, isOpen, user, environment }: Environme
     const [metrics1, setMetrics1] = useState(buildMetrics([]));
 
     useEffect(() => {
-        let metadataApi = getMetadataApi(user);
+        const metadataApi = getMetadataApi(user);
         metadataApi.getEnvironmentMetrics({envId: String(environment.data.envZId) })
             .then(d => {
                 setMetrics30(buildMetrics(d));
