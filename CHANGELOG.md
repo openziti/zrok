@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+FIX: The v1 controller no longer crashes when it encounters a v2 public share without a frontend selection during bandwidth-limit relaxation. It keeps the account's limit journal entry until every share can be relaxed, continues processing other accounts, and safely retries dial policies that were already restored.
+
 CHANGE: Added a `Makefile` following the shared convention: `make` builds (frontends first, then `go install ./...` for the whole module), `make test` is the full repository gate (frontend builds and lints, `go test`, `go vet`), and `make clean` resets the project-owned `GOBIN` and the frontend build products. The `ui` and `agent/agentUi` lint scripts are part of the gate, and the lint errors they reported (`prefer-const`, wrapper object types, unnecessary regex escapes, unused variables, non-null-asserted optional chains, `any` props) are fixed.
 
 CHANGE: Resolved the `go vet` findings that the new gate surfaced, matching the v2.0.4 fixes: signal-notification channels passed to `signal.Notify` are buffered (size 1), unkeyed `xml.Name`/`xml.StartElement` composite literals in the WebDAV client are keyed, and the `testCanary enabler` command defers its snapshot-streamer `CancelFunc`. The WebDAV server prefix test accepts the 307 trailing-slash redirect that `http.ServeMux` issues from Go 1.25 on, alongside the 301 issued by the pinned Go 1.24 toolchain.
@@ -232,8 +234,7 @@ CHANGE: Add usage hint in `zrok config get --help` to clarify how to list all va
 
 CHANGE: The Python SDK's `Overview()` function was refactored as a class method (https://github.com/openziti/zrok/pull/846).
 
-FEATURE: The Python SDK now includes a `ProxyShare` class providing an HTTP proxy for public and private shares and a
-Jupyter notebook example (https://github.com/openziti/zrok/pull/847).
+FEATURE: The Python SDK now includes a `ProxyShare` class providing an HTTP proxy for public and private shares and a Jupyter notebook example (https://github.com/openziti/zrok/pull/847).
 
 FIX: PyPi publishing was failing due to a CI issue (https://github.com/openziti/zrok/issues/849)
 

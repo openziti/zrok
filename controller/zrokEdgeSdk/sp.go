@@ -78,6 +78,27 @@ func createServicePolicy(name string, semantic rest_model.Semantic, identityRole
 	return resp.Payload.Data.ID, nil
 }
 
+func FindServicePolicyByName(name string, edge *rest_management_api_client.ZitiEdgeManagement) (*rest_model.ServicePolicyDetail, error) {
+	filter := fmt.Sprintf("name=%q", name)
+	limit := int64(1)
+	offset := int64(0)
+	req := &service_policy.ListServicePoliciesParams{
+		Filter:  &filter,
+		Limit:   &limit,
+		Offset:  &offset,
+		Context: context.Background(),
+	}
+	req.SetTimeout(30 * time.Second)
+	resp, err := edge.ServicePolicy.ListServicePolicies(req, nil)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error finding service policy '%v'", name)
+	}
+	if len(resp.Payload.Data) == 0 {
+		return nil, nil
+	}
+	return resp.Payload.Data[0], nil
+}
+
 func DeleteServicePoliciesBindForAgentRemote(envZId, enrollmentToken string, edge *rest_management_api_client.ZitiEdgeManagement) error {
 	return DeleteServicePolicies(envZId, fmt.Sprintf("tags.zrokAgentRemote=\"%v\" and type=%d", enrollmentToken, servicePolicyBind), edge)
 }

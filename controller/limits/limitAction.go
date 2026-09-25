@@ -2,6 +2,7 @@ package limits
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/sdk/golang/sdk"
@@ -10,12 +11,12 @@ import (
 )
 
 type limitAction struct {
-	str  *store.Store
-	zCfg *zrokEdgeSdk.Config
+	str     *store.Store
+	newZiti func() (*rest_management_api_client.ZitiEdgeManagement, error)
 }
 
-func newLimitAction(str *store.Store, zCfg *zrokEdgeSdk.Config) *limitAction {
-	return &limitAction{str, zCfg}
+func newLimitAction(str *store.Store, newZiti func() (*rest_management_api_client.ZitiEdgeManagement, error)) *limitAction {
+	return &limitAction{str, newZiti}
 }
 
 func (a *limitAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.BandwidthClass, ul *userLimits, trx *sqlx.Tx) error {
@@ -24,7 +25,7 @@ func (a *limitAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 		return errors.Wrapf(err, "error finding environments for account '%v'", acct.Email)
 	}
 
-	edge, err := zrokEdgeSdk.Client(a.zCfg)
+	edge, err := a.newZiti()
 	if err != nil {
 		return err
 	}
