@@ -22,7 +22,7 @@ func WriteInterstitialAnnounce(w http.ResponseWriter, htmlPath string) {
 		if data, err := FS.ReadFile("interstitial.html"); err == nil {
 			htmlData = data
 		} else {
-			dl.Errorf("error reading embedded interstitial html 'index.html': %v", err)
+			dl.Errorf("error reading embedded interstitial html 'interstitial.html': %v", err)
 		}
 	}
 	w.WriteHeader(http.StatusOK)
