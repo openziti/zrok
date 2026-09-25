@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+FIX: The controller now keeps a bandwidth-limit journal entry when any share cannot be relaxed, and retries safely on the next cycle without recreating dial policies that already exist. A public share without a frontend selection no longer crashes the controller; its account remains limited while other accounts continue through the cycle.
+
 CHANGE: The `Makefile` now follows the shared convention: `make` builds (frontends first, then `go install ./...` for the whole module), `make test` is the full repository gate (frontend builds and lints, `go test`, `go vet`), and `make clean` resets the project-owned `GOBIN` and the frontend build products. The `ui` and `agent/agentUi` lint scripts are part of the gate, and the handful of lint errors they reported (wrapper object types, an unnecessary regex escape, unused variables) are fixed.
 
 ## v2.0.4
@@ -332,8 +334,7 @@ CHANGE: Add usage hint in `zrok config get --help` to clarify how to list all va
 
 CHANGE: The Python SDK's `Overview()` function was refactored as a class method (https://github.com/openziti/zrok/pull/846).
 
-FEATURE: The Python SDK now includes a `ProxyShare` class providing an HTTP proxy for public and private shares and a
-Jupyter notebook example (https://github.com/openziti/zrok/pull/847).
+FEATURE: The Python SDK now includes a `ProxyShare` class providing an HTTP proxy for public and private shares and a Jupyter notebook example (https://github.com/openziti/zrok/pull/847).
 
 FIX: PyPi publishing was failing due to a CI issue (https://github.com/openziti/zrok/issues/849)
 

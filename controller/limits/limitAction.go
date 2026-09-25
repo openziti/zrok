@@ -12,12 +12,12 @@ import (
 )
 
 type limitAction struct {
-	str  *store.Store
-	zCfg *automation.Config
+	str     *store.Store
+	newZiti func() (*automation.ZitiAutomation, error)
 }
 
-func newLimitAction(str *store.Store, zCfg *automation.Config) *limitAction {
-	return &limitAction{str, zCfg}
+func newLimitAction(str *store.Store, newZiti func() (*automation.ZitiAutomation, error)) *limitAction {
+	return &limitAction{str, newZiti}
 }
 
 func (a *limitAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.BandwidthClass, ul *userLimits, trx *sqlx.Tx) error {
@@ -26,7 +26,7 @@ func (a *limitAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 		return errors.Wrapf(err, "error finding environments for account '%v'", acct.Email)
 	}
 
-	ziti, err := automation.NewZitiAutomation(a.zCfg)
+	ziti, err := a.newZiti()
 	if err != nil {
 		return err
 	}

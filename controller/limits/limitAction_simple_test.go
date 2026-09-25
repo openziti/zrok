@@ -11,19 +11,20 @@ import (
 func TestNewLimitActionSimple(t *testing.T) {
 	str := &store.Store{}
 	zCfg := &automation.Config{}
+	factory := func() (*automation.ZitiAutomation, error) { return automation.NewZitiAutomation(zCfg) }
 
-	action := newLimitAction(str, zCfg)
+	action := newLimitAction(str, factory)
 
 	assert.NotNil(t, action)
 	assert.Equal(t, str, action.str)
-	assert.Equal(t, zCfg, action.zCfg)
+	assert.NotNil(t, action.newZiti)
 }
 
 func TestLimitAction_InterfaceCompliance(t *testing.T) {
 	str := &store.Store{}
-	zCfg := &automation.Config{}
+	factory := func() (*automation.ZitiAutomation, error) { return nil, nil }
 
-	action := newLimitAction(str, zCfg)
+	action := newLimitAction(str, factory)
 
 	// verify it implements the AccountAction interface
 	var _ AccountAction = action

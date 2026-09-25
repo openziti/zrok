@@ -11,19 +11,20 @@ import (
 func TestNewRelaxActionSimple(t *testing.T) {
 	str := &store.Store{}
 	zCfg := &automation.Config{}
+	factory := func() (*automation.ZitiAutomation, error) { return automation.NewZitiAutomation(zCfg) }
 
-	action := newRelaxAction(str, zCfg)
+	action := newRelaxAction(str, factory)
 
 	assert.NotNil(t, action)
 	assert.Equal(t, str, action.str)
-	assert.Equal(t, zCfg, action.zCfg)
+	assert.NotNil(t, action.newZiti)
 }
 
 func TestRelaxAction_InterfaceCompliance(t *testing.T) {
 	str := &store.Store{}
-	zCfg := &automation.Config{}
+	factory := func() (*automation.ZitiAutomation, error) { return nil, nil }
 
-	action := newRelaxAction(str, zCfg)
+	action := newRelaxAction(str, factory)
 
 	// verify it implements the AccountAction interface
 	var _ AccountAction = action
