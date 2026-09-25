@@ -1,6 +1,6 @@
 # zrok - Secure internet sharing made simple
 
-![zrok logo](docs/images/zrok_cover.png)
+![zrok logo](website/docs/images/zrok_cover.png)
 
 **Share anything, anywhere, instantly. Enterprise reliability. No firewall changes. No port forwarding. No hassle.**
 
@@ -27,7 +27,7 @@ $ zrok share public --backend-mode drive ~/Documents
 $ zrok share private localhost:3000
 ```
 
-![zrok Web Console](docs/images/zrok_web_console.png)
+![zrok Web Console](website/docs/images/zrok_web_console.png)
 
 ## What you can share
 
@@ -39,7 +39,7 @@ Instantly make local web apps accessible over the internet:
 zrok share public localhost:8080
 ```
 
-![zrok share public](docs/images/zrok_share_public.png)
+![zrok share public](website/docs/images/zrok_share_public.png)
 
 ### Files & directories
 
@@ -49,8 +49,8 @@ Turn any folder into a shareable network drive:
 zrok share public --backend-mode drive ~/Repos/zrok
 ```
 
-![zrok share public -b drive](docs/images/zrok_share_public_drive.png)
-![mounted zrok drive](docs/images/zrok_share_public_drive_explorer.png)
+![zrok share public -b drive](website/docs/images/zrok_share_public_drive.png)
+![mounted zrok drive](website/docs/images/zrok_share_public_drive_explorer.png)
 
 ### Private resources
 
