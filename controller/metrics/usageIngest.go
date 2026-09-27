@@ -2,25 +2,29 @@ package metrics
 
 import (
 	"encoding/json"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"reflect"
 	"time"
+
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 func Ingest(event ZitiEventJson) (*Usage, error) {
 	eventMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(event), &eventMap); err == nil {
 		u := &Usage{ProcessedStamp: time.Now()}
+		invalid := false
 		if ns, found := eventMap["namespace"]; found && ns == "fabric.usage" {
 			if v, found := eventMap["interval_start_utc"]; found {
 				if vFloat64, ok := v.(float64); ok {
 					u.IntervalStart = time.Unix(int64(vFloat64), 0)
 				} else {
 					logrus.Errorf("unable to assert 'interval_start_utc': %v", event)
+					invalid = true
 				}
 			} else {
 				logrus.Errorf("missing 'interval_start_utc': %v", event)
+				invalid = true
 			}
 			if v, found := eventMap["tags"]; found {
 				if tags, ok := v.(map[string]interface{}); ok {
@@ -29,15 +33,19 @@ func Ingest(event ZitiEventJson) (*Usage, error) {
 							u.ZitiServiceId = vStr
 						} else {
 							logrus.Errorf("unable to assert 'tags/serviceId': %v", event)
+							invalid = true
 						}
 					} else {
 						logrus.Errorf("missing 'tags/serviceId': %v", event)
+						invalid = true
 					}
 				} else {
 					logrus.Errorf("unable to assert 'tags': %v", event)
+					invalid = true
 				}
 			} else {
 				logrus.Errorf("missing 'tags': %v", event)
+				invalid = true
 			}
 			if v, found := eventMap["usage"]; found {
 				if usage, ok := v.(map[string]interface{}); ok {
@@ -46,6 +54,7 @@ func Ingest(event ZitiEventJson) (*Usage, error) {
 							u.FrontendTx = int64(vFloat64)
 						} else {
 							logrus.Errorf("unable to assert 'usage/ingress.tx': %v", event)
+							invalid = true
 						}
 					}
 					if v, found := usage["ingress.rx"]; found {
@@ -53,6 +62,7 @@ func Ingest(event ZitiEventJson) (*Usage, error) {
 							u.FrontendRx = int64(vFloat64)
 						} else {
 							logrus.Errorf("unable to assert 'usage/ingress.rx': %v", event)
+							invalid = true
 						}
 					}
 					if v, found := usage["egress.tx"]; found {
@@ -60,6 +70,7 @@ func Ingest(event ZitiEventJson) (*Usage, error) {
 							u.BackendRx = int64(vFloat64)
 						} else {
 							logrus.Errorf("unable to assert 'usage/egress.tx': %v", event)
+							invalid = true
 						}
 					}
 					if v, found := usage["egress.rx"]; found {
@@ -67,13 +78,16 @@ func Ingest(event ZitiEventJson) (*Usage, error) {
 							u.BackendTx = int64(vFloat64)
 						} else {
 							logrus.Errorf("unable to assert 'usage/egress.rx': %v", event)
+							invalid = true
 						}
 					}
 				} else {
 					logrus.Errorf("unable to assert 'usage' (%v) %v", reflect.TypeOf(v), event)
+					invalid = true
 				}
 			} else {
 				logrus.Warnf("missing 'usage': %v", event)
+				invalid = true
 			}
 			if v, found := eventMap["circuit_id"]; found {
 				if vStr, ok := v.(string); ok {
@@ -86,6 +100,10 @@ func Ingest(event ZitiEventJson) (*Usage, error) {
 			}
 		} else {
 			logrus.Errorf("not 'fabric.usage': %v", event)
+			invalid = true
+		}
+		if invalid {
+			return nil, errors.New("unusable fabric.usage event")
 		}
 		return u, nil
 	} else {

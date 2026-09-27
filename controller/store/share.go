@@ -1,6 +1,7 @@
 package store
 
 import (
+	"context"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -101,8 +102,12 @@ func (str *Store) ShareWithTokenExists(shrToken string, tx *sqlx.Tx) (bool, erro
 }
 
 func (str *Store) FindShareWithZIdAndDeleted(zId string, tx *sqlx.Tx) (*Share, error) {
+	return str.FindShareWithZIdAndDeletedContext(context.Background(), zId, tx)
+}
+
+func (str *Store) FindShareWithZIdAndDeletedContext(ctx context.Context, zId string, tx *sqlx.Tx) (*Share, error) {
 	shr := &Share{}
-	if err := tx.QueryRowx("select * from shares where z_id = $1", zId).StructScan(shr); err != nil {
+	if err := tx.QueryRowxContext(ctx, "select * from shares where z_id = $1", zId).StructScan(shr); err != nil {
 		return nil, errors.Wrap(err, "error selecting share by z_id")
 	}
 	return shr, nil

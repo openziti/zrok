@@ -55,6 +55,8 @@ func (e *ZitiEventJsonMsg) Ack() error {
 	return nil
 }
 
+func (e *ZitiEventJsonMsg) Nack(bool) error { return nil }
+
 type ZitiEventAMQP struct {
 	data ZitiEventJson
 	msg  amqp.Delivery
@@ -68,9 +70,12 @@ func (e *ZitiEventAMQP) Ack() error {
 	return e.msg.Ack(false)
 }
 
+func (e *ZitiEventAMQP) Nack(requeue bool) error { return e.msg.Nack(false, requeue) }
+
 type ZitiEventMsg interface {
 	Data() ZitiEventJson
 	Ack() error
+	Nack(requeue bool) error
 }
 
 type ZitiEventJsonSource interface {

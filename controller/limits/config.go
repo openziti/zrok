@@ -14,6 +14,7 @@ type Config struct {
 	Bandwidth      *BandwidthPerPeriod
 	Cycle          time.Duration
 	Enforcing      bool
+	HandoffTimeout time.Duration
 }
 
 type BandwidthPerPeriod struct {

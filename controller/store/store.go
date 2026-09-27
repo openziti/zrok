@@ -1,6 +1,7 @@
 package store
 
 import (
+	"context"
 	"fmt"
 	"github.com/iancoleman/strcase"
 	"github.com/jmoiron/sqlx"
@@ -67,7 +68,11 @@ func Open(cfg *Config) (*Store, error) {
 }
 
 func (str *Store) Begin() (*sqlx.Tx, error) {
-	return str.db.Beginx()
+	return str.BeginContext(context.Background())
+}
+
+func (str *Store) BeginContext(ctx context.Context) (*sqlx.Tx, error) {
+	return str.db.BeginTxx(ctx, nil)
 }
 
 func (str *Store) Close() error {

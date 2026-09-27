@@ -1,6 +1,7 @@
 package store
 
 import (
+	"context"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -40,8 +41,12 @@ func (str *Store) CreateEphemeralEnvironment(i *Environment, tx *sqlx.Tx) (int, 
 }
 
 func (str *Store) GetEnvironment(id int, tx *sqlx.Tx) (*Environment, error) {
+	return str.GetEnvironmentContext(context.Background(), id, tx)
+}
+
+func (str *Store) GetEnvironmentContext(ctx context.Context, id int, tx *sqlx.Tx) (*Environment, error) {
 	i := &Environment{}
-	if err := tx.QueryRowx("select * from environments where id = $1", id).StructScan(i); err != nil {
+	if err := tx.QueryRowxContext(ctx, "select * from environments where id = $1", id).StructScan(i); err != nil {
 		return nil, errors.Wrap(err, "error selecting environment by id")
 	}
 	return i, nil
