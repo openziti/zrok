@@ -12,6 +12,7 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -21,29 +22,34 @@ import (
 	"github.com/openziti/zrok/controller/zrokEdgeSdk/zitifake"
 )
 
-// session tests are sequential because they replace the process-wide CA loader.
-func sessionFixture(t *testing.T) (*zitifake.Server, *Config, *int) {
+// session tests are sequential because they replace the process-wide CA loader. extra fakes serving
+// other cache keys are included in the authentication counter check.
+func sessionFixture(t *testing.T, extra ...*zitifake.Server) (*zitifake.Server, *Config, *atomic.Int64) {
 	t.Helper()
 	fake := zitifake.NewWithCredentials("session-user", "session-password")
 	t.Cleanup(fake.Close)
 	oldPool := sharedSessions.caPool
 	oldClients := sharedSessions.clients
 	sharedSessions.clients = make(map[sessionKey]*rest_management_api_client.ZitiEdgeManagement)
-	caFetches := 0
+	caFetches := &atomic.Int64{}
 	sharedSessions.caPool = func(string) (*x509.CertPool, error) {
-		caFetches++
+		caFetches.Add(1)
 		return nil, nil
 	}
 	before := zitiAuthentications.Value()
 	t.Cleanup(func() {
-		successful, _, _ := fake.AuthCounts()
+		successful := 0
+		for _, f := range append([]*zitifake.Server{fake}, extra...) {
+			n, _, _ := f.AuthCounts()
+			successful += n
+		}
 		if got := zitiAuthentications.Value() - before; got != int64(successful) {
 			t.Errorf("authentication counter delta = %d, fake = %d", got, successful)
 		}
 		sharedSessions.caPool = oldPool
 		sharedSessions.clients = oldClients
 	})
-	return fake, &Config{ApiEndpoint: fake.URL, Username: "session-user", Password: "session-password"}, &caFetches
+	return fake, &Config{ApiEndpoint: fake.URL, Username: "session-user", Password: "session-password"}, caFetches
 }
 
 func mustSession(t *testing.T, cfg *Config) *rest_management_api_client.ZitiEdgeManagement {
@@ -84,8 +90,8 @@ func TestZitiSessionReuse(t *testing.T) {
 			t.Fatalf("operation %d: %v", i, err)
 		}
 	}
-	if successful, attempts, _ := fake.AuthCounts(); successful != 1 || attempts != 1 || *caFetches != 1 {
-		t.Fatalf("successful=%d attempts=%d CA fetches=%d", successful, attempts, *caFetches)
+	if successful, attempts, _ := fake.AuthCounts(); successful != 1 || attempts != 1 || caFetches.Load() != 1 {
+		t.Fatalf("successful=%d attempts=%d CA fetches=%d", successful, attempts, caFetches.Load())
 	}
 }
 
@@ -127,8 +133,8 @@ func TestZitiSessionConcurrentExpiry(t *testing.T) {
 	if refreshes := successful - 1; refreshes < 1 || refreshes > 3 || attempts != successful || unauthorized < 1 {
 		t.Fatalf("successful=%d attempts=%d unauthorized=%d", successful, attempts, unauthorized)
 	}
-	if *caFetches != 1 {
-		t.Fatalf("CA fetched %d times", *caFetches)
+	if caFetches.Load() != 1 {
+		t.Fatalf("CA fetched %d times", caFetches.Load())
 	}
 	_, _, creates, _ := fake.Counts()
 	if creates != 10 {
@@ -228,8 +234,7 @@ func TestZitiSessionFailedBuildNotCached(t *testing.T) {
 				recoverServer = func() { cfg.Password = "session-password" }
 			case "ca":
 				sharedSessions.caPool = func(string) (*x509.CertPool, error) {
-					*caFetches++
-					if *caFetches == 1 {
+					if caFetches.Add(1) == 1 {
 						return nil, errors.New("CA fetch failed")
 					}
 					return nil, nil
@@ -244,8 +249,8 @@ func TestZitiSessionFailedBuildNotCached(t *testing.T) {
 			if err := listServices(edge, 30*time.Second); err != nil {
 				t.Fatal(err)
 			}
-			if *caFetches != 2 {
-				t.Fatalf("CA fetched %d times, want 2", *caFetches)
+			if caFetches.Load() != 2 {
+				t.Fatalf("CA fetched %d times, want 2", caFetches.Load())
 			}
 		})
 	}
@@ -266,5 +271,113 @@ func TestZitiSessionCounterEndpoint(t *testing.T) {
 	}
 	if got := string(vars["zrok.ziti.authentications"]); got != expvar.Get("zrok.ziti.authentications").String() {
 		t.Fatalf("counter endpoint = %s, want %s", got, zitiAuthentications.String())
+	}
+}
+
+func TestZitiSessionSustainedUnauthorizedBounded(t *testing.T) {
+	fake, cfg, _ := sessionFixture(t)
+	edge := mustSession(t, cfg)
+	fake.ExpireAll()
+	fake.RejectAuthentication(true)
+	delay := 500 * time.Millisecond
+	fake.SetAuthenticationDelay(delay)
+	start := make(chan struct{})
+	results := make(chan error, 20)
+	var wg sync.WaitGroup
+	for i := 0; i < 20; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			<-start
+			results <- listServices(edge, 30*time.Second)
+		}()
+	}
+	began := time.Now()
+	close(start)
+	wg.Wait()
+	elapsed := time.Since(began)
+	close(results)
+	for err := range results {
+		var unauthorized *edge_service.ListServicesUnauthorized
+		if !errors.As(err, &unauthorized) {
+			t.Errorf("want typed unauthorized, got %T: %v", err, err)
+		}
+	}
+	if elapsed > 2*delay {
+		t.Fatalf("twenty operations took %v behind a %v login", elapsed, delay)
+	}
+	if _, attempts, _ := fake.AuthCounts(); attempts-1 < 1 || attempts-1 > 3 {
+		t.Fatalf("re-authentication attempts = %d", attempts-1)
+	}
+}
+
+func TestZitiSessionFailedRefreshRemembered(t *testing.T) {
+	fake, cfg, _ := sessionFixture(t)
+	oldClock := refreshClock
+	t.Cleanup(func() { refreshClock = oldClock })
+	edge := mustSession(t, cfg)
+	fake.ExpireAll()
+	fake.RejectAuthentication(true)
+	attempts := func() int {
+		_, n, _ := fake.AuthCounts()
+		return n
+	}
+	operation := func() error {
+		return listServices(edge, 30*time.Second)
+	}
+	if err := operation(); err == nil || attempts() != 2 {
+		t.Fatalf("first operation error=%v attempts=%d", err, attempts())
+	}
+	if err := operation(); err == nil || attempts() != 2 {
+		t.Fatalf("remembered failure error=%v attempts=%d", err, attempts())
+	}
+	refreshClock = func() time.Time { return time.Now().Add(failedRefreshWindow) }
+	if err := operation(); err == nil || attempts() != 3 {
+		t.Fatalf("after window error=%v attempts=%d", err, attempts())
+	}
+}
+
+func TestZitiSessionConcurrentFirstBuild(t *testing.T) {
+	other := zitifake.NewWithCredentials("session-user", "session-password")
+	t.Cleanup(other.Close)
+	fake, cfg, _ := sessionFixture(t, other)
+	delay := 500 * time.Millisecond
+	fake.SetAuthenticationDelay(delay)
+	other.SetAuthenticationDelay(delay)
+	clients := make(chan *rest_management_api_client.ZitiEdgeManagement, 10)
+	var wg sync.WaitGroup
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			edge, err := Client(cfg)
+			if err != nil {
+				t.Error(err)
+			}
+			clients <- edge
+		}()
+	}
+	// let the first key's build start before timing the second key.
+	time.Sleep(100 * time.Millisecond)
+	began := time.Now()
+	if _, err := Client(&Config{ApiEndpoint: other.URL, Username: "session-user", Password: "session-password"}); err != nil {
+		t.Fatal(err)
+	}
+	if elapsed := time.Since(began); elapsed > delay+300*time.Millisecond {
+		t.Fatalf("other key waited %v behind a %v login", elapsed, delay)
+	}
+	wg.Wait()
+	close(clients)
+	var first *rest_management_api_client.ZitiEdgeManagement
+	for edge := range clients {
+		if first == nil {
+			first = edge
+		}
+		if edge == nil || edge != first {
+			t.Fatal("concurrent builds returned different clients")
+		}
+	}
+	if successful, attempts, _ := fake.AuthCounts(); successful != 1 || attempts != 1 {
+		t.Fatalf("successful=%d attempts=%d", successful, attempts)
 	}
 }

@@ -18,38 +18,69 @@ import (
 
 var zitiAuthentications = expvar.NewInt("zrok.ziti.authentications")
 
+// failedRefreshWindow is how long a failed refresh answers callers still holding the same session
+// generation, so a persistent authentication failure costs one login per window.
+const failedRefreshWindow = 5 * time.Second
+
+// refreshClock is replaceable so tests can move past failedRefreshWindow.
+var refreshClock = time.Now
+
 type sessionKey struct {
 	endpoint, username string
 }
 
 type sessionCache struct {
-	mu      sync.Mutex
-	clients map[sessionKey]*rest_management_api_client.ZitiEdgeManagement
-	caPool  func(string) (*x509.CertPool, error)
+	mu       sync.Mutex
+	clients  map[sessionKey]*rest_management_api_client.ZitiEdgeManagement
+	building map[sessionKey]*sessionBuild
+	caPool   func(string) (*x509.CertPool, error)
+}
+
+type sessionBuild struct {
+	done chan struct{}
+	edge *rest_management_api_client.ZitiEdgeManagement
+	err  error
 }
 
 var sharedSessions = sessionCache{
-	clients: make(map[sessionKey]*rest_management_api_client.ZitiEdgeManagement),
-	caPool:  rest_util.GetControllerWellKnownCaPool,
+	clients:  make(map[sessionKey]*rest_management_api_client.ZitiEdgeManagement),
+	building: make(map[sessionKey]*sessionBuild),
+	caPool:   rest_util.GetControllerWellKnownCaPool,
 }
 
 func (c *sessionCache) get(cfg *Config) (*rest_management_api_client.ZitiEdgeManagement, error) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
 	key := sessionKey{cfg.ApiEndpoint, cfg.Username}
+	c.mu.Lock()
 	if edge := c.clients[key]; edge != nil {
+		c.mu.Unlock()
 		return edge, nil
 	}
-	pool, err := c.caPool(cfg.ApiEndpoint)
-	if err != nil {
-		return nil, err
+	if build := c.building[key]; build != nil {
+		c.mu.Unlock()
+		<-build.done
+		return build.edge, build.err
 	}
-	edge, err := newZitiSession(cfg, pool)
-	if err != nil {
-		return nil, err
+	// the first build runs outside the lock so a slow login blocks only callers for this key.
+	build := &sessionBuild{done: make(chan struct{})}
+	c.building[key] = build
+	caPool := c.caPool
+	c.mu.Unlock()
+
+	pool, err := caPool(cfg.ApiEndpoint)
+	var edge *rest_management_api_client.ZitiEdgeManagement
+	if err == nil {
+		edge, err = newZitiSession(cfg, pool)
 	}
-	c.clients[key] = edge
-	return edge, nil
+
+	c.mu.Lock()
+	delete(c.building, key)
+	if err == nil {
+		c.clients[key] = edge
+	}
+	c.mu.Unlock()
+	build.edge, build.err = edge, err
+	close(build.done)
+	return edge, err
 }
 
 // newZitiSession accepts an explicit CA pool so tests can use a plain HTTP fake.
@@ -104,23 +135,65 @@ type sessionTransport struct {
 	mu           sync.RWMutex
 	token        string
 	generation   uint64
+	inflight     *sessionRefresh
+	failure      *sessionRefreshFailure
 }
 
+type sessionRefresh struct {
+	done chan struct{}
+	err  error
+}
+
+type sessionRefreshFailure struct {
+	err        error
+	generation uint64
+	at         time.Time
+}
+
+// refresh is single-flight: concurrent callers share one authentication attempt, and the lock is
+// never held across the network call.
 func (s *sessionTransport) refresh(ctx context.Context, generation uint64, reason string) error {
 	s.mu.Lock()
-	defer s.mu.Unlock()
 	if s.generation != generation {
+		s.mu.Unlock()
 		return nil
 	}
-	token, err := s.authenticate(ctx)
-	if err != nil {
-		return err
+	if f := s.failure; f != nil && f.generation == generation && refreshClock().Sub(f.at) < failedRefreshWindow {
+		s.mu.Unlock()
+		return f.err
 	}
-	s.token = token
-	s.generation++
-	zitiAuthentications.Add(1)
-	logrus.Infof("ziti authentication count '%d', reason '%s'", zitiAuthentications.Value(), reason)
-	return nil
+	call := s.inflight
+	if call == nil {
+		call = &sessionRefresh{done: make(chan struct{})}
+		s.inflight = call
+		// detached from the caller's cancellation so one abandoned request cannot fail every waiter.
+		go s.runRefresh(context.WithoutCancel(ctx), call, generation, reason)
+	}
+	s.mu.Unlock()
+	select {
+	case <-call.done:
+		return call.err
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+
+func (s *sessionTransport) runRefresh(ctx context.Context, call *sessionRefresh, generation uint64, reason string) {
+	token, err := s.authenticate(ctx)
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.inflight = nil
+	if err != nil {
+		s.failure = &sessionRefreshFailure{err: err, generation: generation, at: refreshClock()}
+	} else {
+		s.token = token
+		s.generation++
+		s.failure = nil
+		zitiAuthentications.Add(1)
+		logrus.Infof("ziti authentication count '%d', reason '%s'", zitiAuthentications.Value(), reason)
+	}
+	call.err = err
+	close(call.done)
 }
 
 func (s *sessionTransport) RoundTrip(req *http.Request) (*http.Response, error) {
