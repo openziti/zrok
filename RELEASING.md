@@ -13,8 +13,7 @@ Pre-release version strings must contain exactly one hyphen, and may not contain
 
 ## How to Trigger Release Automation
 
-> [!NOTE]
-> Each trigger is outlined separately, but some may occur simultaneously, e.g., when a draft release is published as stable rather than first publishing it as a pre-release, or a pre-release is promoted to stable and marked as latest at the same time.
+> [!NOTE] Each trigger is outlined separately, but some may occur simultaneously, e.g., when a draft release is published as stable rather than first publishing it as a pre-release, or a pre-release is promoted to stable and marked as latest at the same time.
 
 1. Push a tag to GitHub like `v*.*.*` to trigger **the pre-release workflow**. Wait for this workflow to complete before marking the release stable (`isPrerelease: false`).
     1. Linux packages are uploaded to Artifactory as pre-releases.
@@ -31,6 +30,19 @@ Pre-release version strings must contain exactly one hyphen, and may not contain
     1. Node.js packages are built and released to NPM.
 1. Edit the stable release to mark it as latest.
     1. https://docs.zrok.io/docs/guides/install/ always serves the "latest" stable version via GitHub binary download URLs.
+
+## Two Release Lines
+
+While the v1 line is maintained alongside v2, releases are cut from two places and must not be confused with each other.
+
+- **v2** is `main`. Fixes land on a working branch, merge to `main`, and are tagged `v2.x.y` there. Its artifacts are all named `zrok2`: the `openziti/zrok2` Docker image, the `zrok2*` Linux packages, the `zrok2` Homebrew formula, the `zrok2` PyPI package, the `@openziti/zrok2` npm package.
+- **v1** is `main-v1`, the maintenance branch cut from `v1.1.11`. Fixes land on a working branch, merge to `main-v1`, and are tagged `v1.x.y` there; nothing from it merges to `main`. Its artifacts keep the v1 names: `openziti/zrok`, the `zrok`, `zrok-share` and `zrok-agent` packages, the `zrok` formula, the `zrok` PyPI package, `@openziti/zrok`.
+
+A tag runs the workflow files at the tagged commit, so a `v1.x.y` tag builds and promotes with the v1 branch's workflows and names, and a `v2.x.y` tag with `main`'s. The image repository is chosen by each workflow's default; the `ZROK_CONTAINER_IMAGE_REPO` repository variable is deliberately unset, and setting it would send both lines to one repository.
+
+Two things differ by hand for a v1 release. When publishing the draft, leave "Set as the latest release" unchecked and mark it explicitly as not latest, so the GitHub "latest" release, which the install documentation downloads from, stays on v2. And the `CHANGELOG.md` on the v1 branch gets its own `## v1.x.y` section; the two changelogs describe the same fixes where both lines received them and are edited independently.
+
+Both lines keep the pinned `## Unreleased` section at the top of `CHANGELOG.md`; cutting a release moves its entries under a new `## vX.Y.Z` heading and leaves `## Unreleased` empty above it.
 
 ## Rolling Back Downstreams
 

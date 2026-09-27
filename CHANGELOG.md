@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v2.0.5
+
 FIX: The controller no longer crashes when the bandwidth-limit relax cycle meets a public share with no frontend selection. An account's limit is now cleared only once every one of its shares has been relaxed; a share that cannot be relaxed is retried on the next cycle without disturbing other accounts, and dial policies that already exist are not recreated.
 
 FIX: The controller holds one OpenZiti management session and re-authenticates only when it expires, instead of logging in on every operation. This removes the pressure on the OpenZiti controller's authentication rate limit during bursts of share activity and limit enforcement.
