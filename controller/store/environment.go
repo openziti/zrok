@@ -1,6 +1,7 @@
 package store
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -45,8 +46,12 @@ func (str *Store) CreateEphemeralEnvironment(i *Environment, trx *sqlx.Tx) (int,
 }
 
 func (str *Store) GetEnvironment(id int, trx *sqlx.Tx) (*Environment, error) {
+	return str.GetEnvironmentContext(context.Background(), id, trx)
+}
+
+func (str *Store) GetEnvironmentContext(ctx context.Context, id int, trx *sqlx.Tx) (*Environment, error) {
 	i := &Environment{}
-	if err := trx.QueryRowx("select * from environments where id = $1", id).StructScan(i); err != nil {
+	if err := trx.QueryRowxContext(ctx, "select * from environments where id = $1", id).StructScan(i); err != nil {
 		return nil, errors.Wrap(err, "error selecting environment by id")
 	}
 	return i, nil
@@ -89,17 +94,17 @@ func (str *Store) DeleteEnvironment(id int, trx *sqlx.Tx) error {
 }
 
 type EnvironmentFilter struct {
-	Description    *string
-	Host           *string
-	Address        *string
-	ShareCount     *string
-	AccessCount    *string
-	CreatedAfter   *time.Time
-	CreatedBefore  *time.Time
-	UpdatedAfter   *time.Time
-	UpdatedBefore  *time.Time
-	HasShares      *bool
-	HasAccesses    *bool
+	Description   *string
+	Host          *string
+	Address       *string
+	ShareCount    *string
+	AccessCount   *string
+	CreatedAfter  *time.Time
+	CreatedBefore *time.Time
+	UpdatedAfter  *time.Time
+	UpdatedBefore *time.Time
+	HasShares     *bool
+	HasAccesses   *bool
 }
 
 type EnvironmentWithCounts struct {

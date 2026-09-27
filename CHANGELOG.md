@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+FIX: The controller's metrics consumer now bounds its AMQP prefetch, usage lookup and InfluxDB write time, and retries, so a slow or unavailable store or InfluxDB no longer makes it hold the entire broker queue unacknowledged. Usage lookups and writes share one retry deadline. Malformed events and exhausted processing attempts are dropped without requeue; shutdown leaves unfinished deliveries for broker recovery. A message that triggers a panic is logged and dropped so processing can continue. A full limits queue drops and logs the handoff after a timeout; the recorded usage remains in InfluxDB for subsequent enforcement.
+
 FIX: The controller now keeps a bandwidth-limit journal entry when any share cannot be relaxed, and retries safely on the next cycle without recreating dial policies that already exist. A public share without a frontend selection no longer crashes the controller; its account remains limited while other accounts continue through the cycle.
 
 CHANGE: The `Makefile` now follows the shared convention: `make` builds (frontends first, then `go install ./...` for the whole module), `make test` is the full repository gate (frontend builds and lints, `go test`, `go vet`), and `make clean` resets the project-owned `GOBIN` and the frontend build products. The `ui` and `agent/agentUi` lint scripts are part of the gate, and the handful of lint errors they reported (wrapper object types, an unnecessary regex escape, unused variables) are fixed.

@@ -1,8 +1,10 @@
 package limits
 
 import (
+	"context"
 	"fmt"
 	"reflect"
+	"sync/atomic"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -28,6 +30,7 @@ type Agent struct {
 	relaxActions   []AccountAction
 	close          chan struct{}
 	join           chan struct{}
+	droppedEvents  atomic.Uint64
 }
 
 type bandwidthReader interface {
@@ -252,10 +255,30 @@ func (a *Agent) CanAccessShare(shrId int, trx *sqlx.Tx) (bool, error) {
 }
 
 func (a *Agent) Handle(u *metrics.Usage) error {
+	return a.HandleContext(context.Background(), u)
+}
+
+func (a *Agent) HandleContext(ctx context.Context, u *metrics.Usage) error {
 	dl.Debugf("handling: %v", u)
-	a.queue <- u
+	timeout := 3 * time.Second
+	if a.cfg != nil && a.cfg.HandoffTimeout > 0 {
+		timeout = a.cfg.HandoffTimeout
+	}
+	timer := time.NewTimer(timeout)
+	defer timer.Stop()
+	select {
+	case a.queue <- u:
+		return nil
+	case <-timer.C:
+	case <-a.close:
+	case <-ctx.Done():
+	}
+	a.droppedEvents.Add(1)
+	dl.Warnf("dropped limits handoff for share '%v'; usage is recorded in InfluxDB", u.ShareToken)
 	return nil
 }
+
+func (a *Agent) DroppedEvents() uint64 { return a.droppedEvents.Load() }
 
 func (a *Agent) run() {
 	dl.Info("started")
