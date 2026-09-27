@@ -66,7 +66,7 @@ jobs:
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: '~> v2'
+          version: '~> v2.14'
           args: release --skip=publish --config .goreleaser-linux-${{ matrix.arch.goreleaser }}.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -97,8 +97,14 @@ jobs:
           else
             SEMVER_PRE=${SEMVER#*-}
           fi
-          for PAX in zrok{,-share,-agent}; do
+          BINARY_PACKAGES=(zrok)
+          META_PACKAGES=(zrok-share zrok-agent)
+          for PAX in "${BINARY_PACKAGES[@]}" "${META_PACKAGES[@]}"; do
             _pattern="./dist/${PAX}-${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*.${ARCH}.rpm"
+            if ! compgen -G "$_pattern" > /dev/null && [[ " ${META_PACKAGES[*]} " == *" ${PAX} "* ]]; then
+              # Fall back to noarch for meta packages
+              _pattern="./dist/${PAX}-${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*.noarch.rpm"
+            fi
             if ! compgen -G "$_pattern" > /dev/null; then
               echo "ERROR: No RPM files found matching pattern '${_pattern}'" >&2
               ls -1 ./dist/
@@ -133,8 +139,14 @@ jobs:
           else
             SEMVER_PRE=${SEMVER#*-}
           fi
-          for PAX in zrok{,-share,-agent}; do
+          BINARY_PACKAGES=(zrok)
+          META_PACKAGES=(zrok-share zrok-agent)
+          for PAX in "${BINARY_PACKAGES[@]}" "${META_PACKAGES[@]}"; do
             _pattern="./dist/${PAX}_${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*_${ARCH}.deb"
+            if ! compgen -G "$_pattern" > /dev/null && [[ " ${META_PACKAGES[*]} " == *" ${PAX} "* ]]; then
+              # Fall back to all for meta packages
+              _pattern="./dist/${PAX}_${SEMVER_CORE}${SEMVER_PRE:+~${SEMVER_PRE}}*_all.deb"
+            fi
             if ! compgen -G "$_pattern" > /dev/null; then
               echo "ERROR: No DEB files found matching pattern '${_pattern}'" >&2
               ls -1 ./dist/
@@ -200,7 +212,7 @@ jobs:
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: '~> v2'
+          version: '~> v2.14'
           args: release --skip=publish --config .goreleaser-darwin.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -253,7 +265,7 @@ jobs:
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: '~> v2'
+          version: '~> v2.14'
           args: release --skip=publish --config .goreleaser-windows.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -332,7 +344,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: '~> v2'
+          version: '~> v2.14'
           args: release --config .goreleaser-release.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
