@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## Unreleased
+
+## v2.0.5
+
+FIX: The controller no longer crashes when the bandwidth-limit relax cycle meets a public share with no frontend selection. An account's limit is now cleared only once every one of its shares has been relaxed; a share that cannot be relaxed is retried on the next cycle without disturbing other accounts, and dial policies that already exist are not recreated.
+
+FIX: The controller holds one OpenZiti management session and re-authenticates only when it expires, instead of logging in on every operation. This removes the pressure on the OpenZiti controller's authentication rate limit during bursts of share activity and limit enforcement. A persistent authentication failure, such as rotated or mistyped OpenZiti credentials, now fails operations quickly instead of queueing them behind one login attempt after another.
+
+FIX: The metrics consumer bounds how many AMQP messages it holds unacknowledged and how long it spends on each: InfluxDB writes and share lookups have deadlines and a bounded retry, after which the message is dropped rather than parked, so a slow or unavailable InfluxDB or database can no longer fill the broker's memory. Malformed events are dropped immediately, a panic while processing one message no longer stops the consumer, and a full limits queue drops the handoff after a timeout while the usage stays recorded in InfluxDB.
+
+CHANGE: `Makefile`: `make` builds the UIs and installs the module, `make test` runs the full gate (UI builds and lints, `go test`, `go vet`), `make clean` resets the project-owned `GOBIN` and UI build products. The UI lint errors the gate surfaced are fixed.
+
 ## v2.0.4
 
 FIX: The agent no longer deletes reserved shares from the controller during graceful shutdown or after an abnormal subordinate process exit. Previously, a `SIGTERM`/`SIGINT` (e.g., on system reboot) caused the agent to issue an unconditional `DeleteShare` against the controller for every active share, destroying the reservation for private shares created with `--share-token` and for public shares with reserved names. The reservation is now preserved unless the user explicitly released the share via `zrok2 agent release`, allowing the agent to reattach on the next start. (https://github.com/openziti/zrok/issues/1251)
@@ -328,8 +340,7 @@ CHANGE: Add usage hint in `zrok config get --help` to clarify how to list all va
 
 CHANGE: The Python SDK's `Overview()` function was refactored as a class method (https://github.com/openziti/zrok/pull/846).
 
-FEATURE: The Python SDK now includes a `ProxyShare` class providing an HTTP proxy for public and private shares and a
-Jupyter notebook example (https://github.com/openziti/zrok/pull/847).
+FEATURE: The Python SDK now includes a `ProxyShare` class providing an HTTP proxy for public and private shares and a Jupyter notebook example (https://github.com/openziti/zrok/pull/847).
 
 FIX: PyPi publishing was failing due to a CI issue (https://github.com/openziti/zrok/issues/849)
 

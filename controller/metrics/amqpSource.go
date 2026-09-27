@@ -1,6 +1,8 @@
 package metrics
 
 import (
+	"context"
+	"net"
 	"time"
 
 	"github.com/michaelquigley/df/dd"
@@ -14,6 +16,7 @@ const AmqpSourceType = "amqpSource"
 type AmqpSourceConfig struct {
 	Url       string `dd:"+secret"`
 	QueueName string
+	Prefetch  int
 }
 
 func LoadAmqpSource(v map[string]any) (dd.Dynamic, error) {
@@ -25,22 +28,34 @@ func LoadAmqpSource(v map[string]any) (dd.Dynamic, error) {
 }
 
 type amqpSource struct {
-	cfg    *AmqpSourceConfig
-	conn   *amqp.Connection
-	ch     *amqp.Channel
-	queue  amqp.Queue
-	msgs   <-chan amqp.Delivery
-	errs   chan *amqp.Error
-	events chan ZitiEventMsg
-	close  chan struct{}
-	join   chan struct{}
+	cfg           *AmqpSourceConfig
+	conn          *amqp.Connection
+	ch            *amqp.Channel
+	queue         amqp.Queue
+	msgs          <-chan amqp.Delivery
+	errs          chan *amqp.Error
+	events        chan ZitiEventMsg
+	ctx           context.Context
+	cancel        context.CancelFunc
+	transport     net.Conn
+	stopTransport func() bool
+	join          chan struct{}
 }
 
 func newAmqpSource(cfg *AmqpSourceConfig) (*amqpSource, error) {
+	if cfg.Prefetch < 0 {
+		return nil, errors.New("prefetch must be positive")
+	}
+	config := *cfg
+	if config.Prefetch == 0 {
+		config.Prefetch = 64
+	}
+	ctx, cancel := context.WithCancel(context.Background())
 	as := &amqpSource{
-		cfg:   cfg,
-		close: make(chan struct{}),
-		join:  make(chan struct{}),
+		cfg:    &config,
+		ctx:    ctx,
+		cancel: cancel,
+		join:   make(chan struct{}),
 	}
 	return as, nil
 }
@@ -55,24 +70,29 @@ func (s *amqpSource) Start(events chan ZitiEventMsg) (join chan struct{}, err er
 }
 
 func (s *amqpSource) Stop() {
-	close(s.close)
+	s.cancel()
 	<-s.join
 }
 
 func (s *amqpSource) run() {
 	dl.Info("started")
-	defer dl.Info("stopped")
 	defer close(s.join)
+	defer dl.Info("stopped")
+	defer s.disconnect()
 
 mainLoop:
 	for {
+		if s.ctx.Err() != nil {
+			break mainLoop
+		}
+		s.disconnect()
 		dl.Infof("connecting to '%v'", s.cfg.Url)
 		if err := s.connect(); err != nil {
 			dl.Errorf("error connecting to '%v': %v", s.cfg.Url, err)
 			select {
 			case <-time.After(10 * time.Second):
 				continue mainLoop
-			case <-s.close:
+			case <-s.ctx.Done():
 				break mainLoop
 			}
 		}
@@ -87,7 +107,7 @@ mainLoop:
 					break msgLoop
 				}
 
-			case <-s.close:
+			case <-s.ctx.Done():
 				break mainLoop
 
 			case event, ok := <-s.msgs:
@@ -95,24 +115,46 @@ mainLoop:
 					dl.Debug("selecting on msg !ok")
 					break msgLoop
 				}
-				if event.Body != nil {
-					s.events <- &ZitiEventAMQP{
-						data: ZitiEventJson(event.Body),
-						msg:  event,
-					}
-				} else {
-					dl.Debug("event body was nil!")
-					break msgLoop
+				select {
+				case s.events <- &ZitiEventAMQP{
+					data: ZitiEventJson(event.Body),
+					msg:  event,
+				}:
+				case <-s.ctx.Done():
+					// leave the delivery unsettled for the broker to requeue on connection close.
+					break mainLoop
 				}
 			}
 		}
 	}
 }
 
-func (s *amqpSource) connect() error {
-	conn, err := amqp.Dial(s.cfg.Url)
+func (s *amqpSource) connect() (err error) {
+	ready := false
+	defer func() {
+		if !ready {
+			s.disconnect()
+		}
+	}()
+	conn, err := amqp.DialConfig(s.cfg.Url, amqp.Config{Dial: func(network, addr string) (net.Conn, error) {
+		dialer := net.Dialer{Timeout: 10 * time.Second}
+		raw, err := dialer.DialContext(s.ctx, network, addr)
+		if err != nil {
+			return nil, err
+		}
+		s.transport = raw
+		s.stopTransport = context.AfterFunc(s.ctx, func() { _ = raw.Close() })
+		if err := raw.SetDeadline(time.Now().Add(10 * time.Second)); err != nil {
+			return nil, err
+		}
+		return raw, nil
+	}})
 	if err != nil {
 		return errors.Wrap(err, "error dialing amqp broker")
+	}
+	// the AMQP handshake clears its deadline; bound queue and consumer setup too.
+	if err := s.transport.SetDeadline(time.Now().Add(10 * time.Second)); err != nil {
+		return err
 	}
 
 	ch, err := conn.Channel()
@@ -124,18 +166,36 @@ func (s *amqpSource) connect() error {
 	if err != nil {
 		return errors.Wrap(err, "error declaring queue")
 	}
+	if err := ch.Qos(s.cfg.Prefetch, 0, false); err != nil {
+		return errors.Wrap(err, "error setting prefetch")
+	}
 
 	msgs, err := ch.Consume(s.cfg.QueueName, "zrok", false, false, false, false, nil)
 	if err != nil {
 		return errors.Wrap(err, "error consuming")
 	}
 
-	s.errs = make(chan *amqp.Error)
+	if err := s.transport.SetDeadline(time.Time{}); err != nil {
+		return err
+	}
+	s.errs = make(chan *amqp.Error, 1)
 	conn.NotifyClose(s.errs)
 	s.conn = conn
 	s.ch = ch
 	s.queue = queue
 	s.msgs = msgs
+	ready = true
 
 	return nil
+}
+
+func (s *amqpSource) disconnect() {
+	if s.stopTransport != nil {
+		s.stopTransport()
+		s.stopTransport = nil
+	}
+	if s.transport != nil {
+		_ = s.transport.Close()
+		s.transport = nil
+	}
 }

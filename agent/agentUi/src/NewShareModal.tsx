@@ -25,7 +25,7 @@ const NewShareModal = ({ close, isOpen }: NewShareModalProps) => {
             switch(v.shareMode) {
                 case "public":
                     GetAgentApi().agentSharePublic(v)
-                        .then(r => {
+                        .then(() => {
                             close();
                         })
                         .catch(e => {
@@ -38,7 +38,7 @@ const NewShareModal = ({ close, isOpen }: NewShareModalProps) => {
 
                 case "private":
                     GetAgentApi().agentSharePrivate(v)
-                        .then(r => {
+                        .then(() => {
                             close();
                         })
                         .catch(e => {

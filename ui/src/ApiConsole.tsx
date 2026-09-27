@@ -31,7 +31,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
     const updateGraph = useApiConsoleStore((state) => state.updateGraph);
     const oldGraph = useRef<Graph>(graph);
     const sparkdata = useApiConsoleStore((state) => state.sparkdata);
-    const sparkdataRef = useRef<Map<string, Number[]>>();
+    const sparkdataRef = useRef<Map<string, number[]>>();
     sparkdataRef.current = sparkdata;
     const updateSparkdata = useApiConsoleStore((state) => state.updateSparkdata);
     const nodes = useApiConsoleStore((state) => state.nodes);
@@ -147,9 +147,9 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
         return getMetadataApi(currentUser).getSparklines({body: {environments: environments, shares: shares}}, { signal })
             .then(d => {
                 if(d.sparklines) {
-                    const sparkdataIn = new Map<string, Number[]>();
+                    const sparkdataIn = new Map<string, number[]>();
                     d.sparklines!.forEach(s => {
-                        const activity = new Array<Number>(31);
+                        const activity = new Array<number>(31);
                         if(s.samples) {
                             s.samples?.forEach((sample, i) => {
                                 let v = 0;
@@ -162,7 +162,7 @@ const ApiConsole = ({ logout }: ApiConsoleProps) => {
                     });
                     updateSparkdata(sparkdataIn);
                 } else {
-                    updateSparkdata(new Map<string, Number[]>());
+                    updateSparkdata(new Map<string, number[]>());
                 }
             });
     }, [updateSparkdata]);

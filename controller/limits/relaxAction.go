@@ -1,6 +1,7 @@
 package limits
 
 import (
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_model"
@@ -8,35 +9,41 @@ import (
 	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 	"github.com/pkg/errors"
+	"strings"
 )
 
 type relaxAction struct {
-	str  *store.Store
-	zCfg *automation.Config
+	str     *store.Store
+	newZiti func() (*automation.ZitiAutomation, error)
 }
 
-func newRelaxAction(str *store.Store, zCfg *automation.Config) *relaxAction {
-	return &relaxAction{str, zCfg}
+func newRelaxAction(str *store.Store, newZiti func() (*automation.ZitiAutomation, error)) *relaxAction {
+	return &relaxAction{str, newZiti}
 }
+
+// storeRelaxError distinguishes a failed SQL operation from a retryable Ziti failure.
+type storeRelaxError struct{ error }
+
+func storeFailure(err error) error { return storeRelaxError{err} }
 
 func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.BandwidthClass, _ *userLimits, trx *sqlx.Tx) error {
 	dl.Debugf("relaxing '%v'", acct.Email)
 
 	envs, err := a.str.FindEnvironmentsForAccount(acct.Id, trx)
 	if err != nil {
-		return errors.Wrapf(err, "error finding environments for account '%v'", acct.Email)
+		return storeFailure(errors.Wrapf(err, "error finding environments for account '%v'", acct.Email))
 	}
 
 	jes, err := a.str.FindAllLatestBandwidthLimitJournalForAccount(acct.Id, trx)
 	if err != nil {
-		return errors.Wrapf(err, "error finding latest bandwidth limit journal entries for account '%v'", acct.Email)
+		return storeFailure(errors.Wrapf(err, "error finding latest bandwidth limit journal entries for account '%v'", acct.Email))
 	}
 	limitedBackends := make(map[sdk.BackendMode]bool)
 	for _, je := range jes {
 		if je.LimitClassId != nil {
 			lc, err := a.str.GetLimitClass(*je.LimitClassId, trx)
 			if err != nil {
-				return err
+				return storeFailure(err)
 			}
 			if lc.BackendMode != nil && lc.LimitAction == store.LimitLimitAction {
 				limitedBackends[*lc.BackendMode] = true
@@ -44,15 +51,16 @@ func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 		}
 	}
 
-	ziti, err := automation.NewZitiAutomation(a.zCfg)
+	ziti, err := a.newZiti()
 	if err != nil {
 		return err
 	}
 
+	var failures []string
 	for _, env := range envs {
 		shrs, err := a.str.FindSharesForEnvironment(env.Id, trx)
 		if err != nil {
-			return errors.Wrapf(err, "error finding shares for environment '%v'", env.ZId)
+			return storeFailure(errors.Wrapf(err, "error finding shares for environment '%v'", env.ZId))
 		}
 
 		for _, shr := range shrs {
@@ -61,34 +69,57 @@ func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 				switch shr.ShareMode {
 				case string(sdk.PublicShareMode):
 					if err := relaxPublicShare(a.str, ziti, shr, trx); err != nil {
-						dl.Errorf("error relaxing public share '%v' for account '%v' (ignoring): %v", shr.Token, acct.Email, err)
+						var storeErr storeRelaxError
+						if errors.As(err, &storeErr) {
+							return err
+						}
+						failures = append(failures, fmt.Sprintf("share '%v': %v", shr.Token, err))
 					}
 				case string(sdk.PrivateShareMode):
 					if err := relaxPrivateShare(a.str, ziti, shr, trx); err != nil {
-						dl.Errorf("error relaxing private share '%v' for account '%v' (ignoring): %v", shr.Token, acct.Email, err)
+						var storeErr storeRelaxError
+						if errors.As(err, &storeErr) {
+							return err
+						}
+						failures = append(failures, fmt.Sprintf("share '%v': %v", shr.Token, err))
 					}
 				}
 			}
 		}
 	}
 
+	if len(failures) > 0 {
+		return errors.New(strings.Join(failures, "; "))
+	}
 	return nil
 }
 
 func relaxPublicShare(str *store.Store, ziti *automation.ZitiAutomation, shr *store.Share, trx *sqlx.Tx) error {
 	env, err := str.GetEnvironment(shr.EnvironmentId, trx)
 	if err != nil {
-		return errors.Wrap(err, "error finding environment")
+		return storeFailure(errors.Wrap(err, "error finding environment"))
+	}
+	if shr.FrontendSelection == nil {
+		return errors.Errorf("share '%v' has no frontend selection", shr.Token)
 	}
 
 	fe, err := str.FindFrontendPubliclyNamed(*shr.FrontendSelection, trx)
 	if err != nil {
-		return errors.Wrapf(err, "error finding frontend name '%v' for '%v'", *shr.FrontendSelection, shr.Token)
+		return storeFailure(errors.Wrapf(err, "error finding frontend name '%v' for '%v'", *shr.FrontendSelection, shr.Token))
+	}
+	policyName := env.ZId + "-" + shr.ZId + "-dial"
+	policies, err := ziti.ServicePolicies.Find(&automation.FilterOptions{Filter: automation.BuildFilter("name", policyName)})
+	if err != nil {
+		return errors.Wrapf(err, "error finding dial service policy for '%v'", shr.Token)
+	}
+	if len(policies) > 0 {
+		dl.Debugf("dial service policy '%v' already exists", policyName)
+		return nil
 	}
 
 	opts := &automation.ServicePolicyOptions{
 		BaseOptions: automation.BaseOptions{
-			Name: env.ZId + "-" + shr.ZId + "-dial",
+			Name: policyName,
 			Tags: automation.ZrokShareTags(shr.Token),
 		},
 		IdentityRoles: []string{"@" + fe.ZId},
@@ -107,18 +138,27 @@ func relaxPublicShare(str *store.Store, ziti *automation.ZitiAutomation, shr *st
 func relaxPrivateShare(str *store.Store, ziti *automation.ZitiAutomation, shr *store.Share, trx *sqlx.Tx) error {
 	fes, err := str.FindFrontendsForPrivateShare(shr.Id, trx)
 	if err != nil {
-		return errors.Wrapf(err, "error finding frontends for share '%v'", shr.Token)
+		return storeFailure(errors.Wrapf(err, "error finding frontends for share '%v'", shr.Token))
 	}
 	for _, fe := range fes {
 		if fe.EnvironmentId != nil {
 			env, err := str.GetEnvironment(*fe.EnvironmentId, trx)
 			if err != nil {
-				return errors.Wrapf(err, "error getting environment for frontend '%v'", fe.Token)
+				return storeFailure(errors.Wrapf(err, "error getting environment for frontend '%v'", fe.Token))
+			}
+			policyName := fe.Token + "-" + env.ZId + "-" + shr.ZId + "-dial"
+			policies, err := ziti.ServicePolicies.Find(&automation.FilterOptions{Filter: automation.BuildFilter("name", policyName)})
+			if err != nil {
+				return errors.Wrapf(err, "error finding dial policy for frontend '%v'", fe.Token)
+			}
+			if len(policies) > 0 {
+				dl.Debugf("dial service policy '%v' already exists", policyName)
+				continue
 			}
 
 			opts := &automation.ServicePolicyOptions{
 				BaseOptions: automation.BaseOptions{
-					Name: fe.Token + "-" + env.ZId + "-" + shr.ZId + "-dial",
+					Name: policyName,
 					Tags: automation.NewTags().
 						WithZrok().
 						WithShareToken(shr.Token).

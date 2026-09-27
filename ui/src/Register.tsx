@@ -41,7 +41,7 @@ const SetPasswordForm = ({ email, touLink, register }: SetPasswordFormProps) => 
                 .min(8, "Password must be at least 8 characters")
                 .max(64, "Password must be less than 64 characters")
                 .matches(
-                    /^.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?].*$/,
+                    /^.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?].*$/,
                     "Password requires at least one special character"
                 )
                 .matches(

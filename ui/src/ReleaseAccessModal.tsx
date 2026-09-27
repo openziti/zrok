@@ -17,7 +17,7 @@ interface ReleaseAccessProps {
 
 const ReleaseAccessModal = ({ close, isOpen, user, access, detail }: ReleaseAccessProps) => {
     const [errorMessage, setErrorMessage] = useState<React.JSX.Element>(null);
-    const [frontendToken, setFrontendToken] = useState<String>("");
+    const [frontendToken, setFrontendToken] = useState<string>("");
     const [checked, setChecked] = useState<boolean>(false);
 
     const toggleChecked = () => {

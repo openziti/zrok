@@ -1,6 +1,7 @@
 package store
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -103,8 +104,12 @@ func (str *Store) ShareWithTokenExists(shrToken string, trx *sqlx.Tx) (bool, err
 }
 
 func (str *Store) FindShareWithZIdAndDeleted(zId string, trx *sqlx.Tx) (*Share, error) {
+	return str.FindShareWithZIdAndDeletedContext(context.Background(), zId, trx)
+}
+
+func (str *Store) FindShareWithZIdAndDeletedContext(ctx context.Context, zId string, trx *sqlx.Tx) (*Share, error) {
 	shr := &Share{}
-	if err := trx.Unsafe().QueryRowx("select * from shares where z_id = $1", zId).StructScan(shr); err != nil {
+	if err := trx.Unsafe().QueryRowxContext(ctx, "select * from shares where z_id = $1", zId).StructScan(shr); err != nil {
 		return nil, errors.Wrap(err, "error selecting share by z_id")
 	}
 	return shr, nil
