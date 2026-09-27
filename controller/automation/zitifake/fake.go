@@ -10,9 +10,11 @@ import (
 	"sync"
 	"time"
 
+	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/edge-api/rest_model"
+	"github.com/openziti/edge-api/rest_util"
 )
 
 // Server implements the edge-management resources used by controller tests.
@@ -24,18 +26,78 @@ type Server struct {
 	nextID                         int
 	PolicyCreates, PolicyDeletes   int
 	ServiceCreates, ServiceDeletes int
+	username, password             string
+	sessions                       map[string]bool
+	nextToken                      int
+	authentications, authAttempts  int
+	unauthorized                   int
+	rejectAuthentication           bool
+	rejectOperations               bool
 }
 
 func New() *Server {
-	f := &Server{policies: make(map[string]*rest_model.ServicePolicyDetail), services: make(map[string]*rest_model.ServiceDetail)}
+	return NewWithCredentials("admin", "admin")
+}
+
+func NewWithCredentials(username, password string) *Server {
+	f := &Server{policies: make(map[string]*rest_model.ServicePolicyDetail), services: make(map[string]*rest_model.ServiceDetail), sessions: make(map[string]bool), username: username, password: password}
 	f.Server = httptest.NewServer(http.HandlerFunc(f.serve))
 	return f
 }
 
 func (f *Server) Edge() *rest_management_api_client.ZitiEdgeManagement {
+	// resource-only tests receive an already authenticated fixture client.
+	f.mu.Lock()
+	token := f.issueToken()
+	f.mu.Unlock()
 	host := strings.TrimPrefix(f.URL, "http://")
-	return rest_management_api_client.NewHTTPClientWithConfig(nil, &rest_management_api_client.TransportConfig{
-		Host: host, BasePath: "/edge/management/v1", Schemes: []string{"http"},
+	runtime := httptransport.New(host, "/edge/management/v1", []string{"http"})
+	runtime.DefaultAuthentication = &rest_util.ZitiTokenAuth{Token: token}
+	return rest_management_api_client.New(runtime, nil)
+}
+
+func (f *Server) ExpireAll() {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	clear(f.sessions)
+}
+
+func (f *Server) RejectAuthentication(reject bool) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.rejectAuthentication = reject
+}
+
+func (f *Server) RejectOperations(reject bool) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.rejectOperations = reject
+}
+
+func (f *Server) AuthCounts() (successful, attempts, unauthorized int) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return f.authentications, f.authAttempts, f.unauthorized
+}
+
+func (f *Server) issueToken() string {
+	f.nextToken++
+	token := fmt.Sprintf("session-%d", f.nextToken)
+	f.sessions[token] = true
+	return token
+}
+
+func (f *Server) authenticate(w http.ResponseWriter, r *http.Request) {
+	f.authAttempts++
+	var input rest_model.Authenticate
+	if r.Method != http.MethodPost || r.URL.Query().Get("method") != "password" || json.NewDecoder(r.Body).Decode(&input) != nil || string(input.Username) != f.username || string(input.Password) != f.password || f.rejectAuthentication {
+		writeError(w, http.StatusUnauthorized, "invalid credentials")
+		return
+	}
+	token := f.issueToken()
+	f.authentications++
+	writeJSON(w, http.StatusOK, &rest_model.CurrentAPISessionDetailEnvelope{
+		Data: &rest_model.CurrentAPISessionDetail{APISessionDetail: rest_model.APISessionDetail{Token: &token}}, Meta: &rest_model.Meta{},
 	})
 }
 
@@ -50,6 +112,15 @@ func (f *Server) serve(w http.ResponseWriter, r *http.Request) {
 	defer f.mu.Unlock()
 	w.Header().Set("Content-Type", "application/json")
 	path := strings.TrimPrefix(r.URL.Path, "/edge/management/v1/")
+	if path == "authenticate" {
+		f.authenticate(w, r)
+		return
+	}
+	if !f.sessions[r.Header.Get("zt-session")] || f.rejectOperations {
+		f.unauthorized++
+		writeError(w, http.StatusUnauthorized, "invalid or expired session")
+		return
+	}
 	parts := strings.Split(path, "/")
 	if len(parts) < 1 || (parts[0] != "service-policies" && parts[0] != "services") {
 		writeError(w, 404, "route not found")

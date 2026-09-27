@@ -1,12 +1,10 @@
 package automation
 
 import (
-	"crypto/x509"
 	"fmt"
 	"time"
 
 	"github.com/openziti/edge-api/rest_management_api_client"
-	"github.com/openziti/edge-api/rest_util"
 	"github.com/pkg/errors"
 )
 
@@ -28,27 +26,7 @@ type ZitiAutomation struct {
 }
 
 func NewZitiAutomation(cfg *Config) (*ZitiAutomation, error) {
-	caCerts, err := rest_util.GetControllerWellKnownCas(cfg.ApiEndpoint)
-	if err != nil {
-		return nil, err
-	}
-	caPool := x509.NewCertPool()
-	for _, ca := range caCerts {
-		caPool.AddCert(ca)
-	}
-	edge, err := rest_util.NewEdgeManagementClientWithUpdb(cfg.Username, cfg.Password, cfg.ApiEndpoint, caPool)
-	if err != nil {
-		return nil, err
-	}
-	ziti := &ZitiAutomation{edge: edge}
-	ziti.Identities = NewIdentityManager(ziti)
-	ziti.Services = NewServiceManager(ziti)
-	ziti.Configs = NewConfigManager(ziti)
-	ziti.ConfigTypes = NewConfigTypeManager(ziti)
-	ziti.EdgeRouterPolicies = NewEdgeRouterPolicyManager(ziti)
-	ziti.ServiceEdgeRouterPolicies = NewServiceEdgeRouterPolicyManager(ziti)
-	ziti.ServicePolicies = NewServicePolicyManager(ziti)
-	return ziti, nil
+	return sharedSessions.get(cfg)
 }
 
 func (za *ZitiAutomation) Edge() *rest_management_api_client.ZitiEdgeManagement {
