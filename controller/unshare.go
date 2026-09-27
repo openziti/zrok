@@ -1,24 +1,23 @@
 package controller
 
 import (
-	"context"
-	"fmt"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/openziti/edge-api/rest_management_api_client"
-	edge_service "github.com/openziti/edge-api/rest_management_api_client/service"
 	"github.com/openziti/zrok/controller/store"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/rest_model_zrok"
 	"github.com/openziti/zrok/rest_server_zrok/operations/share"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
-type unshareHandler struct{}
+type unshareHandler struct {
+	edge func() (*rest_management_api_client.ZitiEdgeManagement, error)
+}
 
 func newUnshareHandler() *unshareHandler {
-	return &unshareHandler{}
+	return &unshareHandler{edge: func() (*rest_management_api_client.ZitiEdgeManagement, error) {
+		return zrokEdgeSdk.Client(cfg.Ziti)
+	}}
 }
 
 func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_model_zrok.Principal) middleware.Responder {
@@ -29,17 +28,8 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	edge, err := zrokEdgeSdk.Client(cfg.Ziti)
-	if err != nil {
-		logrus.Errorf("error getting edge client for '%v': %v", principal.Email, err)
-		return share.NewUnshareInternalServerError()
-	}
+	// the store is the authority for the share; a missing share never reaches ziti.
 	shrToken := params.Body.ShareToken
-	shrZId, err := h.findShareZId(shrToken, edge)
-	if err != nil {
-		logrus.Errorf("error finding share identity for '%v' (%v): %v", shrToken, principal.Email, err)
-		return share.NewUnshareNotFound()
-	}
 	var senv *store.Environment
 	if envs, err := str.FindEnvironmentsForAccount(int(principal.ID), tx); err == nil {
 		for _, env := range envs {
@@ -60,13 +50,13 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 	var sshr *store.Share
 	if shrs, err := str.FindSharesForEnvironment(senv.Id, tx); err == nil {
 		for _, shr := range shrs {
-			if shr.ZId == shrZId {
+			if shr.Token == shrToken {
 				sshr = shr
 				break
 			}
 		}
 		if sshr == nil {
-			logrus.Errorf("share with id '%v' not found for '%v'", shrZId, principal.Email)
+			logrus.Errorf("share '%v' not found for '%v'", shrToken, principal.Email)
 			return share.NewUnshareNotFound()
 		}
 	} else {
@@ -75,8 +65,14 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 	}
 
 	if sshr.Reserved == params.Body.Reserved {
+		edge, err := h.edge()
+		if err != nil {
+			logrus.Errorf("error getting edge client for '%v': %v", principal.Email, err)
+			return share.NewUnshareInternalServerError()
+		}
+
 		// single tag-based share deallocator; should work regardless of sharing mode
-		h.deallocateResources(senv, shrToken, shrZId, edge)
+		h.deallocateResources(senv, shrToken, sshr.ZId, edge)
 		logrus.Debugf("deallocated share '%v'", shrToken)
 
 		if err := str.DeleteAccessGrantsForShare(sshr.Id, tx); err != nil {
@@ -88,7 +84,7 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 			return share.NewUnshareInternalServerError()
 		}
 		if err := tx.Commit(); err != nil {
-			logrus.Errorf("error committing transaction for '%v': %v", shrZId, err)
+			logrus.Errorf("error committing transaction for '%v': %v", sshr.ZId, err)
 			return share.NewUnshareInternalServerError()
 		}
 
@@ -97,27 +93,6 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 	}
 
 	return share.NewUnshareOK()
-}
-
-func (h *unshareHandler) findShareZId(shrToken string, edge *rest_management_api_client.ZitiEdgeManagement) (string, error) {
-	filter := fmt.Sprintf("name=\"%v\"", shrToken)
-	limit := int64(1)
-	offset := int64(0)
-	listReq := &edge_service.ListServicesParams{
-		Filter:  &filter,
-		Limit:   &limit,
-		Offset:  &offset,
-		Context: context.Background(),
-	}
-	listReq.SetTimeout(30 * time.Second)
-	listResp, err := edge.Service.ListServices(listReq, nil)
-	if err != nil {
-		return "", err
-	}
-	if len(listResp.Payload.Data) == 1 {
-		return *(listResp.Payload.Data[0].ID), nil
-	}
-	return "", errors.Errorf("share '%v' not found", shrToken)
 }
 
 func (h *unshareHandler) deallocateResources(senv *store.Environment, shrToken, shrZId string, edge *rest_management_api_client.ZitiEdgeManagement) {

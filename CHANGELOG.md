@@ -2,13 +2,15 @@
 
 ## Unreleased
 
-FIX: The controller's metrics consumer now bounds its AMQP prefetch, usage lookup and InfluxDB write time, and retries, so a slow or unavailable store or InfluxDB no longer makes it hold the entire broker queue unacknowledged. Usage lookups and writes share one retry deadline. Malformed events and exhausted processing attempts are dropped without requeue; shutdown leaves unfinished deliveries for broker recovery. A message that triggers a panic is logged and dropped so processing can continue. A full limits queue drops and logs the handoff after a timeout; the recorded usage remains in InfluxDB for subsequent enforcement.
+## v1.1.12
 
-FIX: The v1 controller no longer crashes when it encounters a v2 public share without a frontend selection during bandwidth-limit relaxation. It keeps the account's limit journal entry until every share can be relaxed, continues processing other accounts, and safely retries dial policies that were already restored.
+FIX: The controller no longer crashes when the bandwidth-limit relax cycle meets a v2 public share (one with no frontend selection). An account's limit is now cleared only once every one of its shares has been relaxed; a share that cannot be relaxed is retried on the next cycle without disturbing other accounts, and dial policies that already exist are not recreated.
 
-CHANGE: Added a `Makefile` following the shared convention: `make` builds (frontends first, then `go install ./...` for the whole module), `make test` is the full repository gate (frontend builds and lints, `go test`, `go vet`), and `make clean` resets the project-owned `GOBIN` and the frontend build products. The `ui` and `agent/agentUi` lint scripts are part of the gate, and the lint errors they reported (`prefer-const`, wrapper object types, unnecessary regex escapes, unused variables, non-null-asserted optional chains, `any` props) are fixed.
+FIX: The controller holds one OpenZiti management session and re-authenticates only when it expires, instead of logging in on every operation. This removes the pressure on the OpenZiti controller's authentication rate limit during bursts of share activity. Unsharing a share that does not exist now returns not found without contacting OpenZiti, and a share whose OpenZiti service is already gone can now be unshared instead of remaining listed.
 
-CHANGE: Resolved the `go vet` findings that the new gate surfaced, matching the v2.0.4 fixes: signal-notification channels passed to `signal.Notify` are buffered (size 1), unkeyed `xml.Name`/`xml.StartElement` composite literals in the WebDAV client are keyed, and the `testCanary enabler` command defers its snapshot-streamer `CancelFunc`. The WebDAV server prefix test accepts the 307 trailing-slash redirect that `http.ServeMux` issues from Go 1.25 on, alongside the 301 issued by the pinned Go 1.24 toolchain.
+FIX: The metrics consumer bounds how many AMQP messages it holds unacknowledged and how long it spends on each: InfluxDB writes and share lookups have deadlines and a bounded retry, after which the message is dropped rather than parked, so a slow or unavailable InfluxDB or database can no longer fill the broker's memory. Malformed events are dropped immediately, a panic while processing one message no longer stops the consumer, and a full limits queue drops the handoff after a timeout while the usage stays recorded in InfluxDB.
+
+CHANGE: Added a `Makefile`: `make` builds the UIs and installs the module, `make test` runs the full gate (UI builds and lints, `go test`, `go vet`), `make clean` resets the project-owned `GOBIN` and UI build products. The UI lint errors and `go vet` findings the gate surfaced are fixed, and the WebDAV server prefix test accepts both the 301 and 307 trailing-slash redirects Go issues across toolchain versions.
 
 ## v1.1.11
 
