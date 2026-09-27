@@ -33,6 +33,7 @@ type Server struct {
 	unauthorized                   int
 	rejectAuthentication           bool
 	rejectOperations               bool
+	authDelay                      time.Duration
 }
 
 func New() *Server {
@@ -74,6 +75,13 @@ func (f *Server) RejectOperations(reject bool) {
 	f.rejectOperations = reject
 }
 
+// SetAuthenticationDelay delays every authentication response without blocking other requests.
+func (f *Server) SetAuthenticationDelay(delay time.Duration) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.authDelay = delay
+}
+
 func (f *Server) AuthCounts() (successful, attempts, unauthorized int) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
@@ -108,10 +116,16 @@ func (f *Server) Counts() (policyCreates, policyDeletes, serviceCreates, service
 }
 
 func (f *Server) serve(w http.ResponseWriter, r *http.Request) {
+	path := strings.TrimPrefix(r.URL.Path, "/edge/management/v1/")
+	if path == "authenticate" {
+		f.mu.Lock()
+		delay := f.authDelay
+		f.mu.Unlock()
+		time.Sleep(delay)
+	}
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	w.Header().Set("Content-Type", "application/json")
-	path := strings.TrimPrefix(r.URL.Path, "/edge/management/v1/")
 	if path == "authenticate" {
 		f.authenticate(w, r)
 		return
