@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v1.1.13
+
 FIX: Unsharing a share, disabling an environment or deleting an account through a v1 controller that shares its database with a v2 controller now releases the share's v2 names and frontend mappings as a v2 unshare does. A name used by a share torn down through v1 can be reused on v2 right away, instead of answering "already in use by another share" until the name was deleted. Reserved names stay with their owner; auto-allocated names are released. A dynamic-proxy frontend that is already running drops the route at its next reconciliation rather than immediately.
 
 ## v1.1.12
