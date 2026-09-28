@@ -142,7 +142,15 @@ func (str *Store) UpdateShare(shr *Share, tx *sqlx.Tx) error {
 	return nil
 }
 
+// DeleteShare soft-deletes the share. when the store is shared with a v2 controller, it first does what v2's unshare
+// does to the share's v2 state: releases the auto-allocated names its live mappings point at (reserved names stay with
+// their owner), soft-deletes those mappings and deletes the share's frontend mappings, so the name is free on v2 again.
 func (str *Store) DeleteShare(id int, tx *sqlx.Tx) error {
+	if str.v2Mappings {
+		if err := str.releaseV2Mappings(id, tx); err != nil {
+			return err
+		}
+	}
 	stmt, err := tx.Prepare("update shares set updated_at = current_timestamp, deleted = true where id = $1")
 	if err != nil {
 		return errors.Wrap(err, "error preparing shares delete statement")
@@ -150,6 +158,24 @@ func (str *Store) DeleteShare(id int, tx *sqlx.Tx) error {
 	_, err = stmt.Exec(id)
 	if err != nil {
 		return errors.Wrap(err, "error executing shares delete statement")
+	}
+	return nil
+}
+
+func (str *Store) releaseV2Mappings(shrId int, tx *sqlx.Tx) error {
+	// names first; they are selected through the live mappings released next
+	if _, err := tx.Exec("update names set deleted = true, updated_at = current_timestamp"+
+		" where not deleted and not reserved"+
+		" and id in (select name_id from share_name_mappings where share_id = $1 and not deleted)", shrId); err != nil {
+		return errors.Wrapf(err, "error releasing auto-allocated names for share '%d'", shrId)
+	}
+	if _, err := tx.Exec("update share_name_mappings set deleted = true, updated_at = current_timestamp"+
+		" where share_id = $1 and not deleted", shrId); err != nil {
+		return errors.Wrapf(err, "error deleting share name mappings for share '%d'", shrId)
+	}
+	if _, err := tx.Exec("delete from frontend_mappings"+
+		" where share_token = (select token from shares where id = $1)", shrId); err != nil {
+		return errors.Wrapf(err, "error deleting frontend mappings for share '%d'", shrId)
 	}
 	return nil
 }

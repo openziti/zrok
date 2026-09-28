@@ -30,8 +30,9 @@ type Config struct {
 }
 
 type Store struct {
-	cfg *Config
-	db  *sqlx.DB
+	cfg        *Config
+	db         *sqlx.DB
+	v2Mappings bool
 }
 
 func Open(cfg *Config) (*Store, error) {
@@ -64,7 +65,28 @@ func Open(cfg *Config) (*Store, error) {
 			return nil, errors.Wrapf(err, "error migrating database '%v'", cfg.Path)
 		}
 	}
+	store.probeV2Mappings()
 	return store, nil
+}
+
+// v2MappingTables are the v2 line's name and frontend mapping tables; a store shared with a v2 controller has them,
+// a store only ever migrated by v1 does not, and v1 never creates them.
+var v2MappingTables = []string{"names", "share_name_mappings", "frontend_mappings"}
+
+// probeV2Mappings records whether all of the v2 mapping tables exist, by attempting a trivial read from each; the
+// probe is the same statement on every engine. each read runs outside any transaction, so a failure cannot abort one.
+func (str *Store) probeV2Mappings() {
+	str.v2Mappings = true
+	for _, table := range v2MappingTables {
+		rows, err := str.db.Query(fmt.Sprintf("select 1 from %s limit 1", table))
+		if err != nil {
+			logrus.Infof("v2 mapping table '%v' not present; share teardown leaves v2 mappings alone: %v", table, err)
+			str.v2Mappings = false
+			return
+		}
+		_ = rows.Close()
+	}
+	logrus.Info("v2 mapping tables present; share teardown releases v2 names and mappings")
 }
 
 func (str *Store) Begin() (*sqlx.Tx, error) {

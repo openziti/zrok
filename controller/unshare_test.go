@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/zrok/controller/store"
+	"github.com/openziti/zrok/controller/store/storetest"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk"
 	"github.com/openziti/zrok/controller/zrokEdgeSdk/zitifake"
 	"github.com/openziti/zrok/rest_model_zrok"
@@ -25,6 +27,11 @@ func newUnshareFixture(t *testing.T) *unshareFixture {
 	t.Helper()
 	testStr, err := store.Open(&store.Config{Path: ":memory:", Type: "sqlite3"})
 	require.NoError(t, err)
+	return newUnshareFixtureOn(t, testStr)
+}
+
+func newUnshareFixtureOn(t *testing.T, testStr *store.Store) *unshareFixture {
+	t.Helper()
 	oldStr := str
 	str = testStr
 	t.Cleanup(func() {
@@ -95,4 +102,72 @@ func TestUnshareExistingShareDeallocates(t *testing.T) {
 	shr, err := str.GetShare(shrID, trx)
 	require.NoError(t, err)
 	require.True(t, shr.Deleted)
+}
+
+// openV2Store opens a store that also carries the v2 mapping tables; the store is reopened after creating them so
+// that its probe sees them.
+func openV2Store(t *testing.T) *store.Store {
+	t.Helper()
+	cfg := &store.Config{Path: filepath.Join(t.TempDir(), "zrok.db"), Type: "sqlite3"}
+	v1Str, err := store.Open(cfg)
+	require.NoError(t, err)
+	trx, err := v1Str.Begin()
+	require.NoError(t, err)
+	require.NoError(t, storetest.CreateV2Tables(trx))
+	require.NoError(t, trx.Commit())
+	require.NoError(t, v1Str.Close())
+	v2Str, err := store.Open(cfg)
+	require.NoError(t, err)
+	return v2Str
+}
+
+func (f *unshareFixture) createMappedShare(t *testing.T, shrZId, shrToken string) int {
+	t.Helper()
+	trx, err := str.Begin()
+	require.NoError(t, err)
+	envs, err := str.FindEnvironmentsForAccount(int(f.principal.ID), trx)
+	require.NoError(t, err)
+	shrID, err := str.CreateShare(envs[0].Id, &store.Share{ZId: shrZId, Token: shrToken, ShareMode: string(sdk.PublicShareMode), BackendMode: string(sdk.ProxyBackendMode), PermissionMode: store.OpenPermissionMode}, trx)
+	require.NoError(t, err)
+	_, err = storetest.MapShare(trx, int(f.principal.ID), shrID, shrToken, shrToken)
+	require.NoError(t, err)
+	require.NoError(t, trx.Commit())
+	return shrID
+}
+
+func requireNoLiveMappings(t *testing.T, shrID int, shrToken string) {
+	t.Helper()
+	trx, err := str.Begin()
+	require.NoError(t, err)
+	defer func() { _ = trx.Rollback() }()
+	names, frontends, err := storetest.LiveMappings(trx, shrID, shrToken)
+	require.NoError(t, err)
+	require.Zero(t, names)
+	require.Zero(t, frontends)
+}
+
+func TestUnshareReleasesV2Mappings(t *testing.T) {
+	f := newUnshareFixtureOn(t, openV2Store(t))
+	edge := f.fake.Edge()
+	shrToken := "mapped-share"
+	shrZId, err := zrokEdgeSdk.CreateShareService(f.envZId, shrToken, "config-zid", edge)
+	require.NoError(t, err)
+	shrID := f.createMappedShare(t, shrZId, shrToken)
+
+	require.IsType(t, &share.UnshareOK{}, f.unshare(shrToken))
+	requireNoLiveMappings(t, shrID, shrToken)
+}
+
+func TestDisableReleasesV2Mappings(t *testing.T) {
+	f := newUnshareFixtureOn(t, openV2Store(t))
+	shrToken := "disabled-share"
+	shrID := f.createMappedShare(t, "disabled-zid", shrToken)
+
+	trx, err := str.Begin()
+	require.NoError(t, err)
+	env, err := str.FindEnvironmentForAccount(f.envZId, int(f.principal.ID), trx)
+	require.NoError(t, err)
+	require.NoError(t, removeEnvironmentFromStore(env, trx))
+	require.NoError(t, trx.Commit())
+	requireNoLiveMappings(t, shrID, shrToken)
 }
