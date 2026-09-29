@@ -23,6 +23,8 @@ const (
 	Services                  = "services"
 	ServicePolicies           = "service-policies"
 	ServiceEdgeRouterPolicies = "service-edge-router-policies"
+	Identities                = "identities"
+	EdgeRouterPolicies        = "edge-router-policies"
 )
 
 var labels = map[string]struct{ id, noun string }{
@@ -30,6 +32,8 @@ var labels = map[string]struct{ id, noun string }{
 	Services:                  {"service", "service"},
 	ServicePolicies:           {"policy", "service policy"},
 	ServiceEdgeRouterPolicies: {"serp", "service edge router policy"},
+	Identities:                {"identity", "identity"},
+	EdgeRouterPolicies:        {"erp", "edge router policy"},
 }
 
 type object struct {
@@ -80,7 +84,7 @@ func NewTLSWithCredentials(username, password string) *Server {
 
 func newServer(username, password string) *Server {
 	objects := make(map[string]map[string]*object)
-	for _, kind := range []string{Configs, Services, ServicePolicies, ServiceEdgeRouterPolicies} {
+	for _, kind := range []string{Configs, Services, ServicePolicies, ServiceEdgeRouterPolicies, Identities, EdgeRouterPolicies} {
 		objects[kind] = make(map[string]*object)
 	}
 	return &Server{objects: objects, sessions: make(map[string]bool), username: username, password: password}
@@ -141,6 +145,27 @@ func (f *Server) OnBeforeCreate(hook func(kind, name string)) {
 func (f *Server) Seed(kind, name string, tags *rest_model.Tags) string {
 	f.nextID++
 	id := fmt.Sprintf("%s-%d", labels[kind].id, f.nextID)
+	f.seed(kind, id, name, tags)
+	return id
+}
+
+// SeedWithID inserts an object under a caller-chosen id, without counting it as a create. it takes the
+// fake's lock, so it is called from a test rather than a BeforeCreate hook. identities are addressed
+// by the id the store records (an environment's ZId), which is why this form exists.
+func (f *Server) SeedWithID(kind, id, name string, tags *rest_model.Tags) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.seed(kind, id, name, tags)
+}
+
+// Has reports whether an object of kind exists with id.
+func (f *Server) Has(kind, id string) bool {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return f.objects[kind][id] != nil
+}
+
+func (f *Server) seed(kind, id, name string, tags *rest_model.Tags) {
 	obj := &object{name: name, tags: tags}
 	switch kind {
 	case Configs:
@@ -153,11 +178,14 @@ func (f *Server) Seed(kind, name string, tags *rest_model.Tags) string {
 		obj.detail = &rest_model.ServicePolicyDetail{BaseEntity: base(id, tags), Name: &obj.name, IdentityRoles: rest_model.Roles{}, IdentityRolesDisplay: rest_model.NamedRoles{}, PostureCheckRoles: rest_model.Roles{}, PostureCheckRolesDisplay: rest_model.NamedRoles{}, ServiceRoles: rest_model.Roles{}, ServiceRolesDisplay: rest_model.NamedRoles{}, Semantic: new(rest_model.SemanticAllOf), Type: obj.dial}
 	case ServiceEdgeRouterPolicies:
 		obj.detail = &rest_model.ServiceEdgeRouterPolicyDetail{BaseEntity: base(id, tags), Name: &obj.name, EdgeRouterRoles: rest_model.Roles{}, EdgeRouterRolesDisplay: rest_model.NamedRoles{}, ServiceRoles: rest_model.Roles{}, ServiceRolesDisplay: rest_model.NamedRoles{}, Semantic: new(rest_model.SemanticAllOf)}
+	case Identities:
+		obj.detail = &rest_model.IdentityDetail{BaseEntity: base(id, tags), Name: &obj.name, AuthPolicy: &rest_model.EntityRef{}, AuthPolicyID: new(string), Authenticators: &rest_model.IdentityAuthenticators{}, DefaultHostingCost: new(rest_model.TerminatorCost), Disabled: new(bool), EdgeRouterConnectionStatus: new(string), Enrollment: &rest_model.IdentityEnrollments{}, EnvInfo: &rest_model.EnvInfo{}, ExternalID: new(string), HasAPISession: new(bool), HasEdgeRouterConnection: new(bool), Interfaces: []*rest_model.Interface{}, IsAdmin: new(bool), IsDefaultAdmin: new(bool), IsMfaEnabled: new(bool), RoleAttributes: &rest_model.Attributes{}, SdkInfo: &rest_model.SdkInfo{}, ServiceHostingCosts: rest_model.TerminatorCostMap{}, ServiceHostingPrecedences: rest_model.TerminatorPrecedenceMap{}, Type: &rest_model.EntityRef{}, TypeID: new(string)}
+	case EdgeRouterPolicies:
+		obj.detail = &rest_model.EdgeRouterPolicyDetail{BaseEntity: base(id, tags), Name: &obj.name, EdgeRouterRoles: rest_model.Roles{}, EdgeRouterRolesDisplay: rest_model.NamedRoles{}, IdentityRoles: rest_model.Roles{}, IdentityRolesDisplay: rest_model.NamedRoles{}, IsSystem: new(bool), Semantic: new(rest_model.SemanticAllOf)}
 	default:
 		panic("unknown kind " + kind)
 	}
 	f.objects[kind][id] = obj
-	return id
 }
 
 // Log returns the objects created and deleted through the api, in order, as 'kind/id'.
@@ -248,6 +276,10 @@ func (f *Server) serve(w http.ResponseWriter, r *http.Request) {
 		case http.MethodGet:
 			f.list(w, r, kind)
 		case http.MethodPost:
+			if kind == Identities || kind == EdgeRouterPolicies {
+				writeError(w, 405, "method not allowed")
+				return
+			}
 			f.create(w, r, kind)
 		default:
 			writeError(w, 405, "method not allowed")
@@ -381,6 +413,10 @@ func (f *Server) list(w http.ResponseWriter, r *http.Request, kind string) {
 		writeJSON(w, 200, &rest_model.ListServicePoliciesEnvelope{Data: details[rest_model.ServicePolicyDetail](matched), Meta: &rest_model.Meta{}})
 	case ServiceEdgeRouterPolicies:
 		writeJSON(w, 200, &rest_model.ListServiceEdgeRouterPoliciesEnvelope{Data: details[rest_model.ServiceEdgeRouterPolicyDetail](matched), Meta: &rest_model.Meta{}})
+	case Identities:
+		writeJSON(w, 200, &rest_model.ListIdentitiesEnvelope{Data: details[rest_model.IdentityDetail](matched), Meta: &rest_model.Meta{}})
+	case EdgeRouterPolicies:
+		writeJSON(w, 200, &rest_model.ListEdgeRouterPoliciesEnvelope{Data: details[rest_model.EdgeRouterPolicyDetail](matched), Meta: &rest_model.Meta{}})
 	}
 }
 
@@ -407,6 +443,10 @@ func (f *Server) detail(w http.ResponseWriter, kind, id string) {
 		writeJSON(w, 200, &rest_model.DetailServicePolicyEnvelop{Data: obj.detail.(*rest_model.ServicePolicyDetail), Meta: &rest_model.Meta{}})
 	case ServiceEdgeRouterPolicies:
 		writeJSON(w, 200, &rest_model.DetailServiceEdgePolicyEnvelope{Data: obj.detail.(*rest_model.ServiceEdgeRouterPolicyDetail), Meta: &rest_model.Meta{}})
+	case Identities:
+		writeJSON(w, 200, &rest_model.DetailIdentityEnvelope{Data: obj.detail.(*rest_model.IdentityDetail), Meta: &rest_model.Meta{}})
+	case EdgeRouterPolicies:
+		writeJSON(w, 200, &rest_model.DetailEdgeRouterPolicyEnvelope{Data: obj.detail.(*rest_model.EdgeRouterPolicyDetail), Meta: &rest_model.Meta{}})
 	}
 }
 

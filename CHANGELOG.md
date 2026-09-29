@@ -6,6 +6,8 @@ FIX: A share request that fails part-way now removes the OpenZiti objects it cre
 
 FIX: Deleting OpenZiti objects that are already gone now counts as success during cleanup, so one object removed concurrently no longer stops the rest of a cleanup from running.
 
+FIX: Disabling an environment, or deleting an account, now succeeds when the environment's OpenZiti identity is already gone, so an environment stranded by an earlier partial teardown can be cleaned up. Previously the request failed with an internal error and the environment could never be disabled. The admin identity delete likewise succeeds when the identity is already gone. Any other OpenZiti failure still fails the request and leaves the environment in place for a retry (https://github.com/openziti/zrok/issues/1265).
+
 ## v2.0.5
 
 FIX: The controller no longer crashes when the bandwidth-limit relax cycle meets a public share with no frontend selection. An account's limit is now cleared only once every one of its shares has been relaxed; a share that cannot be relaxed is retried on the next cycle without disturbing other accounts, and dial policies that already exist are not recreated.
