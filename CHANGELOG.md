@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v2.0.6
+
 FIX: A share request that fails part-way now removes the OpenZiti objects it created (config, service and policies) and reports the underlying error. Previously the controller logged a `chk_z_id` constraint failure in place of the real OpenZiti error, and any failure after allocation, such as a closed private share granted to an unknown account, left the objects behind with no share owning them. Failed OpenZiti calls now log OpenZiti's own error code and message, such as the name of a conflicting object, where the log previously showed only the operation and HTTP status.
 
 FIX: Deleting OpenZiti objects that are already gone now counts as success during cleanup, so one object removed concurrently no longer stops the rest of a cleanup from running.
@@ -9,6 +11,10 @@ FIX: Deleting OpenZiti objects that are already gone now counts as success durin
 FIX: Disabling an environment, or deleting an account, now succeeds when the environment's OpenZiti identity is already gone, so an environment stranded by an earlier partial teardown can be cleaned up. Previously the request failed with an internal error and the environment could never be disabled. The admin identity delete likewise succeeds when the identity is already gone. Any other OpenZiti failure still fails the request and leaves the environment in place for a retry (https://github.com/openziti/zrok/issues/1265).
 
 FIX: Disabling an environment, or an administrator deleting an account, now releases each share's names and frontend mappings the same way `unshare` does. Previously a name used by a share removed that way stayed attached to the deleted share and every later attempt to use it answered "already in use by another share" until the name was deleted; auto-allocated names were never released. Frontend mapping updates are now sent to dynamic frontends only after the change is committed, so a request that fails no longer leaves a frontend serving a mapping that does not exist. A share create whose frontend mapping cannot be recorded now fails and removes what it created, and a share delete whose OpenZiti cleanup fails now fails and leaves the share in place for a retry, instead of reporting success with the OpenZiti objects left behind.
+
+FIX: A dynamic frontend now periodically reconciles its mappings against the controller (`mapping_reconcile_interval`, default ten minutes), so a mapping removed or reassigned while its real-time update was lost, such as during a broker outage, now disappears or is corrected without restarting the frontend. A complete set that comes back empty is applied over existing mappings only when two consecutive reconciliations agree. A dynamic frontend started while the controller is unreachable now keeps retrying its initial mapping load instead of exiting.
+
+FIX: A dynamic frontend's mapping update subscriber now bounds how many messages it holds unacknowledged (`amqp_subscriber.prefetch`, default 64) and never requeues. A message it cannot parse, or one with an unknown operation, is logged and discarded once; previously it was redelivered forever, holding up every real update behind it.
 
 ## v2.0.5
 

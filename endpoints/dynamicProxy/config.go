@@ -8,17 +8,18 @@ import (
 )
 
 type config struct {
-	V                      int    `dd:"+match=1"`
-	FrontendToken          string `dd:"+required"`
-	Identity               string
-	BindAddress            string
-	TemplatePath           string
-	MappingRefreshInterval time.Duration
-	Interstitial           *interstitialConfig
-	Oauth                  *oauthConfig
-	AmqpSubscriber         *amqpSubscriberConfig   `dd:"+required"`
-	Controller             *controllerClientConfig `dd:"+required"`
-	Tls                    *endpoints.TlsConfig
+	V                        int    `dd:"+match=1"`
+	FrontendToken            string `dd:"+required"`
+	Identity                 string
+	BindAddress              string
+	TemplatePath             string
+	MappingRefreshInterval   time.Duration
+	MappingReconcileInterval time.Duration
+	Interstitial             *interstitialConfig
+	Oauth                    *oauthConfig
+	AmqpSubscriber           *amqpSubscriberConfig   `dd:"+required"`
+	Controller               *controllerClientConfig `dd:"+required"`
+	Tls                      *endpoints.TlsConfig
 }
 
 type interstitialConfig struct {
@@ -69,11 +70,13 @@ type oauthProviderConfig struct {
 
 func defaults() *config {
 	return &config{
-		Identity:               "public",
-		BindAddress:            "0.0.0.0:8080",
-		MappingRefreshInterval: 5 * time.Minute,
+		Identity:                 "public",
+		BindAddress:              "0.0.0.0:8080",
+		MappingRefreshInterval:   5 * time.Minute,
+		MappingReconcileInterval: 10 * time.Minute,
 		AmqpSubscriber: &amqpSubscriberConfig{
 			QueueDepth: 1024,
+			Prefetch:   64,
 		},
 		Controller: &controllerClientConfig{
 			Timeout: 30 * time.Second,

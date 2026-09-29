@@ -23,6 +23,14 @@ bind_address: "0.0.0.0:8080"
 #
 mapping_refresh_interval: 1m
 
+# The `mapping_reconcile_interval` controls how often the frontend pulls its complete set of mappings from the controller
+# and makes its own mappings match it, dropping names the controller no longer has and correcting names that now point
+# at a different share. This recovers mapping removals missed by the real-time AMQP updates, which the
+# `mapping_refresh_interval` pull cannot see. A complete set that comes back empty is applied over existing
+# mappings only when two consecutive reconciliations agree. Defaults to 10m
+#
+#mapping_reconcile_interval: 10m
+
 # The `amqp_subscriber` section configures the AMQP connection for receiving real-time mapping updates
 # from the dynamicProxyController
 #
@@ -32,6 +40,10 @@ amqp_subscriber:
   
   # Exchange name (must match the controller's amqp_publisher.exchange_name)
   exchange_name: dynamicProxy
+
+  # Maximum number of AMQP messages the broker delivers to this frontend before it has acknowledged them. Defaults to 64
+  #
+  #prefetch: 64
 
 # The `controller` section configures how this frontend connects to the dynamicProxyController
 # for querying mappings via gRPC over the Ziti network
