@@ -4,7 +4,6 @@ import (
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_management_api_client/config"
 	"github.com/openziti/edge-api/rest_model"
-	"github.com/pkg/errors"
 )
 
 type ConfigTypeManager struct {
@@ -37,7 +36,7 @@ func (ctm *ConfigTypeManager) Create(opts *ConfigTypeOptions) (string, error) {
 
 	resp, err := ctm.Edge().Config.CreateConfigType(req, nil)
 	if err != nil {
-		return "", errors.Wrapf(err, "error creating config type '%s'", opts.Name)
+		return "", wrapEdgeError(err, "error creating config type '%s'", opts.Name)
 	}
 
 	dl.Infof("created config type '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
@@ -53,7 +52,7 @@ func (ctm *ConfigTypeManager) Delete(id string) error {
 
 	_, err := ctm.Edge().Config.DeleteConfigType(req, nil)
 	if err != nil {
-		return errors.Wrapf(err, "error deleting config type '%s'", id)
+		return wrapEdgeError(err, "error deleting config type '%s'", id)
 	}
 
 	dl.Infof("deleted config type '%s'", id)
@@ -71,7 +70,7 @@ func (ctm *ConfigTypeManager) Find(opts *FilterOptions) ([]*rest_model.ConfigTyp
 
 	resp, err := ctm.Edge().Config.ListConfigTypes(req, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "error listing config types")
+		return nil, wrapEdgeError(err, "error listing config types")
 	}
 
 	return resp.Payload.Data, nil

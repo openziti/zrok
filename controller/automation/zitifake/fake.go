@@ -17,15 +17,40 @@ import (
 	"github.com/openziti/edge-api/rest_util"
 )
 
+// kinds of object the fake serves, named by their edge-management collection path.
+const (
+	Configs                   = "configs"
+	Services                  = "services"
+	ServicePolicies           = "service-policies"
+	ServiceEdgeRouterPolicies = "service-edge-router-policies"
+)
+
+var labels = map[string]struct{ id, noun string }{
+	Configs:                   {"config", "config"},
+	Services:                  {"service", "service"},
+	ServicePolicies:           {"policy", "service policy"},
+	ServiceEdgeRouterPolicies: {"serp", "service edge router policy"},
+}
+
+type object struct {
+	name   string
+	tags   *rest_model.Tags
+	dial   *rest_model.DialBind
+	detail interface{}
+}
+
 // Server implements the edge-management resources used by controller tests.
 type Server struct {
 	*httptest.Server
 	mu                             sync.Mutex
-	policies                       map[string]*rest_model.ServicePolicyDetail
-	services                       map[string]*rest_model.ServiceDetail
+	objects                        map[string]map[string]*object
 	nextID                         int
 	PolicyCreates, PolicyDeletes   int
 	ServiceCreates, ServiceDeletes int
+	ConfigCreates, ConfigDeletes   int
+	SerpCreates, SerpDeletes       int
+	createLog, deleteLog           []string
+	beforeCreate                   func(kind, name string)
 	username, password             string
 	sessions                       map[string]bool
 	nextToken                      int
@@ -41,9 +66,24 @@ func New() *Server {
 }
 
 func NewWithCredentials(username, password string) *Server {
-	f := &Server{policies: make(map[string]*rest_model.ServicePolicyDetail), services: make(map[string]*rest_model.ServiceDetail), sessions: make(map[string]bool), username: username, password: password}
+	f := newServer(username, password)
 	f.Server = httptest.NewServer(http.HandlerFunc(f.serve))
 	return f
+}
+
+// NewTLSWithCredentials serves over https with the httptest certificate, which Certificate returns.
+func NewTLSWithCredentials(username, password string) *Server {
+	f := newServer(username, password)
+	f.Server = httptest.NewTLSServer(http.HandlerFunc(f.serve))
+	return f
+}
+
+func newServer(username, password string) *Server {
+	objects := make(map[string]map[string]*object)
+	for _, kind := range []string{Configs, Services, ServicePolicies, ServiceEdgeRouterPolicies} {
+		objects[kind] = make(map[string]*object)
+	}
+	return &Server{objects: objects, sessions: make(map[string]bool), username: username, password: password}
 }
 
 func (f *Server) Edge() *rest_management_api_client.ZitiEdgeManagement {
@@ -51,8 +91,8 @@ func (f *Server) Edge() *rest_management_api_client.ZitiEdgeManagement {
 	f.mu.Lock()
 	token := f.issueToken()
 	f.mu.Unlock()
-	host := strings.TrimPrefix(f.URL, "http://")
-	runtime := httptransport.New(host, "/edge/management/v1", []string{"http"})
+	scheme, host, _ := strings.Cut(f.URL, "://")
+	runtime := httptransport.NewWithClient(host, "/edge/management/v1", []string{scheme}, f.Client())
 	runtime.DefaultAuthentication = &rest_util.ZitiTokenAuth{Token: token}
 	return rest_management_api_client.New(runtime, nil)
 }
@@ -86,6 +126,68 @@ func (f *Server) AuthCounts() (successful, attempts, unauthorized int) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	return f.authentications, f.authAttempts, f.unauthorized
+}
+
+// OnBeforeCreate installs a hook invoked with the kind and name of each create before it is applied.
+// the hook runs under the fake's lock, so it may call Seed but no other method.
+func (f *Server) OnBeforeCreate(hook func(kind, name string)) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.beforeCreate = hook
+}
+
+// Seed inserts an object directly, without counting it as a create. it expects the fake's lock to be
+// held, so it is called from a BeforeCreate hook.
+func (f *Server) Seed(kind, name string, tags *rest_model.Tags) string {
+	f.nextID++
+	id := fmt.Sprintf("%s-%d", labels[kind].id, f.nextID)
+	obj := &object{name: name, tags: tags}
+	switch kind {
+	case Configs:
+		obj.detail = &rest_model.ConfigDetail{BaseEntity: base(id, tags), Name: &obj.name, ConfigType: &rest_model.EntityRef{}, ConfigTypeID: new(string), Data: map[string]interface{}{}}
+	case Services:
+		obj.detail = &rest_model.ServiceDetail{BaseEntity: base(id, tags), Name: &obj.name, Config: map[string]map[string]interface{}{}, Configs: []string{}, EncryptionRequired: new(bool), MaxIdleTimeMillis: new(int64), Permissions: rest_model.DialBindArray{}, PostureQueries: []*rest_model.PostureQueries{}, RoleAttributes: &rest_model.Attributes{}, TerminatorStrategy: new(string)}
+	case ServicePolicies:
+		dial := rest_model.DialBindBind
+		obj.dial = &dial
+		obj.detail = &rest_model.ServicePolicyDetail{BaseEntity: base(id, tags), Name: &obj.name, IdentityRoles: rest_model.Roles{}, IdentityRolesDisplay: rest_model.NamedRoles{}, PostureCheckRoles: rest_model.Roles{}, PostureCheckRolesDisplay: rest_model.NamedRoles{}, ServiceRoles: rest_model.Roles{}, ServiceRolesDisplay: rest_model.NamedRoles{}, Semantic: new(rest_model.SemanticAllOf), Type: obj.dial}
+	case ServiceEdgeRouterPolicies:
+		obj.detail = &rest_model.ServiceEdgeRouterPolicyDetail{BaseEntity: base(id, tags), Name: &obj.name, EdgeRouterRoles: rest_model.Roles{}, EdgeRouterRolesDisplay: rest_model.NamedRoles{}, ServiceRoles: rest_model.Roles{}, ServiceRolesDisplay: rest_model.NamedRoles{}, Semantic: new(rest_model.SemanticAllOf)}
+	default:
+		panic("unknown kind " + kind)
+	}
+	f.objects[kind][id] = obj
+	return id
+}
+
+// Log returns the objects created and deleted through the api, in order, as 'kind/id'.
+func (f *Server) Log() (created, deleted []string) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return append([]string(nil), f.createLog...), append([]string(nil), f.deleteLog...)
+}
+
+// Tagged returns 'kind/id' for every object carrying tag key=value, sorted.
+func (f *Server) Tagged(key, value string) []string {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	var out []string
+	for kind, objects := range f.objects {
+		for id, obj := range objects {
+			if obj.tags != nil && fmt.Sprint(obj.tags.SubTags[key]) == value {
+				out = append(out, kind+"/"+id)
+			}
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// Remove deletes an object without counting or logging the delete.
+func (f *Server) Remove(kind, id string) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	delete(f.objects[kind], id)
 }
 
 func (f *Server) issueToken() string {
@@ -136,17 +238,17 @@ func (f *Server) serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	parts := strings.Split(path, "/")
-	if len(parts) < 1 || (parts[0] != "service-policies" && parts[0] != "services") {
+	kind := parts[0]
+	if f.objects[kind] == nil {
 		writeError(w, 404, "route not found")
 		return
 	}
-	policy := parts[0] == "service-policies"
 	if len(parts) == 1 {
 		switch r.Method {
 		case http.MethodGet:
-			f.list(w, r, policy)
+			f.list(w, r, kind)
 		case http.MethodPost:
-			f.create(w, r, policy)
+			f.create(w, r, kind)
 		default:
 			writeError(w, 405, "method not allowed")
 		}
@@ -159,9 +261,9 @@ func (f *Server) serve(w http.ResponseWriter, r *http.Request) {
 	id := parts[1]
 	switch r.Method {
 	case http.MethodGet:
-		f.detail(w, policy, id)
+		f.detail(w, kind, id)
 	case http.MethodDelete:
-		f.delete(w, policy, id)
+		f.delete(w, kind, id)
 	default:
 		writeError(w, 405, "method not allowed")
 	}
@@ -181,112 +283,149 @@ func base(id string, tags *rest_model.Tags) rest_model.BaseEntity {
 	return rest_model.BaseEntity{ID: &id, Tags: tags, CreatedAt: &now, UpdatedAt: &now, Links: rest_model.Links{}}
 }
 
-func (f *Server) create(w http.ResponseWriter, r *http.Request, policy bool) {
+func (f *Server) create(w http.ResponseWriter, r *http.Request, kind string) {
 	var name string
 	var tags *rest_model.Tags
-	if policy {
+	var fill func(obj *object, id string)
+	switch kind {
+	case Configs:
+		var input rest_model.ConfigCreate
+		if err := json.NewDecoder(r.Body).Decode(&input); err != nil || input.Name == nil || input.ConfigTypeID == nil {
+			writeError(w, 400, "invalid config")
+			return
+		}
+		name, tags = *input.Name, input.Tags
+		fill = func(obj *object, id string) {
+			obj.detail = &rest_model.ConfigDetail{BaseEntity: base(id, tags), Name: &obj.name, ConfigType: &rest_model.EntityRef{ID: *input.ConfigTypeID}, ConfigTypeID: input.ConfigTypeID, Data: input.Data}
+		}
+	case Services:
+		var input rest_model.ServiceCreate
+		if err := json.NewDecoder(r.Body).Decode(&input); err != nil || input.Name == nil {
+			writeError(w, 400, "invalid service")
+			return
+		}
+		name, tags = *input.Name, input.Tags
+		fill = func(obj *object, id string) {
+			maxIdle := input.MaxIdleTimeMillis
+			strategy := input.TerminatorStrategy
+			roles := rest_model.Attributes(input.RoleAttributes)
+			obj.detail = &rest_model.ServiceDetail{BaseEntity: base(id, tags), Name: &obj.name, Config: map[string]map[string]interface{}{}, Configs: input.Configs, EncryptionRequired: input.EncryptionRequired, MaxIdleTimeMillis: &maxIdle, Permissions: rest_model.DialBindArray{}, PostureQueries: []*rest_model.PostureQueries{}, RoleAttributes: &roles, TerminatorStrategy: &strategy}
+		}
+	case ServicePolicies:
 		var input rest_model.ServicePolicyCreate
 		if err := json.NewDecoder(r.Body).Decode(&input); err != nil || input.Name == nil {
 			writeError(w, 400, "invalid service policy")
 			return
 		}
 		name, tags = *input.Name, input.Tags
-		for _, existing := range f.policies {
-			if *existing.Name == name {
-				writeError(w, 400, "service policy name conflict: "+name)
-				return
-			}
+		fill = func(obj *object, id string) {
+			obj.dial = input.Type
+			obj.detail = &rest_model.ServicePolicyDetail{BaseEntity: base(id, tags), Name: &obj.name, IdentityRoles: input.IdentityRoles, IdentityRolesDisplay: rest_model.NamedRoles{}, PostureCheckRoles: input.PostureCheckRoles, PostureCheckRolesDisplay: rest_model.NamedRoles{}, ServiceRoles: input.ServiceRoles, ServiceRolesDisplay: rest_model.NamedRoles{}, Semantic: input.Semantic, Type: input.Type}
 		}
-		f.nextID++
-		id := fmt.Sprintf("policy-%d", f.nextID)
-		f.policies[id] = &rest_model.ServicePolicyDetail{BaseEntity: base(id, tags), Name: &name, IdentityRoles: input.IdentityRoles, IdentityRolesDisplay: rest_model.NamedRoles{}, PostureCheckRoles: input.PostureCheckRoles, PostureCheckRolesDisplay: rest_model.NamedRoles{}, ServiceRoles: input.ServiceRoles, ServiceRolesDisplay: rest_model.NamedRoles{}, Semantic: input.Semantic, Type: input.Type}
-		f.PolicyCreates++
-		writeJSON(w, 201, &rest_model.CreateEnvelope{Data: &rest_model.CreateLocation{ID: id}, Meta: &rest_model.Meta{}})
-		return
+	case ServiceEdgeRouterPolicies:
+		var input rest_model.ServiceEdgeRouterPolicyCreate
+		if err := json.NewDecoder(r.Body).Decode(&input); err != nil || input.Name == nil {
+			writeError(w, 400, "invalid service edge router policy")
+			return
+		}
+		name, tags = *input.Name, input.Tags
+		fill = func(obj *object, id string) {
+			obj.detail = &rest_model.ServiceEdgeRouterPolicyDetail{BaseEntity: base(id, tags), Name: &obj.name, EdgeRouterRoles: input.EdgeRouterRoles, EdgeRouterRolesDisplay: rest_model.NamedRoles{}, ServiceRoles: input.ServiceRoles, ServiceRolesDisplay: rest_model.NamedRoles{}, Semantic: input.Semantic}
+		}
 	}
-	var input rest_model.ServiceCreate
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil || input.Name == nil {
-		writeError(w, 400, "invalid service")
-		return
+	if f.beforeCreate != nil {
+		f.beforeCreate(kind, name)
 	}
-	name, tags = *input.Name, input.Tags
-	for _, existing := range f.services {
-		if *existing.Name == name {
-			writeError(w, 400, "service name conflict: "+name)
+	for _, existing := range f.objects[kind] {
+		if existing.name == name {
+			writeError(w, 400, labels[kind].noun+" name conflict: "+name)
 			return
 		}
 	}
-	f.nextID++
-	id := fmt.Sprintf("service-%d", f.nextID)
-	maxIdle := input.MaxIdleTimeMillis
-	strategy := input.TerminatorStrategy
-	roles := rest_model.Attributes(input.RoleAttributes)
-	f.services[id] = &rest_model.ServiceDetail{BaseEntity: base(id, tags), Name: &name, Config: map[string]map[string]interface{}{}, Configs: input.Configs, EncryptionRequired: input.EncryptionRequired, MaxIdleTimeMillis: &maxIdle, Permissions: rest_model.DialBindArray{}, PostureQueries: []*rest_model.PostureQueries{}, RoleAttributes: &roles, TerminatorStrategy: &strategy}
-	f.ServiceCreates++
+	id := f.Seed(kind, name, tags)
+	fill(f.objects[kind][id], id)
+	f.createLog = append(f.createLog, kind+"/"+id)
+	switch kind {
+	case Configs:
+		f.ConfigCreates++
+	case Services:
+		f.ServiceCreates++
+	case ServicePolicies:
+		f.PolicyCreates++
+	case ServiceEdgeRouterPolicies:
+		f.SerpCreates++
+	}
 	writeJSON(w, 201, &rest_model.CreateEnvelope{Data: &rest_model.CreateLocation{ID: id}, Meta: &rest_model.Meta{}})
 }
 
-func (f *Server) list(w http.ResponseWriter, r *http.Request, policy bool) {
+func (f *Server) list(w http.ResponseWriter, r *http.Request, kind string) {
 	filter := r.URL.Query().Get("filter")
-	if policy {
-		ids := make([]string, 0, len(f.policies))
-		for id := range f.policies {
-			ids = append(ids, id)
-		}
-		sort.Strings(ids)
-		data := rest_model.ServicePolicyList{}
-		for _, id := range ids {
-			p := f.policies[id]
-			if match(filter, id, *p.Name, p.Tags, p.Type) {
-				data = append(data, p)
-			}
-		}
-		writeJSON(w, 200, &rest_model.ListServicePoliciesEnvelope{Data: data, Meta: &rest_model.Meta{}})
-		return
-	}
-	ids := make([]string, 0, len(f.services))
-	for id := range f.services {
+	ids := make([]string, 0, len(f.objects[kind]))
+	for id := range f.objects[kind] {
 		ids = append(ids, id)
 	}
 	sort.Strings(ids)
-	data := rest_model.ServiceList{}
+	var matched []*object
 	for _, id := range ids {
-		s := f.services[id]
-		if match(filter, id, *s.Name, s.Tags, nil) {
-			data = append(data, s)
+		obj := f.objects[kind][id]
+		if match(filter, id, obj.name, obj.tags, obj.dial) {
+			matched = append(matched, obj)
 		}
 	}
-	writeJSON(w, 200, &rest_model.ListServicesEnvelope{Data: data, Meta: &rest_model.Meta{}})
+	switch kind {
+	case Configs:
+		writeJSON(w, 200, &rest_model.ListConfigsEnvelope{Data: details[rest_model.ConfigDetail](matched), Meta: &rest_model.Meta{}})
+	case Services:
+		writeJSON(w, 200, &rest_model.ListServicesEnvelope{Data: details[rest_model.ServiceDetail](matched), Meta: &rest_model.Meta{}})
+	case ServicePolicies:
+		writeJSON(w, 200, &rest_model.ListServicePoliciesEnvelope{Data: details[rest_model.ServicePolicyDetail](matched), Meta: &rest_model.Meta{}})
+	case ServiceEdgeRouterPolicies:
+		writeJSON(w, 200, &rest_model.ListServiceEdgeRouterPoliciesEnvelope{Data: details[rest_model.ServiceEdgeRouterPolicyDetail](matched), Meta: &rest_model.Meta{}})
+	}
 }
 
-func (f *Server) detail(w http.ResponseWriter, policy bool, id string) {
-	if policy {
-		if p := f.policies[id]; p != nil {
-			writeJSON(w, 200, &rest_model.DetailServicePolicyEnvelop{Data: p, Meta: &rest_model.Meta{}})
-			return
-		}
-	} else if s := f.services[id]; s != nil {
-		writeJSON(w, 200, &rest_model.DetailServiceEnvelope{Data: s, Meta: &rest_model.Meta{}})
+func details[T any](objects []*object) []*T {
+	out := make([]*T, 0, len(objects))
+	for _, obj := range objects {
+		out = append(out, obj.detail.(*T))
+	}
+	return out
+}
+
+func (f *Server) detail(w http.ResponseWriter, kind, id string) {
+	obj := f.objects[kind][id]
+	if obj == nil {
+		writeError(w, 404, "resource not found: "+id)
 		return
 	}
-	writeError(w, 404, "resource not found: "+id)
+	switch kind {
+	case Configs:
+		writeJSON(w, 200, &rest_model.DetailConfigEnvelope{Data: obj.detail.(*rest_model.ConfigDetail), Meta: &rest_model.Meta{}})
+	case Services:
+		writeJSON(w, 200, &rest_model.DetailServiceEnvelope{Data: obj.detail.(*rest_model.ServiceDetail), Meta: &rest_model.Meta{}})
+	case ServicePolicies:
+		writeJSON(w, 200, &rest_model.DetailServicePolicyEnvelop{Data: obj.detail.(*rest_model.ServicePolicyDetail), Meta: &rest_model.Meta{}})
+	case ServiceEdgeRouterPolicies:
+		writeJSON(w, 200, &rest_model.DetailServiceEdgePolicyEnvelope{Data: obj.detail.(*rest_model.ServiceEdgeRouterPolicyDetail), Meta: &rest_model.Meta{}})
+	}
 }
 
-func (f *Server) delete(w http.ResponseWriter, policy bool, id string) {
-	if policy {
-		if f.policies[id] == nil {
-			writeError(w, 404, "service policy not found: "+id)
-			return
-		}
-		delete(f.policies, id)
-		f.PolicyDeletes++
-	} else {
-		if f.services[id] == nil {
-			writeError(w, 404, "service not found: "+id)
-			return
-		}
-		delete(f.services, id)
+func (f *Server) delete(w http.ResponseWriter, kind, id string) {
+	if f.objects[kind][id] == nil {
+		writeError(w, 404, labels[kind].noun+" not found: "+id)
+		return
+	}
+	delete(f.objects[kind], id)
+	f.deleteLog = append(f.deleteLog, kind+"/"+id)
+	switch kind {
+	case Configs:
+		f.ConfigDeletes++
+	case Services:
 		f.ServiceDeletes++
+	case ServicePolicies:
+		f.PolicyDeletes++
+	case ServiceEdgeRouterPolicies:
+		f.SerpDeletes++
 	}
 	writeJSON(w, 200, struct {
 		Data interface{}      `json:"data"`

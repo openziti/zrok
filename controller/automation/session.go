@@ -66,7 +66,12 @@ func (c *sessionCache) get(cfg *Config) (*ZitiAutomation, error) {
 	caPool := c.caPool
 	c.mu.Unlock()
 
-	pool, err := caPool(cfg.ApiEndpoint)
+	// a plain-http endpoint has no tls, so there is no ca bundle to fetch.
+	var pool *x509.CertPool
+	var err error
+	if !plainHttp(cfg.ApiEndpoint) {
+		pool, err = caPool(cfg.ApiEndpoint)
+	}
 	var ziti *ZitiAutomation
 	if err == nil {
 		ziti, err = newZitiSession(cfg, pool)
@@ -81,6 +86,11 @@ func (c *sessionCache) get(cfg *Config) (*ZitiAutomation, error) {
 	build.ziti, build.err = ziti, err
 	close(build.done)
 	return ziti, err
+}
+
+func plainHttp(endpoint string) bool {
+	u, err := url.Parse(endpoint)
+	return err == nil && u.Scheme == "http"
 }
 
 // newZitiSession accepts an explicit CA pool so tests can use a plain HTTP fake.

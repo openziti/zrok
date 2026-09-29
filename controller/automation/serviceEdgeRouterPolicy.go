@@ -4,7 +4,6 @@ import (
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_management_api_client/service_edge_router_policy"
 	"github.com/openziti/edge-api/rest_model"
-	"github.com/pkg/errors"
 )
 
 type ServiceEdgeRouterPolicyManager struct {
@@ -41,7 +40,7 @@ func (serpm *ServiceEdgeRouterPolicyManager) Create(opts *ServiceEdgeRouterPolic
 
 	resp, err := serpm.Edge().ServiceEdgeRouterPolicy.CreateServiceEdgeRouterPolicy(req, nil)
 	if err != nil {
-		return "", errors.Wrapf(err, "error creating service edge router policy '%s'", opts.Name)
+		return "", wrapEdgeError(err, "error creating service edge router policy '%s'", opts.Name)
 	}
 
 	dl.Infof("created service edge router policy '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
@@ -57,7 +56,7 @@ func (serpm *ServiceEdgeRouterPolicyManager) Delete(id string) error {
 
 	_, err := serpm.Edge().ServiceEdgeRouterPolicy.DeleteServiceEdgeRouterPolicy(req, nil)
 	if err != nil {
-		return errors.Wrapf(err, "error deleting service edge router policy '%s'", id)
+		return wrapEdgeError(err, "error deleting service edge router policy '%s'", id)
 	}
 
 	dl.Infof("deleted service edge router policy '%s'", id)
@@ -75,7 +74,7 @@ func (serpm *ServiceEdgeRouterPolicyManager) Find(opts *FilterOptions) ([]*rest_
 
 	resp, err := serpm.Edge().ServiceEdgeRouterPolicy.ListServiceEdgeRouterPolicies(req, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "error listing service edge router policies")
+		return nil, wrapEdgeError(err, "error listing service edge router policies")
 	}
 
 	return resp.Payload.Data, nil

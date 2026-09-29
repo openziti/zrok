@@ -47,7 +47,7 @@ jobs:
         with:
           node-version: 22.x
 
-      - run: npm install
+      - run: npm ci
         working-directory: ui
 
       - run: npm run build
@@ -55,7 +55,7 @@ jobs:
         env:
           CI: "true"
 
-      - run: npm install
+      - run: npm ci
         working-directory: agent/agentUi
 
       - run: npm run build
@@ -194,7 +194,7 @@ jobs:
         with:
           node-version: 22.x
 
-      - run: npm install
+      - run: npm ci
         working-directory: ui
 
       - run: npm run build
@@ -202,7 +202,7 @@ jobs:
         env:
           CI: "true"
 
-      - run: npm install
+      - run: npm ci
         working-directory: agent/agentUi
 
       - run: npm run build
@@ -248,7 +248,7 @@ jobs:
         with:
           node-version: 22.x
 
-      - run: npm install
+      - run: npm ci
         working-directory: ui
 
       - run: npm run build
@@ -256,7 +256,7 @@ jobs:
         env:
           CI: "true"
 
-      - run: npm install
+      - run: npm ci
         working-directory: agent/agentUi
 
       - run: npm run build

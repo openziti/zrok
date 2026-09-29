@@ -1,6 +1,6 @@
 # Controller OpenZiti management session
 
-The controller shares one OpenZiti management client per API endpoint and username for the life of the process, including bandwidth-limit enforcement and relaxation. It fetches the controller CA bundle and authenticates when that client is first created. A failed initial build is not cached; the next call tries again.
+The controller shares one OpenZiti management client per API endpoint and username for the life of the process, including bandwidth-limit enforcement and relaxation. It fetches the controller CA bundle and authenticates when that client is first created. A plain `http://` endpoint has no TLS, so the CA fetch is skipped for it; this is what lets controller tests reach a fake Ziti through the production client. A failed initial build is not cached; the next call tries again.
 
 When a management request receives HTTP 401, the transport refreshes the session and replays the request once, including its body. Concurrent requests share one in-flight refresh; no lock is held across the authentication call. The CA bundle and management transport remain in use across refreshes. Failed re-authentication or a second 401 returns the operation's typed unauthorized error to its caller; there is no retry loop.
 

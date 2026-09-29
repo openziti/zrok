@@ -23,7 +23,8 @@ import (
 // other cache keys are included in the authentication counter check.
 func sessionFixture(t *testing.T, extra ...*zitifake.Server) (*zitifake.Server, *Config, *atomic.Int64) {
 	t.Helper()
-	fake := zitifake.NewWithCredentials("session-user", "session-password")
+	// https, so the ca fetch is on the build path; the pool trusts the httptest certificate.
+	fake := zitifake.NewTLSWithCredentials("session-user", "session-password")
 	t.Cleanup(fake.Close)
 	oldPool := sharedSessions.caPool
 	oldClients := sharedSessions.clients
@@ -31,7 +32,7 @@ func sessionFixture(t *testing.T, extra ...*zitifake.Server) (*zitifake.Server, 
 	caFetches := &atomic.Int64{}
 	sharedSessions.caPool = func(string) (*x509.CertPool, error) {
 		caFetches.Add(1)
-		return nil, nil
+		return fakePool(fake), nil
 	}
 	before := zitiAuthentications.Value()
 	t.Cleanup(func() {
@@ -47,6 +48,12 @@ func sessionFixture(t *testing.T, extra ...*zitifake.Server) (*zitifake.Server, 
 		sharedSessions.clients = oldClients
 	})
 	return fake, &Config{ApiEndpoint: fake.URL, Username: "session-user", Password: "session-password"}, caFetches
+}
+
+func fakePool(fake *zitifake.Server) *x509.CertPool {
+	pool := x509.NewCertPool()
+	pool.AddCert(fake.Certificate())
+	return pool
 }
 
 func mustSession(t *testing.T, cfg *Config) *ZitiAutomation {
@@ -199,8 +206,8 @@ func TestZitiSessionFailedBuildNotCached(t *testing.T) {
 			case "down":
 				server := httptest.NewUnstartedServer(fake.Config.Handler)
 				// close the server before the first build, then recover on the same port.
-				cfg.ApiEndpoint = "http://" + server.Listener.Addr().String()
-				server.Start()
+				cfg.ApiEndpoint = "https://" + server.Listener.Addr().String()
+				server.StartTLS()
 				server.Close()
 				recoverServer = func() {
 					// restart on the same endpoint to exercise the same cache key.
@@ -211,7 +218,7 @@ func TestZitiSessionFailedBuildNotCached(t *testing.T) {
 						t.Fatal(err)
 					}
 					restarted.Listener = listener
-					restarted.Start()
+					restarted.StartTLS()
 					t.Cleanup(restarted.Close)
 				}
 			case "credentials":
@@ -222,7 +229,7 @@ func TestZitiSessionFailedBuildNotCached(t *testing.T) {
 					if caFetches.Add(1) == 1 {
 						return nil, errors.New("CA fetch failed")
 					}
-					return nil, nil
+					return fakePool(fake), nil
 				}
 				recoverServer = func() {}
 			}
@@ -362,5 +369,19 @@ func TestZitiSessionConcurrentFirstBuild(t *testing.T) {
 	}
 	if successful, attempts, _ := fake.AuthCounts(); successful != 1 || attempts != 1 {
 		t.Fatalf("successful=%d attempts=%d", successful, attempts)
+	}
+}
+
+func TestZitiSessionPlainHttpSkipsCaFetch(t *testing.T) {
+	plain := zitifake.NewWithCredentials("session-user", "session-password")
+	t.Cleanup(plain.Close)
+	_, cfg, caFetches := sessionFixture(t, plain)
+	cfg.ApiEndpoint = plain.URL
+	ziti := mustSession(t, cfg)
+	if _, err := ziti.Services.Find(&FilterOptions{}); err != nil {
+		t.Fatal(err)
+	}
+	if caFetches.Load() != 0 {
+		t.Fatalf("CA fetched %d times for a plain-http endpoint", caFetches.Load())
 	}
 }

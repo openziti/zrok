@@ -4,7 +4,6 @@ import (
 	"github.com/michaelquigley/df/dl"
 	edgeservice "github.com/openziti/edge-api/rest_management_api_client/service"
 	"github.com/openziti/edge-api/rest_model"
-	"github.com/pkg/errors"
 )
 
 type ServiceManager struct {
@@ -60,7 +59,7 @@ func (sm *ServiceManager) Create(opts *ServiceOptions) (string, error) {
 
 	resp, err := sm.Edge().Service.CreateService(req, nil)
 	if err != nil {
-		return "", errors.Wrapf(err, "error creating service '%s'", opts.Name)
+		return "", wrapEdgeError(err, "error creating service '%s'", opts.Name)
 	}
 
 	dl.Infof("created service '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
@@ -76,7 +75,7 @@ func (sm *ServiceManager) Delete(id string) error {
 
 	_, err := sm.Edge().Service.DeleteService(req, nil)
 	if err != nil {
-		return errors.Wrapf(err, "error deleting service '%s'", id)
+		return wrapEdgeError(err, "error deleting service '%s'", id)
 	}
 
 	dl.Infof("deleted service '%s'", id)
@@ -94,7 +93,7 @@ func (sm *ServiceManager) Find(opts *FilterOptions) ([]*rest_model.ServiceDetail
 
 	resp, err := sm.Edge().Service.ListServices(req, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "error listing services")
+		return nil, wrapEdgeError(err, "error listing services")
 	}
 
 	return resp.Payload.Data, nil

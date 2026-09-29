@@ -3,8 +3,10 @@ package automation
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_management_api_client"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/pkg/errors"
@@ -55,6 +57,63 @@ func NewNotFoundError(resource, operation string, cause error) *AutomationError 
 		Cause:     cause,
 	}
 }
+
+// edgeErrorPayload is implemented by every generated edge-api error response type.
+type edgeErrorPayload interface {
+	GetPayload() *rest_model.APIErrorEnvelope
+}
+
+// wrapEdgeError wraps a failed edge-api call and, when the response carries Ziti's error
+// envelope, appends its code and message. the generated error stays in the chain so
+// IsNotFound and errors.As keep working.
+func wrapEdgeError(err error, format string, args ...interface{}) error {
+	var generated edgeErrorPayload
+	if !errors.As(err, &generated) {
+		return errors.Wrapf(err, format, args...)
+	}
+	envelope := generated.GetPayload()
+	if envelope == nil || envelope.Error == nil {
+		return errors.Wrapf(err, format, args...)
+	}
+	apiErr := envelope.Error
+	msg := fmt.Sprintf(format, args...) + ": ziti " + apiErr.Code + ": " + apiErr.Message
+	if cause := edgeErrorCause(apiErr); cause != "" {
+		msg += " (cause: " + cause + ")"
+	}
+	// the generated text is '[METHOD /path][status] operation  payload'; keep the part before the
+	// payload, which formats as a pointer, so the line still names the operation and status.
+	if operation, _, ok := strings.Cut(generated.(error).Error(), "  "); ok {
+		msg += " " + operation
+	}
+	return &edgeError{msg: msg, cause: err}
+}
+
+func edgeErrorCause(apiErr *rest_model.APIError) string {
+	if apiErr.CauseMessage != "" {
+		return apiErr.CauseMessage
+	}
+	if cause := apiErr.Cause; cause != nil {
+		if cause.APIError.Message != "" {
+			return cause.APIError.Message
+		}
+		if cause.Reason != "" {
+			if cause.Field != "" {
+				return cause.Field + ": " + cause.Reason
+			}
+			return cause.Reason
+		}
+	}
+	return ""
+}
+
+type edgeError struct {
+	msg   string
+	cause error
+}
+
+func (e *edgeError) Error() string { return e.msg }
+func (e *edgeError) Unwrap() error { return e.cause }
+func (e *edgeError) Cause() error  { return e.cause }
 
 type BaseOptions struct {
 	Name       string
@@ -139,6 +198,11 @@ func DeleteWithFilter[T any](finder func(*FilterOptions) ([]*T, error), deleter 
 			return errors.Wrapf(err, "error extracting ID for %s", resourceType)
 		}
 		if err := deleter(id); err != nil {
+			// an object that vanished between the listing and its delete is already where we want it.
+			if IsNotFound(err) {
+				dl.Debugf("%s '%s' already deleted", resourceType, id)
+				continue
+			}
 			return errors.Wrapf(err, "error deleting %s '%s'", resourceType, id)
 		}
 	}
