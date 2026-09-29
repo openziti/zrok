@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v2.0.6
+
 FIX: A share request that fails part-way now removes the OpenZiti objects it created (config, service and policies) and reports the underlying error. Previously the controller logged a `chk_z_id` constraint failure in place of the real OpenZiti error, and any failure after allocation, such as a closed private share granted to an unknown account, left the objects behind with no share owning them. Failed OpenZiti calls now log OpenZiti's own error code and message, such as the name of a conflicting object, where the log previously showed only the operation and HTTP status.
 
 FIX: Deleting OpenZiti objects that are already gone now counts as success during cleanup, so one object removed concurrently no longer stops the rest of a cleanup from running.
