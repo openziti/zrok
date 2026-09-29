@@ -5,6 +5,12 @@ import (
 	"time"
 
 	"github.com/openziti/edge-api/rest_management_api_client"
+	"github.com/openziti/edge-api/rest_management_api_client/config"
+	"github.com/openziti/edge-api/rest_management_api_client/edge_router_policy"
+	"github.com/openziti/edge-api/rest_management_api_client/identity"
+	"github.com/openziti/edge-api/rest_management_api_client/service"
+	"github.com/openziti/edge-api/rest_management_api_client/service_edge_router_policy"
+	"github.com/openziti/edge-api/rest_management_api_client/service_policy"
 	"github.com/pkg/errors"
 )
 
@@ -36,11 +42,34 @@ func (za *ZitiAutomation) Edge() *rest_management_api_client.ZitiEdgeManagement 
 // error helper methods to simplify error handling
 
 func (za *ZitiAutomation) IsNotFound(err error) bool {
+	return IsNotFound(err)
+}
+
+// IsNotFound reports whether err says the object is absent: a not-found from the package's read
+// helpers, or the ziti api's not-found answer to one of the deletes this package issues. the pinned
+// edge-api (v0.26.48) generates no Code() accessor on its response types, so this list of generated
+// Delete*NotFound types is the contract; a delete added to the package adds its type here.
+// unauthorized, forbidden, connectivity and validation errors are not absence and are not matched.
+func IsNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
 	var automationErr *AutomationError
 	if errors.As(err, &automationErr) {
 		return automationErr.IsNotFound()
 	}
-	return false
+	return isError[*identity.DeleteIdentityNotFound](err) ||
+		isError[*service.DeleteServiceNotFound](err) ||
+		isError[*config.DeleteConfigNotFound](err) ||
+		isError[*config.DeleteConfigTypeNotFound](err) ||
+		isError[*service_policy.DeleteServicePolicyNotFound](err) ||
+		isError[*service_edge_router_policy.DeleteServiceEdgeRouterPolicyNotFound](err) ||
+		isError[*edge_router_policy.DeleteEdgeRouterPolicyNotFound](err)
+}
+
+func isError[T error](err error) bool {
+	var target T
+	return errors.As(err, &target)
 }
 
 func (za *ZitiAutomation) ShouldRetry(err error) bool {

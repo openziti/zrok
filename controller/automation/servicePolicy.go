@@ -4,7 +4,6 @@ import (
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_management_api_client/service_policy"
 	"github.com/openziti/edge-api/rest_model"
-	"github.com/pkg/errors"
 )
 
 type ServicePolicyManager struct {
@@ -44,7 +43,7 @@ func (spm *ServicePolicyManager) Create(opts *ServicePolicyOptions) (string, err
 
 	resp, err := spm.Edge().ServicePolicy.CreateServicePolicy(req, nil)
 	if err != nil {
-		return "", errors.Wrapf(err, "error creating service policy '%s'", opts.Name)
+		return "", wrapEdgeError(err, "error creating service policy '%s'", opts.Name)
 	}
 
 	dl.Infof("created service policy '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
@@ -60,7 +59,7 @@ func (spm *ServicePolicyManager) Delete(id string) error {
 
 	_, err := spm.Edge().ServicePolicy.DeleteServicePolicy(req, nil)
 	if err != nil {
-		return errors.Wrapf(err, "error deleting service policy '%s'", id)
+		return wrapEdgeError(err, "error deleting service policy '%s'", id)
 	}
 
 	dl.Infof("deleted service policy '%s'", id)
@@ -78,7 +77,7 @@ func (spm *ServicePolicyManager) Find(opts *FilterOptions) ([]*rest_model.Servic
 
 	resp, err := spm.Edge().ServicePolicy.ListServicePolicies(req, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "error listing service policies")
+		return nil, wrapEdgeError(err, "error listing service policies")
 	}
 
 	return resp.Payload.Data, nil

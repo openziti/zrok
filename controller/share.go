@@ -73,30 +73,52 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		}
 	}
 
-	// allocate resources based on share mode
-	var shrZId string
-	switch sdk.ShareMode(params.Body.ShareMode) {
+	// resolve per-mode inputs before allocating, so the check after allocation sees its error
+	shareMode := sdk.ShareMode(params.Body.ShareMode)
+	var interstitial bool
+	switch shareMode {
 	case sdk.PublicShareMode:
-		interstitial, err := h.shouldUseInterstitial(params.Body.BackendMode, principal, trx)
+		interstitial, err = h.shouldUseInterstitial(params.Body.BackendMode, principal, trx)
 		if err != nil {
 			dl.Errorf("error determining interstitial setting for account '%v': %v", principal.Email, err)
 			return share.NewShareInternalServerError()
 		}
-		shrZId, frontendEndpoints, err = h.allocatePublicResources(envZId, shrToken, frontendEndpoints, params, interstitial, trx)
 
 	case sdk.PrivateShareMode:
 		// check private share token availability if provided
 		if params.Body.PrivateShareToken != "" {
-			if err := h.checkPrivateShareTokenAvailability(shrToken); err != nil {
+			if err = h.checkPrivateShareTokenAvailability(shrToken); err != nil {
 				dl.Errorf("private share token conflict: %v", err)
 				return share.NewShareConflict().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 			}
 		}
-		shrZId, frontendEndpoints, err = h.allocatePrivateResources(envZId, shrToken, frontendEndpoints, params, trx)
 
 	default:
 		dl.Errorf("unknown share mode '%v'", params.Body.ShareMode)
 		return share.NewShareInternalServerError()
+	}
+
+	// every ziti object created from here on is deleted by id unless the transaction commits
+	compensation := newZitiCompensation(shrToken)
+	committed := false
+	defer func() {
+		if committed || len(compensation.objects) == 0 {
+			return
+		}
+		ziti, err := automation.NewZitiAutomation(cfg.Ziti)
+		if err != nil {
+			dl.Errorf("error getting ziti automation client to compensate share '%v': %v", shrToken, err)
+			return
+		}
+		compensation.run(ziti)
+	}()
+
+	// allocate resources based on share mode
+	var shrZId string
+	if shareMode == sdk.PublicShareMode {
+		shrZId, frontendEndpoints, err = h.allocatePublicResources(envZId, shrToken, frontendEndpoints, params, interstitial, compensation, trx)
+	} else {
+		shrZId, frontendEndpoints, err = h.allocatePrivateResources(envZId, shrToken, frontendEndpoints, params, compensation, trx)
 	}
 	if err != nil {
 		dl.Errorf("error allocating share resources: %v", err)
@@ -140,6 +162,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		dl.Errorf("error committing share record: %v", err)
 		return share.NewShareInternalServerError()
 	}
+	committed = true
 
 	dl.Infof("recorded share '%v' with id '%v' for '%v'", shrToken, shareId, principal.Email)
 
@@ -267,7 +290,7 @@ func (h *shareHandler) processNameSelections(selections []*rest_model_zrok.NameS
 	return frontendEndpoints, nameIds, nil
 }
 
-func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontendEndpoints []string, params share.ShareParams, interstitial bool, trx interface{}) (string, []string, error) {
+func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontendEndpoints []string, params share.ShareParams, interstitial bool, compensation *zitiCompensation, trx interface{}) (string, []string, error) {
 	// get shared automation client
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
@@ -322,6 +345,7 @@ func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontend
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating config")
 	}
+	compensation.add(zitiConfig, cfgZId)
 
 	// create share service
 	serviceOpts := &automation.ServiceOptions{
@@ -336,6 +360,7 @@ func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontend
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating share service")
 	}
+	compensation.add(zitiService, shrZId)
 
 	// create bind policy (backend can bind to this service)
 	bindPolicyName := envZId + "-" + shrZId + "-bind"
@@ -349,10 +374,11 @@ func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontend
 		PolicyType:    rest_model.DialBindBind,
 		Semantic:      rest_model.SemanticAllOf,
 	}
-	_, err = ziti.ServicePolicies.Create(bindPolicyOpts)
+	bindPolicyZId, err := ziti.ServicePolicies.Create(bindPolicyOpts)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating service policy bind")
 	}
+	compensation.add(zitiServicePolicy, bindPolicyZId)
 
 	// create dial policy (frontends can dial this service)
 	// get frontend identities from namespaces
@@ -389,10 +415,12 @@ func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontend
 			PolicyType:    rest_model.DialBindDial,
 			Semantic:      rest_model.SemanticAllOf,
 		}
-		_, err = ziti.ServicePolicies.Create(dialPolicyOpts)
+		var dialPolicyZId string
+		dialPolicyZId, err = ziti.ServicePolicies.Create(dialPolicyOpts)
 		if err != nil {
 			return "", nil, errors.Wrap(err, "error creating service policy dial")
 		}
+		compensation.add(zitiServicePolicy, dialPolicyZId)
 	}
 
 	// create service edge router policy
@@ -406,10 +434,11 @@ func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontend
 		EdgeRouterRoles: []string{"#all"},
 		Semantic:        rest_model.SemanticAllOf,
 	}
-	_, err = ziti.ServiceEdgeRouterPolicies.Create(serpPolicyOpts)
+	serpPolicyZId, err := ziti.ServiceEdgeRouterPolicies.Create(serpPolicyOpts)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating service edge router policy")
 	}
+	compensation.add(zitiServiceEdgeRouterPolicy, serpPolicyZId)
 
 	dl.Infof("allocated public resources for share '%v' with service id '%v'", shrToken, shrZId)
 	return shrZId, frontendEndpoints, nil
@@ -429,7 +458,7 @@ func (h *shareHandler) checkPrivateShareTokenAvailability(privateShareToken stri
 	return nil
 }
 
-func (h *shareHandler) allocatePrivateResources(envZId, shrToken string, frontendEndpoints []string, params share.ShareParams, trx interface{}) (string, []string, error) {
+func (h *shareHandler) allocatePrivateResources(envZId, shrToken string, frontendEndpoints []string, params share.ShareParams, compensation *zitiCompensation, trx interface{}) (string, []string, error) {
 	// get shared automation client
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
@@ -484,6 +513,7 @@ func (h *shareHandler) allocatePrivateResources(envZId, shrToken string, fronten
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating config")
 	}
+	compensation.add(zitiConfig, cfgZId)
 
 	// create share service
 	serviceOpts := &automation.ServiceOptions{
@@ -498,6 +528,7 @@ func (h *shareHandler) allocatePrivateResources(envZId, shrToken string, fronten
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating share service")
 	}
+	compensation.add(zitiService, shrZId)
 
 	// create bind policy (backend can bind to this service)
 	bindPolicyName := envZId + "-" + shrZId + "-bind"
@@ -511,10 +542,11 @@ func (h *shareHandler) allocatePrivateResources(envZId, shrToken string, fronten
 		PolicyType:    rest_model.DialBindBind,
 		Semantic:      rest_model.SemanticAllOf,
 	}
-	_, err = ziti.ServicePolicies.Create(bindPolicyOpts)
+	bindPolicyZId, err := ziti.ServicePolicies.Create(bindPolicyOpts)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating service policy bind")
 	}
+	compensation.add(zitiServicePolicy, bindPolicyZId)
 
 	// create service edge router policy
 	serpPolicyName := envZId + "-" + shrToken + "-serp"
@@ -527,10 +559,11 @@ func (h *shareHandler) allocatePrivateResources(envZId, shrToken string, fronten
 		EdgeRouterRoles: []string{"#all"},
 		Semantic:        rest_model.SemanticAllOf,
 	}
-	_, err = ziti.ServiceEdgeRouterPolicies.Create(serpPolicyOpts)
+	serpPolicyZId, err := ziti.ServiceEdgeRouterPolicies.Create(serpPolicyOpts)
 	if err != nil {
 		return "", nil, errors.Wrap(err, "error creating service edge router policy")
 	}
+	compensation.add(zitiServiceEdgeRouterPolicy, serpPolicyZId)
 
 	// note: private shares don't create dial policies here
 	// dial access is granted separately via the access endpoint
@@ -540,6 +573,10 @@ func (h *shareHandler) allocatePrivateResources(envZId, shrToken string, fronten
 }
 
 func (h *shareHandler) createShareRecord(envId int, shrZId, shrToken string, params share.ShareParams, frontendEndpoints []string, trx interface{}) (int, error) {
+	if shrZId == "" {
+		return 0, errors.Errorf("refusing to create share record for '%v' without a ziti service id", shrToken)
+	}
+
 	strShr := &store.Share{
 		ZId:            shrZId,
 		Token:          shrToken,

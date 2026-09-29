@@ -4,7 +4,6 @@ import (
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_management_api_client/edge_router_policy"
 	"github.com/openziti/edge-api/rest_model"
-	"github.com/pkg/errors"
 )
 
 type EdgeRouterPolicyManager struct {
@@ -41,7 +40,7 @@ func (erpm *EdgeRouterPolicyManager) Create(opts *EdgeRouterPolicyOptions) (stri
 
 	resp, err := erpm.Edge().EdgeRouterPolicy.CreateEdgeRouterPolicy(req, nil)
 	if err != nil {
-		return "", errors.Wrapf(err, "error creating edge router policy '%s'", opts.Name)
+		return "", wrapEdgeError(err, "error creating edge router policy '%s'", opts.Name)
 	}
 
 	dl.Infof("created edge router policy '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
@@ -57,7 +56,7 @@ func (erpm *EdgeRouterPolicyManager) Delete(id string) error {
 
 	_, err := erpm.Edge().EdgeRouterPolicy.DeleteEdgeRouterPolicy(req, nil)
 	if err != nil {
-		return errors.Wrapf(err, "error deleting edge router policy '%s'", id)
+		return wrapEdgeError(err, "error deleting edge router policy '%s'", id)
 	}
 
 	dl.Infof("deleted edge router policy '%s'", id)
@@ -75,7 +74,7 @@ func (erpm *EdgeRouterPolicyManager) Find(opts *FilterOptions) ([]*rest_model.Ed
 
 	resp, err := erpm.Edge().EdgeRouterPolicy.ListEdgeRouterPolicies(req, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "error listing edge router policies")
+		return nil, wrapEdgeError(err, "error listing edge router policies")
 	}
 
 	return resp.Payload.Data, nil

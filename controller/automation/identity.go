@@ -42,7 +42,7 @@ func (im *IdentityManager) Create(opts *IdentityOptions) (string, error) {
 
 	resp, err := im.Edge().Identity.CreateIdentity(req, nil)
 	if err != nil {
-		return "", errors.Wrapf(err, "error creating identity '%s'", opts.Name)
+		return "", wrapEdgeError(err, "error creating identity '%s'", opts.Name)
 	}
 
 	dl.Infof("created identity '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
@@ -58,7 +58,7 @@ func (im *IdentityManager) Delete(id string) error {
 
 	_, err := im.Edge().Identity.DeleteIdentity(req, nil)
 	if err != nil {
-		return errors.Wrapf(err, "error deleting identity '%s'", id)
+		return wrapEdgeError(err, "error deleting identity '%s'", id)
 	}
 
 	dl.Infof("deleted identity '%s'", id)
@@ -76,7 +76,7 @@ func (im *IdentityManager) Find(opts *FilterOptions) ([]*rest_model.IdentityDeta
 
 	resp, err := im.Edge().Identity.ListIdentities(req, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "error listing identities")
+		return nil, wrapEdgeError(err, "error listing identities")
 	}
 
 	return resp.Payload.Data, nil
@@ -103,7 +103,7 @@ func (im *IdentityManager) Enroll(id string) (*ziti.Config, error) {
 
 	resp, err := im.Edge().Identity.DetailIdentity(p, nil)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error getting identity details for '%s'", id)
+		return nil, wrapEdgeError(err, "error getting identity details for '%s'", id)
 	}
 
 	tkn, _, err := enroll.ParseToken(resp.GetPayload().Data.Enrollment.Ott.JWT)

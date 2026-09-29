@@ -4,7 +4,6 @@ import (
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_management_api_client/config"
 	"github.com/openziti/edge-api/rest_model"
-	"github.com/pkg/errors"
 )
 
 type ConfigManager struct {
@@ -39,7 +38,7 @@ func (cm *ConfigManager) Create(opts *ConfigOptions) (string, error) {
 
 	resp, err := cm.Edge().Config.CreateConfig(req, nil)
 	if err != nil {
-		return "", errors.Wrapf(err, "error creating config '%s'", opts.Name)
+		return "", wrapEdgeError(err, "error creating config '%s'", opts.Name)
 	}
 
 	dl.Infof("created config '%s' with id '%s'", opts.Name, resp.Payload.Data.ID)
@@ -60,7 +59,7 @@ func (cm *ConfigManager) Update(id string, opts *ConfigOptions) error {
 
 	_, err := cm.Edge().Config.UpdateConfig(req, nil)
 	if err != nil {
-		return errors.Wrapf(err, "error updating config '%s'", id)
+		return wrapEdgeError(err, "error updating config '%s'", id)
 	}
 
 	dl.Infof("updated config '%s'", id)
@@ -76,7 +75,7 @@ func (cm *ConfigManager) Delete(id string) error {
 
 	_, err := cm.Edge().Config.DeleteConfig(req, nil)
 	if err != nil {
-		return errors.Wrapf(err, "error deleting config '%s'", id)
+		return wrapEdgeError(err, "error deleting config '%s'", id)
 	}
 
 	dl.Infof("deleted config '%s'", id)
@@ -94,7 +93,7 @@ func (cm *ConfigManager) Find(opts *FilterOptions) ([]*rest_model.ConfigDetail, 
 
 	resp, err := cm.Edge().Config.ListConfigs(req, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "error listing configs")
+		return nil, wrapEdgeError(err, "error listing configs")
 	}
 
 	return resp.Payload.Data, nil
