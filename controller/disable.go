@@ -71,7 +71,10 @@ func disableEnvironment(env *store.Environment, trx *sqlx.Tx, ziti *automation.Z
 
 	// delete identity for environment
 	if err := ziti.Identities.Delete(env.ZId); err != nil {
-		return errors.Wrapf(err, "error deleting identity for environment '%v'", env.ZId)
+		if !automation.IsNotFound(err) {
+			return errors.Wrapf(err, "error deleting identity for environment '%v'", env.ZId)
+		}
+		dl.Infof("identity '%v' for environment already deleted", env.ZId)
 	}
 
 	if err := removeEnvironmentFromStore(env, trx); err != nil {

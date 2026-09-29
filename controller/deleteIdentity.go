@@ -39,8 +39,11 @@ func (h *deleteIdentityHandler) Handle(params admin.DeleteIdentityParams, princi
 
 	// delete the identity
 	if err := ziti.Identities.Delete(identityZId); err != nil {
-		dl.Errorf("error deleting identity '%v': %v", identityZId, err)
-		return admin.NewDeleteIdentityInternalServerError()
+		if !automation.IsNotFound(err) {
+			dl.Errorf("error deleting identity '%v': %v", identityZId, err)
+			return admin.NewDeleteIdentityInternalServerError()
+		}
+		dl.Infof("identity '%v' already deleted", identityZId)
 	}
 
 	return admin.NewDeleteIdentityOK()
