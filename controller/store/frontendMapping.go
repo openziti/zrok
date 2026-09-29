@@ -88,3 +88,34 @@ func (str *Store) FindFrontendMappingsByFrontendTokenWithHigherId(frontendToken 
 	}
 	return mappings, nil
 }
+
+func (str *Store) FindFrontendMappingsByShareToken(shareToken string, trx *sqlx.Tx) ([]*FrontendMapping, error) {
+	rows, err := trx.Queryx("select * from frontend_mappings where share_token = $1 order by id asc", shareToken)
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting frontend mappings by share_token")
+	}
+	defer func() { _ = rows.Close() }()
+	var mappings []*FrontendMapping
+	for rows.Next() {
+		fm := &FrontendMapping{}
+		if err := rows.StructScan(fm); err != nil {
+			return nil, errors.Wrap(err, "error scanning frontend mapping")
+		}
+		mappings = append(mappings, fm)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error iterating frontend mappings by share_token")
+	}
+	return mappings, nil
+}
+
+func (str *Store) DeleteFrontendMappingsByShareToken(shareToken string, trx *sqlx.Tx) error {
+	stmt, err := trx.Prepare("delete from frontend_mappings where share_token = $1")
+	if err != nil {
+		return errors.Wrap(err, "error preparing frontend_mappings delete by share_token statement")
+	}
+	if _, err := stmt.Exec(shareToken); err != nil {
+		return errors.Wrap(err, "error executing frontend_mappings delete by share_token statement")
+	}
+	return nil
+}

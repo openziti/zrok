@@ -29,7 +29,6 @@ var (
 	idb         influxdb2.Client
 	limitsAgent *limits.Agent
 	agentCtrl   *agentController.Controller
-	dPCtrl      *dynamicProxyController.Controller
 )
 
 func Run(inCfg *config.Config) error {
@@ -155,10 +154,11 @@ func Run(inCfg *config.Config) error {
 	}
 
 	if cfg.DynamicProxyController != nil {
-		dPCtrl, err = dynamicProxyController.NewController(cfg.DynamicProxyController, str)
+		dPCtrl, err := dynamicProxyController.NewController(cfg.DynamicProxyController, str)
 		if err != nil {
 			return err
 		}
+		mappingPub = dPCtrl
 		dl.Infof("started dynamic proxy controller")
 	}
 

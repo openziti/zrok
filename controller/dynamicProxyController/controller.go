@@ -3,7 +3,6 @@ package dynamicProxyController
 import (
 	"context"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/v2/controller/store"
@@ -55,42 +54,6 @@ func NewController(cfg *Config, str *store.Store) (*Controller, error) {
 	return ctrl, nil
 }
 
-func (c *Controller) BindFrontendMapping(frontendToken, name, shareToken string, trx *sqlx.Tx) error {
-	// create new frontend mapping
-	fm := &store.FrontendMapping{
-		FrontendToken: frontendToken,
-		Name:          name,
-		ShareToken:    shareToken,
-	}
-
-	fmId, err := c.str.CreateFrontendMapping(fm, trx)
-	if err != nil {
-		return err
-	}
-
-	// broadcast the mapping update via AMQP
-	mapping := Mapping{
-		Id:         int64(fmId),
-		Operation:  OperationBind,
-		Name:       name,
-		ShareToken: shareToken,
-	}
-	return c.sendMappingUpdate(frontendToken, mapping)
-}
-
-func (c *Controller) UnbindFrontendMapping(frontendToken, name string, trx *sqlx.Tx) error {
-	if err := c.str.DeleteFrontendMappingsByFrontendTokenAndName(frontendToken, name, trx); err != nil {
-		return err
-	}
-
-	// broadcast the mapping update via AMQP
-	mapping := Mapping{
-		Operation: OperationUnbind,
-		Name:      name,
-	}
-	return c.sendMappingUpdate(frontendToken, mapping)
-}
-
 func (c *Controller) FrontendMappings(_ context.Context, req *FrontendMappingsRequest) (*FrontendMappingsResponse, error) {
 	trx, err := c.str.Begin()
 	if err != nil {
@@ -120,8 +83,10 @@ func (c *Controller) FrontendMappings(_ context.Context, req *FrontendMappingsRe
 	return &FrontendMappingsResponse{FrontendMappings: out}, nil
 }
 
-func (c *Controller) sendMappingUpdate(frontendToken string, m Mapping) error {
-	if err := c.publisher.Publish(context.Background(), frontendToken, m); err != nil {
+// Publish sends a mapping update to the frontend's queue. the caller has already committed the row
+// the update describes; the store is not touched here.
+func (c *Controller) Publish(ctx context.Context, frontendToken string, m Mapping) error {
+	if err := c.publisher.Publish(ctx, frontendToken, m); err != nil {
 		return err
 	}
 	dl.Infof("sent mapping update '%+v' -> '%s'", m, frontendToken)

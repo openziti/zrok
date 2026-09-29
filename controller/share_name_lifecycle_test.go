@@ -3,6 +3,7 @@ package controller
 import (
 	"testing"
 
+	"github.com/jmoiron/sqlx"
 	controllerConfig "github.com/openziti/zrok/v2/controller/config"
 	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/openziti/zrok/v2/rest_model_zrok"
@@ -102,6 +103,13 @@ func setupShareNameFixture(t *testing.T, reserved bool) *shareNameFixture {
 	}
 }
 
+func (f *shareNameFixture) share(t *testing.T, trx *sqlx.Tx) *store.Share {
+	t.Helper()
+	shr, err := str.GetShare(f.shareID, trx)
+	require.NoError(t, err)
+	return shr
+}
+
 func attachDynamicFrontend(t *testing.T, fixture *shareNameFixture, frontendToken string) {
 	t.Helper()
 
@@ -182,15 +190,16 @@ func TestDeleteShareNameCleansStaleMappingForDeletedShare(t *testing.T) {
 	require.Empty(t, mappings)
 }
 
-func TestCleanupShareNameMappingsHandlesDeletedReservedName(t *testing.T) {
+func TestTeardownShareHandlesDeletedReservedName(t *testing.T) {
 	fixture := setupShareNameFixture(t, true)
+	_, ziti := useZitiFake(t)
 
 	trx, err := str.Begin()
 	require.NoError(t, err)
 	require.NoError(t, str.DeleteName(fixture.nameID, trx))
 
-	handler := newUnshareHandler()
-	require.NoError(t, handler.cleanupShareNameMappings(fixture.shareID, trx))
+	_, err = teardownShare(fixture.share(t, trx), trx, ziti)
+	require.NoError(t, err)
 	require.NoError(t, trx.Commit())
 
 	trx, err = str.Begin()
@@ -207,14 +216,15 @@ func TestCleanupShareNameMappingsHandlesDeletedReservedName(t *testing.T) {
 	require.Empty(t, mappings)
 }
 
-func TestCleanupShareNameMappingsDeletesDynamicName(t *testing.T) {
+func TestTeardownShareDeletesDynamicName(t *testing.T) {
 	fixture := setupShareNameFixture(t, false)
+	_, ziti := useZitiFake(t)
 
 	trx, err := str.Begin()
 	require.NoError(t, err)
 
-	handler := newUnshareHandler()
-	require.NoError(t, handler.cleanupShareNameMappings(fixture.shareID, trx))
+	_, err = teardownShare(fixture.share(t, trx), trx, ziti)
+	require.NoError(t, err)
 	require.NoError(t, trx.Commit())
 
 	trx, err = str.Begin()

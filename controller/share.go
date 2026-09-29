@@ -8,6 +8,7 @@ import (
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/v2/controller/automation"
+	"github.com/openziti/zrok/v2/controller/dynamicProxyController"
 	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/openziti/zrok/v2/rest_model_zrok"
 	"github.com/openziti/zrok/v2/rest_server_zrok/operations/share"
@@ -132,6 +133,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareInternalServerError()
 	}
 
+	var updates []pendingMappingUpdate
 	if sdk.ShareMode(params.Body.ShareMode) == sdk.PublicShareMode {
 		// create share name mappings for namespace selections
 		for _, nameId := range nameIds {
@@ -146,9 +148,11 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 			}
 		}
 
-		// send mapping updates to dynamic frontends after successful commit
-		if err := h.processDynamicMappings(shrToken, nameIds, trx); err != nil {
-			dl.Errorf("error sending mapping updates: %v", err)
+		// record frontend mappings for dynamic frontends; their updates are published after commit
+		updates, err = h.processDynamicMappings(shrToken, nameIds, trx)
+		if err != nil {
+			dl.Errorf("error recording frontend mappings for share '%v': %v", shrToken, err)
+			return share.NewShareInternalServerError()
 		}
 	}
 
@@ -163,6 +167,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		return share.NewShareInternalServerError()
 	}
 	committed = true
+	publishMappingUpdates(updates)
 
 	dl.Infof("recorded share '%v' with id '%v' for '%v'", shrToken, shareId, principal.Email)
 
@@ -646,44 +651,51 @@ func (h *shareHandler) processAccessGrants(shareId int, accessGrants []string, p
 	return nil
 }
 
-func (h *shareHandler) processDynamicMappings(shrToken string, nameIds []int, trx *sqlx.Tx) error {
-	// only send updates if dynamic proxy controller is enabled
-	if dPCtrl == nil {
-		dl.Warnf("dynamic proxy controller is nil")
-		return nil
-	}
-
+// processDynamicMappings records a frontend mapping for each dynamic frontend serving each selected
+// name, and returns a pending bind for each row. the first insert failure is returned, so the request
+// fails and its transaction rolls back.
+func (h *shareHandler) processDynamicMappings(shrToken string, nameIds []int, trx *sqlx.Tx) ([]pendingMappingUpdate, error) {
+	var updates []pendingMappingUpdate
 	for _, nameId := range nameIds {
 		// find name record to get the name and namespace
 		name, err := str.GetName(nameId, trx)
 		if err != nil {
-			return errors.Wrapf(err, "error finding name with id '%v'", nameId)
+			return nil, errors.Wrapf(err, "error finding name with id '%v'", nameId)
 		}
 
 		// find namespace
 		ns, err := str.GetNamespace(name.NamespaceId, trx)
 		if err != nil {
-			return errors.Wrapf(err, "error finding namespace with id '%v'", name.NamespaceId)
+			return nil, errors.Wrapf(err, "error finding namespace with id '%v'", name.NamespaceId)
 		}
 
 		// find dynamic frontends for this namespace
 		frontends, err := str.FindDynamicFrontendsForNamespace(ns.Id, trx)
 		if err != nil {
-			return errors.Wrapf(err, "error finding dynamic frontends for namespace '%v'", ns.Token)
+			return nil, errors.Wrapf(err, "error finding dynamic frontends for namespace '%v'", ns.Token)
 		}
 
-		// send mapping updates to each dynamic frontend
 		for _, frontend := range frontends {
 			frontendName := util.NameInNamespace(name.Name, ns.Name)
-			dl.Infof("binding name '%v'", frontendName)
-
-			if err := dPCtrl.BindFrontendMapping(frontend.Token, frontendName, shrToken, trx); err != nil {
-				dl.Errorf("error binding frontend mapping to frontend '%v': %v", frontend.Token, err)
-				// continue with other frontends rather than failing completely
-			} else {
-				dl.Infof("bound frontend mapping '%v' to dynamic frontend '%v'", frontendName, frontend.Token)
+			fmId, err := str.CreateFrontendMapping(&store.FrontendMapping{
+				FrontendToken: frontend.Token,
+				Name:          frontendName,
+				ShareToken:    shrToken,
+			}, trx)
+			if err != nil {
+				return nil, errors.Wrapf(err, "error recording frontend mapping '%v' for frontend '%v'", frontendName, frontend.Token)
 			}
+			updates = append(updates, pendingMappingUpdate{
+				frontendToken: frontend.Token,
+				mapping: dynamicProxyController.Mapping{
+					Id:         int64(fmId),
+					Operation:  dynamicProxyController.OperationBind,
+					Name:       frontendName,
+					ShareToken: shrToken,
+				},
+			})
+			dl.Debugf("recorded frontend mapping '%v' for dynamic frontend '%v'", frontendName, frontend.Token)
 		}
 	}
-	return nil
+	return updates, nil
 }

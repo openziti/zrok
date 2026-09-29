@@ -48,12 +48,15 @@ func (h *deleteAccountHandler) Handle(params admin.DeleteAccountParams, principa
 		return admin.NewDeleteAccountInternalServerError()
 	}
 
+	var updates []pendingMappingUpdate
 	for _, env := range envs {
 		dl.Infof("disabling environment '%d' (envZId: '%s') for account '%s'", env.Id, env.ZId, params.Body.Email)
-		if err := disableEnvironment(env, trx, ziti); err != nil {
+		envUpdates, err := disableEnvironment(env, trx, ziti)
+		if err != nil {
 			dl.Errorf("error disabling environment '%d' for account '%s': %v", env.Id, params.Body.Email, err)
 			return admin.NewDeleteAccountInternalServerError()
 		}
+		updates = append(updates, envUpdates...)
 		dl.Infof("successfully disabled environment '%d' for account '%s'", env.Id, params.Body.Email)
 	}
 
@@ -66,6 +69,7 @@ func (h *deleteAccountHandler) Handle(params admin.DeleteAccountParams, principa
 		dl.Errorf("error committing transaction: %v", err)
 		return admin.NewDeleteAccountInternalServerError()
 	}
+	publishMappingUpdates(updates)
 
 	dl.Infof("successfully deleted account '%s'", params.Body.Email)
 	return admin.NewDeleteAccountOK()
