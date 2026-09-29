@@ -97,6 +97,37 @@ func TestDisableOtherFailuresStillFail(t *testing.T) {
 	f.requireEnvironmentRemoved(t, false)
 }
 
+// the environment has a frontend and no share, so the frontend's policy delete is the first ziti call
+// the disable makes; the log shows that it, not a later step, failed the request.
+func TestDisableFrontendFailureRollsBack(t *testing.T) {
+	f := setupShareCreateFixture(t)
+	trx, err := str.Begin()
+	require.NoError(t, err)
+	envs, err := str.FindEnvironmentsForAccount(int(f.principal.ID), trx)
+	require.NoError(t, err)
+	require.Len(t, envs, 1)
+	envID := envs[0].Id
+	_, err = str.CreateFrontend(envID, &store.Frontend{Token: "frontend-token", ZId: "env-zid", PermissionMode: store.OpenPermissionMode}, trx)
+	require.NoError(t, err)
+	require.NoError(t, trx.Commit())
+	f.fake.RejectOperations(true)
+
+	resp := newDisableHandler().Handle(environment.DisableParams{Body: environment.DisableBody{Identity: "env-zid"}}, f.principal)
+
+	require.IsType(t, &environment.DisableInternalServerError{}, resp)
+	require.Contains(t, f.logs.String(), "error removing frontend access for 'frontend-token'")
+	trx, err = str.Begin()
+	require.NoError(t, err)
+	defer func() { _ = trx.Rollback() }()
+	env, err := str.GetEnvironment(envID, trx)
+	require.NoError(t, err)
+	require.False(t, env.Deleted)
+	fes, err := str.FindFrontendsForEnvironment(envID, trx)
+	require.NoError(t, err)
+	require.Len(t, fes, 1)
+	require.False(t, fes[0].Deleted)
+}
+
 func TestDeleteAccountWithAbsentIdentitySucceeds(t *testing.T) {
 	f := setupDisableFixture(t)
 

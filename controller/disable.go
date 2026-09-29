@@ -39,7 +39,8 @@ func (h *disableHandler) Handle(params environment.DisableParams, principal *res
 		return environment.NewDisableInternalServerError()
 	}
 
-	if err := disableEnvironment(env, trx, ziti); err != nil {
+	updates, err := disableEnvironment(env, trx, ziti)
+	if err != nil {
 		dl.Errorf("error disabling environment for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
@@ -48,82 +49,59 @@ func (h *disableHandler) Handle(params environment.DisableParams, principal *res
 		dl.Errorf("error committing for user '%v': %v", principal.Email, err)
 		return environment.NewDisableInternalServerError()
 	}
+	publishMappingUpdates(updates)
 
 	return environment.NewDisableOK()
 }
 
-func disableEnvironment(env *store.Environment, trx *sqlx.Tx, ziti *automation.ZitiAutomation) error {
-	if err := removeSharesForEnvironment(env, trx, ziti); err != nil {
-		return errors.Wrapf(err, "error removing shares for environment '%v'", env.ZId)
+// disableEnvironment returns the frontend mapping updates for the environment's shares; the caller
+// publishes them after it commits.
+func disableEnvironment(env *store.Environment, trx *sqlx.Tx, ziti *automation.ZitiAutomation) ([]pendingMappingUpdate, error) {
+	updates, err := removeSharesForEnvironment(env, trx, ziti)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error removing shares for environment '%v'", env.ZId)
 	}
 	if err := removeFrontendsForEnvironment(env, trx, ziti); err != nil {
-		return errors.Wrapf(err, "error removing frontends for environment '%v'", env.ZId)
+		return nil, errors.Wrapf(err, "error removing frontends for environment '%v'", env.ZId)
 	}
 	if err := removeAgentRemoteForEnvironment(env, trx, ziti); err != nil {
-		return errors.Wrapf(err, "error removing agent remote for '%v'", env.ZId)
+		return nil, errors.Wrapf(err, "error removing agent remote for '%v'", env.ZId)
 	}
 
 	// delete edge router policy for environment
 	erpFilter := fmt.Sprintf("name=\"%v\"", env.ZId)
 	if err := ziti.EdgeRouterPolicies.DeleteWithFilter(erpFilter); err != nil {
-		return errors.Wrapf(err, "error deleting edge router policy for environment '%v'", env.ZId)
+		return nil, errors.Wrapf(err, "error deleting edge router policy for environment '%v'", env.ZId)
 	}
 
 	// delete identity for environment
 	if err := ziti.Identities.Delete(env.ZId); err != nil {
 		if !automation.IsNotFound(err) {
-			return errors.Wrapf(err, "error deleting identity for environment '%v'", env.ZId)
+			return nil, errors.Wrapf(err, "error deleting identity for environment '%v'", env.ZId)
 		}
 		dl.Infof("identity '%v' for environment already deleted", env.ZId)
 	}
 
 	if err := removeEnvironmentFromStore(env, trx); err != nil {
-		return errors.Wrapf(err, "error removing environment '%v' from store", env.ZId)
+		return nil, errors.Wrapf(err, "error removing environment '%v' from store", env.ZId)
 	}
-	return nil
+	return updates, nil
 }
 
-func removeSharesForEnvironment(env *store.Environment, trx *sqlx.Tx, ziti *automation.ZitiAutomation) error {
+func removeSharesForEnvironment(env *store.Environment, trx *sqlx.Tx, ziti *automation.ZitiAutomation) ([]pendingMappingUpdate, error) {
 	shrs, err := str.FindSharesForEnvironment(env.Id, trx)
 	if err != nil {
-		return err
+		return nil, errors.Wrapf(err, "error finding shares for environment '%v'", env.ZId)
 	}
+	var updates []pendingMappingUpdate
 	for _, shr := range shrs {
-		shrToken := shr.Token
-		dl.Infof("garbage collecting share '%v' for environment '%v'", shrToken, env.ZId)
-
-		// delete service edge router policies for share
-		serpFilter := fmt.Sprintf("tags.zrokShareToken=\"%v\"", shrToken)
-		if err := ziti.ServiceEdgeRouterPolicies.DeleteWithFilter(serpFilter); err != nil {
-			dl.Error(err)
+		shrUpdates, err := teardownShare(shr, trx, ziti)
+		if err != nil {
+			return nil, err
 		}
-
-		// delete dial service policies for share
-		dialFilter := fmt.Sprintf("tags.zrokShareToken=\"%v\" and type=1", shrToken)
-		if err := ziti.ServicePolicies.DeleteWithFilter(dialFilter); err != nil {
-			dl.Error(err)
-		}
-
-		// delete bind service policies for share
-		bindFilter := fmt.Sprintf("tags.zrokShareToken=\"%v\" and type=2", shrToken)
-		if err := ziti.ServicePolicies.DeleteWithFilter(bindFilter); err != nil {
-			dl.Error(err)
-		}
-
-		// delete configs for share
-		configFilter := fmt.Sprintf("tags.zrokShareToken=\"%v\"", shrToken)
-		if err := ziti.Configs.DeleteWithFilter(configFilter); err != nil {
-			dl.Error(err)
-		}
-
-		// delete service
-		if err := ziti.Services.Delete(shr.ZId); err != nil {
-			dl.Error(err)
-		}
-
-		dl.Infof("removed share '%v' for environment '%v'", shr.Token, env.ZId)
+		updates = append(updates, shrUpdates...)
 	}
-	return nil
+	return updates, nil
 }
 
 func removeFrontendsForEnvironment(env *store.Environment, trx *sqlx.Tx, ziti *automation.ZitiAutomation) error {
@@ -134,7 +112,7 @@ func removeFrontendsForEnvironment(env *store.Environment, trx *sqlx.Tx, ziti *a
 	for _, fe := range fes {
 		filter := fmt.Sprintf("tags.zrokFrontendToken=\"%v\" and type=1", fe.Token)
 		if err := ziti.ServicePolicies.DeleteWithFilter(filter); err != nil {
-			dl.Errorf("error removing frontend access for '%v': %v", fe.Token, err)
+			return errors.Wrapf(err, "error removing frontend access for '%v'", fe.Token)
 		}
 	}
 	return nil
@@ -183,15 +161,6 @@ func removeAgentRemoteForEnvironment(env *store.Environment, trx *sqlx.Tx, ziti 
 }
 
 func removeEnvironmentFromStore(env *store.Environment, trx *sqlx.Tx) error {
-	shrs, err := str.FindSharesForEnvironment(env.Id, trx)
-	if err != nil {
-		return errors.Wrapf(err, "error finding shares for environment '%d'", env.Id)
-	}
-	for _, shr := range shrs {
-		if err := str.DeleteShare(shr.Id, trx); err != nil {
-			return errors.Wrapf(err, "error deleting share '%d' for environment '%d'", shr.Id, env.Id)
-		}
-	}
 	fes, err := str.FindFrontendsForEnvironment(env.Id, trx)
 	if err != nil {
 		return errors.Wrapf(err, "error finding frontends for environment '%d'", env.Id)

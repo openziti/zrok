@@ -8,7 +8,6 @@ import (
 	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/openziti/zrok/v2/rest_model_zrok"
 	"github.com/openziti/zrok/v2/rest_server_zrok/operations/share"
-	"github.com/openziti/zrok/v2/util"
 	"github.com/pkg/errors"
 )
 
@@ -43,39 +42,23 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 		return share.NewUnshareNotFound()
 	}
 
-	// deallocate ziti resources using automation framework
-	if err := h.deallocateResources(shrToken); err != nil {
-		dl.Warnf("error deallocating ziti resources for share '%v': %v", shrToken, err)
-	}
-
-	// send unbind mapping updates before cleaning up share name mappings
-	if err := h.processDynamicMappings(shr.Id, trx); err != nil {
-		dl.Errorf("error sending unbind mapping updates for '%v': %v", shrToken, err)
-	}
-
-	// clean up share name mappings
-	if err := h.cleanupShareNameMappings(shr.Id, trx); err != nil {
-		dl.Errorf("error cleaning up share name mappings for '%v': %v", shrToken, err)
+	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
+	if err != nil {
+		dl.Errorf("error getting automation client for '%v': %v", principal.Email, err)
 		return share.NewUnshareInternalServerError()
 	}
 
-	// clean up access grants
-	if err := str.DeleteAccessGrantsForShare(shr.Id, trx); err != nil {
-		dl.Errorf("error deleting access grants for share '%v': %v", shrToken, err)
+	updates, err := teardownShare(shr, trx, ziti)
+	if err != nil {
+		dl.Errorf("error tearing down share '%v' for '%v': %v", shrToken, principal.Email, err)
 		return share.NewUnshareInternalServerError()
 	}
 
-	// delete the share record
-	if err := str.DeleteShare(shr.Id, trx); err != nil {
-		dl.Errorf("error deleting share '%v': %v", shrToken, err)
-		return share.NewUnshareInternalServerError()
-	}
-
-	// commit transaction
 	if err := trx.Commit(); err != nil {
 		dl.Errorf("error committing transaction for '%v': %v", shrToken, err)
 		return share.NewUnshareInternalServerError()
 	}
+	publishMappingUpdates(updates)
 
 	dl.Infof("successfully unshared '%v' for '%v'", shrToken, principal.Email)
 	return share.NewUnshareOK()
@@ -102,85 +85,4 @@ func (h *unshareHandler) findAndValidateShare(shrToken string, env *store.Enviro
 	}
 
 	return nil, errors.Errorf("share '%v' not found in environment '%v'", shrToken, env.ZId)
-}
-
-func (h *unshareHandler) deallocateResources(shrToken string) error {
-	// get shared automation client
-	za, err := automation.NewZitiAutomation(cfg.Ziti)
-	if err != nil {
-		return errors.Wrap(err, "error getting ziti automation client")
-	}
-
-	// use fluent workflow API for tag-based cleanup
-	err = za.CleanupByTag("zrokShareToken", shrToken)
-	if err != nil {
-		return errors.Wrapf(err, "error cleaning up ziti resources for share '%v'", shrToken)
-	}
-
-	dl.Infof("deallocated ziti resources for share '%v'", shrToken)
-	return nil
-}
-
-func (h *unshareHandler) cleanupShareNameMappings(shareId int, trx *sqlx.Tx) error {
-	details, err := str.FindShareNameCleanupDetailsByShareId(shareId, trx)
-	if err != nil {
-		return errors.Wrapf(err, "error finding share name cleanup details for share '%v'", shareId)
-	}
-
-	for _, detail := range details {
-		// only delete names that are not reserved and are not already deleted
-		if !detail.Reserved && !detail.NameDeleted {
-			if err := str.DeleteName(detail.NameId, trx); err != nil {
-				return errors.Wrapf(err, "error deleting dynamically allocated name '%v'", detail.Name)
-			}
-			dl.Debugf("deleted dynamically allocated name '%v'", detail.Name)
-		}
-
-		// delete the share name mapping
-		if err := str.DeleteShareNameMapping(detail.MappingId, trx); err != nil {
-			return errors.Wrapf(err, "error deleting share name mapping '%v'", detail.MappingId)
-		}
-	}
-
-	return nil
-}
-
-func (h *unshareHandler) processDynamicMappings(shareId int, trx *sqlx.Tx) error {
-	// only send updates if dynamic proxy controller is enabled
-	if dPCtrl == nil {
-		return nil
-	}
-
-	details, err := str.FindShareNameCleanupDetailsByShareId(shareId, trx)
-	if err != nil {
-		return errors.Wrapf(err, "error finding share name cleanup details for share '%v'", shareId)
-	}
-
-	for _, detail := range details {
-		if detail.NamespaceDeleted {
-			dl.Warnf("namespace '%v' is deleted while unbinding share name mapping '%v'", detail.NamespaceName, detail.MappingId)
-			continue
-		}
-
-		// find dynamic frontends for this namespace
-		frontends, err := str.FindDynamicFrontendsForNamespace(detail.NamespaceID, trx)
-		if err != nil {
-			dl.Warnf("error finding dynamic frontends for namespace '%v': %v", detail.NamespaceName, err)
-			continue
-		}
-
-		// send unbind mapping updates to each dynamic frontend
-		for _, frontend := range frontends {
-			frontendName := util.NameInNamespace(detail.Name, detail.NamespaceName)
-
-			if err := dPCtrl.UnbindFrontendMapping(frontend.Token, frontendName, trx); err != nil {
-				dl.Errorf("error unbinding frontend mapping from frontend '%v': %v", frontend.Token, err)
-				// continue with other frontends rather than failing completely
-			} else {
-				dl.Debugf("unbound frontend mapping '%v' from dynamic frontend '%v'", frontendName, frontend.Token)
-			}
-		}
-	}
-
-	return nil
 }
