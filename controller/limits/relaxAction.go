@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/v2/controller/automation"
 	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/openziti/zrok/v2/sdk/golang/sdk"
@@ -94,88 +93,44 @@ func (a *relaxAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 	return nil
 }
 
+// relaxPublicShare restores the frontend dial policy of a public share and the policies of its private
+// accesses.
 func relaxPublicShare(str *store.Store, ziti *automation.ZitiAutomation, shr *store.Share, trx *sqlx.Tx) error {
-	env, err := str.GetEnvironment(shr.EnvironmentId, trx)
+	desired, err := desiredPublicDialPolicies(str, shr, trx)
 	if err != nil {
-		return storeFailure(errors.Wrap(err, "error finding environment"))
+		var missing missingPublicFrontendError
+		if errors.As(err, &missing) {
+			return err
+		}
+		return storeFailure(err)
 	}
-	if shr.FrontendSelection == nil {
-		return errors.Errorf("share '%v' has no frontend selection", shr.Token)
+	if err := ensureDialPolicies(ziti, shr, desired); err != nil {
+		return err
 	}
-
-	fe, err := str.FindFrontendPubliclyNamed(*shr.FrontendSelection, trx)
-	if err != nil {
-		return storeFailure(errors.Wrapf(err, "error finding frontend name '%v' for '%v'", *shr.FrontendSelection, shr.Token))
-	}
-	policyName := env.ZId + "-" + shr.ZId + "-dial"
-	policies, err := ziti.ServicePolicies.Find(&automation.FilterOptions{Filter: automation.BuildFilter("name", policyName)})
-	if err != nil {
-		return errors.Wrapf(err, "error finding dial service policy for '%v'", shr.Token)
-	}
-	if len(policies) > 0 {
-		dl.Debugf("dial service policy '%v' already exists", policyName)
-		return nil
-	}
-
-	opts := &automation.ServicePolicyOptions{
-		BaseOptions: automation.BaseOptions{
-			Name: policyName,
-			Tags: automation.ZrokShareTags(shr.Token),
-		},
-		IdentityRoles: []string{"@" + fe.ZId},
-		ServiceRoles:  []string{"@" + shr.ZId},
-		PolicyType:    rest_model.DialBindDial,
-		Semantic:      rest_model.SemanticAllOf,
-	}
-
-	if _, err := ziti.ServicePolicies.CreateDial(opts); err != nil {
-		return errors.Wrapf(err, "error creating dial service policy for '%v'", shr.Token)
-	}
-	dl.Infof("added dial service policy for '%v'", shr.Token)
-	return nil
+	return relaxAccessFrontends(str, ziti, shr, trx)
 }
 
 func relaxPrivateShare(str *store.Store, ziti *automation.ZitiAutomation, shr *store.Share, trx *sqlx.Tx) error {
-	fes, err := str.FindFrontendsForPrivateShare(shr.Id, trx)
+	return relaxAccessFrontends(str, ziti, shr, trx)
+}
+
+// relaxAccessFrontends restores the dial policy of each private access to the share, whatever its mode.
+func relaxAccessFrontends(str *store.Store, ziti *automation.ZitiAutomation, shr *store.Share, trx *sqlx.Tx) error {
+	desired, err := desiredAccessDialPolicies(str, shr, trx)
 	if err != nil {
-		return storeFailure(errors.Wrapf(err, "error finding frontends for share '%v'", shr.Token))
+		return storeFailure(err)
 	}
-	for _, fe := range fes {
-		if fe.EnvironmentId != nil {
-			env, err := str.GetEnvironment(*fe.EnvironmentId, trx)
-			if err != nil {
-				return storeFailure(errors.Wrapf(err, "error getting environment for frontend '%v'", fe.Token))
-			}
-			policyName := fe.Token + "-" + env.ZId + "-" + shr.ZId + "-dial"
-			policies, err := ziti.ServicePolicies.Find(&automation.FilterOptions{Filter: automation.BuildFilter("name", policyName)})
-			if err != nil {
-				return errors.Wrapf(err, "error finding dial policy for frontend '%v'", fe.Token)
-			}
-			if len(policies) > 0 {
-				dl.Debugf("dial service policy '%v' already exists", policyName)
-				continue
-			}
+	return ensureDialPolicies(ziti, shr, desired)
+}
 
-			opts := &automation.ServicePolicyOptions{
-				BaseOptions: automation.BaseOptions{
-					Name: policyName,
-					Tags: automation.NewTags().
-						WithZrok().
-						WithShareToken(shr.Token).
-						WithTag("zrokEnvironmentZId", env.ZId).
-						WithTag("zrokFrontendToken", fe.Token),
-				},
-				IdentityRoles: []string{"@" + env.ZId},
-				ServiceRoles:  []string{"@" + shr.ZId},
-				PolicyType:    rest_model.DialBindDial,
-				Semantic:      rest_model.SemanticAllOf,
-			}
-
-			if _, err := ziti.ServicePolicies.CreateDial(opts); err != nil {
-				return errors.Wrapf(err, "unable to create dial policy for frontend '%v'", fe.Token)
-			}
-
-			dl.Infof("added dial service policy for share '%v' to private frontend '%v'", shr.Token, fe.Token)
+func ensureDialPolicies(ziti *automation.ZitiAutomation, shr *store.Share, desired []*automation.ServicePolicyOptions) error {
+	for _, opts := range desired {
+		created, err := ensureDialPolicy(ziti, opts)
+		if err != nil {
+			return err
+		}
+		if created {
+			dl.Infof("added dial service policy '%v' for share '%v'", opts.Name, shr.Token)
 		}
 	}
 	return nil

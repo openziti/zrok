@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// DefaultQueryTimeout bounds each of the limits agent's influx queries.
+const DefaultQueryTimeout = 30 * time.Second
+
 type Config struct {
 	Environments   int
 	Shares         int
@@ -15,6 +18,7 @@ type Config struct {
 	Cycle          time.Duration
 	Enforcing      bool
 	HandoffTimeout time.Duration
+	QueryTimeout   time.Duration
 }
 
 type BandwidthPerPeriod struct {
@@ -55,5 +59,6 @@ func DefaultConfig() *Config {
 		Bandwidth:      DefaultBandwidthPerPeriod(),
 		Enforcing:      false,
 		Cycle:          15 * time.Minute,
+		QueryTimeout:   DefaultQueryTimeout,
 	}
 }
