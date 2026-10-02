@@ -21,6 +21,7 @@ The following optional configuration values use these defaults when unset:
 | `metrics.agent.retry_budget` | `2m` shared per message |
 | `metrics.influx.write_timeout` | `10s` per attempt |
 | `limits.handoff_timeout` | `3s` |
+| `limits.query_timeout` | `30s` per limits-agent Influx query |
 
 Share-detail enrichment and the durable write share one per-message deadline, including waiting for a store connection. Enrichment has three outcomes:
 
@@ -32,4 +33,4 @@ The consumer cancels database lookups, active writes, and retry waits at shutdow
 
 The built-in sinks accept cancellation through `HandleContext` while preserving the existing `UsageSink.Handle` interface. A sink implementing only `Handle` runs through a single guarded call slot: if it never returns, subsequent calls time out without starting more goroutines.
 
-No failed-processing path requests requeue. A broker policy may route discarded deliveries to a dead-letter queue with its own length and TTL bounds; no such policy is required or configured by the controller. The limits agent's own Influx queries remain without deadlines; bounding them is deferred to the relax stage. A stuck limits query cannot block this consumer beyond its bounded handoff.
+No failed-processing path requests requeue. A broker policy may route discarded deliveries to a dead-letter queue with its own length and TTL bounds; no such policy is required or configured by the controller. The limits agent's own Influx queries are bounded separately, by `limits.query_timeout` and the agent's shutdown (see `bandwidth-limit-relax.md`). A stuck limits query cannot block this consumer beyond its bounded handoff.

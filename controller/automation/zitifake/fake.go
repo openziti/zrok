@@ -70,6 +70,7 @@ type Server struct {
 	rejectAuthentication           bool
 	rejectOperations               bool
 	rejectDeletes                  map[string]bool
+	rejectCreates                  map[string]bool
 	authDelay                      time.Duration
 }
 
@@ -95,7 +96,7 @@ func newServer(username, password string) *Server {
 	for _, kind := range []string{Configs, Services, ServicePolicies, ServiceEdgeRouterPolicies, Identities, EdgeRouterPolicies} {
 		objects[kind] = make(map[string]*object)
 	}
-	return &Server{objects: objects, sessions: make(map[string]bool), rejectDeletes: make(map[string]bool), username: username, password: password}
+	return &Server{objects: objects, sessions: make(map[string]bool), rejectDeletes: make(map[string]bool), rejectCreates: make(map[string]bool), username: username, password: password}
 }
 
 func (f *Server) Edge() *rest_management_api_client.ZitiEdgeManagement {
@@ -132,6 +133,13 @@ func (f *Server) RejectDeletes(kind string, reject bool) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.rejectDeletes[kind] = reject
+}
+
+// RejectCreates answers every create of an object named name with an internal server error.
+func (f *Server) RejectCreates(name string, reject bool) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.rejectCreates[name] = reject
 }
 
 // SetAuthenticationDelay delays every authentication response without blocking other requests.
@@ -413,6 +421,10 @@ func (f *Server) create(w http.ResponseWriter, r *http.Request, kind string) {
 		fill = func(obj *object, id string) {
 			obj.detail = &rest_model.ServiceEdgeRouterPolicyDetail{BaseEntity: base(id, tags), Name: &obj.name, EdgeRouterRoles: input.EdgeRouterRoles, EdgeRouterRolesDisplay: rest_model.NamedRoles{}, ServiceRoles: input.ServiceRoles, ServiceRolesDisplay: rest_model.NamedRoles{}, Semantic: input.Semantic}
 		}
+	}
+	if f.rejectCreates[name] {
+		writeError(w, http.StatusInternalServerError, labels[kind].noun+" create rejected: "+name)
+		return
 	}
 	if f.beforeCreate != nil {
 		f.beforeCreate(kind, name)

@@ -15,7 +15,7 @@ func TestNewInfluxReaderSimple(t *testing.T) {
 		Bucket: "test-bucket",
 	}
 
-	reader := newInfluxReader(cfg)
+	reader := newInfluxReader(cfg, 0)
 
 	assert.NotNil(t, reader)
 	assert.Equal(t, cfg, reader.cfg)

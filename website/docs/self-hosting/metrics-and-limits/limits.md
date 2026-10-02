@@ -87,6 +87,9 @@ The `cycle` value controls how frequently the limits agent evaluates enforced li
 has their shares disabled, the limits agent evaluates their bandwidth usage on this interval looking to "relax" the
 limit once their usage falls below the threshold.
 
+The optional `query_timeout` value (default `30s`) bounds each InfluxDB query the limits agent makes. A query that
+times out is treated as a failure; no limit is applied or relaxed on its result, and the next cycle tries again.
+
 ### Global resource count limits
 
 The `environments`, `shares`, `reserved_shares`, `unique_names`, and `share_frontends` fields specify the resource count

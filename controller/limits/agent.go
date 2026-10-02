@@ -30,20 +30,23 @@ type Agent struct {
 	relaxActions   []AccountAction
 	close          chan struct{}
 	join           chan struct{}
+	ctx            context.Context
+	cancel         context.CancelFunc
 	droppedEvents  atomic.Uint64
 }
 
 type bandwidthReader interface {
-	totalRxTxForAccount(int64, time.Duration) (int64, int64, error)
-	totalRxTxForEnvironment(int64, time.Duration) (int64, int64, error)
-	totalRxTxForShare(string, time.Duration) (int64, int64, error)
+	totalRxTxForAccount(context.Context, int64, time.Duration) (int64, int64, error)
+	totalRxTxForEnvironment(context.Context, int64, time.Duration) (int64, int64, error)
+	totalRxTxForShare(context.Context, string, time.Duration) (int64, int64, error)
 }
 
 func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *automation.Config, emailCfg *emailUi.Config, str *store.Store) (*Agent, error) {
 	newZiti := func() (*automation.ZitiAutomation, error) { return automation.NewZitiAutomation(zCfg) }
+	ctx, cancel := context.WithCancel(context.Background())
 	a := &Agent{
 		cfg:            cfg,
-		ifx:            newInfluxReader(ifxCfg),
+		ifx:            newInfluxReader(ifxCfg, cfg.QueryTimeout),
 		zCfg:           zCfg,
 		newZiti:        newZiti,
 		str:            str,
@@ -53,6 +56,8 @@ func NewAgent(cfg *Config, ifxCfg *metrics.InfluxConfig, zCfg *automation.Config
 		relaxActions:   []AccountAction{newRelaxAction(str, newZiti)},
 		close:          make(chan struct{}),
 		join:           make(chan struct{}),
+		ctx:            ctx,
+		cancel:         cancel,
 	}
 	return a, nil
 }
@@ -67,7 +72,10 @@ func (a *Agent) Start() {
 	go a.run()
 }
 
+// Stop cancels the agent's context first, so an influx query in flight returns and the run loop can see
+// the close.
 func (a *Agent) Stop() {
+	a.cancel()
 	close(a.close)
 	<-a.join
 }
@@ -464,7 +472,7 @@ func (a *Agent) relax() error {
 
 				if periods, accountFound := accountPeriods[bwje.AccountId]; accountFound {
 					if _, periodFound := periods[bwc.GetPeriodMinutes()]; !periodFound {
-						rx, tx, err := a.ifx.totalRxTxForAccount(int64(bwje.AccountId), time.Duration(bwc.GetPeriodMinutes())*time.Minute)
+						rx, tx, err := a.ifx.totalRxTxForAccount(a.ctx, int64(bwje.AccountId), time.Duration(bwc.GetPeriodMinutes())*time.Minute)
 						if err != nil {
 							return err
 						}
@@ -579,7 +587,7 @@ func (a *Agent) anyBandwidthLimitExceeded(acct *store.Account, u *metrics.Usage,
 
 	for _, bwc := range bwcs {
 		if _, found := periodBw[bwc.GetPeriodMinutes()]; !found {
-			rx, tx, err := a.ifx.totalRxTxForAccount(u.AccountId, time.Minute*time.Duration(bwc.GetPeriodMinutes()))
+			rx, tx, err := a.ifx.totalRxTxForAccount(a.ctx, u.AccountId, time.Minute*time.Duration(bwc.GetPeriodMinutes()))
 			if err != nil {
 				return nil, 0, 0, errors.Wrapf(err, "error getting rx/tx for account '%v'", acct.Email)
 			}
