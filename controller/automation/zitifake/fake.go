@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -25,6 +26,12 @@ const (
 	ServiceEdgeRouterPolicies = "service-edge-router-policies"
 	Identities                = "identities"
 	EdgeRouterPolicies        = "edge-router-policies"
+)
+
+// ziti's page sizes: the page served for a missing or zero limit, and the largest it serves.
+const (
+	defaultPageSize = 10
+	maxPageSize     = 500
 )
 
 var labels = map[string]struct{ id, noun string }{
@@ -62,6 +69,7 @@ type Server struct {
 	unauthorized                   int
 	rejectAuthentication           bool
 	rejectOperations               bool
+	rejectDeletes                  map[string]bool
 	authDelay                      time.Duration
 }
 
@@ -87,7 +95,7 @@ func newServer(username, password string) *Server {
 	for _, kind := range []string{Configs, Services, ServicePolicies, ServiceEdgeRouterPolicies, Identities, EdgeRouterPolicies} {
 		objects[kind] = make(map[string]*object)
 	}
-	return &Server{objects: objects, sessions: make(map[string]bool), username: username, password: password}
+	return &Server{objects: objects, sessions: make(map[string]bool), rejectDeletes: make(map[string]bool), username: username, password: password}
 }
 
 func (f *Server) Edge() *rest_management_api_client.ZitiEdgeManagement {
@@ -117,6 +125,13 @@ func (f *Server) RejectOperations(reject bool) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.rejectOperations = reject
+}
+
+// RejectDeletes answers every delete of kind with an internal server error.
+func (f *Server) RejectDeletes(kind string, reject bool) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.rejectDeletes[kind] = reject
 }
 
 // SetAuthenticationDelay delays every authentication response without blocking other requests.
@@ -156,6 +171,21 @@ func (f *Server) SeedWithID(kind, id, name string, tags *rest_model.Tags) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.seed(kind, id, name, tags)
+}
+
+// Backdate moves the createdAt of the object of kind with id age into the past.
+func (f *Server) Backdate(kind, id string, age time.Duration) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	createdAt := strfmt.DateTime(time.Now().Add(-age))
+	baseOf(f.objects[kind][id].detail).CreatedAt = &createdAt
+}
+
+// Len reports how many objects of kind the fake holds.
+func (f *Server) Len(kind string) int {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return len(f.objects[kind])
 }
 
 // Has reports whether an object of kind exists with id.
@@ -315,6 +345,25 @@ func base(id string, tags *rest_model.Tags) rest_model.BaseEntity {
 	return rest_model.BaseEntity{ID: &id, Tags: tags, CreatedAt: &now, UpdatedAt: &now, Links: rest_model.Links{}}
 }
 
+func baseOf(detail interface{}) *rest_model.BaseEntity {
+	switch v := detail.(type) {
+	case *rest_model.ConfigDetail:
+		return &v.BaseEntity
+	case *rest_model.ServiceDetail:
+		return &v.BaseEntity
+	case *rest_model.ServicePolicyDetail:
+		return &v.BaseEntity
+	case *rest_model.ServiceEdgeRouterPolicyDetail:
+		return &v.BaseEntity
+	case *rest_model.IdentityDetail:
+		return &v.BaseEntity
+	case *rest_model.EdgeRouterPolicyDetail:
+		return &v.BaseEntity
+	default:
+		panic(fmt.Sprintf("unknown detail %T", detail))
+	}
+}
+
 func (f *Server) create(w http.ResponseWriter, r *http.Request, kind string) {
 	var name string
 	var tags *rest_model.Tags
@@ -390,8 +439,17 @@ func (f *Server) create(w http.ResponseWriter, r *http.Request, kind string) {
 	writeJSON(w, 201, &rest_model.CreateEnvelope{Data: &rest_model.CreateLocation{ID: id}, Meta: &rest_model.Meta{}})
 }
 
+// list pages like ziti: a missing or zero limit is the default page of ten, a larger one is capped at
+// 500, and offset skips into the matches in id order.
 func (f *Server) list(w http.ResponseWriter, r *http.Request, kind string) {
-	filter := r.URL.Query().Get("filter")
+	query := r.URL.Query()
+	filter := query.Get("filter")
+	limit, _ := strconv.Atoi(query.Get("limit"))
+	if limit <= 0 {
+		limit = defaultPageSize
+	}
+	limit = min(limit, maxPageSize)
+	offset, _ := strconv.Atoi(query.Get("offset"))
 	ids := make([]string, 0, len(f.objects[kind]))
 	for id := range f.objects[kind] {
 		ids = append(ids, id)
@@ -404,6 +462,8 @@ func (f *Server) list(w http.ResponseWriter, r *http.Request, kind string) {
 			matched = append(matched, obj)
 		}
 	}
+	matched = matched[min(offset, len(matched)):]
+	matched = matched[:min(limit, len(matched))]
 	switch kind {
 	case Configs:
 		writeJSON(w, 200, &rest_model.ListConfigsEnvelope{Data: details[rest_model.ConfigDetail](matched), Meta: &rest_model.Meta{}})
@@ -451,6 +511,10 @@ func (f *Server) detail(w http.ResponseWriter, kind, id string) {
 }
 
 func (f *Server) delete(w http.ResponseWriter, kind, id string) {
+	if f.rejectDeletes[kind] {
+		writeError(w, http.StatusInternalServerError, labels[kind].noun+" delete rejected: "+id)
+		return
+	}
 	if f.objects[kind][id] == nil {
 		writeError(w, 404, labels[kind].noun+" not found: "+id)
 		return

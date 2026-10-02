@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+FIX: `zrok2 admin gc` now decides which share an OpenZiti object belongs to by its `zrokShareToken` tag rather than its name, so it no longer deletes the bind, dial and service edge router policies of live shares; objects with no share token, such as agent-remote services and policies, are never touched. It now reads every object rather than the first page of ten of each kind. It is a dry run by default that prints what it would remove, grouped by share token, and deletes only with `--delete`. Orphaned objects younger than `--min-age` (default 24 hours) are skipped, so a share being created at the time of the run is not collected. Tearing down a share with more than ten OpenZiti objects of one kind, such as a share with many access dial policies, now removes all of them rather than the first ten.
+
 ## v2.0.6
 
 FIX: A share request that fails part-way now removes the OpenZiti objects it created (config, service and policies) and reports the underlying error. Previously the controller logged a `chk_z_id` constraint failure in place of the real OpenZiti error, and any failure after allocation, such as a closed private share granted to an unknown account, left the objects behind with no share owning them. Failed OpenZiti calls now log OpenZiti's own error code and message, such as the name of a conflicting object, where the log previously showed only the operation and HTTP status.

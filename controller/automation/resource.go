@@ -184,10 +184,10 @@ func GetByName[T any](finder func(*FilterOptions) ([]*T, error), name string, re
 	return items[0], nil
 }
 
-// generic helper for bulk delete operations
+// generic helper for bulk delete operations. every match is listed before the first delete, so the
+// deletes cannot shift the pages still to be read.
 func DeleteWithFilter[T any](finder func(*FilterOptions) ([]*T, error), deleter func(string) error, filter string, resourceType string) error {
-	opts := &FilterOptions{Filter: filter}
-	items, err := finder(opts)
+	items, err := FindAll(finder, filter, MaxPageSize)
 	if err != nil {
 		return errors.Wrapf(err, "error finding %s for deletion", resourceType)
 	}
@@ -208,6 +208,31 @@ func DeleteWithFilter[T any](finder func(*FilterOptions) ([]*T, error), deleter 
 	}
 
 	return nil
+}
+
+// MaxPageSize is the largest page the ziti management api serves; a limit of zero gets its default
+// page of ten, not everything.
+const MaxPageSize int64 = 500
+
+// FindAll reads every object matching filter, pageSize at a time with an advancing offset, until a page
+// comes back short. a pageSize of zero or less, or above MaxPageSize, reads MaxPageSize at a time, since
+// ziti would cap a larger page and the short answer would end the listing early.
+func FindAll[T any](finder func(*FilterOptions) ([]*T, error), filter string, pageSize int64) ([]*T, error) {
+	if pageSize <= 0 || pageSize > MaxPageSize {
+		pageSize = MaxPageSize
+	}
+	var all []*T
+	for offset := int64(0); ; {
+		page, err := finder(&FilterOptions{Filter: filter, Limit: pageSize, Offset: offset})
+		if err != nil {
+			return nil, errors.Wrapf(err, "error listing page at offset '%d'", offset)
+		}
+		all = append(all, page...)
+		if int64(len(page)) < pageSize {
+			return all, nil
+		}
+		offset += int64(len(page))
+	}
 }
 
 // helper to extract ID from any resource type
