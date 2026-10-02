@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -39,6 +40,12 @@ func (o *UnaccessReader) ReadResponse(response runtime.ClientResponse, consumer 
 		return nil, result
 	case 500:
 		result := NewUnaccessInternalServerError()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 503:
+		result := NewUnaccessServiceUnavailable()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -268,6 +275,77 @@ func (o *UnaccessInternalServerError) String() string {
 }
 
 func (o *UnaccessInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewUnaccessServiceUnavailable creates a UnaccessServiceUnavailable with default headers values
+func NewUnaccessServiceUnavailable() *UnaccessServiceUnavailable {
+	return &UnaccessServiceUnavailable{}
+}
+
+/*
+UnaccessServiceUnavailable describes a response with status code 503, with default header values.
+
+service unavailable
+*/
+type UnaccessServiceUnavailable struct {
+
+	/* seconds to wait before retrying
+	 */
+	RetryAfter int64
+}
+
+// IsSuccess returns true when this unaccess service unavailable response has a 2xx status code
+func (o *UnaccessServiceUnavailable) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this unaccess service unavailable response has a 3xx status code
+func (o *UnaccessServiceUnavailable) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this unaccess service unavailable response has a 4xx status code
+func (o *UnaccessServiceUnavailable) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this unaccess service unavailable response has a 5xx status code
+func (o *UnaccessServiceUnavailable) IsServerError() bool {
+	return true
+}
+
+// IsCode returns true when this unaccess service unavailable response a status code equal to that given
+func (o *UnaccessServiceUnavailable) IsCode(code int) bool {
+	return code == 503
+}
+
+// Code gets the status code for the unaccess service unavailable response
+func (o *UnaccessServiceUnavailable) Code() int {
+	return 503
+}
+
+func (o *UnaccessServiceUnavailable) Error() string {
+	return fmt.Sprintf("[DELETE /unaccess][%d] unaccessServiceUnavailable", 503)
+}
+
+func (o *UnaccessServiceUnavailable) String() string {
+	return fmt.Sprintf("[DELETE /unaccess][%d] unaccessServiceUnavailable", 503)
+}
+
+func (o *UnaccessServiceUnavailable) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// hydrates response header Retry-After
+	hdrRetryAfter := response.GetHeader("Retry-After")
+
+	if hdrRetryAfter != "" {
+		valretryAfter, err := swag.ConvertInt64(hdrRetryAfter)
+		if err != nil {
+			return errors.InvalidType("Retry-After", "header", "int64", hdrRetryAfter)
+		}
+		o.RetryAfter = valretryAfter
+	}
 
 	return nil
 }

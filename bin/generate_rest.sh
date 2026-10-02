@@ -50,6 +50,18 @@ command -v openapi-generator-cli &>/dev/null || {
   exit 1
 }
 
+# these are the generator versions that reproduce the checked-in tree; any other version rewrites
+# generated files the spec change did not touch. openapi-generator-cli needs java; without it, the
+# openapitools/openapi-generator-cli:v7.14.0 docker image can stand in for the command.
+requiredSwagger="v0.33.2"
+requiredOpenapiGenerator="7.14.0"
+swaggerVersion=$(swagger version 2>/dev/null | sed -n 's/^version: //p')
+openapiGeneratorVersion=$(openapi-generator-cli version 2>/dev/null | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | tail -n 1)
+if [[ "$swaggerVersion" != "$requiredSwagger" || "$openapiGeneratorVersion" != "$requiredOpenapiGenerator" ]]; then
+  echo >&2 "ERROR: requires swagger '$requiredSwagger' (found '$swaggerVersion') and openapi-generator-cli '$requiredOpenapiGenerator' (found '$openapiGeneratorVersion')"
+  exit 1
+fi
+
 command -v realpath &>/dev/null || {
   echo >&2 "command 'realpath' not installed. see: https://www.npmjs.com/package/realpath for installation"
   exit 1

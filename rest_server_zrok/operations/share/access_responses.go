@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/swag"
 )
 
 // AccessCreatedCode is the HTTP code returned for type AccessCreated
@@ -126,4 +127,51 @@ func (o *AccessInternalServerError) WriteResponse(rw http.ResponseWriter, produc
 	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
+}
+
+// AccessServiceUnavailableCode is the HTTP code returned for type AccessServiceUnavailable
+const AccessServiceUnavailableCode int = 503
+
+/*
+AccessServiceUnavailable service unavailable
+
+swagger:response accessServiceUnavailable
+*/
+type AccessServiceUnavailable struct {
+	/*seconds to wait before retrying
+
+	 */
+	RetryAfter int64 `json:"Retry-After"`
+}
+
+// NewAccessServiceUnavailable creates AccessServiceUnavailable with default headers values
+func NewAccessServiceUnavailable() *AccessServiceUnavailable {
+
+	return &AccessServiceUnavailable{}
+}
+
+// WithRetryAfter adds the retryAfter to the access service unavailable response
+func (o *AccessServiceUnavailable) WithRetryAfter(retryAfter int64) *AccessServiceUnavailable {
+	o.RetryAfter = retryAfter
+	return o
+}
+
+// SetRetryAfter sets the retryAfter to the access service unavailable response
+func (o *AccessServiceUnavailable) SetRetryAfter(retryAfter int64) {
+	o.RetryAfter = retryAfter
+}
+
+// WriteResponse to the client
+func (o *AccessServiceUnavailable) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	// response header Retry-After
+
+	retryAfter := swag.FormatInt64(o.RetryAfter)
+	if retryAfter != "" {
+		rw.Header().Set("Retry-After", retryAfter)
+	}
+
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
+
+	rw.WriteHeader(503)
 }

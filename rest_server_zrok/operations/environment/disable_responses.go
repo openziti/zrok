@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/swag"
 )
 
 // DisableOKCode is the HTTP code returned for type DisableOK
@@ -81,4 +82,51 @@ func (o *DisableInternalServerError) WriteResponse(rw http.ResponseWriter, produ
 	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
+}
+
+// DisableServiceUnavailableCode is the HTTP code returned for type DisableServiceUnavailable
+const DisableServiceUnavailableCode int = 503
+
+/*
+DisableServiceUnavailable service unavailable
+
+swagger:response disableServiceUnavailable
+*/
+type DisableServiceUnavailable struct {
+	/*seconds to wait before retrying
+
+	 */
+	RetryAfter int64 `json:"Retry-After"`
+}
+
+// NewDisableServiceUnavailable creates DisableServiceUnavailable with default headers values
+func NewDisableServiceUnavailable() *DisableServiceUnavailable {
+
+	return &DisableServiceUnavailable{}
+}
+
+// WithRetryAfter adds the retryAfter to the disable service unavailable response
+func (o *DisableServiceUnavailable) WithRetryAfter(retryAfter int64) *DisableServiceUnavailable {
+	o.RetryAfter = retryAfter
+	return o
+}
+
+// SetRetryAfter sets the retryAfter to the disable service unavailable response
+func (o *DisableServiceUnavailable) SetRetryAfter(retryAfter int64) {
+	o.RetryAfter = retryAfter
+}
+
+// WriteResponse to the client
+func (o *DisableServiceUnavailable) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	// response header Retry-After
+
+	retryAfter := swag.FormatInt64(o.RetryAfter)
+	if retryAfter != "" {
+		rw.Header().Set("Retry-After", retryAfter)
+	}
+
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
+
+	rw.WriteHeader(503)
 }

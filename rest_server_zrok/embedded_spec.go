@@ -82,6 +82,15 @@ func init() {
           },
           "500": {
             "description": "internal server error"
+          },
+          "503": {
+            "description": "service unavailable",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "description": "seconds to wait before retrying"
+              }
+            }
           }
         },
         "security": [
@@ -1368,6 +1377,15 @@ func init() {
           },
           "500": {
             "description": "internal server error"
+          },
+          "503": {
+            "description": "service unavailable",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "description": "seconds to wait before retrying"
+              }
+            }
           }
         },
         "security": [
@@ -1421,6 +1439,15 @@ func init() {
           },
           "500": {
             "description": "internal server error"
+          },
+          "503": {
+            "description": "service unavailable",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "description": "seconds to wait before retrying"
+              }
+            }
           }
         },
         "security": [
@@ -3344,6 +3371,15 @@ func init() {
             "schema": {
               "$ref": "#/definitions/errorMessage"
             }
+          },
+          "503": {
+            "description": "service unavailable",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "description": "seconds to wait before retrying"
+              }
+            }
           }
         },
         "security": [
@@ -3999,6 +4035,15 @@ func init() {
           },
           "500": {
             "description": "internal server error"
+          },
+          "503": {
+            "description": "service unavailable",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "description": "seconds to wait before retrying"
+              }
+            }
           }
         },
         "security": [
@@ -4044,6 +4089,15 @@ func init() {
             "description": "internal server error",
             "schema": {
               "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "503": {
+            "description": "service unavailable",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "description": "seconds to wait before retrying"
+              }
             }
           }
         },
@@ -4825,6 +4879,15 @@ func init() {
           },
           "500": {
             "description": "internal server error"
+          },
+          "503": {
+            "description": "service unavailable",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "description": "seconds to wait before retrying"
+              }
+            }
           }
         },
         "security": [
@@ -6031,6 +6094,15 @@ func init() {
           },
           "500": {
             "description": "internal server error"
+          },
+          "503": {
+            "description": "service unavailable",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "description": "seconds to wait before retrying"
+              }
+            }
           }
         },
         "security": [
@@ -6084,6 +6156,15 @@ func init() {
           },
           "500": {
             "description": "internal server error"
+          },
+          "503": {
+            "description": "service unavailable",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "description": "seconds to wait before retrying"
+              }
+            }
           }
         },
         "security": [
@@ -7902,6 +7983,15 @@ func init() {
             "schema": {
               "$ref": "#/definitions/errorMessage"
             }
+          },
+          "503": {
+            "description": "service unavailable",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "description": "seconds to wait before retrying"
+              }
+            }
           }
         },
         "security": [
@@ -8546,6 +8636,15 @@ func init() {
           },
           "500": {
             "description": "internal server error"
+          },
+          "503": {
+            "description": "service unavailable",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "description": "seconds to wait before retrying"
+              }
+            }
           }
         },
         "security": [
@@ -8591,6 +8690,15 @@ func init() {
             "description": "internal server error",
             "schema": {
               "$ref": "#/definitions/errorMessage"
+            }
+          },
+          "503": {
+            "description": "service unavailable",
+            "headers": {
+              "Retry-After": {
+                "type": "integer",
+                "description": "seconds to wait before retrying"
+              }
             }
           }
         },

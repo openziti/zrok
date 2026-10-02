@@ -89,6 +89,10 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 		// check private share token availability if provided
 		if params.Body.PrivateShareToken != "" {
 			if err = h.checkPrivateShareTokenAvailability(shrToken); err != nil {
+				if automation.IsRateLimited(err) {
+					dl.Errorf("error checking private share token availability: %v", err)
+					return share.NewShareServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)
+				}
 				dl.Errorf("private share token conflict: %v", err)
 				return share.NewShareConflict().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
 			}
@@ -100,7 +104,7 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	}
 
 	// every ziti object created from here on is deleted by id unless the transaction commits
-	compensation := newZitiCompensation(shrToken)
+	compensation := newZitiCompensation(compensatingShare, shrToken)
 	committed := false
 	defer func() {
 		if committed || len(compensation.objects) == 0 {
@@ -123,6 +127,9 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	}
 	if err != nil {
 		dl.Errorf("error allocating share resources: %v", err)
+		if automation.IsRateLimited(err) {
+			return share.NewShareServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)
+		}
 		return share.NewShareInternalServerError()
 	}
 
@@ -452,11 +459,17 @@ func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontend
 func (h *shareHandler) checkPrivateShareTokenAvailability(privateShareToken string) error {
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
+		if automation.IsRateLimited(err) {
+			return err
+		}
 		return errors.Wrap(err, "error getting ziti automation client")
 	}
 
 	// verify the service name is available
 	_, err = ziti.Services.GetByName(privateShareToken)
+	if automation.IsRateLimited(err) {
+		return err
+	}
 	if err == nil {
 		return errors.Errorf("service name '%v' is already in use", privateShareToken)
 	}

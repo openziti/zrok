@@ -67,6 +67,12 @@ func IsNotFound(err error) bool {
 		isError[*edge_router_policy.DeleteEdgeRouterPolicyNotFound](err)
 }
 
+// IsRateLimited reports whether err is a ziti rate limiter's refusal, from either the command rate
+// limiter (seen by the session transport) or the authentication limiter.
+func IsRateLimited(err error) bool {
+	return isError[*RateLimitedError](err)
+}
+
 func isError[T error](err error) bool {
 	var target T
 	return errors.As(err, &target)

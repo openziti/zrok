@@ -106,6 +106,7 @@ class ShareApi:
             '401': None,
             '404': None,
             '500': None,
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -175,6 +176,7 @@ class ShareApi:
             '401': None,
             '404': None,
             '500': None,
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -244,6 +246,7 @@ class ShareApi:
             '401': None,
             '404': None,
             '500': None,
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -1719,6 +1722,7 @@ class ShareApi:
             '409': "str",
             '422': None,
             '500': "str",
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -1790,6 +1794,7 @@ class ShareApi:
             '409': "str",
             '422': None,
             '500': "str",
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -1861,6 +1866,7 @@ class ShareApi:
             '409': "str",
             '422': None,
             '500': "str",
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -2003,6 +2009,7 @@ class ShareApi:
             '401': None,
             '404': None,
             '500': None,
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -2072,6 +2079,7 @@ class ShareApi:
             '401': None,
             '404': None,
             '500': None,
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -2141,6 +2149,7 @@ class ShareApi:
             '401': None,
             '404': None,
             '500': None,
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -2276,6 +2285,7 @@ class ShareApi:
             '401': None,
             '404': None,
             '500': "str",
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -2345,6 +2355,7 @@ class ShareApi:
             '401': None,
             '404': None,
             '500': "str",
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -2414,6 +2425,7 @@ class ShareApi:
             '401': None,
             '404': None,
             '500': "str",
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,

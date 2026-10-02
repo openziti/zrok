@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -42,6 +43,12 @@ func (o *AccessReader) ReadResponse(response runtime.ClientResponse, consumer ru
 		return nil, result
 	case 500:
 		result := NewAccessInternalServerError()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 503:
+		result := NewAccessServiceUnavailable()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -285,6 +292,77 @@ func (o *AccessInternalServerError) String() string {
 }
 
 func (o *AccessInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewAccessServiceUnavailable creates a AccessServiceUnavailable with default headers values
+func NewAccessServiceUnavailable() *AccessServiceUnavailable {
+	return &AccessServiceUnavailable{}
+}
+
+/*
+AccessServiceUnavailable describes a response with status code 503, with default header values.
+
+service unavailable
+*/
+type AccessServiceUnavailable struct {
+
+	/* seconds to wait before retrying
+	 */
+	RetryAfter int64
+}
+
+// IsSuccess returns true when this access service unavailable response has a 2xx status code
+func (o *AccessServiceUnavailable) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this access service unavailable response has a 3xx status code
+func (o *AccessServiceUnavailable) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this access service unavailable response has a 4xx status code
+func (o *AccessServiceUnavailable) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this access service unavailable response has a 5xx status code
+func (o *AccessServiceUnavailable) IsServerError() bool {
+	return true
+}
+
+// IsCode returns true when this access service unavailable response a status code equal to that given
+func (o *AccessServiceUnavailable) IsCode(code int) bool {
+	return code == 503
+}
+
+// Code gets the status code for the access service unavailable response
+func (o *AccessServiceUnavailable) Code() int {
+	return 503
+}
+
+func (o *AccessServiceUnavailable) Error() string {
+	return fmt.Sprintf("[POST /access][%d] accessServiceUnavailable", 503)
+}
+
+func (o *AccessServiceUnavailable) String() string {
+	return fmt.Sprintf("[POST /access][%d] accessServiceUnavailable", 503)
+}
+
+func (o *AccessServiceUnavailable) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// hydrates response header Retry-After
+	hdrRetryAfter := response.GetHeader("Retry-After")
+
+	if hdrRetryAfter != "" {
+		valretryAfter, err := swag.ConvertInt64(hdrRetryAfter)
+		if err != nil {
+			return errors.InvalidType("Retry-After", "header", "int64", hdrRetryAfter)
+		}
+		o.RetryAfter = valretryAfter
+	}
 
 	return nil
 }

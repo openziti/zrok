@@ -45,12 +45,18 @@ func (h *unshareHandler) Handle(params share.UnshareParams, principal *rest_mode
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		dl.Errorf("error getting automation client for '%v': %v", principal.Email, err)
+		if automation.IsRateLimited(err) {
+			return share.NewUnshareServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)
+		}
 		return share.NewUnshareInternalServerError()
 	}
 
 	updates, err := teardownShare(shr, trx, ziti)
 	if err != nil {
 		dl.Errorf("error tearing down share '%v' for '%v': %v", shrToken, principal.Email, err)
+		if automation.IsRateLimited(err) {
+			return share.NewUnshareServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)
+		}
 		return share.NewUnshareInternalServerError()
 	}
 

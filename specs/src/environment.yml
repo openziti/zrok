@@ -29,6 +29,12 @@
         description: account not found
       500:
         description: internal server error
+      503:
+        description: service unavailable
+        headers:
+          Retry-After:
+            type: integer
+            description: seconds to wait before retrying
 
 /disable:
   post:
@@ -51,3 +57,9 @@
         description: invalid environment
       500:
         description: internal server error
+      503:
+        description: service unavailable
+        headers:
+          Retry-After:
+            type: integer
+            description: seconds to wait before retrying

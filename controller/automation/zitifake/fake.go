@@ -71,6 +71,9 @@ type Server struct {
 	rejectOperations               bool
 	rejectDeletes                  map[string]bool
 	rejectCreates                  map[string]bool
+	rateLimitCreates               map[string]bool
+	rateLimitDeletes               map[string]bool
+	rateLimitAuthentications       int
 	authDelay                      time.Duration
 }
 
@@ -96,7 +99,7 @@ func newServer(username, password string) *Server {
 	for _, kind := range []string{Configs, Services, ServicePolicies, ServiceEdgeRouterPolicies, Identities, EdgeRouterPolicies} {
 		objects[kind] = make(map[string]*object)
 	}
-	return &Server{objects: objects, sessions: make(map[string]bool), rejectDeletes: make(map[string]bool), rejectCreates: make(map[string]bool), username: username, password: password}
+	return &Server{objects: objects, sessions: make(map[string]bool), rejectDeletes: make(map[string]bool), rejectCreates: make(map[string]bool), rateLimitCreates: make(map[string]bool), rateLimitDeletes: make(map[string]bool), username: username, password: password}
 }
 
 func (f *Server) Edge() *rest_management_api_client.ZitiEdgeManagement {
@@ -140,6 +143,29 @@ func (f *Server) RejectCreates(name string, reject bool) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.rejectCreates[name] = reject
+}
+
+// RateLimitCreates answers every create of kind as ziti's command rate limiter does: 429 with the
+// SERVER_TOO_MANY_REQUESTS envelope.
+func (f *Server) RateLimitCreates(kind string, limit bool) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.rateLimitCreates[kind] = limit
+}
+
+// RateLimitDeletes answers every delete of kind as ziti's command rate limiter does.
+func (f *Server) RateLimitDeletes(kind string, limit bool) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.rateLimitDeletes[kind] = limit
+}
+
+// RateLimitAuthentications answers the next n authentications with 429, as ziti's authentication
+// rate limiter does.
+func (f *Server) RateLimitAuthentications(n int) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.rateLimitAuthentications = n
 }
 
 // SetAuthenticationDelay delays every authentication response without blocking other requests.
@@ -265,6 +291,11 @@ func (f *Server) issueToken() string {
 
 func (f *Server) authenticate(w http.ResponseWriter, r *http.Request) {
 	f.authAttempts++
+	if f.rateLimitAuthentications > 0 {
+		f.rateLimitAuthentications--
+		writeRateLimited(w)
+		return
+	}
 	var input rest_model.Authenticate
 	if r.Method != http.MethodPost || r.URL.Query().Get("method") != "password" || json.NewDecoder(r.Body).Decode(&input) != nil || string(input.Username) != f.username || string(input.Password) != f.password || f.rejectAuthentication {
 		writeError(w, http.StatusUnauthorized, "invalid credentials")
@@ -314,8 +345,8 @@ func (f *Server) serve(w http.ResponseWriter, r *http.Request) {
 		case http.MethodGet:
 			f.list(w, r, kind)
 		case http.MethodPost:
-			if kind == Identities || kind == EdgeRouterPolicies {
-				writeError(w, 405, "method not allowed")
+			if f.rateLimitCreates[kind] {
+				writeRateLimited(w)
 				return
 			}
 			f.create(w, r, kind)
@@ -346,6 +377,11 @@ func writeJSON(w http.ResponseWriter, status int, value interface{}) {
 
 func writeError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, &rest_model.APIErrorEnvelope{Error: &rest_model.APIError{Code: http.StatusText(status), Message: message}, Meta: &rest_model.Meta{}})
+}
+
+// writeRateLimited answers as ziti's rate limiters do.
+func writeRateLimited(w http.ResponseWriter) {
+	writeJSON(w, http.StatusTooManyRequests, &rest_model.APIErrorEnvelope{Error: &rest_model.APIError{Code: "SERVER_TOO_MANY_REQUESTS", Message: "too many requests"}, Meta: &rest_model.Meta{}})
 }
 
 func base(id string, tags *rest_model.Tags) rest_model.BaseEntity {
@@ -420,6 +456,25 @@ func (f *Server) create(w http.ResponseWriter, r *http.Request, kind string) {
 		name, tags = *input.Name, input.Tags
 		fill = func(obj *object, id string) {
 			obj.detail = &rest_model.ServiceEdgeRouterPolicyDetail{BaseEntity: base(id, tags), Name: &obj.name, EdgeRouterRoles: input.EdgeRouterRoles, EdgeRouterRolesDisplay: rest_model.NamedRoles{}, ServiceRoles: input.ServiceRoles, ServiceRolesDisplay: rest_model.NamedRoles{}, Semantic: input.Semantic}
+		}
+	case Identities:
+		var input rest_model.IdentityCreate
+		if err := json.NewDecoder(r.Body).Decode(&input); err != nil || input.Name == nil {
+			writeError(w, 400, "invalid identity")
+			return
+		}
+		// the seeded detail stands in; the fake serves no enrollment.
+		name, tags = *input.Name, input.Tags
+		fill = func(*object, string) {}
+	case EdgeRouterPolicies:
+		var input rest_model.EdgeRouterPolicyCreate
+		if err := json.NewDecoder(r.Body).Decode(&input); err != nil || input.Name == nil {
+			writeError(w, 400, "invalid edge router policy")
+			return
+		}
+		name, tags = *input.Name, input.Tags
+		fill = func(obj *object, id string) {
+			obj.detail = &rest_model.EdgeRouterPolicyDetail{BaseEntity: base(id, tags), Name: &obj.name, EdgeRouterRoles: input.EdgeRouterRoles, EdgeRouterRolesDisplay: rest_model.NamedRoles{}, IdentityRoles: input.IdentityRoles, IdentityRolesDisplay: rest_model.NamedRoles{}, IsSystem: new(bool), Semantic: input.Semantic}
 		}
 	}
 	if f.rejectCreates[name] {
@@ -523,6 +578,10 @@ func (f *Server) detail(w http.ResponseWriter, kind, id string) {
 }
 
 func (f *Server) delete(w http.ResponseWriter, kind, id string) {
+	if f.rateLimitDeletes[kind] {
+		writeRateLimited(w)
+		return
+	}
 	if f.rejectDeletes[kind] {
 		writeError(w, http.StatusInternalServerError, labels[kind].noun+" delete rejected: "+id)
 		return

@@ -8,8 +8,10 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
@@ -54,6 +56,12 @@ func (o *ShareReader) ReadResponse(response runtime.ClientResponse, consumer run
 		return nil, result
 	case 500:
 		result := NewShareInternalServerError()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 503:
+		result := NewShareServiceUnavailable()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -432,6 +440,77 @@ func (o *ShareInternalServerError) readResponse(response runtime.ClientResponse,
 	// response payload
 	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
+	}
+
+	return nil
+}
+
+// NewShareServiceUnavailable creates a ShareServiceUnavailable with default headers values
+func NewShareServiceUnavailable() *ShareServiceUnavailable {
+	return &ShareServiceUnavailable{}
+}
+
+/*
+ShareServiceUnavailable describes a response with status code 503, with default header values.
+
+service unavailable
+*/
+type ShareServiceUnavailable struct {
+
+	/* seconds to wait before retrying
+	 */
+	RetryAfter int64
+}
+
+// IsSuccess returns true when this share service unavailable response has a 2xx status code
+func (o *ShareServiceUnavailable) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this share service unavailable response has a 3xx status code
+func (o *ShareServiceUnavailable) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this share service unavailable response has a 4xx status code
+func (o *ShareServiceUnavailable) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this share service unavailable response has a 5xx status code
+func (o *ShareServiceUnavailable) IsServerError() bool {
+	return true
+}
+
+// IsCode returns true when this share service unavailable response a status code equal to that given
+func (o *ShareServiceUnavailable) IsCode(code int) bool {
+	return code == 503
+}
+
+// Code gets the status code for the share service unavailable response
+func (o *ShareServiceUnavailable) Code() int {
+	return 503
+}
+
+func (o *ShareServiceUnavailable) Error() string {
+	return fmt.Sprintf("[POST /share][%d] shareServiceUnavailable", 503)
+}
+
+func (o *ShareServiceUnavailable) String() string {
+	return fmt.Sprintf("[POST /share][%d] shareServiceUnavailable", 503)
+}
+
+func (o *ShareServiceUnavailable) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// hydrates response header Retry-After
+	hdrRetryAfter := response.GetHeader("Retry-After")
+
+	if hdrRetryAfter != "" {
+		valretryAfter, err := swag.ConvertInt64(hdrRetryAfter)
+		if err != nil {
+			return errors.InvalidType("Retry-After", "header", "int64", hdrRetryAfter)
+		}
+		o.RetryAfter = valretryAfter
 	}
 
 	return nil

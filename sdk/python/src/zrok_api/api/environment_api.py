@@ -95,6 +95,7 @@ class EnvironmentApi:
             '200': None,
             '401': None,
             '500': None,
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -163,6 +164,7 @@ class EnvironmentApi:
             '200': None,
             '401': None,
             '500': None,
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -231,6 +233,7 @@ class EnvironmentApi:
             '200': None,
             '401': None,
             '500': None,
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -366,6 +369,7 @@ class EnvironmentApi:
             '401': None,
             '404': None,
             '500': None,
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -435,6 +439,7 @@ class EnvironmentApi:
             '401': None,
             '404': None,
             '500': None,
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,
@@ -504,6 +509,7 @@ class EnvironmentApi:
             '401': None,
             '404': None,
             '500': None,
+            '503': None,
         }
         response_data = self.api_client.call_api(
             *_param,

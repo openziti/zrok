@@ -12,10 +12,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-type accessHandler struct{}
+type accessHandler struct {
+	// commit is replaceable so a test can fail the commit after the dial policy exists.
+	commit func(*sqlx.Tx) error
+}
 
 func newAccessHandler() *accessHandler {
-	return &accessHandler{}
+	return &accessHandler{commit: (*sqlx.Tx).Commit}
 }
 
 func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_zrok.Principal) middleware.Responder {
@@ -94,6 +97,9 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		dl.Error(err)
+		if automation.IsRateLimited(err) {
+			return share.NewAccessServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)
+		}
 		return share.NewAccessInternalServerError()
 	}
 
@@ -113,15 +119,30 @@ func (h *accessHandler) Handle(params share.AccessParams, principal *rest_model_
 		Semantic:      rest_model.SemanticAllOf,
 	}
 
-	if _, err := ziti.ServicePolicies.CreateDial(opts); err != nil {
+	dialPolicyZId, err := ziti.ServicePolicies.CreateDial(opts)
+	if err != nil {
 		dl.Errorf("unable to create dial policy for user '%v': %v", principal.Email, err)
+		if automation.IsRateLimited(err) {
+			return share.NewAccessServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)
+		}
 		return share.NewAccessInternalServerError()
 	}
 
-	if err := trx.Commit(); err != nil {
+	// the dial policy is deleted by id unless the frontend record commits
+	compensation := newZitiCompensation(compensatingAccess, feToken)
+	compensation.add(zitiServicePolicy, dialPolicyZId)
+	committed := false
+	defer func() {
+		if !committed {
+			compensation.run(ziti)
+		}
+	}()
+
+	if err := h.commit(trx); err != nil {
 		dl.Errorf("error committing frontend record: %v", err)
 		return share.NewAccessInternalServerError()
 	}
+	committed = true
 
 	return share.NewAccessCreated().WithPayload(&share.AccessCreatedBody{
 		FrontendToken: feToken,

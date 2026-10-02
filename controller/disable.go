@@ -36,12 +36,18 @@ func (h *disableHandler) Handle(params environment.DisableParams, principal *res
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		dl.Errorf("error getting automation client for user '%v': %v", principal.Email, err)
+		if automation.IsRateLimited(err) {
+			return environment.NewDisableServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)
+		}
 		return environment.NewDisableInternalServerError()
 	}
 
 	updates, err := disableEnvironment(env, trx, ziti)
 	if err != nil {
 		dl.Errorf("error disabling environment for user '%v': %v", principal.Email, err)
+		if automation.IsRateLimited(err) {
+			return environment.NewDisableServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)
+		}
 		return environment.NewDisableInternalServerError()
 	}
 
