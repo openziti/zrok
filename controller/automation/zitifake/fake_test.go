@@ -2,6 +2,7 @@ package zitifake
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/openziti/edge-api/rest_management_api_client/service_policy"
@@ -59,4 +60,22 @@ func TestServiceRoutes(t *testing.T) {
 	_, _, creates, deletes := fake.Counts()
 	require.Equal(t, 1, creates)
 	require.Equal(t, 1, deletes)
+}
+
+func TestDeleteWithFilterReadsEveryPage(t *testing.T) {
+	fake := New()
+	defer fake.Close()
+	ziti := automation.NewZitiAutomationWithEdge(fake.Edge())
+	// more than ziti's default page of ten, and more than two of them.
+	for i := 0; i < 25; i++ {
+		id := fmt.Sprintf("policy-%02d", i)
+		fake.SeedWithID(ServicePolicies, id, id, automation.ZrokShareTags("share-one").ToRestModel())
+	}
+	fake.SeedWithID(ServicePolicies, "other", "other", automation.ZrokShareTags("share-two").ToRestModel())
+
+	require.NoError(t, ziti.ServicePolicies.DeleteWithFilter(automation.BuildTagFilter("zrokShareToken", "share-one")))
+	require.Empty(t, fake.Tagged("zrokShareToken", "share-one"))
+	_, deleted := fake.Log()
+	require.Len(t, deleted, 25)
+	require.True(t, fake.Has(ServicePolicies, "other"))
 }

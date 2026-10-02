@@ -1,16 +1,157 @@
 package controller
 
 import (
-	"strings"
+	"fmt"
+	"io"
+	"os"
+	"sort"
+	"text/tabwriter"
+	"time"
 
 	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/v2/controller/automation"
 	zrok_config "github.com/openziti/zrok/v2/controller/config"
 	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/pkg/errors"
 )
 
-func GC(inCfg *zrok_config.Config) error {
+// DefaultGCMinAge is how old an orphaned object must be before gc touches it. a day is well clear of
+// clock skew between the ziti and zrok hosts, and with the leak stopped nothing younger needs reclaiming.
+// any guard at all also keeps gc off a share whose
+// ziti objects are allocated but whose row has not yet committed is never collected.
+const DefaultGCMinAge = 24 * time.Hour
+
+type GCOptions struct {
+	// Delete removes the orphaned objects; without it gc only reports.
+	Delete bool
+	// MinAge skips orphaned objects younger than this by their createdAt.
+	MinAge time.Duration
+	// pageSize overrides automation.MaxPageSize for tests.
+	pageSize int64
+}
+
+// gcFilter lists everything zrok tagged; ownership is then decided by the zrokShareToken tag.
+const gcFilter = "tags.zrok != null"
+
+const gcShareTokenTag = "zrokShareToken"
+
+// gcKind is one kind of ziti object gc collects. gcKinds returns them in deletion order.
+type gcKind struct {
+	name   string
+	list   func(pageSize int64) ([]*gcObject, error)
+	delete func(id string) error
+}
+
+// gcKinds lists the kinds in the order their orphans are deleted: policies and configs before services,
+// so a service is never left referenced by an object that outlives it.
+func gcKinds(ziti *automation.ZitiAutomation) []*gcKind {
+	return []*gcKind{
+		{
+			name: "service edge router policies",
+			list: func(pageSize int64) ([]*gcObject, error) {
+				return gcList(ziti.ServiceEdgeRouterPolicies.Find, pageSize, func(v *rest_model.ServiceEdgeRouterPolicyDetail) (*rest_model.BaseEntity, *string) {
+					return &v.BaseEntity, v.Name
+				})
+			},
+			delete: ziti.ServiceEdgeRouterPolicies.Delete,
+		},
+		{
+			name: "service policies",
+			list: func(pageSize int64) ([]*gcObject, error) {
+				return gcList(ziti.ServicePolicies.Find, pageSize, func(v *rest_model.ServicePolicyDetail) (*rest_model.BaseEntity, *string) {
+					return &v.BaseEntity, v.Name
+				})
+			},
+			delete: ziti.ServicePolicies.Delete,
+		},
+		{
+			name: "configs",
+			list: func(pageSize int64) ([]*gcObject, error) {
+				return gcList(ziti.Configs.Find, pageSize, func(v *rest_model.ConfigDetail) (*rest_model.BaseEntity, *string) {
+					return &v.BaseEntity, v.Name
+				})
+			},
+			delete: ziti.Configs.Delete,
+		},
+		{
+			name: "services",
+			list: func(pageSize int64) ([]*gcObject, error) {
+				return gcList(ziti.Services.Find, pageSize, func(v *rest_model.ServiceDetail) (*rest_model.BaseEntity, *string) {
+					return &v.BaseEntity, v.Name
+				})
+			},
+			delete: ziti.Services.Delete,
+		},
+	}
+}
+
+type gcObject struct {
+	id         string
+	name       string
+	shareToken string
+	createdAt  time.Time
+	hasCreated bool
+}
+
+func gcList[T any](finder func(*automation.FilterOptions) ([]*T, error), pageSize int64, entity func(*T) (*rest_model.BaseEntity, *string)) ([]*gcObject, error) {
+	items, err := automation.FindAll(finder, gcFilter, pageSize)
+	if err != nil {
+		return nil, err
+	}
+	seen := make(map[string]bool, len(items))
+	out := make([]*gcObject, 0, len(items))
+	for _, item := range items {
+		base, name := entity(item)
+		if base.ID == nil || seen[*base.ID] {
+			// an offset listing can repeat an object when another process deletes concurrently.
+			continue
+		}
+		seen[*base.ID] = true
+		obj := &gcObject{id: *base.ID}
+		if name != nil {
+			obj.name = *name
+		}
+		if base.Tags != nil {
+			if token, ok := base.Tags.SubTags[gcShareTokenTag].(string); ok {
+				obj.shareToken = token
+			}
+		}
+		if base.CreatedAt != nil {
+			obj.createdAt = time.Time(*base.CreatedAt)
+			obj.hasCreated = true
+		}
+		out = append(out, obj)
+	}
+	return out, nil
+}
+
+type gcKindReport struct {
+	kind     *gcKind
+	live     int
+	tooYoung int
+	unowned  int
+	orphans  []*gcObject
+
+	deleted     int
+	alreadyGone int
+	failed      int
+}
+
+func (r *gcKindReport) total() int {
+	return r.live + len(r.orphans) + r.tooYoung + r.unowned
+}
+
+type gcReport struct {
+	liveShares int
+	minAge     time.Duration
+	deleteMode bool
+	kinds      []*gcKindReport
+}
+
+// GC reports, and with opts.Delete removes, the ziti objects carrying a zrokShareToken tag whose token
+// belongs to no live share.
+func GC(inCfg *zrok_config.Config, opts GCOptions) error {
 	cfg = inCfg
 	if v, err := store.Open(cfg.Store); err == nil {
 		str = v
@@ -22,163 +163,151 @@ func GC(inCfg *zrok_config.Config) error {
 			dl.Errorf("error closing store: %v", err)
 		}
 	}()
-	trx, err := str.Begin()
-	if err != nil {
-		return err
-	}
-	defer func() { _ = trx.Rollback() }()
-	sshrs, err := str.FindAllShares(trx)
-	if err != nil {
-		return err
-	}
-	liveMap := make(map[string]struct{})
-	for _, sshr := range sshrs {
-		liveMap[sshr.Token] = struct{}{}
-	}
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		return err
 	}
-	if err := gcServices(ziti, liveMap); err != nil {
-		return errors.Wrap(err, "error garbage collecting services")
+	return runGC(ziti, opts, os.Stdout)
+}
+
+func runGC(ziti *automation.ZitiAutomation, opts GCOptions, out io.Writer) error {
+	rpt, err := gcSurvey(ziti, opts)
+	if err != nil {
+		return err
 	}
-	if err := gcServiceEdgeRouterPolicies(ziti, liveMap); err != nil {
-		return errors.Wrap(err, "error garbage collecting service edge router policies")
+	rpt.print(out)
+	if !opts.Delete {
+		return nil
 	}
-	if err := gcServicePolicies(ziti, liveMap); err != nil {
-		return errors.Wrap(err, "error garbage collecting service policies")
-	}
-	if err := gcConfigs(ziti, liveMap); err != nil {
-		return errors.Wrap(err, "error garbage collecting configs")
+	failed := gcReclaim(rpt)
+	rpt.printDeleted(out)
+	if failed > 0 {
+		return errors.Errorf("'%d' deletes failed; see the log", failed)
 	}
 	return nil
 }
 
-func gcServices(ziti *automation.ZitiAutomation, liveMap map[string]struct{}) error {
-	filterOpts := &automation.FilterOptions{
-		Filter: "tags.zrok != null",
-		Limit:  0,
-		Offset: 0,
-	}
-
-	services, err := ziti.Services.Find(filterOpts)
+// gcSurvey reads the live share tokens and then every zrok-tagged object of each kind, and sorts each
+// object into live, orphaned, too young or not owned by a share. the store is read first, so an object
+// created after the read is younger than the run and falls under the age guard.
+func gcSurvey(ziti *automation.ZitiAutomation, opts GCOptions) (*gcReport, error) {
+	live, err := gcLiveTokens()
 	if err != nil {
-		return errors.Wrap(err, "error listing services")
+		return nil, err
 	}
-
-	for _, svc := range services {
-		if _, found := liveMap[*svc.Name]; !found {
-			dl.Infof("garbage collecting, zitiSvcId='%v', zrokSvcId='%v'", *svc.ID, *svc.Name)
-
-			// delete service edge router policies for share
-			serpFilter := "name=\"" + *svc.Name + "\""
-			if err := ziti.ServiceEdgeRouterPolicies.DeleteWithFilter(serpFilter); err != nil {
-				dl.Errorf("error garbage collecting service edge router policy: %v", err)
-			}
-
-			// delete dial service policies for share
-			dialFilter := "name=\"" + *svc.Name + "-dial\""
-			if err := ziti.ServicePolicies.DeleteWithFilter(dialFilter); err != nil {
-				dl.Errorf("error garbage collecting service dial policy: %v", err)
-			}
-
-			// delete bind service policies for share
-			bindFilter := "name=\"" + *svc.Name + "-bind\""
-			if err := ziti.ServicePolicies.DeleteWithFilter(bindFilter); err != nil {
-				dl.Errorf("error garbage collecting service bind policy: %v", err)
-			}
-
-			// delete configs for share
-			configFilter := "name=\"" + *svc.Name + "\""
-			if err := ziti.Configs.DeleteWithFilter(configFilter); err != nil {
-				dl.Errorf("error garbage collecting config: %v", err)
-			}
-
-			// delete service
-			if err := ziti.Services.Delete(*svc.ID); err != nil {
-				dl.Errorf("error garbage collecting service: %v", err)
-			}
-		} else {
-			dl.Infof("remaining live, zitiSvcId='%v', zrokSvcId='%v'", *svc.ID, *svc.Name)
+	rpt := &gcReport{liveShares: len(live), minAge: opts.MinAge, deleteMode: opts.Delete}
+	now := time.Now()
+	for _, kind := range gcKinds(ziti) {
+		objs, err := kind.list(opts.pageSize)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error listing %s", kind.name)
 		}
+		kr := &gcKindReport{kind: kind}
+		for _, obj := range objs {
+			switch {
+			case obj.shareToken == "":
+				kr.unowned++
+			case live[obj.shareToken]:
+				kr.live++
+				dl.Debugf("live %s '%s' ('%s'), share '%s'", kind.name, obj.id, obj.name, obj.shareToken)
+			case !obj.hasCreated || now.Sub(obj.createdAt) < opts.MinAge:
+				kr.tooYoung++
+				dl.Infof("too young to collect: %s '%s' ('%s'), share '%s', created '%s'", kind.name, obj.id, obj.name, obj.shareToken, obj.createdAt.Format(time.RFC3339))
+			default:
+				kr.orphans = append(kr.orphans, obj)
+				dl.Infof("orphaned: %s '%s' ('%s'), share '%s', created '%s'", kind.name, obj.id, obj.name, obj.shareToken, obj.createdAt.Format(time.RFC3339))
+			}
+		}
+		rpt.kinds = append(rpt.kinds, kr)
 	}
-	return nil
+	return rpt, nil
 }
 
-func gcServiceEdgeRouterPolicies(ziti *automation.ZitiAutomation, liveMap map[string]struct{}) error {
-	filterOpts := &automation.FilterOptions{
-		Filter: "tags.zrok != null",
-		Limit:  0,
-		Offset: 0,
-	}
-
-	policies, err := ziti.ServiceEdgeRouterPolicies.Find(filterOpts)
+func gcLiveTokens() (map[string]bool, error) {
+	trx, err := str.Begin()
 	if err != nil {
-		return errors.Wrap(err, "error listing service edge router policies")
+		return nil, errors.Wrap(err, "error starting transaction")
 	}
-
-	for _, serp := range policies {
-		if _, found := liveMap[*serp.Name]; !found {
-			dl.Infof("garbage collecting, svcId='%v'", *serp.Name)
-			filter := "name=\"" + *serp.Name + "\""
-			if err := ziti.ServiceEdgeRouterPolicies.DeleteWithFilter(filter); err != nil {
-				dl.Errorf("error garbage collecting service edge router policy: %v", err)
-			}
-		} else {
-			dl.Infof("remaining live, svcId='%v'", *serp.Name)
-		}
+	defer func() { _ = trx.Rollback() }()
+	shrs, err := str.FindAllShares(trx)
+	if err != nil {
+		return nil, errors.Wrap(err, "error listing live shares")
 	}
-	return nil
+	live := make(map[string]bool, len(shrs))
+	for _, shr := range shrs {
+		live[shr.Token] = true
+	}
+	return live, nil
 }
 
-func gcServicePolicies(ziti *automation.ZitiAutomation, liveMap map[string]struct{}) error {
-	filterOpts := &automation.FilterOptions{
-		Filter: "tags.zrok != null",
-		Limit:  0,
-		Offset: 0,
-	}
-
-	policies, err := ziti.ServicePolicies.Find(filterOpts)
-	if err != nil {
-		return errors.Wrap(err, "error listing service policies")
-	}
-
-	for _, sp := range policies {
-		spName := strings.Split(*sp.Name, "-")[0]
-		if _, found := liveMap[spName]; !found {
-			dl.Infof("garbage collecting, svcId='%v'", spName)
-			deleteFilter := "id=\"" + *sp.ID + "\""
-			if err := ziti.ServicePolicies.DeleteWithFilter(deleteFilter); err != nil {
-				dl.Errorf("error garbage collecting service policy: %v", err)
+// gcReclaim deletes the survey's orphans by id, kind by kind in deletion order. an object already gone
+// counts as collected; any other failure is logged and the run continues. it returns the failure count.
+func gcReclaim(rpt *gcReport) int {
+	failed := 0
+	for _, kr := range rpt.kinds {
+		for _, obj := range kr.orphans {
+			err := kr.kind.delete(obj.id)
+			switch {
+			case err == nil:
+				kr.deleted++
+			case automation.IsNotFound(err):
+				kr.alreadyGone++
+				dl.Infof("%s '%s' ('%s') already gone", kr.kind.name, obj.id, obj.name)
+			default:
+				kr.failed++
+				failed++
+				dl.Errorf("error collecting %s '%s' ('%s'), share '%s': %v", kr.kind.name, obj.id, obj.name, obj.shareToken, err)
 			}
-		} else {
-			dl.Infof("remaining live, svcId='%v'", spName)
 		}
 	}
-	return nil
+	return failed
 }
 
-func gcConfigs(ziti *automation.ZitiAutomation, liveMap map[string]struct{}) error {
-	filterOpts := &automation.FilterOptions{
-		Filter: "tags.zrok != null",
-		Limit:  0,
-		Offset: 0,
+func (rpt *gcReport) print(out io.Writer) {
+	if rpt.deleteMode {
+		_, _ = fmt.Fprintf(out, "garbage collection (deleting orphans)\n")
+	} else {
+		_, _ = fmt.Fprintf(out, "garbage collection dry run (nothing deleted; run with --delete to remove orphans)\n")
 	}
+	_, _ = fmt.Fprintf(out, "live shares: %d, minimum age: %v\n\n", rpt.liveShares, rpt.minAge)
 
-	configs, err := ziti.Configs.Find(filterOpts)
-	if err != nil {
-		return errors.Wrap(err, "error listing configs")
+	tw := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
+	_, _ = fmt.Fprintf(tw, "kind\tlive\torphaned\ttoo young\tnot share-owned\t\n")
+	for _, kr := range rpt.kinds {
+		_, _ = fmt.Fprintf(tw, "%s\t%d\t%d\t%d\t%d\t\n", kr.kind.name, kr.live, len(kr.orphans), kr.tooYoung, kr.unowned)
 	}
+	_ = tw.Flush()
 
-	for _, c := range configs {
-		if _, found := liveMap[*c.Name]; !found {
-			configFilter := "name=\"" + *c.Name + "\""
-			if err := ziti.Configs.DeleteWithFilter(configFilter); err != nil {
-				dl.Errorf("error garbage collecting config: %v", err)
-			}
-		} else {
-			dl.Infof("remaining live, svcId='%v'", *c.Name)
+	byToken := make(map[string][]string)
+	for _, kr := range rpt.kinds {
+		for _, obj := range kr.orphans {
+			byToken[obj.shareToken] = append(byToken[obj.shareToken], fmt.Sprintf("%s '%s' ('%s')", kr.kind.name, obj.id, obj.name))
 		}
 	}
-	return nil
+	if len(byToken) == 0 {
+		_, _ = fmt.Fprintf(out, "\nno orphaned objects\n")
+		return
+	}
+	tokens := make([]string, 0, len(byToken))
+	for token := range byToken {
+		tokens = append(tokens, token)
+	}
+	sort.Strings(tokens)
+	_, _ = fmt.Fprintf(out, "\norphaned objects by share token:\n")
+	for _, token := range tokens {
+		_, _ = fmt.Fprintf(out, "  '%s'\n", token)
+		for _, line := range byToken[token] {
+			_, _ = fmt.Fprintf(out, "    %s\n", line)
+		}
+	}
+}
+
+func (rpt *gcReport) printDeleted(out io.Writer) {
+	_, _ = fmt.Fprintf(out, "\n")
+	tw := tabwriter.NewWriter(out, 0, 0, 2, ' ', 0)
+	_, _ = fmt.Fprintf(tw, "kind\tdeleted\talready gone\tfailed\t\n")
+	for _, kr := range rpt.kinds {
+		_, _ = fmt.Fprintf(tw, "%s\t%d\t%d\t%d\t\n", kr.kind.name, kr.deleted, kr.alreadyGone, kr.failed)
+	}
+	_ = tw.Flush()
 }
