@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v2.0.7
+
 FIX: `zrok2 admin gc` now decides which share an OpenZiti object belongs to by its `zrokShareToken` tag rather than its name, so it no longer deletes the bind, dial and service edge router policies of live shares; objects with no share token, such as agent-remote services and policies, are never touched. It now reads every object rather than the first page of ten of each kind. It is a dry run by default that prints what it would remove, grouped by share token, and deletes only with `--delete`. Orphaned objects younger than `--min-age` (default 24 hours) are skipped, so a share being created at the time of the run is not collected. Tearing down a share with more than ten OpenZiti objects of one kind, such as a share with many access dial policies, now removes all of them rather than the first ten.
 
 FIX: Accounts holding public shares are now released when their bandwidth usage falls back under the limit. Previously the relax cycle failed for every public share created by v2, because it looked for the v1 frontend selection those shares never have, so the account stayed limited indefinitely after its usage had recovered and its journal entry had to be cleared by hand. The relax now restores a public share's dial policy from the share's names and the frontends serving their namespaces, the same way the share was created; a share created by v1 is still restored from its frontend selection, and a share that has neither had no dial policy to restore and no longer holds the account back.
