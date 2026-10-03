@@ -61,12 +61,18 @@ func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_mo
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		dl.Error(err)
+		if automation.IsRateLimited(err) {
+			return share.NewUnaccessServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)
+		}
 		return share.NewUnaccessInternalServerError()
 	}
 
 	filter := fmt.Sprintf("tags.zrokShareToken=\"%v\" and tags.zrokFrontendToken=\"%v\" and type=1", shrToken, feToken)
 	if err := ziti.ServicePolicies.DeleteWithFilter(filter); err != nil {
 		dl.Errorf("error removing access to '%v' for '%v': %v", shrToken, envZId, err)
+		if automation.IsRateLimited(err) {
+			return share.NewUnaccessServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)
+		}
 		return share.NewUnaccessInternalServerError()
 	}
 

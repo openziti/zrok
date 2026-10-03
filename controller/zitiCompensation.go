@@ -15,6 +15,17 @@ const (
 	zitiService                 zitiObjectKind = "service"
 	zitiServicePolicy           zitiObjectKind = "service policy"
 	zitiServiceEdgeRouterPolicy zitiObjectKind = "service edge router policy"
+	zitiIdentity                zitiObjectKind = "identity"
+	zitiEdgeRouterPolicy        zitiObjectKind = "edge router policy"
+)
+
+// zitiCompensationSubject names what a compensated request was creating, for the log.
+type zitiCompensationSubject string
+
+const (
+	compensatingShare       zitiCompensationSubject = "share"
+	compensatingAccess      zitiCompensationSubject = "access"
+	compensatingEnvironment zitiCompensationSubject = "environment"
 )
 
 type zitiObject struct {
@@ -27,12 +38,13 @@ type zitiObject struct {
 // racing for the same private share token both pass the availability check and carry the same token
 // tag, so a tag-scoped cleanup by the loser would delete the winner's objects.
 type zitiCompensation struct {
-	token   string
+	subject zitiCompensationSubject
+	name    string
 	objects []zitiObject
 }
 
-func newZitiCompensation(token string) *zitiCompensation {
-	return &zitiCompensation{token: token}
+func newZitiCompensation(subject zitiCompensationSubject, name string) *zitiCompensation {
+	return &zitiCompensation{subject: subject, name: name}
 }
 
 func (c *zitiCompensation) add(kind zitiObjectKind, id string) {
@@ -50,12 +62,12 @@ func (c *zitiCompensation) run(ziti *automation.ZitiAutomation) {
 		case err == nil:
 			deleted = append(deleted, obj.id)
 		case automation.IsNotFound(err):
-			dl.Debugf("compensating share '%v': %v '%v' already deleted", c.token, obj.kind, obj.id)
+			dl.Debugf("compensating %v '%v': %v '%v' already deleted", c.subject, c.name, obj.kind, obj.id)
 		default:
-			dl.Errorf("compensating share '%v': error deleting %v '%v': %v", c.token, obj.kind, obj.id, err)
+			dl.Errorf("compensating %v '%v': error deleting %v '%v': %v", c.subject, c.name, obj.kind, obj.id, err)
 		}
 	}
-	dl.Infof("compensated failed share '%v': deleted ziti objects '%v'", c.token, strings.Join(deleted, ", "))
+	dl.Infof("compensated failed %v '%v': deleted ziti objects '%v'", c.subject, c.name, strings.Join(deleted, ", "))
 }
 
 func (c *zitiCompensation) delete(ziti *automation.ZitiAutomation, obj zitiObject) error {
@@ -68,6 +80,10 @@ func (c *zitiCompensation) delete(ziti *automation.ZitiAutomation, obj zitiObjec
 		return ziti.ServicePolicies.Delete(obj.id)
 	case zitiServiceEdgeRouterPolicy:
 		return ziti.ServiceEdgeRouterPolicies.Delete(obj.id)
+	case zitiIdentity:
+		return ziti.Identities.Delete(obj.id)
+	case zitiEdgeRouterPolicy:
+		return ziti.EdgeRouterPolicies.Delete(obj.id)
 	default:
 		return errors.Errorf("unknown ziti object kind '%v'", obj.kind)
 	}

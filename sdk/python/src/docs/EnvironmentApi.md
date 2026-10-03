@@ -79,6 +79,7 @@ void (empty response body)
 **200** | environment disabled |  -  |
 **401** | invalid environment |  -  |
 **500** | internal server error |  -  |
+**503** | service unavailable |  * Retry-After - seconds to wait before retrying <br>  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -157,6 +158,7 @@ Name | Type | Description  | Notes
 **401** | unauthorized |  -  |
 **404** | account not found |  -  |
 **500** | internal server error |  -  |
+**503** | service unavailable |  * Retry-After - seconds to wait before retrying <br>  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

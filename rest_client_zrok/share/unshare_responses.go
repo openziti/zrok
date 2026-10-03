@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -44,6 +45,12 @@ func (o *UnshareReader) ReadResponse(response runtime.ClientResponse, consumer r
 		return nil, result
 	case 500:
 		result := NewUnshareInternalServerError()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+	case 503:
+		result := NewUnshareServiceUnavailable()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -284,6 +291,77 @@ func (o *UnshareInternalServerError) readResponse(response runtime.ClientRespons
 	// response payload
 	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && !stderrors.Is(err, io.EOF) {
 		return err
+	}
+
+	return nil
+}
+
+// NewUnshareServiceUnavailable creates a UnshareServiceUnavailable with default headers values
+func NewUnshareServiceUnavailable() *UnshareServiceUnavailable {
+	return &UnshareServiceUnavailable{}
+}
+
+/*
+UnshareServiceUnavailable describes a response with status code 503, with default header values.
+
+service unavailable
+*/
+type UnshareServiceUnavailable struct {
+
+	/* seconds to wait before retrying
+	 */
+	RetryAfter int64
+}
+
+// IsSuccess returns true when this unshare service unavailable response has a 2xx status code
+func (o *UnshareServiceUnavailable) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this unshare service unavailable response has a 3xx status code
+func (o *UnshareServiceUnavailable) IsRedirect() bool {
+	return false
+}
+
+// IsClientError returns true when this unshare service unavailable response has a 4xx status code
+func (o *UnshareServiceUnavailable) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this unshare service unavailable response has a 5xx status code
+func (o *UnshareServiceUnavailable) IsServerError() bool {
+	return true
+}
+
+// IsCode returns true when this unshare service unavailable response a status code equal to that given
+func (o *UnshareServiceUnavailable) IsCode(code int) bool {
+	return code == 503
+}
+
+// Code gets the status code for the unshare service unavailable response
+func (o *UnshareServiceUnavailable) Code() int {
+	return 503
+}
+
+func (o *UnshareServiceUnavailable) Error() string {
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareServiceUnavailable", 503)
+}
+
+func (o *UnshareServiceUnavailable) String() string {
+	return fmt.Sprintf("[DELETE /unshare][%d] unshareServiceUnavailable", 503)
+}
+
+func (o *UnshareServiceUnavailable) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// hydrates response header Retry-After
+	hdrRetryAfter := response.GetHeader("Retry-After")
+
+	if hdrRetryAfter != "" {
+		valretryAfter, err := swag.ConvertInt64(hdrRetryAfter)
+		if err != nil {
+			return errors.InvalidType("Retry-After", "header", "int64", hdrRetryAfter)
+		}
+		o.RetryAfter = valretryAfter
 	}
 
 	return nil

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/swag"
 
 	"github.com/openziti/zrok/v2/rest_model_zrok"
 )
@@ -126,4 +127,51 @@ func (o *UnshareInternalServerError) WriteResponse(rw http.ResponseWriter, produ
 	if err := producer.Produce(rw, payload); err != nil {
 		panic(err) // let the recovery middleware deal with this
 	}
+}
+
+// UnshareServiceUnavailableCode is the HTTP code returned for type UnshareServiceUnavailable
+const UnshareServiceUnavailableCode int = 503
+
+/*
+UnshareServiceUnavailable service unavailable
+
+swagger:response unshareServiceUnavailable
+*/
+type UnshareServiceUnavailable struct {
+	/*seconds to wait before retrying
+
+	 */
+	RetryAfter int64 `json:"Retry-After"`
+}
+
+// NewUnshareServiceUnavailable creates UnshareServiceUnavailable with default headers values
+func NewUnshareServiceUnavailable() *UnshareServiceUnavailable {
+
+	return &UnshareServiceUnavailable{}
+}
+
+// WithRetryAfter adds the retryAfter to the unshare service unavailable response
+func (o *UnshareServiceUnavailable) WithRetryAfter(retryAfter int64) *UnshareServiceUnavailable {
+	o.RetryAfter = retryAfter
+	return o
+}
+
+// SetRetryAfter sets the retryAfter to the unshare service unavailable response
+func (o *UnshareServiceUnavailable) SetRetryAfter(retryAfter int64) {
+	o.RetryAfter = retryAfter
+}
+
+// WriteResponse to the client
+func (o *UnshareServiceUnavailable) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	// response header Retry-After
+
+	retryAfter := swag.FormatInt64(o.RetryAfter)
+	if retryAfter != "" {
+		rw.Header().Set("Retry-After", retryAfter)
+	}
+
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
+
+	rw.WriteHeader(503)
 }

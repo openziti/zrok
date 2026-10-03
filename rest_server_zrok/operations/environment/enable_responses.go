@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/swag"
 )
 
 // EnableCreatedCode is the HTTP code returned for type EnableCreated
@@ -126,4 +127,51 @@ func (o *EnableInternalServerError) WriteResponse(rw http.ResponseWriter, produc
 	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
 
 	rw.WriteHeader(500)
+}
+
+// EnableServiceUnavailableCode is the HTTP code returned for type EnableServiceUnavailable
+const EnableServiceUnavailableCode int = 503
+
+/*
+EnableServiceUnavailable service unavailable
+
+swagger:response enableServiceUnavailable
+*/
+type EnableServiceUnavailable struct {
+	/*seconds to wait before retrying
+
+	 */
+	RetryAfter int64 `json:"Retry-After"`
+}
+
+// NewEnableServiceUnavailable creates EnableServiceUnavailable with default headers values
+func NewEnableServiceUnavailable() *EnableServiceUnavailable {
+
+	return &EnableServiceUnavailable{}
+}
+
+// WithRetryAfter adds the retryAfter to the enable service unavailable response
+func (o *EnableServiceUnavailable) WithRetryAfter(retryAfter int64) *EnableServiceUnavailable {
+	o.RetryAfter = retryAfter
+	return o
+}
+
+// SetRetryAfter sets the retryAfter to the enable service unavailable response
+func (o *EnableServiceUnavailable) SetRetryAfter(retryAfter int64) {
+	o.RetryAfter = retryAfter
+}
+
+// WriteResponse to the client
+func (o *EnableServiceUnavailable) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	// response header Retry-After
+
+	retryAfter := swag.FormatInt64(o.RetryAfter)
+	if retryAfter != "" {
+		rw.Header().Set("Retry-After", retryAfter)
+	}
+
+	rw.Header().Del(runtime.HeaderContentType) // Remove Content-Type on empty responses
+
+	rw.WriteHeader(503)
 }

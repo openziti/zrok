@@ -1608,6 +1608,12 @@ paths:
           description: account not found
         500:
           description: internal server error
+        503:
+          description: service unavailable
+          headers:
+            Retry-After:
+              type: integer
+              description: seconds to wait before retrying
   
   /disable:
     post:
@@ -1630,6 +1636,12 @@ paths:
           description: invalid environment
         500:
           description: internal server error
+        503:
+          description: service unavailable
+          headers:
+            Retry-After:
+              type: integer
+              description: seconds to wait before retrying
   #
   # metadata.yml
   #
@@ -2239,6 +2251,12 @@ paths:
           description: not found
         500:
           description: internal server error
+        503:
+          description: service unavailable
+          headers:
+            Retry-After:
+              type: integer
+              description: seconds to wait before retrying
     patch:
       tags:
         - share
@@ -2297,6 +2315,12 @@ paths:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
+        503:
+          description: service unavailable
+          headers:
+            Retry-After:
+              type: integer
+              description: seconds to wait before retrying
     patch:
       tags:
         - share
@@ -2517,6 +2541,12 @@ paths:
           description: not found
         500:
           description: internal server error
+        503:
+          description: service unavailable
+          headers:
+            Retry-After:
+              type: integer
+              description: seconds to wait before retrying
   
   /unshare:
     delete:
@@ -2545,6 +2575,12 @@ paths:
           description: internal server error
           schema:
             $ref: "#/definitions/errorMessage"
+        503:
+          description: service unavailable
+          headers:
+            Retry-After:
+              type: integer
+              description: seconds to wait before retrying
 
 
 definitions:

@@ -7,16 +7,21 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"path"
 	"sync"
 	"time"
 
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_management_api_client"
+	"github.com/openziti/edge-api/rest_management_api_client/authentication"
 	"github.com/openziti/edge-api/rest_util"
 )
 
 var zitiAuthentications = expvar.NewInt("zrok.ziti.authentications")
+
+// zitiRateLimited counts management requests a ziti rate limiter answered with 429.
+var zitiRateLimited = expvar.NewInt("zrok.ziti.rate_limited")
 
 // failedRefreshWindow is how long a failed refresh answers callers still holding the same session
 // generation, so a persistent authentication failure costs one login per window.
@@ -122,6 +127,9 @@ func newZitiSession(cfg *Config, pool *x509.CertPool) (*ZitiAutomation, error) {
 	session.authenticate = func(ctx context.Context) (string, error) {
 		params := auth.Params().WithContext(ctx).WithTimeout(DefaultRequestTimeout)
 		resp, err := authEdge.Authentication.Authenticate(params)
+		if isError[*authentication.AuthenticateTooManyRequests](err) {
+			return "", newRateLimitedError(authenticateLimiter, http.MethodPost, path.Join(basePath, "authenticate"))
+		}
 		if err != nil {
 			return "", err
 		}
@@ -206,6 +214,8 @@ func (s *sessionTransport) runRefresh(ctx context.Context, call *sessionRefresh,
 	close(call.done)
 }
 
+// RoundTrip refreshes an expired session and replays the request once. a 429 from a ziti rate
+// limiter is consumed and returned as a *RateLimitedError; it is never retried here.
 func (s *sessionTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	request := req.Clone(req.Context())
 	s.mu.RLock()
@@ -213,15 +223,26 @@ func (s *sessionTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 	generation := s.generation
 	s.mu.RUnlock()
 	resp, err := s.base.RoundTrip(request)
-	if err != nil || resp.StatusCode != http.StatusUnauthorized {
-		return resp, err
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode == http.StatusTooManyRequests {
+		return nil, rateLimitedResponse(req, resp)
+	}
+	if resp.StatusCode != http.StatusUnauthorized {
+		return resp, nil
 	}
 	// a streaming body cannot be replayed; preserve the original typed 401.
 	if req.Body != nil && req.Body != http.NoBody && req.GetBody == nil {
 		return resp, nil
 	}
 	if err := s.refresh(req.Context(), generation, "expired"); err != nil {
-		// let the generated client decode the original operation's typed 401.
+		// a rate-limited login is reported as such; otherwise let the generated client decode the
+		// original operation's typed 401.
+		if IsRateLimited(err) {
+			resp.Body.Close()
+			return nil, err
+		}
 		return resp, nil
 	}
 	resp.Body.Close()
@@ -235,5 +256,9 @@ func (s *sessionTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 	s.mu.RLock()
 	replay.Header.Set("zt-session", s.token)
 	s.mu.RUnlock()
-	return s.base.RoundTrip(replay)
+	resp, err = s.base.RoundTrip(replay)
+	if err == nil && resp.StatusCode == http.StatusTooManyRequests {
+		return nil, rateLimitedResponse(req, resp)
+	}
+	return resp, err
 }

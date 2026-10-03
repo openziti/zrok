@@ -9,6 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/michaelquigley/df/dl"
 	rest_model_edge "github.com/openziti/edge-api/rest_model"
+	"github.com/openziti/sdk-golang/ziti"
 	"github.com/openziti/zrok/v2/controller/automation"
 	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/openziti/zrok/v2/rest_model_zrok"
@@ -16,10 +17,18 @@ import (
 	"github.com/pkg/errors"
 )
 
-type enableHandler struct{}
+type enableHandler struct {
+	// enroll and commit are replaceable so a test can run without an enrollment endpoint and fail the
+	// commit after the ziti objects exist.
+	enroll func(*automation.ZitiAutomation, string) (*ziti.Config, error)
+	commit func(*sqlx.Tx) error
+}
 
 func newEnableHandler() *enableHandler {
-	return &enableHandler{}
+	return &enableHandler{
+		enroll: func(za *automation.ZitiAutomation, id string) (*ziti.Config, error) { return za.Identities.Enroll(id) },
+		commit: (*sqlx.Tx).Commit,
+	}
 }
 
 func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_model_zrok.Principal) middleware.Responder {
@@ -41,9 +50,12 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		return environment.NewEnableInternalServerError()
 	}
 
-	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
+	za, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {
 		dl.Errorf("error getting automation client for user '%v': %v", principal.Email, err)
+		if automation.IsRateLimited(err) {
+			return environment.NewEnableServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)
+		}
 		return environment.NewEnableInternalServerError()
 	}
 
@@ -58,16 +70,32 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		Type:    rest_model_edge.IdentityTypeUser,
 		IsAdmin: false,
 	}
-	envZId, err := ziti.Identities.Create(identityOpts)
+	envZId, err := za.Identities.Create(identityOpts)
 	if err != nil {
 		dl.Errorf("error creating environment identity for user '%v': %v", principal.Email, err)
+		if automation.IsRateLimited(err) {
+			return environment.NewEnableServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)
+		}
 		return environment.NewEnableInternalServerError()
 	}
 
+	// every ziti object created from here on is deleted by id unless the transaction commits
+	compensation := newZitiCompensation(compensatingEnvironment, identityName)
+	compensation.add(zitiIdentity, envZId)
+	committed := false
+	defer func() {
+		if !committed {
+			compensation.run(za)
+		}
+	}()
+
 	// enroll identity
-	zitiCfg, err := ziti.Identities.Enroll(envZId)
+	zitiCfg, err := h.enroll(za, envZId)
 	if err != nil {
 		dl.Errorf("error enrolling environment identity for user '%v': %v", principal.Email, err)
+		if automation.IsRateLimited(err) {
+			return environment.NewEnableServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)
+		}
 		return environment.NewEnableInternalServerError()
 	}
 
@@ -81,10 +109,15 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		EdgeRouterRoles: []string{"#all"},
 		Semantic:        rest_model_edge.SemanticAllOf,
 	}
-	if _, err := ziti.EdgeRouterPolicies.Create(erpOpts); err != nil {
+	erpZId, err := za.EdgeRouterPolicies.Create(erpOpts)
+	if err != nil {
 		dl.Errorf("error creating edge router policy for user '%v': %v", principal.Email, err)
+		if automation.IsRateLimited(err) {
+			return environment.NewEnableServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)
+		}
 		return environment.NewEnableInternalServerError()
 	}
+	compensation.add(zitiEdgeRouterPolicy, erpZId)
 
 	envId, err := str.CreateEnvironment(int(principal.ID), &store.Environment{
 		Description: params.Body.Description,
@@ -98,10 +131,11 @@ func (h *enableHandler) Handle(params environment.EnableParams, principal *rest_
 		return environment.NewEnableInternalServerError()
 	}
 
-	if err := trx.Commit(); err != nil {
+	if err := h.commit(trx); err != nil {
 		dl.Errorf("error committing for user '%v': %v", principal.Email, err)
 		return environment.NewEnableInternalServerError()
 	}
+	committed = true
 	dl.Infof("created environment for '%v', with ziti identity '%v', and database id '%v'", principal.Email, envZId, envId)
 
 	resp := environment.NewEnableCreated().WithPayload(&environment.EnableCreatedBody{Identity: envZId})

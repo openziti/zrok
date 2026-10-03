@@ -33,6 +33,12 @@
         description: not found
       500:
         description: internal server error
+      503:
+        description: service unavailable
+        headers:
+          Retry-After:
+            type: integer
+            description: seconds to wait before retrying
   patch:
     tags:
       - share
@@ -91,6 +97,12 @@
         description: internal server error
         schema:
           $ref: "#/definitions/errorMessage"
+      503:
+        description: service unavailable
+        headers:
+          Retry-After:
+            type: integer
+            description: seconds to wait before retrying
   patch:
     tags:
       - share
@@ -311,6 +323,12 @@
         description: not found
       500:
         description: internal server error
+      503:
+        description: service unavailable
+        headers:
+          Retry-After:
+            type: integer
+            description: seconds to wait before retrying
 
 /unshare:
   delete:
@@ -339,3 +357,9 @@
         description: internal server error
         schema:
           $ref: "#/definitions/errorMessage"
+      503:
+        description: service unavailable
+        headers:
+          Retry-After:
+            type: integer
+            description: seconds to wait before retrying
