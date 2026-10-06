@@ -127,7 +127,7 @@ func requireShareReleased(t *testing.T, shareID, nameID int, shareToken, name st
 	require.NoError(t, trx.QueryRow("select deleted from share_name_mappings where share_id = $1", shareID).Scan(&mappingDeleted))
 	require.True(t, mappingDeleted)
 
-	// the availability query share creation uses
+	// no live mapping holds the name
 	mappings, err := str.FindShareNameMappingsByNameId(nameID, trx)
 	require.NoError(t, err)
 	require.Empty(t, mappings)
@@ -141,7 +141,7 @@ func requireShareReleased(t *testing.T, shareID, nameID int, shareToken, name st
 	require.Equal(t, !reserved, nameDeleted)
 
 	if reserved {
-		endpoints, nameIds, err := (&shareHandler{}).processNameSelections(
+		endpoints, nameIds, _, err := (&shareHandler{}).processNameSelections(
 			[]*rest_model_zrok.NameSelection{{NamespaceToken: "public", Name: name}},
 			"new-share-token", principal, trx)
 		require.NoError(t, err)
@@ -332,9 +332,11 @@ func TestShareFailedFrontendMappingInsertFailsRequest(t *testing.T) {
 	require.NoError(t, err)
 	_, err = str.CreateName(&store.Name{NamespaceId: ns.Id, Name: "demo", AccountId: int(f.principal.ID), Reserved: true}, trx)
 	require.NoError(t, err)
+	// a row already holding (frontend_token, name) is now healed or answered as a conflict before the
+	// insert, so the insert is made to fail directly
+	_, err = trx.Exec("create trigger reject_frontend_mappings before insert on frontend_mappings begin select raise(fail, 'rejected'); end")
+	require.NoError(t, err)
 	require.NoError(t, trx.Commit())
-	// (frontend_token, name) is unique, so this row makes the create's insert fail
-	insertFrontendMapping(t, "dynamic-fe", "demo.example.com", "other-token")
 	token := f.recordToken()
 	req := publicShareRequest(string(store.OpenPermissionMode))
 	req.NameSelections = []*rest_model_zrok.NameSelection{{NamespaceToken: "public", Name: "demo"}}
@@ -345,7 +347,7 @@ func TestShareFailedFrontendMappingInsertFailsRequest(t *testing.T) {
 	require.Contains(t, f.logs.String(), "error recording frontend mapping 'demo.example.com'")
 	f.requireNoShares(t)
 	f.requireCompensated(t, *token, 5)
-	requireFrontendMappings(t, "other-token", 1)
+	requireFrontendMappings(t, *token, 0)
 	require.Empty(t, pub.recorded())
 }
 
