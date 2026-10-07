@@ -12,7 +12,6 @@ import (
 	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/v2/controller/automation"
 	zrok_config "github.com/openziti/zrok/v2/controller/config"
-	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/pkg/errors"
 )
 
@@ -153,10 +152,10 @@ type gcReport struct {
 // belongs to no live share.
 func GC(inCfg *zrok_config.Config, opts GCOptions) error {
 	cfg = inCfg
-	if v, err := store.Open(cfg.Store); err == nil {
+	if v, err := openAdminStore(cfg.Store); err == nil {
 		str = v
 	} else {
-		return errors.Wrap(err, "error opening store")
+		return err
 	}
 	defer func() {
 		if err := str.Close(); err != nil {

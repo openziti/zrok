@@ -3,6 +3,8 @@ package controller
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -13,6 +15,7 @@ import (
 	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/openziti/zrok/v2/rest_model_zrok"
 	"github.com/openziti/zrok/v2/rest_server_zrok/operations/admin"
+	"github.com/openziti/zrok/v2/rest_server_zrok/operations/environment"
 	shareops "github.com/openziti/zrok/v2/rest_server_zrok/operations/share"
 	"github.com/stretchr/testify/require"
 )
@@ -217,7 +220,8 @@ func TestDeleteAccountTearsDownEveryShare(t *testing.T) {
 	resp := newDeleteAccountHandler().Handle(admin.DeleteAccountParams{Body: admin.DeleteAccountBody{Email: "test@example.com"}}, &rest_model_zrok.Principal{Admin: true})
 
 	require.IsType(t, &admin.DeleteAccountOK{}, resp)
-	requireShareReleased(t, fixture.shareID, fixture.nameID, "share-token", "demo", true, fixture.principal)
+	// the account's names go with it, so its reserved name is released too, like an allocated one
+	requireShareReleased(t, fixture.shareID, fixture.nameID, "share-token", "demo", false, fixture.principal)
 	requireShareReleased(t, share2ID, name2ID, "share-token-2", "share-token-2", false, fixture.principal)
 	require.ElementsMatch(t, []recordedUpdate{
 		unbindOf("dynamic-fe", "demo.example.com"),
@@ -382,4 +386,141 @@ func TestUnshareZitiFailureRollsBack(t *testing.T) {
 	fms, err := str.FindFrontendMappingsByShareToken(token, trx)
 	require.NoError(t, err)
 	require.Len(t, fms, 1)
+}
+
+// addAccessFrontends gives the share-name fixture's share two private accesses from an environment of a
+// second account, so disabling or deleting the share's own account cannot reach them through its
+// environments; only the share teardown can.
+func addAccessFrontends(t *testing.T, fixture *shareNameFixture) []int {
+	t.Helper()
+	trx, err := str.Begin()
+	require.NoError(t, err)
+	accessorID, err := str.CreateAccount(&store.Account{Email: "accessor@example.com", Salt: "salt", Password: "password", Token: "accessor-token"}, trx)
+	require.NoError(t, err)
+	accessorEnvID, err := str.CreateEnvironment(accessorID, &store.Environment{Description: "accessor", Host: "host", Address: "address", ZId: "accessor-env-zid"}, trx)
+	require.NoError(t, err)
+	var ids []int
+	for _, token := range []string{"access-1", "access-2"} {
+		id, err := str.CreateFrontend(accessorEnvID, &store.Frontend{Token: token, ZId: "accessor-env-zid", PrivateShareId: &fixture.shareID, PermissionMode: store.OpenPermissionMode}, trx)
+		require.NoError(t, err)
+		ids = append(ids, id)
+	}
+	require.NoError(t, trx.Commit())
+	return ids
+}
+
+func requireFrontendsDeleted(t *testing.T, ids []int) {
+	t.Helper()
+	trx, err := str.Begin()
+	require.NoError(t, err)
+	defer func() { _ = trx.Rollback() }()
+	for _, id := range ids {
+		var deleted bool
+		require.NoError(t, trx.QueryRow("select deleted from frontends where id = $1", id).Scan(&deleted))
+		require.True(t, deleted, "frontend '%d'", id)
+	}
+}
+
+func TestTeardownReleasesAccessFrontends(t *testing.T) {
+	cases := map[string]func(t *testing.T, fixture *shareNameFixture) interface{}{
+		"unshare": func(t *testing.T, fixture *shareNameFixture) interface{} {
+			resp := newUnshareHandler().Handle(shareops.UnshareParams{Body: shareops.UnshareBody{EnvZID: "env-zid", ShareToken: "share-token"}}, fixture.principal)
+			require.IsType(t, &shareops.UnshareOK{}, resp)
+			return resp
+		},
+		"disable": func(t *testing.T, fixture *shareNameFixture) interface{} {
+			resp := newDisableHandler().Handle(environment.DisableParams{Body: environment.DisableBody{Identity: "env-zid"}}, fixture.principal)
+			require.IsType(t, &environment.DisableOK{}, resp)
+			return resp
+		},
+		"deleteAccount": func(t *testing.T, fixture *shareNameFixture) interface{} {
+			resp := newDeleteAccountHandler().Handle(admin.DeleteAccountParams{Body: admin.DeleteAccountBody{Email: "test@example.com"}}, &rest_model_zrok.Principal{Admin: true})
+			require.IsType(t, &admin.DeleteAccountOK{}, resp)
+			return resp
+		},
+	}
+	for name, run := range cases {
+		t.Run(name, func(t *testing.T) {
+			fixture := setupShareNameFixture(t, false)
+			attachDynamicFrontend(t, fixture, "dynamic-fe")
+			insertFrontendMapping(t, "dynamic-fe", "demo.example.com", "share-token")
+			useZitiFake(t)
+			installRecordingPublisher(t)
+			accesses := addAccessFrontends(t, fixture)
+
+			run(t, fixture)
+
+			requireFrontendsDeleted(t, accesses)
+			requireShareReleased(t, fixture.shareID, fixture.nameID, "share-token", "demo", false, fixture.principal)
+		})
+	}
+}
+
+// storeState dumps every row of the named tables, for comparing before and after.
+func storeState(t *testing.T, tables ...string) string {
+	t.Helper()
+	trx, err := str.Begin()
+	require.NoError(t, err)
+	defer func() { _ = trx.Rollback() }()
+	var out strings.Builder
+	for _, table := range tables {
+		rows, err := trx.Queryx("select * from " + table + " order by id")
+		require.NoError(t, err)
+		for rows.Next() {
+			cols, err := rows.SliceScan()
+			require.NoError(t, err)
+			_, _ = fmt.Fprintf(&out, "%s %v\n", table, cols)
+		}
+		require.NoError(t, rows.Err())
+		require.NoError(t, rows.Close())
+	}
+	return out.String()
+}
+
+func TestDeleteAccountReleasesNames(t *testing.T) {
+	fixture := setupShareNameFixture(t, true)
+	useZitiFake(t)
+	// the share is gone already, the way a clean unshare leaves it; the account keeps its reserved name
+	// and an allocated name no share holds
+	trx, err := str.Begin()
+	require.NoError(t, err)
+	shr := fixture.share(t, trx)
+	_, err = releaseShareFromStore(shr, trx)
+	require.NoError(t, err)
+	allocatedID, err := str.CreateName(&store.Name{NamespaceId: fixture.namespaceID, Name: "allocated", AccountId: fixture.accountID}, trx)
+	require.NoError(t, err)
+	require.NoError(t, trx.Commit())
+
+	resp := newDeleteAccountHandler().Handle(admin.DeleteAccountParams{Body: admin.DeleteAccountBody{Email: "test@example.com"}}, &rest_model_zrok.Principal{Admin: true})
+
+	require.IsType(t, &admin.DeleteAccountOK{}, resp)
+	require.True(t, nameDeleted(t, fixture.nameID))
+	require.True(t, nameDeleted(t, allocatedID))
+}
+
+func TestDeleteAccountFailsOnNameHeldByLiveShare(t *testing.T) {
+	fixture := setupShareNameFixture(t, true)
+	useZitiFake(t)
+	// a second name of the account held by a live share of another account, which no teardown of this
+	// account reaches
+	trx, err := str.Begin()
+	require.NoError(t, err)
+	otherID, err := str.CreateAccount(&store.Account{Email: "other@example.com", Salt: "salt", Password: "password", Token: "other-token"}, trx)
+	require.NoError(t, err)
+	otherEnvID, err := str.CreateEnvironment(otherID, &store.Environment{Description: "other", Host: "host", Address: "address", ZId: "other-env-zid"}, trx)
+	require.NoError(t, err)
+	otherShareID, err := str.CreateShare(otherEnvID, &store.Share{ZId: "other-share-zid", Token: "other-share", ShareMode: "public", BackendMode: "proxy", PermissionMode: store.OpenPermissionMode}, trx)
+	require.NoError(t, err)
+	heldID, err := str.CreateName(&store.Name{NamespaceId: fixture.namespaceID, Name: "held", AccountId: fixture.accountID, Reserved: true}, trx)
+	require.NoError(t, err)
+	_, err = str.CreateShareNameMapping(&store.ShareNameMapping{ShareId: otherShareID, NameId: heldID}, trx)
+	require.NoError(t, err)
+	require.NoError(t, trx.Commit())
+	tables := []string{"accounts", "environments", "shares", "names", "share_name_mappings", "frontends"}
+	before := storeState(t, tables...)
+
+	resp := newDeleteAccountHandler().Handle(admin.DeleteAccountParams{Body: admin.DeleteAccountBody{Email: "test@example.com"}}, &rest_model_zrok.Principal{Admin: true})
+
+	require.IsType(t, &admin.DeleteAccountInternalServerError{}, resp)
+	require.Equal(t, before, storeState(t, tables...))
 }

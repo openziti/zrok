@@ -288,3 +288,38 @@ func TestShareCreateHealingRollsBackWithRequest(t *testing.T) {
 	require.Equal(t, dynamicProxyController.OperationUnbind, updates[0].mapping.Operation)
 	require.Equal(t, dynamicProxyController.OperationBind, updates[1].mapping.Operation)
 }
+
+// a share token is unique only among live shares, so a deleted share and a live share can carry the same
+// one. a frontend mapping with that token has a live holder, whichever row a join would return first.
+func TestShareCreateReusedTokenFrontendHolderIsLive(t *testing.T) {
+	f := setupShareCreateFixture(t)
+	addDynamicFrontend(t, "dynamic-fe")
+
+	trx, err := str.Begin()
+	require.NoError(t, err)
+	otherID, err := str.CreateAccount(&store.Account{Email: "other@example.com", Salt: "salt", Password: "password", Token: "other-token"}, trx)
+	require.NoError(t, err)
+	otherEnvID, err := str.CreateEnvironment(otherID, &store.Environment{Description: "other environment", Host: "host", Address: "address", ZId: "other-env-zid"}, trx)
+	require.NoError(t, err)
+	deadID, err := str.CreateShare(otherEnvID, &store.Share{ZId: "reused-dead-zid", Token: "reused", ShareMode: "public", BackendMode: "proxy", PermissionMode: store.OpenPermissionMode}, trx)
+	require.NoError(t, err)
+	require.NoError(t, str.DeleteShare(deadID, trx))
+	_, err = str.CreateShare(otherEnvID, &store.Share{ZId: "reused-live-zid", Token: "reused", ShareMode: "public", BackendMode: "proxy", PermissionMode: store.OpenPermissionMode}, trx)
+	require.NoError(t, err)
+	ns, err := str.FindNamespaceWithToken("public", trx)
+	require.NoError(t, err)
+	_, err = str.CreateName(&store.Name{NamespaceId: ns.Id, Name: "demo", AccountId: int(f.principal.ID), Reserved: true}, trx)
+	require.NoError(t, err)
+	require.NoError(t, trx.Commit())
+	insertFrontendMapping(t, "dynamic-fe", "demo.example.com", "reused")
+
+	resp := f.share(demoShareRequest(string(store.OpenPermissionMode)))
+
+	conflict, ok := resp.(*shareops.ShareConflict)
+	require.True(t, ok, "%T", resp)
+	require.Equal(t, "name 'demo' in namespace 'public' is in use by share 'reused'; run 'zrok2 delete share reused' to release it", string(conflict.Payload))
+	requireFrontendMappings(t, "reused", 1)
+	created, _ := f.fake.Log()
+	require.Empty(t, created)
+	require.NotContains(t, f.logs.String(), "healed severed name")
+}

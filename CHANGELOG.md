@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-FIX: A name whose share no longer exists is released automatically the next time it is used, instead of answering "already in use by another share" forever. When a name is held by a live share, the error now names that share and the `zrok2 delete share` command that releases it.
+CHANGE: **Admin repair commands no longer migrate the store.** `zrok2 admin gc`, `zrok2 admin repair-dial-policies` and `zrok2 admin repair-store` no longer migrate the store's schema when they open it, even when the configuration allows auto-migration, so a dry run never changes the database; against a store whose schema is behind the binary, run `zrok2 admin migrate` or start the controller first.
+
+FEATURE: A new `zrok2 admin repair-store <configPath>` command releases the names and frontend mappings still attached to shares that no longer exist, left behind by earlier versions, along with stranded environments, shares, accesses and names; it is a dry run by default that counts and samples what it would repair, and repairs in small batches with `--apply`.
+
+FIX: A name whose share no longer exists is released automatically the next time it is used, instead of answering "already in use by another share" forever. When a name is held by a live share, the error now names that share and the `zrok2 delete share` command that releases it; tearing down a share now also releases its private accesses, and deleting an account releases its names.
 
 ## v2.0.7
 

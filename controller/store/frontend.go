@@ -377,3 +377,71 @@ func (str *Store) FindFrontendsForAccountWithFilter(accountId int, filter *Front
 
 	return results, nil
 }
+
+// AccessFrontendRepairDetail is a live access frontend whose share is deleted, with the share's token.
+type AccessFrontendRepairDetail struct {
+	Id            int    `db:"id"`
+	Token         string `db:"token"`
+	EnvironmentId *int   `db:"environment_id"`
+	ShareToken    string `db:"share_token"`
+}
+
+// a live access frontend whose private share has no live row.
+const accessFrontendsOfDeletedSharesWhere = `where not f.deleted
+	  and f.private_share_id is not null
+	  and not exists (select 1 from shares s where s.id = f.private_share_id and not s.deleted)`
+
+// CountAccessFrontendsOfDeletedShares counts the live access frontends whose share is deleted.
+func (str *Store) CountAccessFrontendsOfDeletedShares(trx *sqlx.Tx) (int, error) {
+	var count int
+	if err := trx.QueryRow("select count(*) from frontends f " + accessFrontendsOfDeletedSharesWhere).Scan(&count); err != nil {
+		return 0, errors.Wrap(err, "error counting access frontends of deleted shares")
+	}
+	return count, nil
+}
+
+// FindAccessFrontendsOfDeletedShares lists, lowest id first, up to limit live access frontends whose share
+// is deleted.
+func (str *Store) FindAccessFrontendsOfDeletedShares(limit int, trx *sqlx.Tx) ([]*AccessFrontendRepairDetail, error) {
+	sql := `select f.id, f.token, f.environment_id, coalesce(s.token, '') as share_token
+	        from frontends f
+	        left join shares s on f.private_share_id = s.id
+	        ` + accessFrontendsOfDeletedSharesWhere + ` order by f.id limit $1`
+	rows, err := trx.Queryx(sql, limit)
+	if err != nil {
+		return nil, errors.Wrap(err, "error finding access frontends of deleted shares")
+	}
+	defer func() { _ = rows.Close() }()
+	var fes []*AccessFrontendRepairDetail
+	for rows.Next() {
+		fe := &AccessFrontendRepairDetail{}
+		if err := rows.StructScan(fe); err != nil {
+			return nil, errors.Wrap(err, "error scanning access frontend of deleted share")
+		}
+		fes = append(fes, fe)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error iterating access frontends of deleted shares")
+	}
+	return fes, nil
+}
+
+// DeleteFrontends soft-deletes the live frontends among ids and returns how many it deleted.
+func (str *Store) DeleteFrontends(ids []int, trx *sqlx.Tx) (int64, error) {
+	if len(ids) == 0 {
+		return 0, nil
+	}
+	query, args, err := sqlx.In("update frontends set updated_at = current_timestamp, deleted = true where id in (?) and not deleted", ids)
+	if err != nil {
+		return 0, errors.Wrap(err, "error building frontends delete statement")
+	}
+	res, err := trx.Exec(trx.Rebind(query), args...)
+	if err != nil {
+		return 0, errors.Wrap(err, "error executing frontends delete statement")
+	}
+	n, err := res.RowsAffected()
+	if err != nil {
+		return 0, errors.Wrap(err, "error reading frontends deleted")
+	}
+	return n, nil
+}

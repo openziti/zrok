@@ -1,6 +1,6 @@
 # Garbage collection
 
-`zrok2 admin gc <configPath> [--delete] [--min-age 24h]` (`cmd/zrok2/adminGc.go`, `controller/gc.go`) runs as its own process against the controller's store and OpenZiti controller, and removes OpenZiti objects left behind by shares that no longer exist.
+`zrok2 admin gc <configPath> [--delete] [--min-age 24h]` (`cmd/zrok2/adminGc.go`, `controller/gc.go`) runs as its own process against the controller's store and OpenZiti controller, and removes OpenZiti objects left behind by shares that no longer exist. It opens the store with auto-migration off (`controller/adminStore.go`), so even a dry run never changes the schema; migrations belong to the controller and `zrok2 admin migrate`.
 
 ## What gc owns
 

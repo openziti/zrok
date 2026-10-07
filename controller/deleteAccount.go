@@ -2,10 +2,12 @@ package controller
 
 import (
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/jmoiron/sqlx"
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/controller/automation"
 	"github.com/openziti/zrok/v2/rest_model_zrok"
 	"github.com/openziti/zrok/v2/rest_server_zrok/operations/admin"
+	"github.com/pkg/errors"
 )
 
 type deleteAccountHandler struct{}
@@ -60,6 +62,11 @@ func (h *deleteAccountHandler) Handle(params admin.DeleteAccountParams, principa
 		dl.Infof("successfully disabled environment '%d' for account '%s'", env.Id, params.Body.Email)
 	}
 
+	if err := releaseAccountNames(account.Id, trx); err != nil {
+		dl.Errorf("error releasing names for account '%s': %v", params.Body.Email, err)
+		return admin.NewDeleteAccountInternalServerError()
+	}
+
 	if err := str.DeleteAccount(account.Id, trx); err != nil {
 		dl.Errorf("error deleting account '%s': %v", params.Body.Email, err)
 		return admin.NewDeleteAccountInternalServerError()
@@ -73,4 +80,31 @@ func (h *deleteAccountHandler) Handle(params admin.DeleteAccountParams, principa
 
 	dl.Infof("successfully deleted account '%s'", params.Body.Email)
 	return admin.NewDeleteAccountOK()
+}
+
+// releaseAccountNames soft-deletes every live name of an account being deleted, reserved names included.
+// it runs after the account's environments are torn down, so no live share can still hold one of its
+// names; a mapping to a live share is a store error and fails the delete. a mapping to a share deleted
+// before teardownShare released names is severed, and is released with its name.
+func releaseAccountNames(accountId int, trx *sqlx.Tx) error {
+	mappings, err := str.FindShareNameMappingsForAccountNamesWithShare(accountId, trx)
+	if err != nil {
+		return err
+	}
+	for _, mapping := range mappings {
+		if !mapping.ShareDeleted {
+			return errors.Errorf("name mapping '%d' still holds a name for live share '%v'", mapping.Id, mapping.ShareToken)
+		}
+	}
+	for _, mapping := range mappings {
+		if err := str.DeleteShareNameMapping(mapping.Id, trx); err != nil {
+			return errors.Wrapf(err, "error releasing severed name mapping '%d'", mapping.Id)
+		}
+	}
+	released, err := str.DeleteNamesForAccount(accountId, trx)
+	if err != nil {
+		return err
+	}
+	dl.Infof("released '%d' names and '%d' severed name mappings for account '%d'", released, len(mappings), accountId)
+	return nil
 }

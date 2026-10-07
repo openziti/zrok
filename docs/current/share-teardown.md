@@ -1,16 +1,23 @@
 # Share teardown
 
-`teardownShare` (`controller/teardownShare.go`) is the only code that deletes a share row. `unshare`, `disable` and admin `deleteAccount` (through `disableEnvironment`) all call it, once per share, inside the request's transaction. It runs, in order:
+`teardownShare` (`controller/teardownShare.go`) tears a share down. `unshare`, `disable` and admin `deleteAccount` (through `disableEnvironment`) all call it, once per share, inside the request's transaction. Its store half is `releaseShareFromStore`, the only code that deletes a share row; `admin repair-store` calls that half alone for shares stranded in deleted environments (see `repair-store.md`). It runs, in order:
 
 1. Name mappings: the share's live `share_name_mappings` rows are soft-deleted, and each auto-allocated (non-reserved) name they point at is soft-deleted with them. Reserved names survive and can be used by the next share.
 2. Frontend mappings: every `frontend_mappings` row carrying the share token is deleted, whether or not a dynamic proxy controller is configured. One unbind update is returned per row.
-3. Access grants for the share.
-4. The share row.
-5. OpenZiti objects tagged `zrokShareToken=<token>`. An object already gone counts as deleted; any other failure fails the teardown.
+3. Access frontends: every live `frontends` row whose `private_share_id` is the share, the private accesses to it, is soft-deleted. Their dial policies carry the share token and go in step 6. `unaccess` still removes a single access on its own.
+4. Access grants for the share.
+5. The share row.
+6. OpenZiti objects tagged `zrokShareToken=<token>`. An object already gone counts as deleted; any other failure fails the teardown.
 
 Any failure returns at once and the caller's transaction rolls back, leaving every row for a retry. OpenZiti goes last so that an OpenZiti failure leaves the store untouched.
 
 Frontend mapping updates, binds from share create and unbinds from teardown, are returned to the handler and published only after its `trx.Commit()` returns nil, through `publishMappingUpdates`. A failed publish is logged at error level and not returned: the committed rows are authoritative. A lost bind or unbind is recovered by the dynamic frontend's periodic full reconciliation; see `dynamic-proxy-mappings.md`. Without a dynamic proxy controller the rows are still written and nothing is published.
+
+## Account delete
+
+Admin `deleteAccount` disables each of the account's environments, which tears down every share in them, and then, before it deletes the account row, releases the account's names (`releaseAccountNames`): every live name of the account, reserved or not, is soft-deleted. By then no live share of the account can hold one. A mapping on one of its names to a live share (some other account's share) is a store error and fails the delete, rolling everything back; a severed mapping, to a share already deleted, is soft-deleted with its name.
+
+## Share create
 
 On share create, a failed `frontend_mappings` insert fails the request; the share-create compensation then removes the OpenZiti objects the request created.
 
