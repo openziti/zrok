@@ -8,6 +8,12 @@ FEATURE: A new `zrok2 admin repair-store <configPath>` command releases the name
 
 FIX: A name whose share no longer exists is released automatically the next time it is used, instead of answering "already in use by another share" forever. When a name is held by a live share, the error now names that share and the `zrok2 delete share` command that releases it; tearing down a share now also releases its private accesses, and deleting an account releases its names.
 
+FIX: The embedded interstitial page is served again when no external interstitial file is configured; previously its file name was misspelled, so the frontend served an empty page (https://github.com/openziti/zrok/issues/1262).
+
+FIX: On OpenZiti 2.x, a bandwidth limit now removes a share's dial policy, disabling an environment and deleting a private access now withdraw a frontend's access, and agent unenroll now deletes the agent remote's dial and bind policies; previously none of these removed any policy there. OpenZiti 1.x behaves as before.
+
+FIX: A failed agent enrollment (`zrok2 agent enroll`) no longer leaves its OpenZiti service, service policies and service edge router policy behind; they are deleted when the enrollment cannot be recorded.
+
 ## v2.0.7
 
 FIX: `zrok2 admin gc` now decides which share an OpenZiti object belongs to by its `zrokShareToken` tag rather than its name, so it no longer deletes the bind, dial and service edge router policies of live shares; objects with no share token, such as agent-remote services and policies, are never touched. It now reads every object rather than the first page of ten of each kind. It is a dry run by default that prints what it would remove, grouped by share token, and deletes only with `--delete`. Orphaned objects younger than `--min-age` (default 24 hours) are skipped, so a share being created at the time of the run is not collected. Tearing down a share with more than ten OpenZiti objects of one kind, such as a share with many access dial policies, now removes all of them rather than the first ten.

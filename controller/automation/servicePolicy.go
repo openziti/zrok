@@ -4,6 +4,7 @@ import (
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/edge-api/rest_management_api_client/service_policy"
 	"github.com/openziti/edge-api/rest_model"
+	"github.com/pkg/errors"
 )
 
 type ServicePolicyManager struct {
@@ -93,6 +94,32 @@ func (spm *ServicePolicyManager) GetByName(name string) (*rest_model.ServicePoli
 
 func (spm *ServicePolicyManager) DeleteWithFilter(filter string) error {
 	return DeleteWithFilter(spm.Find, spm.Delete, filter, "service policy")
+}
+
+// DeleteByTagAndType deletes the service policies matching tagFilter whose type is t. the type is read
+// from each listed policy, never put in the filter: ziti 1.x accepts the integer type in a filter, but
+// 2.x matches nothing with it, so a filter naming the type would silently delete nothing there. every
+// match is listed before the first delete, and a policy that vanished before its delete is skipped.
+func (spm *ServicePolicyManager) DeleteByTagAndType(tagFilter string, t rest_model.DialBind) error {
+	policies, err := FindAll(spm.Find, tagFilter, MaxPageSize)
+	if err != nil {
+		return errors.Wrapf(err, "error finding %v service policies for deletion", t)
+	}
+	for _, policy := range policies {
+		if policy.Type == nil || *policy.Type != t {
+			continue
+		}
+		if err := spm.Delete(*policy.ID); err != nil {
+			// an object that vanished between the listing and its delete is already where we want it.
+			if IsNotFound(err) {
+				dl.Debugf("service policy '%s' already deleted", *policy.ID)
+				continue
+			}
+			// Delete already names the policy.
+			return err
+		}
+	}
+	return nil
 }
 
 // convenience methods for specific policy types

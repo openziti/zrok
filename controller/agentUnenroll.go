@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/v2/controller/automation"
 	"github.com/openziti/zrok/v2/rest_model_zrok"
 	"github.com/openziti/zrok/v2/rest_server_zrok/operations/agent"
@@ -51,15 +52,14 @@ func (h *agentUnenrollHandler) Handle(params agent.UnenrollParams, principal *re
 	}
 
 	// delete dial service policies for agent remote
-	dialFilter := fmt.Sprintf("tags.zrokAgentRemote=\"%v\" and type=1", ae.Token)
-	if err := ziti.ServicePolicies.DeleteWithFilter(dialFilter); err != nil {
+	policyFilter := automation.BuildTagFilter("zrokAgentRemote", ae.Token)
+	if err := ziti.ServicePolicies.DeleteByTagAndType(policyFilter, rest_model.DialBindDial); err != nil {
 		dl.Errorf("error removing agent remote dial service policy for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewUnenrollInternalServerError()
 	}
 
 	// delete bind service policies for agent remote
-	bindFilter := fmt.Sprintf("tags.zrokAgentRemote=\"%v\" and type=2", ae.Token)
-	if err := ziti.ServicePolicies.DeleteWithFilter(bindFilter); err != nil {
+	if err := ziti.ServicePolicies.DeleteByTagAndType(policyFilter, rest_model.DialBindBind); err != nil {
 		dl.Errorf("error removing agent remote bind service policy for '%v' (%v): %v", env.ZId, principal.Email, err)
 		return agent.NewUnenrollInternalServerError()
 	}

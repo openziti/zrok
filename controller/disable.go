@@ -6,6 +6,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	"github.com/michaelquigley/df/dl"
+	rest_model_edge "github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/v2/controller/automation"
 	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/openziti/zrok/v2/rest_model_zrok"
@@ -116,8 +117,8 @@ func removeFrontendsForEnvironment(env *store.Environment, trx *sqlx.Tx, ziti *a
 		return err
 	}
 	for _, fe := range fes {
-		filter := fmt.Sprintf("tags.zrokFrontendToken=\"%v\" and type=1", fe.Token)
-		if err := ziti.ServicePolicies.DeleteWithFilter(filter); err != nil {
+		filter := automation.BuildTagFilter("zrokFrontendToken", fe.Token)
+		if err := ziti.ServicePolicies.DeleteByTagAndType(filter, rest_model_edge.DialBindDial); err != nil {
 			return errors.Wrapf(err, "error removing frontend access for '%v'", fe.Token)
 		}
 	}
@@ -141,15 +142,12 @@ func removeAgentRemoteForEnvironment(env *store.Environment, trx *sqlx.Tx, ziti 
 			return err
 		}
 
-		// delete dial service policies for agent remote
-		dialFilter := fmt.Sprintf("tags.zrokAgentRemote=\"%v\" and type=1", ae.Token)
-		if err := ziti.ServicePolicies.DeleteWithFilter(dialFilter); err != nil {
+		// delete dial and bind service policies for agent remote
+		policyFilter := automation.BuildTagFilter("zrokAgentRemote", ae.Token)
+		if err := ziti.ServicePolicies.DeleteByTagAndType(policyFilter, rest_model_edge.DialBindDial); err != nil {
 			return err
 		}
-
-		// delete bind service policies for agent remote
-		bindFilter := fmt.Sprintf("tags.zrokAgentRemote=\"%v\" and type=2", ae.Token)
-		if err := ziti.ServicePolicies.DeleteWithFilter(bindFilter); err != nil {
+		if err := ziti.ServicePolicies.DeleteByTagAndType(policyFilter, rest_model_edge.DialBindBind); err != nil {
 			return err
 		}
 

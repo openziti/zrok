@@ -1,10 +1,9 @@
 package limits
 
 import (
-	"fmt"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/michaelquigley/df/dl"
+	"github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/v2/controller/automation"
 	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/openziti/zrok/v2/sdk/golang/sdk"
@@ -41,8 +40,8 @@ func (a *limitAction) HandleAccount(acct *store.Account, _, _ int64, bwc store.B
 		for _, shr := range shrs {
 			if _, ignore := ignoreBackends[sdk.BackendMode(shr.BackendMode)]; !ignore {
 				// delete dial polcies for share
-				filter := fmt.Sprintf("tags.zrokShareToken=\"%v\" and type=1", shr.Token)
-				if err := ziti.ServicePolicies.DeleteWithFilter(filter); err != nil {
+				filter := automation.BuildTagFilter("zrokShareToken", shr.Token)
+				if err := ziti.ServicePolicies.DeleteByTagAndType(filter, rest_model.DialBindDial); err != nil {
 					return errors.Wrapf(err, "error deleting dial service policy for '%v'", shr.Token)
 				}
 				dl.Infof("removed dial service policy for share '%v' of environment '%v'", shr.Token, env.ZId)
