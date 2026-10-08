@@ -118,6 +118,19 @@ To make a name ephemeral (deleted when the share ends):
 zrok2 modify name -n public myapp -r=false
 ```
 
+### Delete the share holding a name
+
+When a name is held by a share you no longer have running, for example one left behind on another machine, delete that
+share by its name instead of looking up its token:
+
+```bash
+zrok2 delete share myapp
+```
+
+`zrok2 delete share` takes a share token or a name. A name held in more than one namespace by different shares must be
+qualified as `<namespaceToken>:<name>` (for example `zrok2 delete share public:myapp`). A name that no live share holds
+is reported as such, and the command exits with status 2.
+
 ### Delete a name
 
 Remove a name when you no longer need it:

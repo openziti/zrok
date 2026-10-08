@@ -24,7 +24,6 @@ import (
 	"github.com/openziti/zrok/v2/environment"
 	"github.com/openziti/zrok/v2/environment/env_core"
 	"github.com/openziti/zrok/v2/sdk/golang/sdk"
-	"github.com/openziti/zrok/v2/tui"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -55,6 +54,7 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd := &cobra.Command{
 		Use:   "public <target>",
 		Short: "Share a target resource publicly",
+		Long:  "Share a target resource publicly\n\n" + exitCodesHelp,
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &sharePublicCommand{cmd: cmd}
@@ -171,16 +171,25 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 		proxy.SetCaddyLoggingWriter(mdl)
 	}
 
+	backend := &runningBackend{}
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.shutdown(root, shr)
+		cmd.shutdown(root, shr, backend)
 		os.Exit(0)
 	}()
 
+	// fail deletes the share before exiting, so the next attempt creates it cleanly instead of conflicting
+	// with this one
+	fail := func(msg string, err error) {
+		cmd.shutdown(root, shr, backend)
+		cmd.error(msg, err)
+	}
+
 	requests := make(chan *endpoints.Request, 1024)
 
+	var be shareBackend
 	switch cmd.backendMode {
 	case "proxy":
 		cfg := &proxy.BackendConfig{
@@ -192,16 +201,11 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 			SuperNetwork:    superNetwork,
 		}
 
-		be, err := proxy.NewBackend(cfg)
+		proxyBe, err := proxy.NewBackend(cfg)
 		if err != nil {
-			cmd.error("unable to create proxy backend", err)
+			fail("unable to create proxy backend", err)
 		}
-
-		go func() {
-			if err := be.Run(); err != nil {
-				dl.Errorf("error running http proxy backend: %v", err)
-			}
-		}()
+		be = proxyBe
 
 	case "web":
 		cfg := &proxy.CaddyWebBackendConfig{
@@ -211,16 +215,11 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 			Requests:     requests,
 		}
 
-		be, err := proxy.NewCaddyWebBackend(cfg)
+		webBe, err := proxy.NewCaddyWebBackend(cfg)
 		if err != nil {
-			cmd.error("unable to create web backend", err)
+			fail("unable to create web backend", err)
 		}
-
-		go func() {
-			if err := be.Run(); err != nil {
-				dl.Errorf("error running http web backend: %v", err)
-			}
-		}()
+		be = webBe
 
 	case "caddy":
 		cfg := &proxy.CaddyfileBackendConfig{
@@ -229,17 +228,11 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 			Requests:      requests,
 		}
 
-		be, err := proxy.NewCaddyfileBackend(cfg)
+		caddyBe, err := proxy.NewCaddyfileBackend(cfg)
 		if err != nil {
-			cmd.shutdown(root, shr)
-			cmd.error("unable to create caddy backend", err)
+			fail("unable to create caddy backend", err)
 		}
-
-		go func() {
-			if err := be.Run(); err != nil {
-				dl.Errorf("error running caddy backend: %v", err)
-			}
-		}()
+		be = caddyBe
 
 	case "drive":
 		cfg := &drive.BackendConfig{
@@ -250,19 +243,27 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 			SuperNetwork: superNetwork,
 		}
 
-		be, err := drive.NewBackend(cfg)
+		driveBe, err := drive.NewBackend(cfg)
 		if err != nil {
-			cmd.error("unable to create drive backend", err)
+			fail("unable to create drive backend", err)
 		}
-
-		go func() {
-			if err := be.Run(); err != nil {
-				dl.Errorf("error running drive backend: %v", err)
-			}
-		}()
+		be = driveBe
 
 	default:
-		tui.Error("invalid backend mode", nil)
+		fail("unable to create share", errors.Errorf("invalid backend mode '%v'", cmd.backendMode))
+	}
+	backend.set(be)
+
+	if startsInline(cmd.backendMode) {
+		if err := be.Run(); err != nil {
+			fail(fmt.Sprintf("unable to start '%v' backend", cmd.backendMode), err)
+		}
+	} else {
+		go func() {
+			if err := be.Run(); err != nil && !backend.isStopping() {
+				dl.Errorf("error running '%v' backend: %v", cmd.backendMode, err)
+			}
+		}()
 	}
 
 	if cmd.subordinate {
@@ -272,7 +273,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 		data["frontend_endpoints"] = shr.FrontendEndpoints
 		jsonData, err := json.Marshal(data)
 		if err != nil {
-			cmd.error("unable to marshal", err)
+			fail("unable to marshal", err)
 		}
 		fmt.Println(string(jsonData))
 	}
@@ -322,26 +323,26 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 		}()
 
 		if _, err := prg.Run(); err != nil {
-			tui.Error("An error occurred", err)
+			fail("An error occurred", err)
 		}
 
 		close(requests)
-		cmd.shutdown(root, shr)
+		cmd.shutdown(root, shr, backend)
 	}
 }
 
 func (cmd *sharePublicCommand) error(msg string, err error) {
 	if cmd.subordinate {
-		subordinateError(errors.Wrap(err, msg))
+		subordinateError(msg, err)
 	}
-	if !panicInstead {
-		tui.Error(msg, err)
-	}
-	panic(errors.Wrap(err, msg))
+	exitWithFailure(msg, err)
 }
 
-func (cmd *sharePublicCommand) shutdown(root env_core.Root, shr *sdk.Share) {
+// shutdown stops the backend before deleting the share, so the ziti sdk is not left rebinding to a service
+// the controller is deleting.
+func (cmd *sharePublicCommand) shutdown(root env_core.Root, shr *sdk.Share, backend *runningBackend) {
 	dl.Debugf("shutting down '%v'", shr.Token)
+	backend.stop()
 	if err := sdk.DeleteShare(root, shr); err != nil {
 		dl.Errorf("error shutting down '%v': %v", shr.Token, err)
 	}
@@ -355,50 +356,38 @@ func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
 	case "proxy":
 		v, err := parseUrl(args[0])
 		if err != nil {
-			if !panicInstead {
-				tui.Error("invalid target endpoint URL", err)
-			}
-			panic(err)
+			exitWithFailure("invalid target endpoint URL", err)
 		}
 		target = v
 
 	case "web":
 		v, err := filepath.Abs(args[0])
 		if err != nil {
-			if !panicInstead {
-				tui.Error("invalid target endpoint URL", err)
-			}
-			panic(err)
+			exitWithFailure("invalid target endpoint URL", err)
 		}
 		target = v
 
 	case "caddy":
 		v, err := filepath.Abs(args[0])
 		if err != nil {
-			if !panicInstead {
-				tui.Error("invalid target endpoint URL", err)
-			}
-			panic(err)
+			exitWithFailure("invalid target endpoint URL", err)
 		}
 		target = v
 
 	case "drive":
 		v, err := filepath.Abs(args[0])
 		if err != nil {
-			if !panicInstead {
-				tui.Error("invalid target endpoint URL", err)
-			}
-			panic(err)
+			exitWithFailure("invalid target endpoint URL", err)
 		}
 		target = v
 
 	default:
-		tui.Error(fmt.Sprintf("invalid backend mode '%v'", cmd.backendMode), nil)
+		exitWithFailure(fmt.Sprintf("invalid backend mode '%v'", cmd.backendMode), nil)
 	}
 
 	client, conn, err := agentClient.NewClient(root)
 	if err != nil {
-		tui.Error("error connecting to agent", err)
+		exitWithFailure("error connecting to agent", err)
 	}
 	defer func() { _ = conn.Close() }()
 
@@ -416,7 +405,7 @@ func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
 	for _, nssStr := range cmd.nameSelections {
 		nss, err := sdk.ParseNameSelection(nssStr)
 		if err != nil {
-			tui.Error(fmt.Sprintf("invalid namespace selection '%v'", nssStr), err)
+			exitWithFailure(fmt.Sprintf("invalid namespace selection '%v'", nssStr), err)
 		}
 		grpcReq.NameSelections = append(grpcReq.NameSelections, &agentGrpc.NameSelection{
 			NamespaceToken: nss.NamespaceToken,
@@ -425,7 +414,7 @@ func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
 	}
 	shr, err := client.SharePublic(context.Background(), grpcReq)
 	if err != nil {
-		tui.Error("error creating share", err)
+		exitWithFailure("error creating share", err)
 	}
 
 	fmt.Println(shr)

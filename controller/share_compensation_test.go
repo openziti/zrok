@@ -272,3 +272,20 @@ func TestSharePrivateTokenRaceLeavesWinnerIntact(t *testing.T) {
 	require.Equal(t, winner, remaining)
 	f.requireNoShares(t)
 }
+
+func TestSharePrivateTokenHeldByServiceConflicts(t *testing.T) {
+	f := setupShareCreateFixture(t)
+	const token = "reclaiming"
+	// a service still carrying the token, as one does while a recently deleted share is torn down.
+	f.fake.Seed(zitifake.Services, token, automation.ZrokShareTags(token).ToRestModel())
+
+	resp := f.share(privateShareRequest(token))
+
+	conflict, ok := resp.(*shareops.ShareConflict)
+	require.True(t, ok, "%T", resp)
+	require.Equal(t, rest_model_zrok.ErrorMessage("share token '"+token+"' is in use; if the share using it was recently deleted, it is being reclaimed and will be available again shortly"), conflict.Payload)
+	require.NotContains(t, string(conflict.Payload), "service name")
+	created, _ := f.fake.Log()
+	require.Empty(t, created)
+	f.requireNoShares(t)
+}

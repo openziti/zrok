@@ -30,6 +30,7 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 	accountLimited, err := isAccountLimited(int(principal.ID), trx)
 	if err != nil {
 		dl.Errorf("error checking account limited for '%v': %v", principal.Email, err)
+		return metadata.NewOverviewInternalServerError()
 	}
 
 	ovr := &rest_model_zrok.Overview{AccountLimited: accountLimited}
@@ -59,7 +60,11 @@ func (h *overviewHandler) Handle(_ metadata.OverviewParams, principal *rest_mode
 			return metadata.NewOverviewInternalServerError()
 		}
 		for _, shr := range shrs {
-			frontendEndpoints := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, trx)
+			frontendEndpoints, err := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, trx)
+			if err != nil {
+				dl.Errorf("error building frontend endpoints for user '%v': %v", principal.Email, err)
+				return metadata.NewOverviewInternalServerError()
+			}
 			target := ""
 			if shr.BackendProxyEndpoint != nil {
 				target = *shr.BackendProxyEndpoint

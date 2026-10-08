@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+CHANGE: **Share and access commands now exit with status 2, not 1, when the zrok controller refuses the request.** Scripts that test for status 1 must also accept 2. `zrok2 share public`, `zrok2 share private` and `zrok2 access private` now exit with status 2 when the zrok controller refuses the request (a 4xx such as a name already held by another share), with a message saying that retrying will not change the answer, and with status 1 for failures a later retry may fix (the controller unreachable, busy or failing); when the controller is busy the message says how many seconds to wait. A process supervisor can now stop restarting on status 2, for example with systemd's `RestartPreventExitStatus=2`.
+
 CHANGE: **Admin repair commands no longer migrate the store.** `zrok2 admin gc`, `zrok2 admin repair-dial-policies` and `zrok2 admin repair-store` no longer migrate the store's schema when they open it, even when the configuration allows auto-migration, so a dry run never changes the database; against a store whose schema is behind the binary, run `zrok2 admin migrate` or start the controller first.
 
 FEATURE: A new `zrok2 admin repair-store <configPath>` command releases the names and frontend mappings still attached to shares that no longer exist, left behind by earlier versions, along with stranded environments, shares, accesses and names; it is a dry run by default that counts and samples what it would repair, and repairs in small batches with `--apply`.
@@ -13,6 +15,18 @@ FIX: The embedded interstitial page is served again when no external interstitia
 FIX: On OpenZiti 2.x, a bandwidth limit now removes a share's dial policy, disabling an environment and deleting a private access now withdraw a frontend's access, and agent unenroll now deletes the agent remote's dial and bind policies; previously none of these removed any policy there. OpenZiti 1.x behaves as before.
 
 FIX: A failed agent enrollment (`zrok2 agent enroll`) no longer leaves its OpenZiti service, service policies and service edge router policy behind; they are deleted when the enrollment cannot be recorded.
+
+FIX: A share whose backend fails to start (for example, a missing Caddyfile or an unavailable OpenZiti listener) is now deleted before `zrok2 share public` or `zrok2 share private` exits, so the next attempt creates it cleanly instead of failing against the orphaned share.
+
+FIX: `zrok2 disable` now keeps the local environment and identity whenever the zrok controller does not complete the request, so nothing is lost that a retry would need (https://github.com/openziti/zrok/issues/1265). An unreachable, busy or failing controller exits with status 1 and can be retried. A refusal, such as a 401, exits with status 2 and says the controller refused the request; if the environment no longer exists on the controller, the local copy under `~/.zrok2` can be removed by hand. Previously every failure removed the local environment.
+
+FIX: `zrok2 delete share` now accepts a name as well as a share token, and deletes the live share holding that name from the environment that share runs in.
+
+FIX: `--verbose` now enables debug logging; previously it left the log level at info. The interactive share and access displays still show info-level output, so debug lines appear in headless mode (`--headless`) only.
+
+FIX: Shutting down a share no longer logs an OpenZiti `failure creating Bind session` warning; the share's listener is now closed before the share is deleted.
+
+FIX: Creating a private share with a chosen share token that is still in use now answers a conflict that says the token is in use and, if its share was recently deleted, that it will be available again shortly, instead of reporting an OpenZiti "service name already in use".
 
 ## v2.0.7
 

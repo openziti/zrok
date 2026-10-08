@@ -58,6 +58,10 @@ func (b *CaddyfileBackend) Run() error {
 	return nil
 }
 
+func (b *CaddyfileBackend) Stop() error {
+	return caddy.Stop()
+}
+
 func preprocessCaddyfile(inF string, shr *sdk.Share) (string, error) {
 	input, err := os.ReadFile(inF)
 	if err != nil {

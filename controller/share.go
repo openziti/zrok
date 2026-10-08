@@ -504,7 +504,7 @@ func (h *shareHandler) checkPrivateShareTokenAvailability(privateShareToken stri
 		return err
 	}
 	if err == nil {
-		return errors.Errorf("service name '%v' is already in use", privateShareToken)
+		return errors.Errorf("share token '%v' is in use; if the share using it was recently deleted, it is being reclaimed and will be available again shortly", privateShareToken)
 	}
 	return nil
 }

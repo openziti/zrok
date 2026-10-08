@@ -60,7 +60,7 @@ var rootCmd = &cobra.Command{
 	Short: "zrok2",
 	PersistentPreRun: func(_ *cobra.Command, _ []string) {
 		if verbose {
-			dl.Init(dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo))
+			dl.Init(dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelDebug))
 			logrus.SetLevel(logrus.DebugLevel)
 		}
 	},

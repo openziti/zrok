@@ -28,7 +28,6 @@ import (
 	"github.com/openziti/zrok/v2/environment/env_core"
 	"github.com/openziti/zrok/v2/rest_client_zrok"
 	"github.com/openziti/zrok/v2/rest_client_zrok/share"
-	"github.com/openziti/zrok/v2/tui"
 	"github.com/openziti/zrok/v2/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -57,6 +56,7 @@ func newAccessPrivateCommand() *accessPrivateCommand {
 	cmd := &cobra.Command{
 		Use:   "private <shareToken>",
 		Short: "Create a private frontend to access a share",
+		Long:  "Create a private frontend to access a share\n\n" + exitCodesHelp,
 		Args:  cobra.ExactArgs(1),
 	}
 	command := &accessPrivateCommand{cmd: cmd}
@@ -95,7 +95,7 @@ func (cmd *accessPrivateCommand) run(_ *cobra.Command, args []string) {
 	}
 
 	if !root.IsEnabled() {
-		tui.Error("unable to load environment; did you 'zrok2 enable'?", nil)
+		exitWithFailure("unable to load environment; did you 'zrok2 enable'?", nil)
 	}
 
 	detectAndRouteToAgent(
@@ -265,7 +265,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 		data["bind_address"] = bindAddress
 		jsonData, err := json.Marshal(data)
 		if err != nil {
-			subordinateError(err)
+			cmd.error(err)
 		}
 		fmt.Println(string(jsonData))
 	}
@@ -316,7 +316,7 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 		}()
 
 		if _, err := prg.Run(); err != nil {
-			tui.Error("An error occurred", err)
+			exitWithFailure("An error occurred", err)
 		}
 
 		close(requests)
@@ -326,12 +326,9 @@ func (cmd *accessPrivateCommand) accessLocal(args []string, root env_core.Root) 
 
 func (cmd *accessPrivateCommand) error(err error) {
 	if cmd.subordinate {
-		subordinateError(err)
+		subordinateError("unable to create private access", err)
 	}
-	if !panicInstead {
-		tui.Error("unable to create private access", err)
-	}
-	panic(err)
+	exitWithFailure("unable to create private access", err)
 }
 
 func (cmd *accessPrivateCommand) shutdown(frontendToken, envZId, shrToken string, zrok *rest_client_zrok.Zrok, auth runtime.ClientAuthInfoWriter) {
@@ -350,7 +347,7 @@ func (cmd *accessPrivateCommand) shutdown(frontendToken, envZId, shrToken string
 func (cmd *accessPrivateCommand) accessAgent(args []string, root env_core.Root) {
 	client, conn, err := agentClient.NewClient(root)
 	if err != nil {
-		tui.Error("error connecting to agent", err)
+		exitWithFailure("error connecting to agent", err)
 	}
 	defer func() { _ = conn.Close() }()
 
@@ -368,7 +365,7 @@ func (cmd *accessPrivateCommand) accessAgent(args []string, root env_core.Root) 
 
 	acc, err := client.AccessPrivate(context.Background(), req)
 	if err != nil {
-		tui.Error("error creating access", err)
+		exitWithFailure("error creating access", err)
 	}
 
 	fmt.Println(acc)

@@ -57,3 +57,7 @@ func (b *Backend) Run() error {
 	}
 	return nil
 }
+
+func (b *Backend) Stop() error {
+	return b.listener.Close()
+}

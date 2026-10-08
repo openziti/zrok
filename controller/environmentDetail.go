@@ -51,7 +51,11 @@ func (h *environmentDetailHandler) Handle(params metadata.GetEnvironmentDetailPa
 		dl.Debug("skipping spark data for shares; no influx configuration")
 	}
 	for _, shr := range shrs {
-		frontendEndpoints := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, trx)
+		frontendEndpoints, err := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, trx)
+		if err != nil {
+			dl.Errorf("error building frontend endpoints for user '%v': %v", principal.Email, err)
+			return metadata.NewGetEnvironmentDetailInternalServerError()
+		}
 		target := ""
 		if shr.BackendProxyEndpoint != nil {
 			target = *shr.BackendProxyEndpoint
