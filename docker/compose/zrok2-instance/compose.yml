@@ -169,7 +169,8 @@ services:
 
   # ── zrok2 Bootstrap (one-shot) ────────────────────────────────────────────
   #
-  # Sources nfpm/zrok2-bootstrap.bash (the same library used for Linux
+  # Sources the zrok2-bootstrap library shipped in the image at
+  # /usr/local/bin/zrok2-bootstrap (the same library used for Linux
   # self-hosting) and calls its functions to generate configs, run
   # "zrok2 admin bootstrap", and create the default public frontend +
   # namespace.  All post-bootstrap admin commands run against a temporary
@@ -203,7 +204,6 @@ services:
     volumes:
       - zrok2-config:/var/lib/zrok2
       - ./entrypoint-init.bash:/bootstrap/entrypoint-init.bash:ro
-      - ../../../nfpm/zrok2-bootstrap.bash:/bootstrap/zrok2-bootstrap.bash:ro
     networks:
       - zrok2
 

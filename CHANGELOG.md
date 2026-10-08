@@ -10,6 +10,10 @@ FEATURE: Admin `GET /name/{namespaceToken}/{name}` returns one name with its own
 
 FEATURE: A new `zrok2 admin repair-store <configPath>` command releases the names and frontend mappings still attached to shares that no longer exist, left behind by earlier versions, along with stranded environments, shares, accesses and names; it is a dry run by default that counts and samples what it would repair, and repairs in small batches with `--apply`.
 
+FIX: The `zrok2-instance` Docker Compose bootstrap no longer fails with `/bootstrap/zrok2-bootstrap.bash: is a directory` when run from a fetched compose directory; the init container sources the bootstrap library shipped in the `openziti/zrok2` image (https://github.com/openziti/zrok/issues/1260).
+
+FIX: Creating an agent enrollment no longer writes the enrollment token to the controller log.
+
 FIX: A name whose share no longer exists is released automatically the next time it is used, instead of answering "already in use by another share" forever. When a name is held by a live share, the error now names that share and the `zrok2 delete share` command that releases it; tearing down a share now also releases its private accesses, and deleting an account releases its names.
 
 FIX: The embedded interstitial page is served again when no external interstitial file is configured; previously its file name was misspelled, so the frontend served an empty page (https://github.com/openziti/zrok/issues/1262).

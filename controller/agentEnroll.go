@@ -46,7 +46,7 @@ func (h *agentEnrollHandler) Handle(params agent.EnrollParams, principal *rest_m
 		dl.Errorf("error creating agent enrollment token for '%v': %v", principal.Email, err)
 		return agent.NewEnrollInternalServerError()
 	}
-	dl.Infof("enrollment token: %v", token)
+	dl.Infof("created enrollment token for '%v'", principal.Email)
 
 	ziti, err := automation.NewZitiAutomation(cfg.Ziti)
 	if err != nil {

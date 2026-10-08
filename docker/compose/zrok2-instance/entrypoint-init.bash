@@ -20,8 +20,9 @@ set -o errexit -o nounset -o pipefail
 # Source the bootstrap library — loads ALL function definitions (info, warn,
 # die, retry, wait_for, step_create_frontend, step_create_namespace,
 # step_map_namespace_frontend, etc.) without executing the main() workflow.
+# The library ships inside the openziti/zrok2 image; a fetched compose directory has no copy of it.
 # shellcheck source=../../../nfpm/zrok2-bootstrap.bash
-source /bootstrap/zrok2-bootstrap.bash
+source /usr/local/bin/zrok2-bootstrap
 
 # ── Map Docker env vars to bootstrap env vars ────────────────────────────────
 #
