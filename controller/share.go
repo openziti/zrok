@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/go-openapi/runtime/middleware"
@@ -66,11 +67,16 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 	// process namespace selections
 	var frontendEndpoints []string
 	var nameIds []int
+	var unbinds []pendingMappingUpdate
 	if sdk.ShareMode(params.Body.ShareMode) == sdk.PublicShareMode {
-		frontendEndpoints, nameIds, err = h.processNameSelections(params.Body.NameSelections, shrToken, principal, trx)
+		frontendEndpoints, nameIds, unbinds, err = h.processNameSelections(params.Body.NameSelections, shrToken, principal, trx)
 		if err != nil {
 			dl.Errorf("namespace selection processing failed: %v", err)
-			return share.NewShareConflict().WithPayload(rest_model_zrok.ErrorMessage(err.Error()))
+			var conflict *nameSelectionConflict
+			if errors.As(err, &conflict) {
+				return share.NewShareConflict().WithPayload(rest_model_zrok.ErrorMessage(conflict.Error()))
+			}
+			return share.NewShareInternalServerError()
 		}
 	}
 
@@ -155,12 +161,14 @@ func (h *shareHandler) Handle(params share.ShareParams, principal *rest_model_zr
 			}
 		}
 
-		// record frontend mappings for dynamic frontends; their updates are published after commit
-		updates, err = h.processDynamicMappings(shrToken, nameIds, trx)
+		// record frontend mappings for dynamic frontends; their updates are published after commit, behind
+		// the unbinds for any mappings healed off the same names
+		binds, err := h.processDynamicMappings(shrToken, nameIds, trx)
 		if err != nil {
 			dl.Errorf("error recording frontend mappings for share '%v': %v", shrToken, err)
 			return share.NewShareInternalServerError()
 		}
+		updates = append(unbinds, binds...)
 	}
 
 	// handle access grants if closed permission mode
@@ -230,15 +238,36 @@ func (h *shareHandler) shouldUseInterstitial(backendMode string, principal *rest
 	return !skipInterstitial, nil
 }
 
-func (h *shareHandler) processNameSelections(selections []*rest_model_zrok.NameSelection, shrToken string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) ([]string, []int, error) {
+// nameSelectionConflict is a name selection the request itself cannot have: a name or namespace that does
+// not exist, one the account does not own or is not granted, or a name held by a live share. any other
+// error from processNameSelections is a failure of the controller.
+type nameSelectionConflict struct {
+	msg string
+}
+
+func (c *nameSelectionConflict) Error() string {
+	return c.msg
+}
+
+func newNameSelectionConflict(format string, args ...interface{}) error {
+	return &nameSelectionConflict{msg: fmt.Sprintf(format, args...)}
+}
+
+// processNameSelections resolves the request's names. it also returns the unbinds for any frontend
+// mappings it healed, which the handler publishes after commit ahead of the share's own binds.
+func (h *shareHandler) processNameSelections(selections []*rest_model_zrok.NameSelection, shrToken string, principal *rest_model_zrok.Principal, trx *sqlx.Tx) ([]string, []int, []pendingMappingUpdate, error) {
 	var frontendEndpoints []string
 	var nameIds []int
+	var unbinds []pendingMappingUpdate
 
 	for _, selection := range selections {
 		// find namespace by token
 		ns, err := str.FindNamespaceWithToken(selection.NamespaceToken, trx)
 		if err != nil {
-			return nil, nil, errors.Wrapf(err, "error finding namespace with token '%v'", selection.NamespaceToken)
+			if errors.Is(err, sql.ErrNoRows) {
+				return nil, nil, nil, newNameSelectionConflict("namespace '%v' not found", selection.NamespaceToken)
+			}
+			return nil, nil, nil, errors.Wrapf(err, "error finding namespace with token '%v'", selection.NamespaceToken)
 		}
 
 		var endpoint string
@@ -247,22 +276,26 @@ func (h *shareHandler) processNameSelections(selections []*rest_model_zrok.NameS
 		if selection.Name != "" { // user specified a name - validate ownership and availability
 			name, err := str.FindNameByNamespaceAndName(ns.Id, selection.Name, trx)
 			if err != nil {
-				return nil, nil, errors.Wrapf(err, "error finding name '%v' in namespace '%v'", selection.Name, ns.Token)
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, nil, nil, newNameSelectionConflict("name '%v' not found in namespace '%v'", selection.Name, ns.Token)
+				}
+				return nil, nil, nil, errors.Wrapf(err, "error finding name '%v' in namespace '%v'", selection.Name, ns.Token)
 			}
 
 			// check if user owns this name
 			if name.AccountId != int(principal.ID) {
-				return nil, nil, errors.Errorf("user '%v' does not own name '%v' in namespace '%v'", principal.Email, selection.Name, ns.Token)
+				return nil, nil, nil, newNameSelectionConflict("user '%v' does not own name '%v' in namespace '%v'", principal.Email, selection.Name, ns.Token)
 			}
 
-			// check if there's already a share_name_mapping for this name
-			existing, err := str.FindShareNameMappingsByNameId(name.Id, trx)
+			// release the name if its holder is a deleted share; a live holder is a conflict
+			conflict, healed, err := healSeveredName(ns, name, trx)
 			if err != nil {
-				return nil, nil, errors.Wrapf(err, "error checking existing share name mappings for name '%v'", selection.Name)
+				return nil, nil, nil, errors.Wrapf(err, "error checking availability of name '%v' in namespace '%v'", selection.Name, ns.Token)
 			}
-			if len(existing) > 0 {
-				return nil, nil, errors.Errorf("name '%v' in namespace '%v' is already in use by another share", selection.Name, ns.Token)
+			if conflict != nil {
+				return nil, nil, nil, &nameSelectionConflict{msg: conflict.message()}
 			}
+			unbinds = append(unbinds, healed...)
 
 			nameId = name.Id
 			endpoint = util.NameInNamespace(name.Name, ns.Name)
@@ -272,10 +305,10 @@ func (h *shareHandler) processNameSelections(selections []*rest_model_zrok.NameS
 			if !ns.Open {
 				granted, err := str.CheckNamespaceGrant(ns.Id, int(principal.ID), trx)
 				if err != nil {
-					return nil, nil, errors.Wrapf(err, "error checking namespace grant for account '%v' and namespace '%v'", principal.Email, ns.Token)
+					return nil, nil, nil, errors.Wrapf(err, "error checking namespace grant for account '%v' and namespace '%v'", principal.Email, ns.Token)
 				}
 				if !granted {
-					return nil, nil, errors.Errorf("account '%v' is not granted access to namespace '%v'", principal.Email, ns.Token)
+					return nil, nil, nil, newNameSelectionConflict("account '%v' is not granted access to namespace '%v'", principal.Email, ns.Token)
 				}
 			}
 
@@ -289,7 +322,7 @@ func (h *shareHandler) processNameSelections(selections []*rest_model_zrok.NameS
 
 			nameId, err = str.CreateName(name, trx)
 			if err != nil {
-				return nil, nil, errors.Wrapf(err, "error creating allocated name '%v' in namespace '%v' for account '%v'", shrToken, ns.Token, principal.Email)
+				return nil, nil, nil, errors.Wrapf(err, "error creating allocated name '%v' in namespace '%v' for account '%v'", shrToken, ns.Token, principal.Email)
 			}
 
 			endpoint = util.NameInNamespace(shrToken, ns.Name)
@@ -299,7 +332,7 @@ func (h *shareHandler) processNameSelections(selections []*rest_model_zrok.NameS
 		nameIds = append(nameIds, nameId)
 	}
 
-	return frontendEndpoints, nameIds, nil
+	return frontendEndpoints, nameIds, unbinds, nil
 }
 
 func (h *shareHandler) allocatePublicResources(envZId, shrToken string, frontendEndpoints []string, params share.ShareParams, interstitial bool, compensation *zitiCompensation, trx interface{}) (string, []string, error) {
@@ -471,7 +504,7 @@ func (h *shareHandler) checkPrivateShareTokenAvailability(privateShareToken stri
 		return err
 	}
 	if err == nil {
-		return errors.Errorf("service name '%v' is already in use", privateShareToken)
+		return errors.Errorf("share token '%v' is in use; if the share using it was recently deleted, it is being reclaimed and will be available again shortly", privateShareToken)
 	}
 	return nil
 }

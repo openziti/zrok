@@ -283,3 +283,38 @@ func parseComparisonFilter(filter, columnName string) (string, error) {
 
 	return fmt.Sprintf("%s %s %d", columnName, operator, value), nil
 }
+
+// a live environment whose account is deleted.
+const environmentsOfDeletedAccountsWhere = `where not e.deleted
+	  and exists (select 1 from accounts a where a.id = e.account_id and a.deleted)`
+
+// CountEnvironmentsOfDeletedAccounts counts the live environments whose account is deleted.
+func (str *Store) CountEnvironmentsOfDeletedAccounts(trx *sqlx.Tx) (int, error) {
+	var count int
+	if err := trx.QueryRow("select count(*) from environments e " + environmentsOfDeletedAccountsWhere).Scan(&count); err != nil {
+		return 0, errors.Wrap(err, "error counting environments of deleted accounts")
+	}
+	return count, nil
+}
+
+// FindEnvironmentsOfDeletedAccounts lists, lowest id first, up to limit live environments whose account is
+// deleted.
+func (str *Store) FindEnvironmentsOfDeletedAccounts(limit int, trx *sqlx.Tx) ([]*Environment, error) {
+	rows, err := trx.Queryx("select e.* from environments e "+environmentsOfDeletedAccountsWhere+" order by e.id limit $1", limit)
+	if err != nil {
+		return nil, errors.Wrap(err, "error finding environments of deleted accounts")
+	}
+	defer func() { _ = rows.Close() }()
+	var envs []*Environment
+	for rows.Next() {
+		env := &Environment{}
+		if err := rows.StructScan(env); err != nil {
+			return nil, errors.Wrap(err, "error scanning environment of deleted account")
+		}
+		envs = append(envs, env)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error iterating environments of deleted accounts")
+	}
+	return envs, nil
+}

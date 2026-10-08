@@ -55,7 +55,11 @@ func (h *shareDetailHandler) Handle(params metadata.GetShareDetailParams, princi
 		dl.Debug("skipping spark data; no influx configuration")
 	}
 
-	frontendEndpoints := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, trx)
+	frontendEndpoints, err := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, trx)
+	if err != nil {
+		dl.Errorf("error building frontend endpoints for user '%v': %v", principal.Email, err)
+		return metadata.NewGetShareDetailInternalServerError()
+	}
 
 	target := ""
 	if shr.BackendProxyEndpoint != nil {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"math"
 	"net/url"
@@ -12,7 +11,6 @@ import (
 	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/v2/agent/agentClient"
-	"github.com/openziti/zrok/v2/cmd/zrok2/subordinate"
 	"github.com/openziti/zrok/v2/environment"
 	"github.com/openziti/zrok/v2/environment/env_core"
 	"github.com/openziti/zrok/v2/tui"
@@ -85,18 +83,6 @@ func parseUrl(in string) (string, error) {
 	}
 
 	return targetEndpoint.String(), nil
-}
-
-func subordinateError(err error) {
-	msg := make(map[string]interface{})
-	msg[subordinate.MessageKey] = subordinate.ErrorMessage
-	msg[subordinate.ErrorMessage] = err.Error()
-	if data, err := json.Marshal(msg); err == nil {
-		fmt.Println(string(data))
-	} else {
-		fmt.Println("{\"" + subordinate.MessageKey + "\":\"" + subordinate.ErrorMessage + "\",\"" + subordinate.ErrorMessage + "\":\"internal error\"}")
-	}
-	os.Exit(1)
 }
 
 // detectAndRouteToAgent handles the common pattern of checking if the agent is running

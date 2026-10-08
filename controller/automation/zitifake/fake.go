@@ -75,6 +75,8 @@ type Server struct {
 	rateLimitDeletes               map[string]bool
 	rateLimitAuthentications       int
 	authDelay                      time.Duration
+	integerTypeMatchesNothing      bool
+	vanishBeforeDelete             map[string]bool
 }
 
 func New() *Server {
@@ -99,7 +101,7 @@ func newServer(username, password string) *Server {
 	for _, kind := range []string{Configs, Services, ServicePolicies, ServiceEdgeRouterPolicies, Identities, EdgeRouterPolicies} {
 		objects[kind] = make(map[string]*object)
 	}
-	return &Server{objects: objects, sessions: make(map[string]bool), rejectDeletes: make(map[string]bool), rejectCreates: make(map[string]bool), rateLimitCreates: make(map[string]bool), rateLimitDeletes: make(map[string]bool), username: username, password: password}
+	return &Server{objects: objects, sessions: make(map[string]bool), rejectDeletes: make(map[string]bool), rejectCreates: make(map[string]bool), rateLimitCreates: make(map[string]bool), rateLimitDeletes: make(map[string]bool), vanishBeforeDelete: make(map[string]bool), username: username, password: password}
 }
 
 func (f *Server) Edge() *rest_management_api_client.ZitiEdgeManagement {
@@ -129,6 +131,32 @@ func (f *Server) RejectOperations(reject bool) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.rejectOperations = reject
+}
+
+// Generations are the two filter behaviours a test of policy selection runs under: ziti 1.x, where an
+// integer type clause selects dial or bind policies, and 2.x, where it matches nothing.
+var Generations = []struct {
+	Name                      string
+	IntegerTypeMatchesNothing bool
+}{
+	{"ziti-1.x", false},
+	{"ziti-2.x", true},
+}
+
+// IntegerTypeMatchesNothing makes a 'type=1' or 'type=2' filter clause match nothing, as ziti 2.x
+// does; ziti 1.x, and the fake by default, select dial and bind service policies with them.
+func (f *Server) IntegerTypeMatchesNothing(nothing bool) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.integerTypeMatchesNothing = nothing
+}
+
+// VanishBeforeDelete removes the object of kind with id when its delete arrives, so the delete finds
+// it already gone, as when another request deletes it between a listing and the delete.
+func (f *Server) VanishBeforeDelete(kind, id string) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.vanishBeforeDelete[kind+"/"+id] = true
 }
 
 // RejectDeletes answers every delete of kind with an internal server error.
@@ -227,6 +255,16 @@ func (f *Server) Has(kind, id string) bool {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	return f.objects[kind][id] != nil
+}
+
+// SeedPolicyWithID inserts a service policy of type t under a caller-chosen id, without counting it as
+// a create. it takes the fake's lock, so it is called from a test rather than a BeforeCreate hook.
+func (f *Server) SeedPolicyWithID(id, name string, tags *rest_model.Tags, t rest_model.DialBind) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.seed(ServicePolicies, id, name, tags)
+	obj := f.objects[ServicePolicies][id]
+	*obj.dial = t
 }
 
 func (f *Server) seed(kind, id, name string, tags *rest_model.Tags) {
@@ -525,7 +563,7 @@ func (f *Server) list(w http.ResponseWriter, r *http.Request, kind string) {
 	var matched []*object
 	for _, id := range ids {
 		obj := f.objects[kind][id]
-		if match(filter, id, obj.name, obj.tags, obj.dial) {
+		if match(filter, id, obj.name, obj.tags, obj.dial, f.integerTypeMatchesNothing) {
 			matched = append(matched, obj)
 		}
 	}
@@ -586,6 +624,10 @@ func (f *Server) delete(w http.ResponseWriter, kind, id string) {
 		writeError(w, http.StatusInternalServerError, labels[kind].noun+" delete rejected: "+id)
 		return
 	}
+	if f.vanishBeforeDelete[kind+"/"+id] {
+		delete(f.vanishBeforeDelete, kind+"/"+id)
+		delete(f.objects[kind], id)
+	}
 	if f.objects[kind][id] == nil {
 		writeError(w, 404, labels[kind].noun+" not found: "+id)
 		return
@@ -608,7 +650,7 @@ func (f *Server) delete(w http.ResponseWriter, kind, id string) {
 	}{Meta: &rest_model.Meta{}})
 }
 
-func match(filter, id, name string, tags *rest_model.Tags, kind *rest_model.DialBind) bool {
+func match(filter, id, name string, tags *rest_model.Tags, kind *rest_model.DialBind, integerTypeMatchesNothing bool) bool {
 	if filter == "" {
 		return true
 	}
@@ -633,6 +675,8 @@ func match(filter, id, name string, tags *rest_model.Tags, kind *rest_model.Dial
 			if !ok || tags == nil || fmt.Sprint(tags.SubTags[key]) != strings.Trim(value, `"`) {
 				return false
 			}
+		case (clause == "type=1" || clause == "type=2") && integerTypeMatchesNothing:
+			return false
 		case clause == "type=1":
 			if kind == nil || *kind != rest_model.DialBindDial {
 				return false

@@ -141,15 +141,10 @@ func (h *listSharesHandler) Handle(params metadata.ListSharesParams, principal *
 	}
 
 	// check account limits
-	isLimited := false
-	if empty, err := str.IsBandwidthLimitJournalEmpty(int(principal.ID), trx); !empty && err == nil {
-		alj, err := str.FindLatestBandwidthLimitJournal(int(principal.ID), trx)
-		if err != nil {
-			dl.Errorf("error finding account limit journal for '%v': %v", principal.Email, err)
-		}
-		isLimited = alj != nil && alj.Action == store.LimitLimitAction
-	} else if err != nil {
-		dl.Errorf("error finding account limit journal for '%v': %v", principal.Email, err)
+	isLimited, err := isAccountLimited(int(principal.ID), trx)
+	if err != nil {
+		dl.Errorf("error checking account limit journal for '%v': %v", principal.Email, err)
+		return metadata.NewListSharesInternalServerError()
 	}
 
 	// build response
@@ -178,11 +173,15 @@ func (h *listSharesHandler) Handle(params metadata.ListSharesParams, principal *
 		env, err := str.GetEnvironment(shr.EnvironmentId, trx)
 		if err != nil {
 			dl.Errorf("error getting environment for share '%v': %v", shr.Token, err)
-			continue
+			return metadata.NewListSharesInternalServerError()
 		}
 
 		// build frontend endpoints
-		frontendEndpoints := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, trx)
+		frontendEndpoints, err := buildFrontendEndpointsForShare(shr.Id, shr.Token, shr.FrontendEndpoint, trx)
+		if err != nil {
+			dl.Errorf("error building frontend endpoints for user '%v': %v", principal.Email, err)
+			return metadata.NewListSharesInternalServerError()
+		}
 
 		// get target
 		target := ""

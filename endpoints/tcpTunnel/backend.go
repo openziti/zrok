@@ -65,6 +65,10 @@ func (b *Backend) Run() error {
 	}
 }
 
+func (b *Backend) Stop() error {
+	return b.listener.Close()
+}
+
 func (b *Backend) handle(conn net.Conn) {
 	dl.Debugf("handling '%v'", conn.RemoteAddr())
 	if rAddr, err := net.ResolveTCPAddr("tcp", b.cfg.EndpointAddress); err == nil {

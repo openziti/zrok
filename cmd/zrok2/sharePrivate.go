@@ -52,6 +52,7 @@ func newSharePrivateCommand() *sharePrivateCommand {
 	cmd := &cobra.Command{
 		Use:   "private [<target>]",
 		Short: "Share a target resource privately",
+		Long:  "Share a target resource privately\n\n" + exitCodesHelp,
 		Args:  cobra.RangeArgs(0, 1),
 	}
 	command := &sharePrivateCommand{cmd: cmd}
@@ -88,7 +89,7 @@ func (cmd *sharePrivateCommand) run(cobraCmd *cobra.Command, args []string) {
 	}
 
 	if !root.IsEnabled() {
-		tui.Error("unable to load environment; did you 'zrok2 enable'?", nil)
+		exitWithFailure("unable to load environment; did you 'zrok2 enable'?", nil)
 	}
 
 	detectAndRouteToAgent(
@@ -170,16 +171,25 @@ func (cmd *sharePrivateCommand) shareLocal(cobraCmd *cobra.Command, args []strin
 		proxy.SetCaddyLoggingWriter(mdl)
 	}
 
+	backend := &runningBackend{}
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		cmd.shutdown(root, shr, skipDelete)
+		cmd.shutdown(root, shr, skipDelete, backend)
 		os.Exit(0)
 	}()
 
+	// fail deletes a share this command created before exiting, so the next attempt creates it cleanly
+	// instead of conflicting with this one
+	fail := func(msg string, err error) {
+		cmd.shutdown(root, shr, skipDelete, backend)
+		cmd.error(msg, err)
+	}
+
 	requests := make(chan *endpoints.Request, 1024)
 
+	var be shareBackend
 	switch backendMode {
 	case "proxy":
 		cfg := &proxy.BackendConfig{
@@ -191,16 +201,11 @@ func (cmd *sharePrivateCommand) shareLocal(cobraCmd *cobra.Command, args []strin
 			SuperNetwork:    superNetwork,
 		}
 
-		be, err := proxy.NewBackend(cfg)
+		proxyBe, err := proxy.NewBackend(cfg)
 		if err != nil {
-			cmd.error("unable to create 'proxy' backend", err)
+			fail("unable to create 'proxy' backend", err)
 		}
-
-		go func() {
-			if err := be.Run(); err != nil {
-				dl.Errorf("error running http proxy backend: %v", err)
-			}
-		}()
+		be = proxyBe
 
 	case "web":
 		cfg := &proxy.CaddyWebBackendConfig{
@@ -210,16 +215,11 @@ func (cmd *sharePrivateCommand) shareLocal(cobraCmd *cobra.Command, args []strin
 			Requests:     requests,
 		}
 
-		be, err := proxy.NewCaddyWebBackend(cfg)
+		webBe, err := proxy.NewCaddyWebBackend(cfg)
 		if err != nil {
-			cmd.error("unable to create 'web' backend", err)
+			fail("unable to create 'web' backend", err)
 		}
-
-		go func() {
-			if err := be.Run(); err != nil {
-				dl.Errorf("error running http web backend: %v", err)
-			}
-		}()
+		be = webBe
 
 	case "tcpTunnel":
 		cfg := &tcpTunnel.BackendConfig{
@@ -230,16 +230,11 @@ func (cmd *sharePrivateCommand) shareLocal(cobraCmd *cobra.Command, args []strin
 			SuperNetwork:    superNetwork,
 		}
 
-		be, err := tcpTunnel.NewBackend(cfg)
+		tcpBe, err := tcpTunnel.NewBackend(cfg)
 		if err != nil {
-			cmd.error("unable to create 'tcpTunnel' backend", err)
+			fail("unable to create 'tcpTunnel' backend", err)
 		}
-
-		go func() {
-			if err := be.Run(); err != nil {
-				dl.Errorf("error running tcpTunnel backend: %v", err)
-			}
-		}()
+		be = tcpBe
 
 	case "udpTunnel":
 		cfg := &udpTunnel.BackendConfig{
@@ -250,16 +245,11 @@ func (cmd *sharePrivateCommand) shareLocal(cobraCmd *cobra.Command, args []strin
 			SuperNetwork:    superNetwork,
 		}
 
-		be, err := udpTunnel.NewBackend(cfg)
+		udpBe, err := udpTunnel.NewBackend(cfg)
 		if err != nil {
-			cmd.error("unable to create 'udpTunnel' backend", err)
+			fail("unable to create 'udpTunnel' backend", err)
 		}
-
-		go func() {
-			if err := be.Run(); err != nil {
-				dl.Errorf("error running udpTunnel backend: %v", err)
-			}
-		}()
+		be = udpBe
 
 	case "caddy":
 		cfg := &proxy.CaddyfileBackendConfig{
@@ -268,17 +258,11 @@ func (cmd *sharePrivateCommand) shareLocal(cobraCmd *cobra.Command, args []strin
 			Requests:      requests,
 		}
 
-		be, err := proxy.NewCaddyfileBackend(cfg)
+		caddyBe, err := proxy.NewCaddyfileBackend(cfg)
 		if err != nil {
-			cmd.shutdown(root, shr, skipDelete)
-			cmd.error("unable to create 'caddy' backend", err)
+			fail("unable to create 'caddy' backend", err)
 		}
-
-		go func() {
-			if err := be.Run(); err != nil {
-				dl.Errorf("error running caddy backend: %v", err)
-			}
-		}()
+		be = caddyBe
 
 	case "drive":
 		cfg := &drive.BackendConfig{
@@ -289,16 +273,11 @@ func (cmd *sharePrivateCommand) shareLocal(cobraCmd *cobra.Command, args []strin
 			SuperNetwork: superNetwork,
 		}
 
-		be, err := drive.NewBackend(cfg)
+		driveBe, err := drive.NewBackend(cfg)
 		if err != nil {
-			cmd.error("unable to create 'drive' backend", err)
+			fail("unable to create 'drive' backend", err)
 		}
-
-		go func() {
-			if err := be.Run(); err != nil {
-				dl.Errorf("error running drive backend: %v", err)
-			}
-		}()
+		be = driveBe
 
 	case "socks":
 		cfg := &socks.BackendConfig{
@@ -308,19 +287,27 @@ func (cmd *sharePrivateCommand) shareLocal(cobraCmd *cobra.Command, args []strin
 			SuperNetwork: superNetwork,
 		}
 
-		be, err := socks.NewBackend(cfg)
+		socksBe, err := socks.NewBackend(cfg)
 		if err != nil {
-			cmd.error("unable to create 'socks' backend", err)
+			fail("unable to create 'socks' backend", err)
 		}
-
-		go func() {
-			if err := be.Run(); err != nil {
-				dl.Errorf("error running socks backend: %v", err)
-			}
-		}()
+		be = socksBe
 
 	default:
-		cmd.error("unable to create share", errors.New("invalid backend mode"))
+		fail("unable to create share", errors.New("invalid backend mode"))
+	}
+	backend.set(be)
+
+	if startsInline(backendMode) {
+		if err := be.Run(); err != nil {
+			fail(fmt.Sprintf("unable to start '%v' backend", backendMode), err)
+		}
+	} else {
+		go func() {
+			if err := be.Run(); err != nil && !backend.isStopping() {
+				dl.Errorf("error running '%v' backend: %v", backendMode, err)
+			}
+		}()
 	}
 
 	if cmd.subordinate {
@@ -330,7 +317,7 @@ func (cmd *sharePrivateCommand) shareLocal(cobraCmd *cobra.Command, args []strin
 		data["frontend_endpoints"] = shr.FrontendEndpoints
 		jsonData, err := json.Marshal(data)
 		if err != nil {
-			cmd.error("unable to create share", err)
+			fail("unable to create share", err)
 		}
 		fmt.Println(string(jsonData))
 	}
@@ -380,26 +367,26 @@ func (cmd *sharePrivateCommand) shareLocal(cobraCmd *cobra.Command, args []strin
 		}()
 
 		if _, err := prg.Run(); err != nil {
-			tui.Error("An error occurred", err)
+			fail("An error occurred", err)
 		}
 
 		close(requests)
-		cmd.shutdown(root, shr, skipDelete)
+		cmd.shutdown(root, shr, skipDelete, backend)
 	}
 }
 
 func (cmd *sharePrivateCommand) error(msg string, err error) {
 	if cmd.subordinate {
-		subordinateError(errors.Wrap(err, msg))
+		subordinateError(msg, err)
 	}
-	if !panicInstead {
-		tui.Error(msg, err)
-	}
-	panic(errors.Wrap(err, msg))
+	exitWithFailure(msg, err)
 }
 
-func (cmd *sharePrivateCommand) shutdown(root env_core.Root, shr *sdk.Share, skipDelete bool) {
+// shutdown stops the backend before deleting the share, so the ziti sdk is not left rebinding to a service
+// the controller is deleting.
+func (cmd *sharePrivateCommand) shutdown(root env_core.Root, shr *sdk.Share, skipDelete bool, backend *runningBackend) {
 	dl.Debugf("shutting down '%v'", shr.Token)
+	backend.stop()
 	if !skipDelete {
 		if err := sdk.DeleteShare(root, shr); err != nil {
 			dl.Errorf("error shutting down '%v': %v", shr.Token, err)
@@ -415,15 +402,15 @@ func (cmd *sharePrivateCommand) shareAgent(cobraCmd *cobra.Command, args []strin
 	if cmd.shareToken != "" {
 		// using existing share - verify it exists and get its backend mode
 		if cobraCmd.Flags().Changed("backend-mode") {
-			tui.Error("--backend-mode cannot be specified when using --share-token", nil)
+			exitWithFailure("--backend-mode cannot be specified when using --share-token", nil)
 		}
 
 		shareDetail, err := sdk.GetShareDetail(root, cmd.shareToken)
 		if err != nil {
-			tui.Error("share not found", err)
+			exitWithFailure("share not found", err)
 		}
 		if shareDetail.ShareMode != "private" {
-			tui.Error("share is not private", nil)
+			exitWithFailure("share is not private", nil)
 		}
 
 		backendMode = shareDetail.BackendMode
@@ -434,81 +421,69 @@ func (cmd *sharePrivateCommand) shareAgent(cobraCmd *cobra.Command, args []strin
 	switch backendMode {
 	case "proxy":
 		if len(args) != 1 {
-			tui.Error("the 'proxy' backend mode expects a <target>", nil)
+			exitWithFailure("the 'proxy' backend mode expects a <target>", nil)
 		}
 		v, err := parseUrl(args[0])
 		if err != nil {
-			if !panicInstead {
-				tui.Error("invalid target endpoint URL", err)
-			}
-			panic(err)
+			exitWithFailure("invalid target endpoint URL", err)
 		}
 		target = v
 
 	case "web":
 		if len(args) != 1 {
-			tui.Error("the 'web' backend mode expects a <target>", nil)
+			exitWithFailure("the 'web' backend mode expects a <target>", nil)
 		}
 		v, err := filepath.Abs(args[0])
 		if err != nil {
-			if !panicInstead {
-				tui.Error("invalid target endpoint URL", err)
-			}
-			panic(err)
+			exitWithFailure("invalid target endpoint URL", err)
 		}
 		target = v
 
 	case "tcpTunnel":
 		if len(args) != 1 {
-			tui.Error("the 'tcpTunnel' backend mode expects a <target>", nil)
+			exitWithFailure("the 'tcpTunnel' backend mode expects a <target>", nil)
 		}
 		target = args[0]
 
 	case "udpTunnel":
 		if len(args) != 1 {
-			tui.Error("the 'udpTunnel' backend mode expects a <target>", nil)
+			exitWithFailure("the 'udpTunnel' backend mode expects a <target>", nil)
 		}
 		target = args[0]
 
 	case "caddy":
 		if len(args) != 1 {
-			tui.Error("the 'caddy' backend mode expects a <target>", nil)
+			exitWithFailure("the 'caddy' backend mode expects a <target>", nil)
 		}
 		v, err := filepath.Abs(args[0])
 		if err != nil {
-			if !panicInstead {
-				tui.Error("invalid target endpoint URL", err)
-			}
-			panic(err)
+			exitWithFailure("invalid target endpoint URL", err)
 		}
 		target = v
 
 	case "drive":
 		if len(args) != 1 {
-			tui.Error("the 'drive' backend mode expects a <target>", nil)
+			exitWithFailure("the 'drive' backend mode expects a <target>", nil)
 		}
 		v, err := filepath.Abs(args[0])
 		if err != nil {
-			if !panicInstead {
-				tui.Error("invalid target endpoint URL", err)
-			}
-			panic(err)
+			exitWithFailure("invalid target endpoint URL", err)
 		}
 		target = v
 
 	case "socks":
 		if len(args) != 0 {
-			tui.Error("the 'socks' backend mode does not expect <target>", nil)
+			exitWithFailure("the 'socks' backend mode does not expect <target>", nil)
 		}
 		target = "socks"
 
 	default:
-		tui.Error(fmt.Sprintf("invalid backend mode '%v'", backendMode), nil)
+		exitWithFailure(fmt.Sprintf("invalid backend mode '%v'", backendMode), nil)
 	}
 
 	client, conn, err := agentClient.NewClient(root)
 	if err != nil {
-		tui.Error("error connecting to agent", err)
+		exitWithFailure("error connecting to agent", err)
 	}
 	defer func() { _ = conn.Close() }()
 
@@ -521,7 +496,7 @@ func (cmd *sharePrivateCommand) shareAgent(cobraCmd *cobra.Command, args []strin
 		AccessGrants:      cmd.accessGrants,
 	})
 	if err != nil {
-		tui.Error("error creating share", err)
+		exitWithFailure("error creating share", err)
 	}
 
 	fmt.Println(shr)

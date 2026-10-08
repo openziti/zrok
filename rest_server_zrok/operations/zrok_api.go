@@ -255,6 +255,13 @@ func NewZrokAPI(spec *loads.Document) *ZrokAPI {
 			return middleware.NotImplemented("operation metadata.GetFrontendDetail has not yet been implemented")
 		}),
 
+		AdminGetNameHandler: admin.GetNameHandlerFunc(func(params admin.GetNameParams, principal *rest_model_zrok.Principal) middleware.Responder {
+			_ = params
+			_ = principal
+
+			return middleware.NotImplemented("operation admin.GetName has not yet been implemented")
+		}),
+
 		MetadataGetShareDetailHandler: metadata.GetShareDetailHandlerFunc(func(params metadata.GetShareDetailParams, principal *rest_model_zrok.Principal) middleware.Responder {
 			_ = params
 			_ = principal
@@ -743,6 +750,8 @@ type ZrokAPI struct {
 	MetadataGetEnvironmentMetricsHandler metadata.GetEnvironmentMetricsHandler
 	// MetadataGetFrontendDetailHandler sets the operation handler for the get frontend detail operation
 	MetadataGetFrontendDetailHandler metadata.GetFrontendDetailHandler
+	// AdminGetNameHandler sets the operation handler for the get name operation
+	AdminGetNameHandler admin.GetNameHandler
 	// MetadataGetShareDetailHandler sets the operation handler for the get share detail operation
 	MetadataGetShareDetailHandler metadata.GetShareDetailHandler
 	// MetadataGetShareMetricsHandler sets the operation handler for the get share metrics operation
@@ -1023,6 +1032,9 @@ func (o *ZrokAPI) Validate() error {
 	}
 	if o.MetadataGetFrontendDetailHandler == nil {
 		unregistered = append(unregistered, "metadata.GetFrontendDetailHandler")
+	}
+	if o.AdminGetNameHandler == nil {
+		unregistered = append(unregistered, "admin.GetNameHandler")
 	}
 	if o.MetadataGetShareDetailHandler == nil {
 		unregistered = append(unregistered, "metadata.GetShareDetailHandler")
@@ -1409,6 +1421,10 @@ func (o *ZrokAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/detail/frontend/{frontendId}"] = metadata.NewGetFrontendDetail(o.context, o.MetadataGetFrontendDetailHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/name/{namespaceToken}/{name}"] = admin.NewGetName(o.context, o.AdminGetNameHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

@@ -9,11 +9,30 @@ import (
 	"github.com/pkg/errors"
 )
 
-// teardownShare is the only place a share row is deleted. it runs inside the caller's transaction and
-// returns the unbind updates for the frontend mappings it deleted, which the caller publishes after it
-// commits. any failure returns at once, so the caller's rollback leaves every row for a retry. ziti goes
-// last, so a ziti failure leaves the store untouched.
+// teardownShare tears a share down: its store rows through releaseShareFromStore, then its ziti objects.
+// it runs inside the caller's transaction and returns the unbind updates for the frontend mappings it
+// deleted, which the caller publishes after it commits. any failure returns at once, so the caller's
+// rollback leaves every row for a retry. ziti goes last, so a ziti failure leaves the store untouched.
 func teardownShare(shr *store.Share, trx *sqlx.Tx, ziti *automation.ZitiAutomation) ([]pendingMappingUpdate, error) {
+	updates, err := releaseShareFromStore(shr, trx)
+	if err != nil {
+		return nil, err
+	}
+
+	// a not-found inside is tolerated by the filter deletes; anything else fails the teardown
+	if err := ziti.CleanupByTag("zrokShareToken", shr.Token); err != nil {
+		return nil, errors.Wrapf(err, "error cleaning up ziti objects for share '%v'", shr.Token)
+	}
+
+	dl.Infof("tore down share '%v'", shr.Token)
+	return updates, nil
+}
+
+// releaseShareFromStore is the store half of teardownShare and the only place a share row is deleted:
+// teardownShare calls it on every request path, and the repair-store sweep calls it alone for shares
+// stranded in deleted environments, leaving their ziti objects to gc. it returns the unbind updates for
+// the frontend mappings it deleted.
+func releaseShareFromStore(shr *store.Share, trx *sqlx.Tx) ([]pendingMappingUpdate, error) {
 	// release the share's names: auto-allocated names are deleted with their mappings, reserved names
 	// survive
 	details, err := str.FindShareNameCleanupDetailsByShareId(shr.Id, trx)
@@ -48,6 +67,18 @@ func teardownShare(shr *store.Share, trx *sqlx.Tx, ziti *automation.ZitiAutomati
 		})
 	}
 
+	// the private accesses to the share; their dial policies carry the share token and go with its ziti
+	// objects
+	fes, err := str.FindFrontendsForPrivateShare(shr.Id, trx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error finding access frontends for share '%v'", shr.Token)
+	}
+	for _, fe := range fes {
+		if err := str.DeleteFrontend(fe.Id, trx); err != nil {
+			return nil, errors.Wrapf(err, "error deleting access frontend '%v' for share '%v'", fe.Token, shr.Token)
+		}
+	}
+
 	if err := str.DeleteAccessGrantsForShare(shr.Id, trx); err != nil {
 		return nil, errors.Wrapf(err, "error deleting access grants for share '%v'", shr.Token)
 	}
@@ -55,12 +86,5 @@ func teardownShare(shr *store.Share, trx *sqlx.Tx, ziti *automation.ZitiAutomati
 	if err := str.DeleteShare(shr.Id, trx); err != nil {
 		return nil, errors.Wrapf(err, "error deleting share '%v'", shr.Token)
 	}
-
-	// a not-found inside is tolerated by the filter deletes; anything else fails the teardown
-	if err := ziti.CleanupByTag("zrokShareToken", shr.Token); err != nil {
-		return nil, errors.Wrapf(err, "error cleaning up ziti objects for share '%v'", shr.Token)
-	}
-
-	dl.Infof("tore down share '%v'", shr.Token)
 	return updates, nil
 }

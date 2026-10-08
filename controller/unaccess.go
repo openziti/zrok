@@ -1,10 +1,9 @@
 package controller
 
 import (
-	"fmt"
-
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/michaelquigley/df/dl"
+	rest_model_edge "github.com/openziti/edge-api/rest_model"
 	"github.com/openziti/zrok/v2/controller/automation"
 	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/openziti/zrok/v2/rest_model_zrok"
@@ -67,8 +66,8 @@ func (h *unaccessHandler) Handle(params share.UnaccessParams, principal *rest_mo
 		return share.NewUnaccessInternalServerError()
 	}
 
-	filter := fmt.Sprintf("tags.zrokShareToken=\"%v\" and tags.zrokFrontendToken=\"%v\" and type=1", shrToken, feToken)
-	if err := ziti.ServicePolicies.DeleteWithFilter(filter); err != nil {
+	filter := automation.BuildTagFilter("zrokShareToken", shrToken) + " and " + automation.BuildTagFilter("zrokFrontendToken", feToken)
+	if err := ziti.ServicePolicies.DeleteByTagAndType(filter, rest_model_edge.DialBindDial); err != nil {
 		dl.Errorf("error removing access to '%v' for '%v': %v", shrToken, envZId, err)
 		if automation.IsRateLimited(err) {
 			return share.NewUnaccessServiceUnavailable().WithRetryAfter(rateLimitedRetryAfter)

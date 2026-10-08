@@ -23,9 +23,10 @@ const (
 type zitiCompensationSubject string
 
 const (
-	compensatingShare       zitiCompensationSubject = "share"
-	compensatingAccess      zitiCompensationSubject = "access"
-	compensatingEnvironment zitiCompensationSubject = "environment"
+	compensatingShare           zitiCompensationSubject = "share"
+	compensatingAccess          zitiCompensationSubject = "access"
+	compensatingEnvironment     zitiCompensationSubject = "environment"
+	compensatingAgentEnrollment zitiCompensationSubject = "agent enrollment"
 )
 
 type zitiObject struct {

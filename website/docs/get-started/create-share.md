@@ -36,6 +36,27 @@ live activity as the share is accessed:
 
 ![Sparkline activity graphs](../images/zrok-visualizer-sparklines.png)
 
+## When a share fails to start
+
+If `zrok2 share public` (or `share private`, or `access private`) cannot start, it prints why and exits with a status
+that says whether trying again can help. This matters when the command runs under a process supervisor such as systemd:
+
+| Exit status | Meaning |
+|-------------|---------|
+| `0` | The command finished normally. |
+| `1` | A later retry may succeed: the zrok service could not be reached, was busy (it answers when to retry, for example `the zrok service is busy, retry in 5 seconds`), or failed. Also used for any failure that is not an answer from the zrok service. |
+| `2` | The zrok service refused the request (for example, the name is already held by another share, or the account token is not valid). Retrying will not change the answer. |
+
+A supervisor should not restart the command on status 2; for example, a systemd unit can set
+`RestartPreventExitStatus=2`. To have shares retried for you with backoff, run them through the
+[agent](./set-up-agent.md) instead.
+
+For more detail on a failure, add `--verbose` (`-v`) to print debug output. Debug output appears in headless mode
+(`--headless`) only; the interactive display shows info-level output whether or not `--verbose` is given.
+
+If the backend fails to start after the share was created (for example, a missing Caddyfile), the share is deleted
+before the command exits, so the next attempt starts clean.
+
 ## Stop the share
 
 Press `Ctrl+C` or close the terminal. The share is torn down and the URL stops working. This is by design—zrok

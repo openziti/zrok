@@ -20,6 +20,7 @@ Method | HTTP request | Description
 [**delete_identity**](AdminApi.md#delete_identity) | **DELETE** /identity | 
 [**delete_namespace**](AdminApi.md#delete_namespace) | **DELETE** /namespace | 
 [**delete_organization**](AdminApi.md#delete_organization) | **DELETE** /organization | 
+[**get_name**](AdminApi.md#get_name) | **GET** /name/{namespaceToken}/{name} | 
 [**get_skip_interstitial_grant**](AdminApi.md#get_skip_interstitial_grant) | **GET** /skip-interstitial-grant | 
 [**grant_skip_interstitial**](AdminApi.md#grant_skip_interstitial) | **POST** /skip-interstitial-grant | 
 [**invite_token_generate**](AdminApi.md#invite_token_generate) | **POST** /invite/token/generate | 
@@ -1250,6 +1251,85 @@ void (empty response body)
 **200** | organization deleted |  -  |
 **401** | unauthorized |  -  |
 **404** | organization not found |  -  |
+**500** | internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **get_name**
+> GetName200Response get_name(namespace_token, name)
+
+### Example
+
+* Api Key Authentication (key):
+
+```python
+import zrok_api
+from zrok_api.models.get_name200_response import GetName200Response
+from zrok_api.rest import ApiException
+from pprint import pprint
+
+# Defining the host is optional and defaults to /api/v2
+# See configuration.py for a list of all supported configuration parameters.
+configuration = zrok_api.Configuration(
+    host = "/api/v2"
+)
+
+# The client must configure the authentication and authorization parameters
+# in accordance with the API server security policy.
+# Examples for each auth method are provided below, use the example that
+# satisfies your auth use case.
+
+# Configure API key authorization: key
+configuration.api_key['key'] = os.environ["API_KEY"]
+
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['key'] = 'Bearer'
+
+# Enter a context with an instance of the API client
+with zrok_api.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = zrok_api.AdminApi(api_client)
+    namespace_token = 'namespace_token_example' # str | 
+    name = 'name_example' # str | 
+
+    try:
+        api_response = api_instance.get_name(namespace_token, name)
+        print("The response of AdminApi->get_name:\n")
+        pprint(api_response)
+    except Exception as e:
+        print("Exception when calling AdminApi->get_name: %s\n" % e)
+```
+
+
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **namespace_token** | **str**|  | 
+ **name** | **str**|  | 
+
+### Return type
+
+[**GetName200Response**](GetName200Response.md)
+
+### Authorization
+
+[key](../README.md#key)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/zrok.v1+json
+
+### HTTP response details
+
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | ok |  -  |
+**401** | unauthorized |  -  |
+**404** | not found |  -  |
 **500** | internal server error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

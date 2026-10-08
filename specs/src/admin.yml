@@ -601,6 +601,57 @@
       500:
         description: internal server error
 
+/name/{namespaceToken}/{name}:
+  get:
+    tags:
+      - admin
+    security:
+      - key: []
+    operationId: getName
+    parameters:
+      - name: namespaceToken
+        in: path
+        type: string
+        required: true
+      - name: name
+        in: path
+        type: string
+        required: true
+    responses:
+      200:
+        description: ok
+        schema:
+          type: object
+          required:
+            - namespaceToken
+            - namespaceName
+            - name
+            - accountEmail
+            - shareToken
+            - reserved
+            - createdAt
+          properties:
+            namespaceToken:
+              type: string
+            namespaceName:
+              type: string
+            name:
+              type: string
+            accountEmail:
+              type: string
+            shareToken:
+              type: string
+            reserved:
+              type: boolean
+            createdAt:
+              type: integer
+      401:
+        description: unauthorized
+      404:
+        description: not found
+      500:
+        description: internal server error
+
 /namespaces:
   get:
     tags:

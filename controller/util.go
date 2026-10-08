@@ -15,6 +15,7 @@ import (
 	"github.com/openziti/zrok/v2/controller/store"
 	"github.com/openziti/zrok/v2/rest_model_zrok"
 	"github.com/openziti/zrok/v2/util"
+	"github.com/pkg/errors"
 )
 
 type zrokAuthenticator struct {
@@ -131,13 +132,13 @@ func hasNumeric(check string) bool {
 // buildFrontendEndpointsForShare retrieves names for a share and builds frontend endpoints
 // from those names. Falls back to the deprecated FrontendEndpoint field if no names are
 // mapped (for backwards compatibility).
-func buildFrontendEndpointsForShare(shareId int, shareToken string, deprecatedEndpoint *string, trx *sqlx.Tx) []string {
+// buildFrontendEndpointsForShare returns the share's frontend endpoints from its names. a store error is
+// returned rather than logged past: on postgresql it has aborted the caller's transaction.
+func buildFrontendEndpointsForShare(shareId int, shareToken string, deprecatedEndpoint *string, trx *sqlx.Tx) ([]string, error) {
 	// retrieve names for this share using the new mapping table
 	shareNames, err := str.FindNamesForShare(shareId, trx)
 	if err != nil {
-		dl.Errorf("error finding names for share '%v': %v", shareToken, err)
-		// continue without failing the entire request
-		shareNames = []*store.NameWithNamespace{}
+		return nil, errors.Wrapf(err, "error finding names for share '%v'", shareToken)
 	}
 
 	// build frontend endpoints from the names
@@ -152,7 +153,7 @@ func buildFrontendEndpointsForShare(shareId int, shareToken string, deprecatedEn
 		frontendEndpoints = []string{*deprecatedEndpoint}
 	}
 
-	return frontendEndpoints
+	return frontendEndpoints, nil
 }
 
 // isAccountLimited checks if an account has an active bandwidth limit restriction.

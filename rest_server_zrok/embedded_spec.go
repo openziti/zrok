@@ -2403,6 +2403,82 @@ func init() {
         ]
       }
     },
+    "/name/{namespaceToken}/{name}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "operationId": "getName",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "namespaceToken",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "type": "object",
+              "required": [
+                "namespaceToken",
+                "namespaceName",
+                "name",
+                "accountEmail",
+                "shareToken",
+                "reserved",
+                "createdAt"
+              ],
+              "properties": {
+                "accountEmail": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "namespaceName": {
+                  "type": "string"
+                },
+                "namespaceToken": {
+                  "type": "string"
+                },
+                "reserved": {
+                  "type": "boolean"
+                },
+                "shareToken": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        },
+        "security": [
+          {
+            "key": []
+          }
+        ]
+      }
+    },
     "/namespace": {
       "post": {
         "tags": [
@@ -7051,6 +7127,82 @@ func init() {
           },
           "401": {
             "description": "unauthorized"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        },
+        "security": [
+          {
+            "key": []
+          }
+        ]
+      }
+    },
+    "/name/{namespaceToken}/{name}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "operationId": "getName",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "namespaceToken",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "type": "object",
+              "required": [
+                "namespaceToken",
+                "namespaceName",
+                "name",
+                "accountEmail",
+                "shareToken",
+                "reserved",
+                "createdAt"
+              ],
+              "properties": {
+                "accountEmail": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "namespaceName": {
+                  "type": "string"
+                },
+                "namespaceToken": {
+                  "type": "string"
+                },
+                "reserved": {
+                  "type": "boolean"
+                },
+                "shareToken": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "not found"
           },
           "500": {
             "description": "internal server error"

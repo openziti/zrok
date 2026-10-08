@@ -79,3 +79,25 @@ func TestDeleteWithFilterReadsEveryPage(t *testing.T) {
 	require.Len(t, deleted, 25)
 	require.True(t, fake.Has(ServicePolicies, "other"))
 }
+
+func TestIntegerTypeMatchesNothing(t *testing.T) {
+	fake := New()
+	defer fake.Close()
+	ziti := automation.NewZitiAutomationWithEdge(fake.Edge())
+	tags := automation.ZrokShareTags("share-one").ToRestModel()
+	fake.SeedPolicyWithID("dial", "dial", tags, rest_model.DialBindDial)
+	fake.SeedPolicyWithID("bind", "bind", tags, rest_model.DialBindBind)
+	find := func(filter string) int {
+		items, err := ziti.ServicePolicies.Find(&automation.FilterOptions{Filter: filter})
+		require.NoError(t, err, filter)
+		return len(items)
+	}
+
+	require.Equal(t, 1, find(`tags.zrokShareToken="share-one" and type=1`))
+	require.Equal(t, 1, find(`tags.zrokShareToken="share-one" and type=2`))
+
+	fake.IntegerTypeMatchesNothing(true)
+	require.Zero(t, find(`tags.zrokShareToken="share-one" and type=1`))
+	require.Zero(t, find(`tags.zrokShareToken="share-one" and type=2`))
+	require.Equal(t, 2, find(`tags.zrokShareToken="share-one"`))
+}

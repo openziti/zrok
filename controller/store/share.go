@@ -261,3 +261,40 @@ func (str *Store) FindSharesForAccountWithFilter(accountId int, filter *ShareFil
 
 	return results, nil
 }
+
+// a live share whose environment is deleted or belongs to a deleted account. the second half counts the
+// shares of environments the sweep has yet to delete, so a survey sees them before the environments go.
+const strandedSharesWhere = `where not s.deleted
+	  and exists (select 1 from environments e where e.id = s.environment_id
+	              and (e.deleted or exists (select 1 from accounts a where a.id = e.account_id and a.deleted)))`
+
+// CountStrandedShares counts the live shares whose environment is deleted or belongs to a deleted account.
+func (str *Store) CountStrandedShares(trx *sqlx.Tx) (int, error) {
+	var count int
+	if err := trx.QueryRow("select count(*) from shares s " + strandedSharesWhere).Scan(&count); err != nil {
+		return 0, errors.Wrap(err, "error counting stranded shares")
+	}
+	return count, nil
+}
+
+// FindStrandedShares lists, lowest id first, up to limit live shares whose environment is deleted or
+// belongs to a deleted account.
+func (str *Store) FindStrandedShares(limit int, trx *sqlx.Tx) ([]*Share, error) {
+	rows, err := trx.Unsafe().Queryx("select s.* from shares s "+strandedSharesWhere+" order by s.id limit $1", limit)
+	if err != nil {
+		return nil, errors.Wrap(err, "error finding stranded shares")
+	}
+	defer func() { _ = rows.Close() }()
+	var shrs []*Share
+	for rows.Next() {
+		shr := &Share{}
+		if err := rows.StructScan(shr); err != nil {
+			return nil, errors.Wrap(err, "error scanning stranded share")
+		}
+		shrs = append(shrs, shr)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error iterating stranded shares")
+	}
+	return shrs, nil
+}
