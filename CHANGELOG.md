@@ -2,37 +2,23 @@
 
 ## Unreleased
 
-CHANGE: **Share and access commands now exit with status 2, not 1, when the zrok controller refuses the request.** Scripts that test for status 1 must also accept 2. `zrok2 share public`, `zrok2 share private` and `zrok2 access private` now exit with status 2 when the zrok controller refuses the request (a 4xx such as a name already held by another share), with a message saying that retrying will not change the answer, and with status 1 for failures a later retry may fix (the controller unreachable, busy or failing); when the controller is busy the message says how many seconds to wait. A process supervisor can now stop restarting on status 2, for example with systemd's `RestartPreventExitStatus=2`.
+CHANGE: **Share and access commands exit with status 2, not 1, when the controller refuses the request.** `zrok2 share public`, `zrok2 share private` and `zrok2 access private` exit 2 for a refusal a retry cannot change (such as a name held by another share, now named in the message) and 1 for a failure a retry may fix (the controller unreachable, busy or failing; a busy controller says how many seconds to wait). Scripts that test for status 1 must also accept 2; a supervisor can stop restarting on 2, for example with systemd's `RestartPreventExitStatus=2`.
 
-CHANGE: **Admin repair commands no longer migrate the store.** `zrok2 admin gc`, `zrok2 admin repair-dial-policies` and `zrok2 admin repair-store` no longer migrate the store's schema when they open it, even when the configuration allows auto-migration, so a dry run never changes the database; against a store whose schema is behind the binary, run `zrok2 admin migrate` or start the controller first.
+CHANGE: **Admin repair commands no longer migrate the store.** `zrok2 admin gc`, `zrok2 admin repair-dial-policies` and `zrok2 admin repair-store` open the store without migrating it, so a dry run never changes the database; run `zrok2 admin migrate` or start the controller first when the schema is behind the binary.
 
-FEATURE: Admin `GET /name/{namespaceToken}/{name}` returns one name with its owner and current share token for reconciling names without listing them all.
+FEATURE: `zrok2 admin repair-store <configPath>` releases what earlier versions left behind: names and frontend mappings still attached to deleted shares, stranded environments, shares, accesses and names. It is a dry run by default that counts and samples what it would repair, and repairs in small batches with `--apply`.
 
-FEATURE: A new `zrok2 admin repair-store <configPath>` command releases the names and frontend mappings still attached to shares that no longer exist, left behind by earlier versions, along with stranded environments, shares, accesses and names; it is a dry run by default that counts and samples what it would repair, and repairs in small batches with `--apply`.
+FEATURE: Admin `GET /name/{namespaceToken}/{name}` returns one name with its owner and current share token, for reconciling names without listing them all.
 
-FIX: The `zrok2-instance` Docker Compose bootstrap no longer fails with `/bootstrap/zrok2-bootstrap.bash: is a directory` when run from a fetched compose directory; the init container sources the bootstrap library shipped in the `openziti/zrok2` image (https://github.com/openziti/zrok/issues/1260).
+FIX: A name whose share no longer exists is released automatically the next time it is used, instead of answering "already in use by another share" forever. Tearing down a share now also releases its private accesses, and deleting an account releases its names.
 
-FIX: Creating an agent enrollment no longer writes the enrollment token to the controller log.
+FIX: `zrok2 share` no longer leaves a share behind when its backend fails to start, so the next attempt creates it cleanly; shutting down a share closes its listener before deleting the share, which removes the OpenZiti `failure creating Bind session` warning. A private share whose chosen token is still in use now says so, and that a recently deleted share's token will be available again shortly.
 
-FIX: A name whose share no longer exists is released automatically the next time it is used, instead of answering "already in use by another share" forever. When a name is held by a live share, the error now names that share and the `zrok2 delete share` command that releases it; tearing down a share now also releases its private accesses, and deleting an account releases its names.
+FIX: `zrok2 disable` keeps the local environment and identity whenever the controller does not complete the request, so a retry has what it needs (https://github.com/openziti/zrok/issues/1265); if the environment no longer exists on the controller, the local copy under `~/.zrok2` can be removed by hand. `zrok2 delete share` accepts a name as well as a share token. `--verbose` enables debug logging (visible in headless mode).
 
-FIX: The embedded interstitial page is served again when no external interstitial file is configured; previously its file name was misspelled, so the frontend served an empty page (https://github.com/openziti/zrok/issues/1262).
+FIX: On OpenZiti 2.x, bandwidth limits, disabling an environment, deleting a private access and agent unenroll now remove the policies they are meant to; previously none of them removed any policy there. A failed agent enrollment no longer leaves its OpenZiti objects behind, and the enrollment token is no longer written to the controller log.
 
-FIX: On OpenZiti 2.x, a bandwidth limit now removes a share's dial policy, disabling an environment and deleting a private access now withdraw a frontend's access, and agent unenroll now deletes the agent remote's dial and bind policies; previously none of these removed any policy there. OpenZiti 1.x behaves as before.
-
-FIX: A failed agent enrollment (`zrok2 agent enroll`) no longer leaves its OpenZiti service, service policies and service edge router policy behind; they are deleted when the enrollment cannot be recorded.
-
-FIX: A share whose backend fails to start (for example, a missing Caddyfile or an unavailable OpenZiti listener) is now deleted before `zrok2 share public` or `zrok2 share private` exits, so the next attempt creates it cleanly instead of failing against the orphaned share.
-
-FIX: `zrok2 disable` now keeps the local environment and identity whenever the zrok controller does not complete the request, so nothing is lost that a retry would need (https://github.com/openziti/zrok/issues/1265). An unreachable, busy or failing controller exits with status 1 and can be retried. A refusal, such as a 401, exits with status 2 and says the controller refused the request; if the environment no longer exists on the controller, the local copy under `~/.zrok2` can be removed by hand. Previously every failure removed the local environment.
-
-FIX: `zrok2 delete share` now accepts a name as well as a share token, and deletes the live share holding that name from the environment that share runs in.
-
-FIX: `--verbose` now enables debug logging; previously it left the log level at info. The interactive share and access displays still show info-level output, so debug lines appear in headless mode (`--headless`) only.
-
-FIX: Shutting down a share no longer logs an OpenZiti `failure creating Bind session` warning; the share's listener is now closed before the share is deleted.
-
-FIX: Creating a private share with a chosen share token that is still in use now answers a conflict that says the token is in use and, if its share was recently deleted, that it will be available again shortly, instead of reporting an OpenZiti "service name already in use".
+FIX: The embedded interstitial page is served again when no external file is configured (https://github.com/openziti/zrok/issues/1262), and the `zrok2-instance` Docker Compose bootstrap no longer fails with `is a directory` when run from a fetched directory (https://github.com/openziti/zrok/issues/1260).
 
 ## v2.0.7
 
