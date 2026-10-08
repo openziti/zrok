@@ -116,6 +116,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**delete_identity**](docs/AdminApi.md#delete_identity) | **DELETE** /identity | 
 *AdminApi* | [**delete_namespace**](docs/AdminApi.md#delete_namespace) | **DELETE** /namespace | 
 *AdminApi* | [**delete_organization**](docs/AdminApi.md#delete_organization) | **DELETE** /organization | 
+*AdminApi* | [**get_name**](docs/AdminApi.md#get_name) | **GET** /name/{namespaceToken}/{name} | 
 *AdminApi* | [**get_skip_interstitial_grant**](docs/AdminApi.md#get_skip_interstitial_grant) | **GET** /skip-interstitial-grant | 
 *AdminApi* | [**grant_skip_interstitial**](docs/AdminApi.md#grant_skip_interstitial) | **POST** /skip-interstitial-grant | 
 *AdminApi* | [**invite_token_generate**](docs/AdminApi.md#invite_token_generate) | **POST** /invite/token/generate | 
@@ -213,6 +214,7 @@ Class | Method | HTTP request | Description
  - [EnvironmentSummary](docs/EnvironmentSummary.md)
  - [EnvironmentsList](docs/EnvironmentsList.md)
  - [Frontend](docs/Frontend.md)
+ - [GetName200Response](docs/GetName200Response.md)
  - [GetSkipInterstitialGrant200Response](docs/GetSkipInterstitialGrant200Response.md)
  - [GetSparklines200Response](docs/GetSparklines200Response.md)
  - [GetSparklinesRequest](docs/GetSparklinesRequest.md)

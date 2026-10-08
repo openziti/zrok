@@ -132,6 +132,20 @@ func (str *Store) FindNamesWithShareTokensForAccountAndNamespace(accountId, name
 	return names, nil
 }
 
+func (str *Store) FindNameWithShareTokenByNamespaceAndName(namespaceId int, name string, trx *sqlx.Tx) (*NameWithShareToken, error) {
+	query := `select n.id, n.created_at, n.updated_at, n.deleted, n.namespace_id, n.name, n.account_id, n.reserved, s.token as share_token
+			from names n
+			left join share_name_mappings snm on n.id = snm.name_id and not snm.deleted
+			left join shares s on snm.share_id = s.id and not s.deleted
+			where n.namespace_id = $1 and n.name = $2 and not n.deleted`
+
+	nwst := &NameWithShareToken{}
+	if err := trx.QueryRowx(query, namespaceId, name).Scan(&nwst.Name.Id, &nwst.Name.CreatedAt, &nwst.Name.UpdatedAt, &nwst.Name.Deleted, &nwst.Name.NamespaceId, &nwst.Name.Name, &nwst.Name.AccountId, &nwst.Name.Reserved, &nwst.ShareToken); err != nil {
+		return nil, errors.Wrap(err, "error finding name with share token by namespace and name")
+	}
+	return nwst, nil
+}
+
 func (str *Store) FindNamesForShare(shareId int, trx *sqlx.Tx) ([]*NameWithNamespace, error) {
 	sql := `select n.id, n.created_at, n.updated_at, n.deleted, n.namespace_id,
 	               n.name, n.account_id, n.reserved,

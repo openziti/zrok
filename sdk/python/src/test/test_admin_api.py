@@ -122,6 +122,12 @@ class TestAdminApi(unittest.TestCase):
         """
         pass
 
+    def test_get_name(self) -> None:
+        """Test case for get_name
+
+        """
+        pass
+
     def test_get_skip_interstitial_grant(self) -> None:
         """Test case for get_skip_interstitial_grant
 

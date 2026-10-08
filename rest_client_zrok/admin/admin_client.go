@@ -129,6 +129,8 @@ type ClientService interface {
 
 	DeleteOrganization(params *DeleteOrganizationParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DeleteOrganizationOK, error)
 
+	GetName(params *GetNameParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetNameOK, error)
+
 	GetSkipInterstitialGrant(params *GetSkipInterstitialGrantParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetSkipInterstitialGrantOK, error)
 
 	GrantSkipInterstitial(params *GrantSkipInterstitialParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GrantSkipInterstitialOK, error)
@@ -871,6 +873,50 @@ func (a *Client) DeleteOrganization(params *DeleteOrganizationParams, authInfo r
 	//
 	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for deleteOrganization: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+GetName get name API
+*/
+func (a *Client) GetName(params *GetNameParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetNameOK, error) {
+	// NOTE: parameters are not validated before sending
+	if params == nil {
+		params = NewGetNameParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getName",
+		Method:             "GET",
+		PathPattern:        "/name/{namespaceToken}/{name}",
+		ProducesMediaTypes: []string{"application/zrok.v1+json"},
+		ConsumesMediaTypes: []string{"application/zrok.v1+json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetNameReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+
+	// only one success response has to be checked
+	success, ok := result.(*GetNameOK)
+	if ok {
+		return success, nil
+	}
+
+	// unexpected success response.
+
+	// no default response is defined.
+	//
+	// safeguard: normally, in the absence of a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getName: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

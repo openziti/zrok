@@ -29,6 +29,7 @@ import type {
   CreateOrganization201Response,
   CreateOrganizationRequest,
   DeleteIdentityRequest,
+  GetName200Response,
   GetSkipInterstitialGrant200Response,
   InviteTokenGenerateRequest,
   LimitClass,
@@ -75,6 +76,8 @@ import {
     CreateOrganizationRequestToJSON,
     DeleteIdentityRequestFromJSON,
     DeleteIdentityRequestToJSON,
+    GetName200ResponseFromJSON,
+    GetName200ResponseToJSON,
     GetSkipInterstitialGrant200ResponseFromJSON,
     GetSkipInterstitialGrant200ResponseToJSON,
     InviteTokenGenerateRequestFromJSON,
@@ -171,6 +174,11 @@ export interface DeleteNamespaceRequest {
 
 export interface DeleteOrganizationRequest {
     body?: CreateOrganization201Response;
+}
+
+export interface GetNameRequest {
+    namespaceToken: string;
+    name: string;
 }
 
 export interface GetSkipInterstitialGrantRequest {
@@ -773,6 +781,53 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async deleteOrganization(requestParameters: DeleteOrganizationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteOrganizationRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async getNameRaw(requestParameters: GetNameRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetName200Response>> {
+        if (requestParameters['namespaceToken'] == null) {
+            throw new runtime.RequiredError(
+                'namespaceToken',
+                'Required parameter "namespaceToken" was null or undefined when calling getName().'
+            );
+        }
+
+        if (requestParameters['name'] == null) {
+            throw new runtime.RequiredError(
+                'name',
+                'Required parameter "name" was null or undefined when calling getName().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["x-token"] = await this.configuration.apiKey("x-token"); // key authentication
+        }
+
+
+        let urlPath = `/name/{namespaceToken}/{name}`;
+        urlPath = urlPath.replace(`{${"namespaceToken"}}`, encodeURIComponent(String(requestParameters['namespaceToken'])));
+        urlPath = urlPath.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters['name'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => GetName200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getName(requestParameters: GetNameRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetName200Response> {
+        const response = await this.getNameRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
