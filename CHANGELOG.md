@@ -2,9 +2,11 @@
 
 ## Unreleased
 
-CHANGE: Official builds now use Go 1.27.3, with CI and source-build Docker images using the same compiler version. Building from source still requires Go 1.26 or newer.
+## v2.0.9
 
 FIX: Web shares no longer panic while starting Caddy when built with Go 1.27 or the JSON v2 experiment. The embedded Caddy dependency is updated from 2.9.1 to 2.11.7 to recognize the JSON type used by these builds, allowing both terminal and headless web shares to start. This update also requires newer shared dependencies, including Go OpenAPI, gRPC and OpenTelemetry.
+
+CHANGE: Official builds now use Go 1.27.3, with CI and source-build Docker images using the same compiler version. Building from source still requires Go 1.26 or newer.
 
 ## v2.0.8
 
