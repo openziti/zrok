@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## v2.0.9
+FIX: Public shares requested through the agent use the current configured default namespace when none is supplied, including after the configuration changes while the agent is running. Defaults such as 'team:app' select namespace 'team' and name 'app', matching the CLI. Empty namespaces, invalid authentication combinations and OAuth refresh intervals fail before starting a worker. Standalone public shares also stop and clean up when a serving backend fails.
 
 FIX: Web shares no longer panic while starting Caddy when built with Go 1.27 or the JSON v2 experiment. The embedded Caddy dependency is updated from 2.9.1 to 2.11.7 to recognize the JSON type used by these builds, allowing both terminal and headless web shares to start. This update also requires newer shared dependencies, including Go OpenAPI, gRPC and OpenTelemetry.
 

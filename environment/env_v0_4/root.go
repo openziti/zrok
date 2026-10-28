@@ -2,10 +2,12 @@ package env_v0_4
 
 import (
 	"encoding/json"
+	stderrors "errors"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/michaelquigley/df/dd"
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/environment/env_core"
 	"github.com/pkg/errors"
@@ -163,14 +165,15 @@ func loadConfig() (*env_core.Config, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting config file path")
 	}
-	data, err := os.ReadFile(cf)
-	if err != nil {
-		return nil, errors.Wrapf(err, "error reading config file '%v'", cf)
-	}
+	return loadConfigFile(cf)
+}
+
+func loadConfigFile(cf string) (*env_core.Config, error) {
 	cfg := &config{}
-	if err := json.Unmarshal(data, cfg); err != nil {
-		return nil, errors.Wrapf(err, "error unmarshaling config file '%v'", cf)
+	if err := dd.BindFromJSON(cfg, cf); err != nil {
+		return nil, errors.Wrapf(err, "error loading config file '%v'", cf)
 	}
+
 	out := &env_core.Config{
 		ApiEndpoint:      cfg.ApiEndpoint,
 		DefaultNamespace: cfg.DefaultNamespace,
@@ -187,7 +190,11 @@ func saveConfig(cfg *env_core.Config) error {
 		Headless:         cfg.Headless,
 		SuperNetwork:     cfg.SuperNetwork,
 	}
-	data, err := json.MarshalIndent(in, "", "  ")
+	values, err := dd.Unbind(in)
+	if err != nil {
+		return errors.Wrap(err, "error unbinding config")
+	}
+	data, err := json.MarshalIndent(values, "", "  ")
 	if err != nil {
 		return errors.Wrap(err, "error marshaling config")
 	}
@@ -287,14 +294,36 @@ type metadata struct {
 }
 
 type config struct {
-	ApiEndpoint      string `json:"api_endpoint"`
-	DefaultNamespace string `json:"default_namespace"`
-	Headless         bool   `json:"headless"`
-	SuperNetwork     bool   `json:"super_network"`
+	ApiEndpoint      string `dd:"api_endpoint"`
+	DefaultNamespace string `dd:"default_namespace"`
+	Headless         bool   `dd:"headless"`
+	SuperNetwork     bool   `dd:"super_network"`
 }
 
 type environment struct {
 	AccountToken string `json:"zrok_token"`
 	ZId          string `json:"ziti_identity"`
 	ApiEndpoint  string `json:"api_endpoint"`
+}
+
+// FreshDefaultNamespace reads only the current namespace setting at the operation's original root.
+// it deliberately leaves cached configuration and environment credentials untouched.
+func FreshDefaultNamespace(root env_core.Root) (string, error) {
+	if value := os.Getenv("ZROK2_DEFAULT_NAMESPACE"); value != "" {
+		return value, nil
+	}
+	if root.Metadata() == nil || root.Metadata().RootPath == "" {
+		return "", errors.New("missing environment root path")
+	}
+	cfg, err := loadConfigFile(filepath.Join(root.Metadata().RootPath, "config.json"))
+	if stderrors.Is(err, os.ErrNotExist) {
+		return "public", nil
+	}
+	if err != nil {
+		return "", err
+	}
+	if cfg.DefaultNamespace != "" {
+		return cfg.DefaultNamespace, nil
+	}
+	return "public", nil
 }
