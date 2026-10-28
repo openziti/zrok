@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -163,7 +164,31 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 }
 
 // runBackend contains no controller resource operations. its caller owns the share lifecycle.
+type publicBackendFactory func(context.Context, chan *endpoints.Request) (shareBackend, error)
+
 func (cmd *sharePublicCommand) runBackend(ctx context.Context, root env_core.Root, req *sdk.ShareRequest, shr *sdk.Share) error {
+	return cmd.serveBackend(ctx, req, shr, func(_ context.Context, requests chan *endpoints.Request) (shareBackend, error) {
+		return newPublicBackend(root, req, shr, cmd.insecure, requests)
+	})
+}
+
+// runWorker registers EOF and signal control before construction and has no controller resource capability.
+// the CLI and agent switch to this supplied-token runner together in stage 4.
+func (cmd *sharePublicCommand) runWorker(parent context.Context, input io.ReadCloser, req *sdk.ShareRequest, shr *sdk.Share, construct publicBackendFactory) error {
+	if shr == nil || strings.TrimSpace(shr.Token) == "" {
+		return fmt.Errorf("public worker requires a share token")
+	}
+	ctx, stop, err := subordinate.WorkerContext(parent, input)
+	if err != nil {
+		return err
+	}
+	defer stop()
+	worker := *cmd
+	worker.subordinate = true
+	return worker.serveBackend(ctx, req, shr, construct)
+}
+
+func (cmd *sharePublicCommand) serveBackend(ctx context.Context, req *sdk.ShareRequest, shr *sdk.Share, construct publicBackendFactory) error {
 	if ctx.Err() != nil {
 		return nil
 	}
@@ -177,7 +202,7 @@ func (cmd *sharePublicCommand) runBackend(ctx context.Context, root env_core.Roo
 	started := make(chan error, 1)
 	go func() {
 		started <- runner.start(ctx, string(req.BackendMode), func() (shareBackend, error) {
-			return newPublicBackend(root, req, shr, cmd.insecure, requests)
+			return construct(ctx, requests)
 		})
 	}()
 	// cancellation can arrive during a blocking constructor. mark the holder stopping before joining it.

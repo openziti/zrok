@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"errors"
+	"io"
 	"path/filepath"
 	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/openziti/zrok/v2/endpoints"
 	"github.com/openziti/zrok/v2/environment/env_core"
 	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 	"github.com/stretchr/testify/require"
@@ -165,4 +167,39 @@ func TestStandalonePublicLifecycle(t *testing.T) {
 	require.ErrorIs(t, err, failure)
 	require.ErrorIs(t, err, deleteErr)
 	require.ErrorContains(t, err, "'known'")
+}
+
+func TestPublicWorkerEOFWhileConstructing(t *testing.T) {
+	input, parent := io.Pipe()
+	defer parent.Close()
+	entered := make(chan struct{})
+	be := &publicTestBackend{}
+	result := make(chan error, 1)
+	cmd := &sharePublicCommand{}
+	go func() {
+		result <- cmd.runWorker(context.Background(), input, &sdk.ShareRequest{BackendMode: sdk.ProxyBackendMode}, &sdk.Share{Token: "owned"}, func(ctx context.Context, _ chan *endpoints.Request) (shareBackend, error) {
+			close(entered)
+			<-ctx.Done()
+			return be, nil
+		})
+	}()
+	<-entered
+	require.NoError(t, parent.Close())
+	require.NoError(t, receivePublicResult(t, result))
+	require.EqualValues(t, 0, be.runs.Load())
+	require.EqualValues(t, 1, be.stops.Load())
+}
+
+func TestPublicWorkerServingFailure(t *testing.T) {
+	input, parent := io.Pipe()
+	defer parent.Close()
+	failure := errors.New("worker backend failed")
+	be := &publicTestBackend{run: func() error { return failure }}
+	cmd := &sharePublicCommand{}
+	result := make(chan error, 1)
+	go func() {
+		result <- cmd.runWorker(context.Background(), input, &sdk.ShareRequest{BackendMode: sdk.ProxyBackendMode}, &sdk.Share{Token: "owned"}, func(context.Context, chan *endpoints.Request) (shareBackend, error) { return be, nil })
+	}()
+	require.ErrorIs(t, receivePublicResult(t, result), failure)
+	require.EqualValues(t, 1, be.stops.Load())
 }
