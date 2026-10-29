@@ -12,6 +12,19 @@ import (
 	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
 
+// publicLifecycle keeps resource ownership outside the backend-only worker path.
+func (cmd *sharePublicCommand) publicLifecycle(root env_core.Root, req *sdk.ShareRequest,
+	create func(env_core.Root, *sdk.ShareRequest) (*sdk.Share, error),
+	remove func(env_core.Root, *sdk.Share) error, run func(*sdk.Share) error) error {
+	if err := cmd.validateWorkerOptions(); err != nil {
+		return err
+	}
+	if cmd.subordinate {
+		return run(&sdk.Share{Token: cmd.shareToken})
+	}
+	return publicShareLifecycle(root, req, create, remove, run)
+}
+
 // publicShareLifecycle leaves backend execution to run, whose return joins backend stop before deletion.
 func publicShareLifecycle(root env_core.Root, req *sdk.ShareRequest,
 	create func(env_core.Root, *sdk.ShareRequest) (*sdk.Share, error),

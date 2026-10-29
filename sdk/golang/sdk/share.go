@@ -1,17 +1,38 @@
 package sdk
 
 import (
+	"context"
 	"strings"
 
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/rest_client_zrok"
 	"github.com/openziti/zrok/v2/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/v2/rest_client_zrok/share"
 	"github.com/openziti/zrok/v2/rest_model_zrok"
 	"github.com/pkg/errors"
 )
 
+func shareClient(ctx context.Context, root env_core.Root) (*rest_client_zrok.Zrok, error) {
+	if ctx != nil {
+		return env_core.ClientContext(ctx, root)
+	}
+	return root.Client()
+}
+
 func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
+	return createShare(nil, root, request)
+}
+
+// CreateShareContext bounds initialization and creation with the same context.
+func CreateShareContext(ctx context.Context, root env_core.Root, request *ShareRequest) (*Share, error) {
+	if ctx == nil {
+		return nil, errors.New("missing share creation context")
+	}
+	return createShare(ctx, root, request)
+}
+
+func createShare(ctx context.Context, root env_core.Root, request *ShareRequest) (*Share, error) {
 	if !root.IsEnabled() {
 		return nil, errors.New("environment is not enabled; enable with 'zrok2 enable' first!")
 	}
@@ -44,7 +65,8 @@ func CreateShare(root env_core.Root, request *ShareRequest) (*Share, error) {
 		out.Body.AuthScheme = string(Oauth)
 	}
 
-	zrok, err := root.Client()
+	out.Context = ctx
+	zrok, err := shareClient(ctx, root)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting zrok client")
 	}
@@ -100,11 +122,24 @@ func newPublicShare(root env_core.Root, request *ShareRequest) *share.ShareParam
 }
 
 func DeleteShare(root env_core.Root, shr *Share) error {
+	return deleteShare(nil, root, shr)
+}
+
+// DeleteShareContext bounds initialization and deletion with the same context.
+func DeleteShareContext(ctx context.Context, root env_core.Root, shr *Share) error {
+	if ctx == nil {
+		return errors.New("missing share deletion context")
+	}
+	return deleteShare(ctx, root, shr)
+}
+
+func deleteShare(ctx context.Context, root env_core.Root, shr *Share) error {
 	req := share.NewUnshareParams()
+	req.Context = ctx
 	req.Body.EnvZID = root.Environment().ZitiIdentity
 	req.Body.ShareToken = shr.Token
 
-	zrok, err := root.Client()
+	zrok, err := shareClient(ctx, root)
 	if err != nil {
 		return errors.Wrap(err, "error getting zrok client")
 	}

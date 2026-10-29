@@ -203,3 +203,42 @@ func TestPublicWorkerServingFailure(t *testing.T) {
 	require.ErrorIs(t, receivePublicResult(t, result), failure)
 	require.EqualValues(t, 1, be.stops.Load())
 }
+
+func TestPublicWorkerOptionMatrix(t *testing.T) {
+	for _, args := range [][]string{
+		{"--share-token", "owned"}, {"--share-token="}, {"--share-token", " "},
+		{"--subordinate"}, {"--subordinate", "--share-token="}, {"--subordinate", "--share-token", "  "},
+	} {
+		cmd := newSharePublicCommand()
+		require.NoError(t, cmd.cmd.ParseFlags(args))
+		calls := 0
+		err := cmd.publicLifecycle(nil, nil,
+			func(env_core.Root, *sdk.ShareRequest) (*sdk.Share, error) {
+				t.Fatal("invalid options created a share")
+				return nil, nil
+			},
+			func(env_core.Root, *sdk.Share) error { t.Fatal("invalid options deleted a share"); return nil },
+			func(*sdk.Share) error { calls++; return nil })
+		require.Error(t, err, "%v", args)
+		require.Zero(t, calls)
+	}
+	private := newSharePrivateCommand()
+	require.NoError(t, private.cmd.ParseFlags([]string{"--share-token", "existing"}))
+	require.Equal(t, "existing", private.shareToken)
+}
+
+func TestPublicSubordinateNeverCreatesOrDeletes(t *testing.T) {
+	failure := errors.New("backend startup failed")
+	for _, runErr := range []error{nil, failure} {
+		cmd := newSharePublicCommand()
+		require.NoError(t, cmd.cmd.ParseFlags([]string{"--subordinate", "--share-token", "owned"}))
+		err := cmd.publicLifecycle(nil, &sdk.ShareRequest{},
+			func(env_core.Root, *sdk.ShareRequest) (*sdk.Share, error) {
+				t.Fatal("worker attempted controller create")
+				return nil, nil
+			},
+			func(env_core.Root, *sdk.Share) error { t.Fatal("worker attempted controller delete"); return nil },
+			func(shr *sdk.Share) error { require.Equal(t, &sdk.Share{Token: "owned"}, shr); return runErr })
+		require.ErrorIs(t, err, runErr)
+	}
+}

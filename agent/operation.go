@@ -66,7 +66,9 @@ type operation struct {
 }
 
 type lifecycleOptions struct {
+	create     time.Duration
 	startup    time.Duration
+	graceful   time.Duration
 	forcedExit time.Duration
 	cleanup    time.Duration
 	shutdown   time.Duration
@@ -74,7 +76,7 @@ type lifecycleOptions struct {
 }
 
 func defaultLifecycleOptions() lifecycleOptions {
-	return lifecycleOptions{6 * time.Minute, 5 * time.Second, 30 * time.Second, 120 * time.Second, 5 * time.Second}
+	return lifecycleOptions{create: time.Minute, startup: 6 * time.Minute, graceful: 5 * time.Second, forcedExit: 5 * time.Second, cleanup: 30 * time.Second, shutdown: 120 * time.Second, server: 5 * time.Second}
 }
 
 func cloneRequest(request any) any {
@@ -165,6 +167,10 @@ func (a *Agent) endWork() {
 
 func (a *Agent) claimStartLocked(op *operation, caller context.Context, origin string) *startAttempt {
 	ctx, cancel := context.WithTimeout(a.ctx, a.options.startup)
+	if _, public := op.request.(*SharePublicRequest); public {
+		cancel()
+		ctx, cancel = context.WithCancel(a.ctx)
+	}
 	attempt := &startAttempt{ctx: ctx, cancel: cancel, caller: caller, done: make(chan struct{})}
 	attempt.detach = context.AfterFunc(caller, cancel)
 	op.start = attempt
@@ -222,7 +228,14 @@ func (a *Agent) joinStart(op *operation, attempt *startAttempt) error {
 
 func (a *Agent) runStart(op *operation, attempt *startAttempt) {
 	defer a.endWork()
-	shr, acc, err := a.launchLegacy(op, attempt)
+	var shr *share
+	var acc *access
+	var err error
+	if req, public := op.request.(*SharePublicRequest); public {
+		shr, err = a.launchPublic(op, attempt, req)
+	} else {
+		shr, acc, err = a.launchLegacy(op, attempt)
+	}
 	attempt.detach()
 	a.mu.Lock()
 	op.shr = shr
@@ -312,11 +325,16 @@ func (a *Agent) runCleanup(op *operation, attempt *cleanupAttempt) {
 	a.mu.Lock()
 	child := op.child
 	snapshot := op.bootSnapshot
+	_, public := op.request.(*SharePublicRequest)
 	a.mu.Unlock()
 	var err error
 	if child != nil {
-		err = proctree.StopChild(child)
-		if err == nil {
+		if public {
+			err = proctree.StopControlledChild(context.Background(), child, a.options.graceful, a.options.forcedExit)
+		} else {
+			err = proctree.StopChild(child)
+		}
+		if err == nil && !public {
 			ctx, cancel := context.WithTimeout(context.Background(), a.options.forcedExit)
 			select {
 			case <-child.Done():
@@ -346,9 +364,13 @@ func (a *Agent) runCleanup(op *operation, attempt *cleanupAttempt) {
 		if acc != nil && acc.frontendToken != "" {
 			err = a.deps.deleteAccess(ctx, acc.token, acc.frontendToken)
 		}
-		if shr != nil && shr.token != "" && (released || !restartEligible(op.request)) {
+		if shr != nil && shr.token != "" && (public || released || !restartEligible(op.request)) {
 			shareDeleted = true
-			err = a.deps.deleteShare(ctx, shr.token)
+			if public {
+				err = a.deps.deletePublic(ctx, shr.token)
+			} else {
+				err = a.deps.deleteShare(ctx, shr.token)
+			}
 		}
 		cancel()
 	}
@@ -362,7 +384,8 @@ func (a *Agent) runCleanup(op *operation, attempt *cleanupAttempt) {
 		a.mu.Lock()
 	}
 	if err != nil {
-		a.recordFailureLocked(op, fmt.Errorf("pending cleanup for '%v': %w", op.resourceToken(), err))
+		err = fmt.Errorf("pending cleanup for '%v': %w", op.resourceToken(), err)
+		a.recordFailureLocked(op, err)
 		op.phase = phaseFailed
 	} else {
 		op.child = nil
@@ -454,18 +477,6 @@ func (a *Agent) launchLegacy(op *operation, attempt *startAttempt) (*share, *acc
 	var handler *UnifiedBootHandler
 	var command []string
 	switch req := op.request.(type) {
-	case *SharePublicRequest:
-		prepared, err := a.preparePublicRequest(req)
-		if err != nil {
-			return nil, nil, err
-		}
-		var names []NameSelection
-		for _, ns := range prepared.NameSelections {
-			names = append(names, NameSelection{NamespaceToken: ns.NamespaceToken, Name: ns.Name})
-		}
-		boot.shr = &share{shareMode: sdk.PublicShareMode, backendMode: prepared.BackendMode, target: prepared.Target, basicAuth: prepared.BasicAuth, nameSelections: names, insecure: req.Insecure, oauthProvider: prepared.OauthProvider, oauthEmailAddressPatterns: prepared.OauthEmailAddressPatterns, closed: req.Closed, accessGrants: prepared.AccessGrants}
-		command = NewSharePublicCommand().BackendMode(req.BackendMode).BasicAuth(prepared.BasicAuth).NameSelections(names).Insecure(req.Insecure).OauthProvider(prepared.OauthProvider).OauthEmailDomains(prepared.OauthEmailAddressPatterns).OauthRefreshInterval(prepared.OauthRefreshInterval.String()).Open(!req.Closed).AccessGrants(prepared.AccessGrants).Target(prepared.Target).Build()
-		handler = NewShareBootHandler(boot.shr, &boot.err)
 	case *SharePrivateRequest:
 		boot.shr = &share{shareMode: sdk.PrivateShareMode, backendMode: sdk.BackendMode(req.BackendMode), target: req.Target, insecure: req.Insecure, closed: req.Closed, accessGrants: req.AccessGrants}
 		builder := NewSharePrivateCommand()

@@ -2,7 +2,11 @@
 
 ## Unreleased
 
+FIX: **Agent-managed public shares are now deleted on shutdown, including named shares.** Reserved names and saved restart requests survive, but restarting creates a new share with a new token. Failed cleanup keeps tokens visible, retries before recreation, and reports unresolved tokens at shutdown.
+
 FIX: **The agent API changes: `Agent.Shutdown()` now returns an error, and `Agent.ReloadRegistry()` is replaced by `Agent.RestoreRegistryOnce()`.** Agent shutdown waits for in-flight startup, share and access cleanup, and saved restart requests before exiting. The agent command now exits 1 instead of 0 if shutdown fails or times out. Releasing a queued or in-flight retry prevents it from returning, and stopping during registry replay preserves requests not yet attempted.
+
+FIX: Public shares routed through the agent now exit 2 when the controller refuses creation, preserving its error message. Temporary controller failures continue to exit 1, including retry advice when the service is busy.
 
 FIX: Releasing agent-managed shares and accesses no longer waits indefinitely for blocked child output. Startup messages split across reads or delivered together are no longer lost.
 

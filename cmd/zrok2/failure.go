@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/go-openapi/runtime"
+	"github.com/openziti/zrok/v2/agent/agentGrpc"
 	"github.com/openziti/zrok/v2/cmd/zrok2/subordinate"
 	"github.com/openziti/zrok/v2/environment"
 	restEnvironment "github.com/openziti/zrok/v2/rest_client_zrok/environment"
@@ -189,12 +190,18 @@ func configuredApiEndpoint() string {
 
 // controllerAnswer returns the status and any error message of a controller response carried by err.
 func controllerAnswer(err error) (status int, payload string, found bool) {
+	if response, ok := agentGrpc.ControllerResponseFromError(err); ok {
+		return response.Status, response.Payload, true
+	}
 	var answer statusError
 	if errors.As(err, &answer) {
-		if withPayload, ok := answer.(interface {
+		switch withPayload := answer.(type) {
+		case interface {
 			GetPayload() rest_model_zrok.ErrorMessage
-		}); ok {
+		}:
 			payload = string(withPayload.GetPayload())
+		case interface{ GetPayload() string }:
+			payload = withPayload.GetPayload()
 		}
 		return answer.Code(), payload, true
 	}
@@ -207,6 +214,9 @@ func controllerAnswer(err error) (status int, payload string, found bool) {
 
 // retryAfterSeconds returns the Retry-After the controller answered with err, or zero when it gave none.
 func retryAfterSeconds(err error) int64 {
+	if response, ok := agentGrpc.ControllerResponseFromError(err); ok {
+		return response.RetryAfter
+	}
 	var shareErr *share.ShareServiceUnavailable
 	if errors.As(err, &shareErr) {
 		return shareErr.RetryAfter

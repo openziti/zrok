@@ -39,6 +39,7 @@ type sharePublicCommand struct {
 	backendMode          string
 	headless             bool
 	subordinate          bool
+	shareToken           string
 	forceLocal           bool
 	forceAgent           bool
 	insecure             bool
@@ -71,6 +72,8 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().StringVarP(&command.backendMode, "backend-mode", "b", "proxy", "The backend mode {proxy, web, caddy, drive}")
 	cmd.Flags().BoolVar(&command.headless, "headless", headless, "Disable TUI and run headless")
 	cmd.Flags().BoolVar(&command.subordinate, "subordinate", false, "Enable agent mode")
+	cmd.Flags().StringVar(&command.shareToken, "share-token", "", "Existing public share token (internal worker option)")
+	_ = cmd.Flags().MarkHidden("share-token")
 	cmd.MarkFlagsMutuallyExclusive("headless", "subordinate")
 	cmd.Flags().BoolVar(&command.forceLocal, "force-local", false, "Skip agent detection and force local mode")
 	cmd.Flags().BoolVar(&command.forceAgent, "force-agent", false, "Skip agent detection and force agent mode")
@@ -89,6 +92,10 @@ func newSharePublicCommand() *sharePublicCommand {
 }
 
 func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
+	if err := cmd.validateWorkerOptions(); err != nil {
+		cmd.error("invalid public worker options", err)
+		return
+	}
 	if cmd.subordinate {
 		logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
 		dlOpts := dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo)
@@ -111,6 +118,17 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		func() { cmd.shareLocal(args, root) },
 		func() { cmd.shareAgent(args, root) },
 	)
+}
+
+func (cmd *sharePublicCommand) validateWorkerOptions() error {
+	supplied := cmd.shareToken != "" || cmd.cmd != nil && cmd.cmd.Flags().Changed("share-token")
+	if supplied && !cmd.subordinate {
+		return newPermanentError("public --share-token requires --subordinate")
+	}
+	if cmd.subordinate && strings.TrimSpace(cmd.shareToken) == "" {
+		return newPermanentError("public --subordinate requires a nonempty --share-token")
+	}
+	return nil
 }
 
 // prepareRequest resolves paths in the invoking shell before either local execution or agent routing.
@@ -145,7 +163,19 @@ func (cmd *sharePublicCommand) prepareRequest(args []string) (*sdk.ShareRequest,
 }
 
 func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
-	req, err := cmd.prepareRequest(args)
+	var req *sdk.ShareRequest
+	var err error
+	if cmd.subordinate {
+		// workers validate execution settings without resolving names or controller authentication.
+		var target string
+		target, err = sharepublic.Target(cmd.backendMode, args)
+		if err == nil && cmd.backendMode != "proxy" {
+			target, err = filepath.Abs(target)
+		}
+		req = &sdk.ShareRequest{ShareMode: sdk.PublicShareMode, BackendMode: sdk.BackendMode(cmd.backendMode), Target: target}
+	} else {
+		req, err = cmd.prepareRequest(args)
+	}
 	if err != nil {
 		cmd.error("unable to create share", err)
 		return
@@ -155,7 +185,12 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 	}
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
-	err = publicShareLifecycle(root, req, sdk.CreateShare, sdk.DeleteShare, func(shr *sdk.Share) error {
+	err = cmd.publicLifecycle(root, req, sdk.CreateShare, sdk.DeleteShare, func(shr *sdk.Share) error {
+		if cmd.subordinate {
+			return cmd.runWorker(ctx, os.Stdin, req, shr, func(_ context.Context, requests chan *endpoints.Request) (shareBackend, error) {
+				return newPublicBackend(root, req, shr, cmd.insecure, requests)
+			})
+		}
 		return cmd.runBackend(ctx, root, req, shr)
 	})
 	if err != nil {
@@ -173,7 +208,6 @@ func (cmd *sharePublicCommand) runBackend(ctx context.Context, root env_core.Roo
 }
 
 // runWorker registers EOF and signal control before construction and has no controller resource capability.
-// the CLI and agent switch to this supplied-token runner together in stage 4.
 func (cmd *sharePublicCommand) runWorker(parent context.Context, input io.ReadCloser, req *sdk.ShareRequest, shr *sdk.Share, construct publicBackendFactory) error {
 	if shr == nil || strings.TrimSpace(shr.Token) == "" {
 		return fmt.Errorf("public worker requires a share token")

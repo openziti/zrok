@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -18,6 +19,7 @@ import (
 	"github.com/openziti/zrok/v2/agent/agentGrpc"
 	"github.com/openziti/zrok/v2/agent/proctree"
 	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -51,15 +53,27 @@ func newLifecycleAgent(t *testing.T) *Agent {
 	a.deps.startChild = func(tail proctree.TailFunction, _ ...string) (*proctree.Child, error) {
 		return lifecycleChild(tail, "boot")
 	}
+	a.deps.createPublic = func(context.Context, *sdk.ShareRequest) (*sdk.Share, error) {
+		return &sdk.Share{Token: "known-token", FrontendEndpoints: []string{"http://share.example"}}, nil
+	}
+	a.deps.deletePublic = func(ctx context.Context, token string) error { return a.deps.deleteShare(ctx, token) }
+	// shared lifecycle fixtures can block either launch path at the same boundary.
+	a.deps.startPublic = func(opts proctree.ControlledOptions, args ...string) (*proctree.Child, error) {
+		return a.deps.startChild(opts.Stdout, args...)
+	}
 	t.Cleanup(func() { _ = a.Shutdown() })
 	return a
 }
 
 func TestAgentLifecycleHelper(t *testing.T) {
 	mode := ""
+	token := "known-token"
 	for index, arg := range os.Args {
 		if arg == "--" && index+1 < len(os.Args) {
 			mode = os.Args[index+1]
+			if index+2 < len(os.Args) {
+				token = os.Args[index+2]
+			}
 			break
 		}
 	}
@@ -67,14 +81,18 @@ func TestAgentLifecycleHelper(t *testing.T) {
 		return
 	}
 	if mode == "boot" {
-		data, _ := json.Marshal(map[string]any{"msg": "boot", "token": "known-token", "frontend_token": "known-frontend", "frontend_endpoints": []string{"http://share.example"}, "bind_address": "127.0.0.1:10000"})
+		data, _ := json.Marshal(map[string]any{"msg": "boot", "token": token, "frontend_token": "known-frontend", "frontend_endpoints": []string{"http://share.example"}, "bind_address": "127.0.0.1:10000"})
 		fmt.Println(string(data))
 	}
-	<-time.NewTimer(time.Hour).C
+	if mode == "eof" {
+		_ = os.Stdout.Close()
+	}
+	_, _ = io.Copy(io.Discard, os.Stdin)
+	os.Exit(0)
 }
 
 func lifecycleChild(tail proctree.TailFunction, mode string) (*proctree.Child, error) {
-	return proctree.StartChild(tail, os.Args[0], "-test.run=^TestAgentLifecycleHelper$", "--", mode)
+	return proctree.StartControlledChild(proctree.ControlledOptions{Stdout: tail}, os.Args[0], "-test.run=^TestAgentLifecycleHelper$", "--", mode)
 }
 func waitLifecycle(t *testing.T, done <-chan struct{}) {
 	t.Helper()
@@ -335,7 +353,8 @@ func TestReleaseCancelsInFlightRetryByFailureID(t *testing.T) {
 	close(finishLaunch)
 	require.NoError(t, lifecycleResult(t, released))
 	require.EqualValues(t, 2, launches.Load())
-	require.EqualValues(t, 1, deletes.Load())
+	// both the failed launch's resource and the cancelled retry's resource are agent-owned.
+	require.EqualValues(t, 2, deletes.Load())
 	a.retryDue(time.Now().Add(time.Hour))
 	require.EqualValues(t, 2, launches.Load())
 	require.Empty(t, savedRegistry(t, a).PublicShares)

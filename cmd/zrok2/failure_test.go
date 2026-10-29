@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/go-openapi/runtime"
+	"github.com/openziti/zrok/v2/agent/agentGrpc"
 	restEnvironment "github.com/openziti/zrok/v2/rest_client_zrok/environment"
 	"github.com/openziti/zrok/v2/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/v2/rest_client_zrok/share"
@@ -17,6 +18,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func TestClassifyFailurePermanentForClientErrors(t *testing.T) {
@@ -140,4 +143,39 @@ func TestBusyMessage(t *testing.T) {
 	assert.Equal(t, "the zrok service is busy, retry in 30 seconds", busyMessage(30))
 	assert.Equal(t, "the zrok service is busy, retry in 1 second", busyMessage(1))
 	assert.Equal(t, "the zrok service is busy, retry shortly", busyMessage(0))
+}
+
+func TestClassifyAgentControllerResponse(t *testing.T) {
+	for _, test := range []struct {
+		response agentGrpc.ControllerResponse
+		code     int
+		detail   string
+	}{
+		{agentGrpc.ControllerResponse{Status: 400, Payload: "client upgrade required"}, exitPermanent, "client upgrade required"},
+		{agentGrpc.ControllerResponse{Status: 409, Payload: "name 'app' is held by share 'existing'"}, exitPermanent, "name 'app' is held by share 'existing'"},
+		{agentGrpc.ControllerResponse{Status: 401}, exitPermanent, "the zrok controller answered '401 unauthorized'; check the account token"},
+		{agentGrpc.ControllerResponse{Status: 429}, exitTransient, "the zrok service is busy, retry shortly"},
+		{agentGrpc.ControllerResponse{Status: 500, Payload: "controller failure"}, exitTransient, "controller failure"},
+		{agentGrpc.ControllerResponse{Status: 503, RetryAfter: 5}, exitTransient, "the zrok service is busy, retry in 5 seconds"},
+	} {
+		rpcError := test.response.AsError(errors.New("controller request failed"))
+		// classification receives a reconstructed wire status, without the server's Go error types.
+		wireStatus := status.Convert(rpcError).Proto()
+		f := classifyFailure(status.FromProto(wireStatus).Err())
+		require.Equal(t, test.code, f.exitCode)
+		require.Equal(t, test.detail, f.detail)
+	}
+	for _, err := range []error{
+		status.Error(codes.Unknown, "controller answered 409"),
+		status.Error(codes.Unavailable, "agent unavailable"),
+	} {
+		require.Equal(t, exitTransient, classifyFailure(err).exitCode, "unstructured RPC errors must stay transient")
+	}
+}
+
+func TestVersionCheckRejectionPreservesCLIMessage(t *testing.T) {
+	err := errors.Wrap(&metadata.ClientVersionCheckBadRequest{Payload: "client upgrade required"}, "client initialization failed")
+	f := classifyFailure(err)
+	require.Equal(t, exitPermanent, f.exitCode)
+	require.Equal(t, "client upgrade required", f.detail)
 }

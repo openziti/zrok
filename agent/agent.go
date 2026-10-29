@@ -24,6 +24,9 @@ import (
 
 type agentDependencies struct {
 	startChild     func(proctree.TailFunction, ...string) (*proctree.Child, error)
+	startPublic    func(proctree.ControlledOptions, ...string) (*proctree.Child, error)
+	createPublic   func(context.Context, *sdk.ShareRequest) (*sdk.Share, error)
+	deletePublic   func(context.Context, string) error
 	deleteShare    func(context.Context, string) error
 	deleteAccess   func(context.Context, string, string) error
 	loadRegistry   func(string) (*Registry, error)
@@ -77,6 +80,10 @@ func NewAgent(cfg *AgentConfig, root env_core.Root) (*Agent, error) {
 	a := &Agent{cfg: &config, root: root, ctx: ctx, cancel: cancel, options: defaultLifecycleOptions(), operations: map[string]*operation{}, retryCalc: newRetryCalculator(&config), idle: idle}
 	a.deps = agentDependencies{
 		startChild:  proctree.StartChild,
+		startPublic: proctree.StartControlledChild,
+		createPublic: func(ctx context.Context, req *sdk.ShareRequest) (*sdk.Share, error) {
+			return sdk.CreateShareContext(ctx, root, req)
+		},
 		deleteShare: func(_ context.Context, token string) error { return sdk.DeleteShare(root, &sdk.Share{Token: token}) },
 		deleteAccess: func(_ context.Context, token, frontend string) error {
 			return sdk.DeleteAccess(root, &sdk.Access{Token: frontend, ShareToken: token})
@@ -85,6 +92,7 @@ func NewAgent(cfg *AgentConfig, root env_core.Root) (*Agent, error) {
 		saveRegistry:   func(registry *Registry, path string) error { return registry.Save(path) },
 		remoteListener: func(token string) (net.Listener, error) { return sdk.NewListener(token, root) },
 	}
+	a.deps.deletePublic = a.deletePublicShare
 	return a, nil
 }
 
