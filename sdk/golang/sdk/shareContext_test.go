@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-openapi/runtime"
 	"github.com/openziti/zrok/v2/environment/env_core"
 	"github.com/openziti/zrok/v2/environment/env_v0_4"
 	"github.com/openziti/zrok/v2/rest_client_zrok"
@@ -135,4 +136,100 @@ func TestShareContextRequiresCapabilityAndLegacyRemainsCompatible(t *testing.T) 
 	require.Equal(t, "created", created.Token)
 	require.NoError(t, DeleteShare(root, created))
 	require.EqualValues(t, 4, requests.Load())
+}
+
+type deadlineShareRoot struct {
+	*contextShareHTTPRoot
+	dispatched chan time.Time
+}
+
+func (r *deadlineShareRoot) ClientContext(ctx context.Context) (*rest_client_zrok.Zrok, error) {
+	client, err := r.contextShareHTTPRoot.ClientContext(ctx)
+	if err == nil {
+		client.SetTransport(&deadlineShareTransport{ClientTransport: client.Transport, dispatched: r.dispatched})
+	}
+	return client, err
+}
+
+type deadlineShareTransport struct {
+	runtime.ClientTransport
+	dispatched chan time.Time
+}
+
+func (t *deadlineShareTransport) Submit(operation *runtime.ClientOperation) (any, error) {
+	var deadline time.Time
+	if operation.Context != nil {
+		deadline, _ = operation.Context.Deadline()
+	}
+	t.dispatched <- deadline
+	return t.ClientTransport.Submit(operation)
+}
+
+func TestShareDeadlineIsUnchangedAfterDelayedVersionCheck(t *testing.T) {
+	for _, operation := range []string{"create", "delete"} {
+		t.Run(operation, func(t *testing.T) {
+			versionEntered, allowVersion, operationEntered, release := make(chan struct{}), make(chan struct{}), make(chan struct{}), make(chan struct{})
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
+				if request.URL.Path == "/api/v2/clientVersionCheck" {
+					close(versionEntered)
+					select {
+					case <-allowVersion:
+					case <-request.Context().Done():
+					}
+					return
+				}
+				close(operationEntered)
+				select {
+				case <-request.Context().Done():
+				case <-release:
+				}
+			}))
+			defer server.Close()
+			defer close(release)
+			t.Setenv("ZROK2_API_ENDPOINT", server.URL)
+			base, err := env_v0_4.Default()
+			require.NoError(t, err)
+			root := &deadlineShareRoot{contextShareHTTPRoot: &contextShareHTTPRoot{&shareHTTPRoot{Root: base}}, dispatched: make(chan time.Time, 1)}
+			ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+			defer cancel()
+			originalDeadline, _ := ctx.Deadline()
+			result := make(chan error, 1)
+			go func() {
+				if operation == "create" {
+					_, err := CreateShareContext(ctx, root, &ShareRequest{ShareMode: PublicShareMode})
+					result <- err
+				} else {
+					result <- DeleteShareContext(ctx, root, &Share{Token: "owned"})
+				}
+			}()
+			select {
+			case <-versionEntered:
+			case <-ctx.Done():
+				t.Fatal("version check was not dispatched")
+			}
+			select {
+			case <-root.dispatched:
+				t.Fatal("operation preceded version approval")
+			default:
+			}
+			close(allowVersion)
+			select {
+			case deadline := <-root.dispatched:
+				require.Equal(t, originalDeadline, deadline, "initialization reset the operation budget")
+			case <-ctx.Done():
+				t.Fatal("operation was not dispatched after version approval")
+			}
+			select {
+			case <-operationEntered:
+			case <-ctx.Done():
+				t.Fatal("generated HTTP transport never reached the operation")
+			}
+			select {
+			case err := <-result:
+				require.ErrorIs(t, err, context.DeadlineExceeded)
+			case <-time.After(time.Second):
+				t.Fatal("stalled operation exceeded the original deadline")
+			}
+		})
+	}
 }
