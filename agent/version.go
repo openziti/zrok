@@ -11,8 +11,11 @@ import (
 func (i *agentGrpcImpl) Version(_ context.Context, _ *agentGrpc.VersionRequest) (*agentGrpc.VersionResponse, error) {
 	v := build.String()
 	dl.Debugf("responding to version inquiry with '%v'", v)
+	i.agent.mu.Lock()
+	endpoint := i.agent.httpEndpoint
+	i.agent.mu.Unlock()
 	return &agentGrpc.VersionResponse{
 		V:               v,
-		ConsoleEndpoint: i.agent.httpEndpoint,
+		ConsoleEndpoint: endpoint,
 	}, nil
 }

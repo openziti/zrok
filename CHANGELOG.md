@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+FIX: **The agent API changes: `Agent.Shutdown()` now returns an error, and `Agent.ReloadRegistry()` is replaced by `Agent.RestoreRegistryOnce()`.** Agent shutdown waits for in-flight startup, share and access cleanup, and saved restart requests before exiting. The agent command now exits 1 instead of 0 if shutdown fails or times out. Releasing a queued or in-flight retry prevents it from returning, and stopping during registry replay preserves requests not yet attempted.
+
 FIX: Releasing agent-managed shares and accesses no longer waits indefinitely for blocked child output. Startup messages split across reads or delivered together are no longer lost.
 
 FIX: Public shares requested through the agent use the current configured default namespace when none is supplied, including after the configuration changes while the agent is running. Defaults such as 'team:app' select namespace 'team' and name 'app', matching the CLI. Empty namespaces, invalid authentication combinations and OAuth refresh intervals fail before starting a worker. Standalone public shares also stop and clean up when a serving backend fails.

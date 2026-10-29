@@ -6,95 +6,30 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/agent/agentGrpc"
-	"github.com/openziti/zrok/v2/agent/proctree"
-	"github.com/openziti/zrok/v2/cmd/zrok2/subordinate"
 	"github.com/openziti/zrok/v2/environment/env_v0_4"
 	"github.com/openziti/zrok/v2/internal/sharepublic"
 	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
 
 func (a *Agent) SharePublic(req *SharePublicRequest) (shareToken string, frontendEndpoint []string, err error) {
-	prepared, err := a.preparePublicRequest(req)
-	if err != nil {
-		return "", nil, err
-	}
-	original := req
-	normalized := *req
-	normalized.Target = prepared.Target
-	normalized.BasicAuth = prepared.BasicAuth
-	normalized.AccessGrants = prepared.AccessGrants
-	normalized.OauthEmailDomains = prepared.OauthEmailAddressPatterns
-	normalized.OauthRefreshInterval = prepared.OauthRefreshInterval.String()
-	normalized.NameSelections = nil
-	for _, selection := range prepared.NameSelections {
-		normalized.NameSelections = append(normalized.NameSelections, NameSelection{NamespaceToken: selection.NamespaceToken, Name: selection.Name})
-	}
-	req = &normalized
-
-	shr := &share{
-		shareMode:   sdk.PublicShareMode,
-		backendMode: sdk.BackendMode(req.BackendMode),
-		request:     original,
-		sub:         subordinate.NewMessageHandler(),
-		agent:       a,
-	}
-	shr.sub.MessageHandler = func(msg subordinate.Message) {
-		dl.Info(msg)
-	}
-	var bootErr error
-	bootHandler := NewShareBootHandler(shr, &bootErr)
-	shr.sub.BootHandler = bootHandler.HandleBoot
-	shr.sub.MalformedHandler = bootHandler.HandleMalformed
-
-	// build command using CommandBuilder
-	shrCmd := NewSharePublicCommand().
-		BackendMode(req.BackendMode).
-		BasicAuth(req.BasicAuth).
-		NameSelections(req.NameSelections).
-		Insecure(req.Insecure).
-		OauthProvider(req.OauthProvider).
-		OauthEmailDomains(req.OauthEmailDomains).
-		OauthRefreshInterval(req.OauthRefreshInterval).
-		Open(!req.Closed).
-		AccessGrants(req.AccessGrants).
-		Target(req.Target).
-		Build()
-
-	// set share properties
-	shr.basicAuth = req.BasicAuth
-	shr.nameSelections = req.NameSelections
-	shr.insecure = req.Insecure
-	shr.oauthProvider = req.OauthProvider
-	shr.oauthEmailAddressPatterns = req.OauthEmailDomains
-	shr.closed = req.Closed
-	shr.accessGrants = req.AccessGrants
-	shr.target = req.Target
-
-	dl.Infof("executing '%v'", shrCmd)
-
-	shr.process, err = proctree.StartChild(shr.sub.Tail, shrCmd...)
-	if err != nil {
-		return "", nil, err
-	}
-
-	<-shr.sub.BootComplete
-
-	if bootErr == nil {
-		go shr.monitor()
-		a.addShare <- shr
-		return shr.token, shr.frontendEndpoints, nil
-
-	} else {
-		if err := proctree.WaitChild(shr.process); err != nil {
-			dl.Errorf("error joining: %v", err)
-		}
-		return "", nil, fmt.Errorf("unable to start share: %v", bootErr)
-	}
+	return a.sharePublic(context.Background(), req)
 }
 
-func (i *agentGrpcImpl) SharePublic(_ context.Context, req *agentGrpc.SharePublicRequest) (*agentGrpc.SharePublicResponse, error) {
+func (a *Agent) sharePublic(ctx context.Context, req *SharePublicRequest) (string, []string, error) {
+	if req == nil {
+		return "", nil, fmt.Errorf("missing public share request")
+	}
+	op, err := a.startRequest(ctx, req)
+	if err != nil {
+		return "", nil, err
+	}
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return op.shr.token, append([]string(nil), op.shr.frontendEndpoints...), nil
+}
+
+func (i *agentGrpcImpl) SharePublic(ctx context.Context, req *agentGrpc.SharePublicRequest) (*agentGrpc.SharePublicResponse, error) {
 	out := &SharePublicRequest{
 		Target:               req.Target,
 		BasicAuth:            req.BasicAuth,
@@ -112,7 +47,7 @@ func (i *agentGrpcImpl) SharePublic(_ context.Context, req *agentGrpc.SharePubli
 		}
 		out.NameSelections = append(out.NameSelections, NameSelection{NamespaceToken: nssIn.NamespaceToken, Name: nssIn.Name})
 	}
-	if shareToken, frontendEndpoints, err := i.agent.SharePublic(out); err == nil {
+	if shareToken, frontendEndpoints, err := i.agent.sharePublic(ctx, out); err == nil {
 		return &agentGrpc.SharePublicResponse{Token: shareToken, FrontendEndpoints: frontendEndpoints}, nil
 	} else {
 		return nil, err

@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"slices"
 	"sort"
 
 	"github.com/openziti/zrok/v2/agent/agentGrpc"
@@ -9,88 +10,59 @@ import (
 )
 
 func (i *agentGrpcImpl) Status(_ context.Context, _ *agentGrpc.StatusRequest) (*agentGrpc.StatusResponse, error) {
-	var accesses []*agentGrpc.AccessDetail
-
-	// active accesses
-	for feToken, acc := range i.agent.accesses {
-		accesses = append(accesses, &agentGrpc.AccessDetail{
-			FrontendToken:   feToken,
-			Token:           acc.token,
-			BindAddress:     acc.bindAddress,
-			ResponseHeaders: acc.responseHeaders,
-			Status:          "active",
-		})
-	}
-
-	// failed accesses
-	for failureId, access := range i.agent.retryManager.accesses {
-		status := "retrying"
-		if i.agent.cfg.MaxRetries > -1 && access.Failure.Count >= i.agent.cfg.MaxRetries {
-			status = "failed"
+	a := i.agent
+	response := &agentGrpc.StatusResponse{}
+	a.mu.Lock()
+	for _, op := range a.operations {
+		if op.phase == phaseIdle {
+			continue
 		}
-		accesses = append(accesses, &agentGrpc.AccessDetail{
-			FrontendToken:   "",
-			Token:           access.Request.ShareToken,
-			BindAddress:     access.Request.BindAddress,
-			ResponseHeaders: access.Request.ResponseHeaders,
-			Status:          status,
-			Failure: &agentGrpc.Failure{
-				Id:        failureId,
-				Count:     int32(access.Failure.Count),
-				LastError: access.Failure.LastError,
-				NextRetry: timestamppb.New(access.Failure.NextRetry),
-			},
-		})
+		status := string(op.phase)
+		var failure *agentGrpc.Failure
+		if op.failure != nil {
+			failure = &agentGrpc.Failure{Id: op.failureID, Count: int32(op.failure.Count), LastError: op.failure.LastError, NextRetry: timestamppb.New(op.failure.NextRetry)}
+			if a.cfg.MaxRetries >= 0 && op.failure.Count >= a.cfg.MaxRetries && op.phase == phaseRetry {
+				status = "failed"
+			}
+		} else if op.phase == phaseQueued || op.phase == phaseStarting {
+			failure = &agentGrpc.Failure{Id: op.id}
+		}
+		switch req := op.request.(type) {
+		case *AccessPrivateRequest:
+			detail := &agentGrpc.AccessDetail{Token: req.ShareToken, BindAddress: req.BindAddress, ResponseHeaders: slices.Clone(req.ResponseHeaders), Status: status, Failure: failure}
+			if op.acc != nil {
+				detail.FrontendToken = op.acc.frontendToken
+				detail.BindAddress = op.acc.bindAddress
+			}
+			response.Accesses = append(response.Accesses, detail)
+		case *SharePublicRequest:
+			detail := &agentGrpc.ShareDetail{ShareMode: "public", BackendMode: req.BackendMode, BackendEndpoint: req.Target, Closed: req.Closed, Status: status, Failure: failure}
+			if op.shr != nil {
+				detail.Token = op.shr.token
+				detail.BackendMode = string(op.shr.backendMode)
+				detail.BackendEndpoint = op.shr.target
+				detail.FrontendEndpoint = slices.Clone(op.shr.frontendEndpoints)
+			}
+			response.Shares = append(response.Shares, detail)
+		case *SharePrivateRequest:
+			detail := &agentGrpc.ShareDetail{ShareMode: "private", BackendMode: req.BackendMode, BackendEndpoint: req.Target, Closed: req.Closed, Status: status, Failure: failure}
+			if op.shr != nil {
+				detail.Token = op.shr.token
+				detail.BackendMode = string(op.shr.backendMode)
+				detail.BackendEndpoint = op.shr.target
+				detail.FrontendEndpoint = slices.Clone(op.shr.frontendEndpoints)
+			}
+			response.Shares = append(response.Shares, detail)
+		}
 	}
-
-	sort.Slice(accesses, func(i, j int) bool {
-		return accesses[i].Token < accesses[j].Token
+	a.mu.Unlock()
+	sort.Slice(response.Accesses, func(i, j int) bool { return response.Accesses[i].Token < response.Accesses[j].Token })
+	sort.Slice(response.Shares, func(i, j int) bool {
+		left, right := response.Shares[i], response.Shares[j]
+		if left.BackendEndpoint != right.BackendEndpoint {
+			return left.BackendEndpoint < right.BackendEndpoint
+		}
+		return left.Token < right.Token
 	})
-
-	var shares []*agentGrpc.ShareDetail
-
-	// active shares
-	for token, shr := range i.agent.shares {
-		shares = append(shares, &agentGrpc.ShareDetail{
-			Token:            token,
-			ShareMode:        string(shr.shareMode),
-			BackendMode:      string(shr.backendMode),
-			FrontendEndpoint: shr.frontendEndpoints,
-			BackendEndpoint:  shr.target,
-			Closed:           shr.closed,
-			Status:           "active",
-		})
-	}
-
-	// Add failed shares with failure IDs
-	for failureId, share := range i.agent.retryManager.publicShares {
-		status := "retrying"
-		if i.agent.cfg.MaxRetries > -1 && share.Failure.Count >= i.agent.cfg.MaxRetries {
-			status = "failed"
-		}
-		shares = append(shares, &agentGrpc.ShareDetail{
-			Token:            "",
-			ShareMode:        "public",
-			BackendMode:      share.Request.BackendMode,
-			FrontendEndpoint: nil,
-			BackendEndpoint:  share.Request.Target,
-			Closed:           share.Request.Closed,
-			Status:           status,
-			Failure: &agentGrpc.Failure{
-				Id:        failureId,
-				Count:     int32(share.Failure.Count),
-				LastError: share.Failure.LastError,
-				NextRetry: timestamppb.New(share.Failure.NextRetry),
-			},
-		})
-	}
-
-	sort.Slice(shares, func(i, j int) bool {
-		if shares[i].BackendEndpoint != shares[j].BackendEndpoint {
-			return shares[i].BackendEndpoint < shares[j].BackendEndpoint
-		}
-		return shares[i].Token < shares[j].Token
-	})
-
-	return &agentGrpc.StatusResponse{Accesses: accesses, Shares: shares}, nil
+	return response, nil
 }

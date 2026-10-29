@@ -3,19 +3,16 @@ package agent
 import (
 	"time"
 
-	"github.com/michaelquigley/df/dl"
-	"github.com/openziti/zrok/v2/agent/proctree"
-	"github.com/openziti/zrok/v2/cmd/zrok2/subordinate"
 	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
 
 type SharePrivateRequest struct {
-	Target            string   `json:"target"`
-	PrivateShareToken string   `json:"private_share_token"`
-	BackendMode       string   `json:"backend_mode"`
-	Insecure          bool     `json:"insecure"`
-	Closed            bool     `json:"closed"`
-	AccessGrants      []string `json:"access_grants"`
+	Target            string   `dd:"target"`
+	PrivateShareToken string   `dd:"private_share_token"`
+	BackendMode       string   `dd:"backend_mode"`
+	Insecure          bool     `dd:"insecure"`
+	Closed            bool     `dd:"closed"`
+	AccessGrants      []string `dd:"access_grants"`
 }
 
 func (spr *SharePrivateRequest) hasReservedToken() bool {
@@ -23,21 +20,21 @@ func (spr *SharePrivateRequest) hasReservedToken() bool {
 }
 
 type NameSelection struct {
-	NamespaceToken string `json:"namespace_token"`
-	Name           string `json:"name"`
+	NamespaceToken string `dd:"namespace_token"`
+	Name           string `dd:"name"`
 }
 
 type SharePublicRequest struct {
-	Target               string          `json:"target"`
-	BasicAuth            []string        `json:"basic_auth"`
-	NameSelections       []NameSelection `json:"name_selections"`
-	BackendMode          string          `json:"backend_mode"`
-	Insecure             bool            `json:"insecure"`
-	OauthProvider        string          `json:"oauth_provider"`
-	OauthEmailDomains    []string        `json:"oauth_email_domains"`
-	OauthRefreshInterval string          `json:"oauth_refresh_interval"`
-	Closed               bool            `json:"closed"`
-	AccessGrants         []string        `json:"access_grants"`
+	Target               string          `dd:"target"`
+	BasicAuth            []string        `dd:"basic_auth"`
+	NameSelections       []NameSelection `dd:"name_selections"`
+	BackendMode          string          `dd:"backend_mode"`
+	Insecure             bool            `dd:"insecure"`
+	OauthProvider        string          `dd:"oauth_provider"`
+	OauthEmailDomains    []string        `dd:"oauth_email_domains"`
+	OauthRefreshInterval string          `dd:"oauth_refresh_interval"`
+	Closed               bool            `dd:"closed"`
+	AccessGrants         []string        `dd:"access_grants"`
 }
 
 func (spr *SharePublicRequest) hasReservedName() bool {
@@ -63,23 +60,4 @@ type share struct {
 	oauthCheckInterval        time.Duration
 	closed                    bool
 	accessGrants              []string
-
-	request          interface{}
-	releaseRequested bool
-	processExited    bool
-	lastError        error
-
-	process *proctree.Child
-	sub     *subordinate.MessageHandler
-
-	agent *Agent
-}
-
-func (s *share) monitor() {
-	if err := proctree.WaitChild(s.process); err != nil {
-		dl.ChannelLog(s.token).Error(err)
-		s.lastError = err
-	}
-	s.processExited = true
-	s.agent.rmShare <- s
 }

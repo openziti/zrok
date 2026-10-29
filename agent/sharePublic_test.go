@@ -44,7 +44,7 @@ func TestPublicPreparationFreshDefault(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, []sdk.NameSelection{{NamespaceToken: "cli-default"}, {NamespaceToken: "team", Name: "app"}}, explicit.NameSelections)
 	req.NameSelections = nil
-	_, _, err = a.SharePublic(req)
+	_, err = a.preparePublicRequest(req)
 	require.Error(t, err) // fails before launching a child
 	t.Setenv("ZROK2_DEFAULT_NAMESPACE", "process-default")
 	override, err := a.preparePublicRequest(req)
@@ -53,7 +53,7 @@ func TestPublicPreparationFreshDefault(t *testing.T) {
 }
 
 func TestPublicPreparationValidation(t *testing.T) {
-	a := &Agent{}
+	a := newLifecycleAgent(t)
 	explicit := []NameSelection{{NamespaceToken: "team", Name: "app"}}
 	for _, req := range []*SharePublicRequest{
 		nil,

@@ -1,291 +1,65 @@
 package agent
 
 import (
+	"context"
 	"math"
 	"time"
-
-	"github.com/jaevor/go-nanoid"
-	"github.com/michaelquigley/df/dl"
 )
 
-type retryManager struct {
-	a             *Agent
-	close         chan struct{}
-	addAccess     chan *AccessRegistryEntry
-	rmAccess      chan string
-	accesses      map[string]*AccessRegistryEntry
-	addPubShare   chan *PublicShareRegistryEntry
-	rmPubShare    chan string
-	publicShares  map[string]*PublicShareRegistryEntry
-	addPrivShare  chan *PrivateShareRegistryEntry
-	rmPrivShare   chan string
-	privateShares map[string]*PrivateShareRegistryEntry
-	retryCalc     *retryCalculator
-}
-
-func newRetryManager(a *Agent) *retryManager {
-	return &retryManager{
-		a:             a,
-		close:         make(chan struct{}),
-		addAccess:     make(chan *AccessRegistryEntry),
-		rmAccess:      make(chan string),
-		accesses:      make(map[string]*AccessRegistryEntry),
-		addPubShare:   make(chan *PublicShareRegistryEntry),
-		rmPubShare:    make(chan string),
-		publicShares:  make(map[string]*PublicShareRegistryEntry),
-		addPrivShare:  make(chan *PrivateShareRegistryEntry),
-		rmPrivShare:   make(chan string),
-		privateShares: make(map[string]*PrivateShareRegistryEntry),
-		retryCalc:     newRetryCalculator(a.cfg),
+func (a *Agent) startRetryLocked() {
+	if a.retryStarted || a.stopping {
+		return
 	}
-}
-
-func (rm *retryManager) stop() {
-	close(rm.close)
-}
-
-func (rm *retryManager) addFailedAccess(failed *AccessRegistryEntry) {
-	rm.addAccess <- failed
-}
-
-func (rm *retryManager) hasFailedAccess(failureId string) bool {
-	_, found := rm.accesses[failureId]
-	return found
-}
-
-func (rm *retryManager) rmFailedAccess(failureId string) {
-	rm.rmAccess <- failureId
-}
-
-func (rm *retryManager) addFailedPublicShare(failed *PublicShareRegistryEntry) {
-	rm.addPubShare <- failed
-}
-
-func (rm *retryManager) hasFailedPublicShare(failureId string) bool {
-	_, found := rm.publicShares[failureId]
-	return found
-}
-
-func (rm *retryManager) rmFailedPublicShare(failureId string) {
-	rm.rmPubShare <- failureId
-}
-
-func (rm *retryManager) addFailedPrivateShare(failed *PrivateShareRegistryEntry) {
-	rm.addPrivShare <- failed
-}
-
-func (rm *retryManager) hasFailedPrivateShare(failureId string) bool {
-	_, found := rm.privateShares[failureId]
-	return found
-}
-
-func (rm *retryManager) rmFailedPrivateShare(failureId string) {
-	rm.rmPrivShare <- failureId
-}
-
-func (rm *retryManager) failures() ([]*AccessRegistryEntry, []*PublicShareRegistryEntry, []*PrivateShareRegistryEntry) {
-	var accesses []*AccessRegistryEntry
-	for _, access := range rm.accesses {
-		accesses = append(accesses, access)
-	}
-	var publicShares []*PublicShareRegistryEntry
-	for _, share := range rm.publicShares {
-		publicShares = append(publicShares, share)
-	}
-	var privateShares []*PrivateShareRegistryEntry
-	for _, share := range rm.privateShares {
-		privateShares = append(privateShares, share)
-	}
-	return accesses, publicShares, privateShares
-}
-
-func (rm *retryManager) run() {
-	dl.Info("started")
-	defer dl.Info("exited")
-
-	for {
-		select {
-		case <-rm.close:
-			return
-
-		case failedAccess := <-rm.addAccess:
-			if failureId, err := rm.generateId(); err == nil {
-				rm.accesses[failureId] = failedAccess
-				dl.Infof("added access failure with id '%v'", failureId)
-			} else {
-				dl.Errorf("error adding access failure: %v", err)
-			}
-
-			if err := rm.a.SaveRegistry(); err != nil {
-				dl.Errorf("error saving registry: %v", err)
-			}
-
-		case failureId := <-rm.rmAccess:
-			delete(rm.accesses, failureId)
-
-			if err := rm.a.SaveRegistry(); err != nil {
-				dl.Errorf("error saving registry: %v", err)
-			}
-
-		case failedPublicShare := <-rm.addPubShare:
-			if shareId, err := rm.generateId(); err == nil {
-				rm.publicShares[shareId] = failedPublicShare
-				dl.Infof("added share with id '%v'", shareId)
-			} else {
-				dl.Errorf("error adding access failure: %v", err)
-			}
-
-			if err := rm.a.SaveRegistry(); err != nil {
-				dl.Errorf("error saving registry: %v", err)
-			}
-
-		case failureId := <-rm.rmPubShare:
-			delete(rm.publicShares, failureId)
-
-			if err := rm.a.SaveRegistry(); err != nil {
-				dl.Errorf("error saving registry: %v", err)
-			}
-
-		case failedPrivShare := <-rm.addPrivShare:
-			if shareId, err := rm.generateId(); err == nil {
-				rm.privateShares[shareId] = failedPrivShare
-				dl.Infof("added private share with id '%v'", shareId)
-			} else {
-				dl.Errorf("error adding private share failure: %v", err)
-			}
-
-			if err := rm.a.SaveRegistry(); err != nil {
-				dl.Errorf("error saving registry: %v", err)
-			}
-
-		case failureId := <-rm.rmPrivShare:
-			delete(rm.privateShares, failureId)
-
-			if err := rm.a.SaveRegistry(); err != nil {
-				dl.Errorf("error saving registry: %v", err)
-			}
-
-		case <-time.After(5 * time.Second):
-			rm.retry()
+	a.retryStarted = true
+	a.beginWorkLocked()
+	go func() {
+		defer a.endWork()
+		interval := a.cfg.RetryCheckInterval
+		if interval <= 0 {
+			interval = 5 * time.Second
 		}
-	}
+		ticker := time.NewTicker(interval)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-a.ctx.Done():
+				return
+			case now := <-ticker.C:
+				a.retryDue(now)
+			}
+		}
+	}()
 }
 
-func (rm *retryManager) retry() {
-	dl.Debug("retrying")
-	defer dl.Debug("exiting")
-
-	registryModified := false
-	newAccesses := make(map[string]*AccessRegistryEntry)
-	for failureId, access := range rm.accesses {
-		if time.Now().After(access.Failure.NextRetry) {
-			if resp, err := rm.a.AccessPrivate(access.Request); err != nil {
-				dl.Errorf("failed to restart private access '%v': %v", access.Request.ShareToken, err)
-				if access.Failure != nil {
-					access.Failure.Count++
-					access.Failure.LastError = err.Error()
-				} else {
-					access.Failure = &FailureEntry{
-						Count:     1,
-						LastError: err.Error(),
-					}
-				}
-
-				// calculate next retry with exponential backoff
-				access.Failure.NextRetry = rm.retryCalc.nextRetryTime(access.Failure.Count)
-				registryModified = true
-				newAccesses[failureId] = access
-
-				dl.Infof("next retry for private access '%v' scheduled for '%v'", failureId, access.Failure.NextRetry)
-
-			} else {
-				access.Failure = nil
-				registryModified = true
-				dl.Infof("restarted private access '%v' -> '%v'", access.Request.ShareToken, resp)
-			}
-		} else {
-			newAccesses[failureId] = access
+func (a *Agent) retryDue(now time.Time) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if a.stopping {
+		return
+	}
+	for _, op := range a.operations {
+		if op.failure == nil || op.failure.NextRetry.After(now) {
+			continue
 		}
-	}
-	rm.accesses = newAccesses
-
-	newShares := make(map[string]*PublicShareRegistryEntry)
-	for failureId, share := range rm.publicShares {
-		if rm.retryCalc.shouldRetry(share.Failure.NextRetry) {
-			if shrToken, fes, err := rm.a.SharePublic(share.Request); err != nil {
-				dl.Errorf("failed to restart public share '%v': %v", failureId, err)
-				if share.Failure != nil {
-					share.Failure.Count++
-					share.Failure.LastError = err.Error()
-				} else {
-					share.Failure = &FailureEntry{
-						Count:     1,
-						LastError: err.Error(),
-					}
-				}
-
-				// calculate next retry with exponential backoff
-				share.Failure.NextRetry = rm.retryCalc.nextRetryTime(share.Failure.Count)
-				registryModified = true
-				newShares[failureId] = share
-
-				dl.Infof("next retry for public share '%v' scheduled for '%v'", failureId, share.Failure.NextRetry)
-
-			} else {
-				share.Failure = nil
-				registryModified = true
-				dl.Infof("restarted public share '%v' -> '%v'", shrToken, fes)
-			}
-		} else {
-			newShares[failureId] = share
+		if op.phase == phaseFailed && (op.child != nil || op.resourceToken() != "") {
+			a.claimCleanupLocked(op)
+			continue
 		}
-	}
-	rm.publicShares = newShares
-
-	newPrivateShares := make(map[string]*PrivateShareRegistryEntry)
-	for failureId, share := range rm.privateShares {
-		if rm.retryCalc.shouldRetry(share.Failure.NextRetry) {
-			if shrToken, err := rm.a.SharePrivate(share.Request); err != nil {
-				dl.Errorf("failed to restart private share '%v': %v", failureId, err)
-				if share.Failure != nil {
-					share.Failure.Count++
-					share.Failure.LastError = err.Error()
-				} else {
-					share.Failure = &FailureEntry{
-						Count:     1,
-						LastError: err.Error(),
-					}
-				}
-
-				// calculate next retry with exponential backoff
-				share.Failure.NextRetry = rm.retryCalc.nextRetryTime(share.Failure.Count)
-				registryModified = true
-				newPrivateShares[failureId] = share
-
-				dl.Infof("next retry for private share '%v' scheduled for '%v'", failureId, share.Failure.NextRetry)
-
-			} else {
-				share.Failure = nil
-				registryModified = true
-				dl.Infof("restarted private share '%v' -> '%v'", share.Request.Target, shrToken)
+		if op.cleanup != nil {
+			select {
+			case <-op.cleanup.done:
+			default:
+				continue
 			}
-		} else {
-			newPrivateShares[failureId] = share
 		}
+		if op.released || op.phase != phaseRetry || !op.desired {
+			continue
+		}
+		if a.cfg.MaxRetries >= 0 && op.failure.Count >= a.cfg.MaxRetries {
+			continue
+		}
+		a.claimStartLocked(op, context.Background(), "retry")
 	}
-	rm.privateShares = newPrivateShares
-
-	if registryModified {
-		rm.a.SaveRegistry()
-	}
-}
-
-func (rm *retryManager) generateId() (string, error) {
-	gen, err := nanoid.CustomASCII("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 8)
-	if err != nil {
-		return "", err
-	}
-	return "err_" + gen(), nil
 }
 
 // retryCalculator provides centralized exponential backoff calculation
