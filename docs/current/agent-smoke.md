@@ -1,6 +1,6 @@
 # Agent smoke
 
-The `agent smoke` workflow (`.github/workflows/agent-smoke.yml`) runs the agent's named public share through an interrupt and a restart on native GitHub-hosted runners, against a live zrok v2 service with a dedicated test account. It builds `zrok2` from the triggering commit on each runner and drives it as a user would. It supplies the native platform evidence recorded in [Agent share lifecycle](agent-share-lifecycle.md). It is the only CI workflow that uses a live service account. It runs on manual dispatch and, temporarily, on pushes to `fixes-209` for validation before merging. No other workflow, required check, release or `Makefile` target depends on it.
+The `agent smoke` workflow (`.github/workflows/agent-smoke.yml`) runs the agent's named public share through an interrupt and a restart on native GitHub-hosted runners, against a live zrok v2 service with a dedicated test account. It builds `zrok2` from the triggering commit on each runner and drives it as a user would. It supplies the native platform evidence recorded in [Agent share lifecycle](agent-share-lifecycle.md). It is the only CI workflow that uses a live service account. It runs only on manual dispatch. No other workflow, required check, release or `Makefile` target depends on it.
 
 One platform matrix runs the same build, fixture, live-scenario and cleanup sequence on each row, each on a fresh runner:
 
@@ -42,7 +42,7 @@ A missing secret fails the live step with an error naming it; no row is green wi
 
 ## Dispatch
 
-To validate before merging, the workflow temporarily also triggers on every push to `fixes-209`; the `zrok-agent-smoke` environment already admits that branch. GitHub reads the workflow from the pushed commit, so these runs need no change on `main`. Find them in Actions under the pushed commit, or use `gh run list --branch fixes-209 --workflow agent-smoke.yml`. Remove the temporary `push` trigger after every platform row passes and before merging, to restore manual-only operation.
+The temporary `fixes-209` push trigger was removed after the operator reported successful runs on all three platforms. Pushing a commit no longer starts this workflow.
 
 GitHub's manual Run workflow button requires the workflow on the default branch. Once it reaches `main`, an authorized operator selects the branch to test: Actions, `agent smoke`, Run workflow, or `gh workflow run agent-smoke.yml --ref <branch>`. The branch must be one the `zrok-agent-smoke` environment admits. The workflow takes no inputs: the checkout is the triggering ref, and the endpoint and namespace come only from the environment's variables.
 
@@ -109,4 +109,4 @@ Without a logged environment identity, cleanup matches the exact description. An
 
 Hosted run [41112465896](https://github.com/openziti/zrok/actions/runs/41112465896) passed on 2026-10-30 at commit `ee5cbd392a34ced018d608699ee6cc6e0b838ece`, using the `macos-15` arm64 runner against the production zrok service. Native process/worker fixtures, agent lifecycle race tests, offline harness tests, the live scenario and fallback cleanup all passed. This supplies the macOS evidence for successful SIGINT shutdown, old-token absence, reserved-name preservation, automatic replay with a different token, public HTTP traffic and final resource cleanup. That run came from the earlier macOS-only workflow, `macos-agent-smoke.yml`, which this workflow replaces.
 
-The generalized three-row workflow has no hosted run yet. Native Linux live validation, native Windows validation (console-event delivery, job-object cleanup, the agent's socket transport and the live scenario) and a macOS regression run await its first run on `fixes-209`. The Windows harness and fixtures have been compiled and vetted from Linux only; compilation is no runtime evidence. When a row completes, record here its run URL, commit, runner OS and architecture, native fixture results, graceful-stop event, scenario result and cleanup outcome. Only a passing row updates its platform's line in [Agent share lifecycle](agent-share-lifecycle.md).
+On 2026-10-30, the operator reported that all three rows of the generalized workflow passed on `fixes-209`: macOS arm64, Linux amd64 and Windows amd64. This supplies the first native Windows pass and regression passes for macOS and Linux after the shared harness refactor. The temporary push trigger has been removed. The run URL, tested commit and detailed step results have not yet been attached here; this result is operator-reported rather than independently inspected.

@@ -4,11 +4,6 @@ name: agent smoke
 # environment, account and recovery procedure.
 on:  # yamllint disable-line rule:truthy
   workflow_dispatch:
-  # temporary validation: run the expanded workflow on the development branch before it reaches main; remove
-  # after every platform row passes, before merging
-  push:
-    branches:
-      - fixes-209
 
 permissions:
   contents: read
