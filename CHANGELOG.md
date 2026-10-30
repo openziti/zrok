@@ -18,6 +18,8 @@ CHANGE: Official builds now use Go 1.27.3, with CI and source-build Docker image
 
 CHANGE: A `macOS agent smoke` workflow builds `zrok2` from the selected branch on a GitHub-hosted macOS runner. It takes an agent-managed named public share through Ctrl-C and a restart against a dedicated zrok test account, checking that the agent exits cleanly, the old share is gone, the reserved name survives and the replayed share has a new token. It runs on manual dispatch and temporarily on pushes to `fixes-209` for validation before merging, needs only the `ZROK2_CI_ACCOUNT_TOKEN` secret in the `zrok-agent-smoke` environment, and leaves existing builds and tests unchanged; see `docs/current/macos-agent-smoke.md`.
 
+FIX: Agent lifecycle tests use short temporary directory names so their Unix sockets fit within macOS path limits. The macOS smoke workflow no longer times out in these fixtures before reaching the live scenario.
+
 ## v2.0.8
 
 CHANGE: **Share and access commands exit with status 2, not 1, when the controller refuses the request.** `zrok2 share public`, `zrok2 share private` and `zrok2 access private` exit 2 for a refusal a retry cannot change (such as a name held by another share, now named in the message) and 1 for a failure a retry may fix (the controller unreachable, busy or failing; a busy controller says how many seconds to wait). Scripts that test for status 1 must also accept 2; a supervisor can stop restarting on 2, for example with systemd's `RestartPreventExitStatus=2`.

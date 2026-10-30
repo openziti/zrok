@@ -42,7 +42,11 @@ func (r *lifecycleRoot) Metadata() *env_core.Metadata { return &env_core.Metadat
 
 func newLifecycleAgent(t *testing.T) *Agent {
 	t.Helper()
-	a, err := NewAgent(DefaultConfig(), &lifecycleRoot{dir: t.TempDir()})
+	// keep the socket path short even under macOS's long temporary directory; t.TempDir includes the test name.
+	dir, err := os.MkdirTemp("", "agent-")
+	require.NoError(t, err)
+	t.Cleanup(func() { require.NoError(t, os.RemoveAll(dir)) })
+	a, err := NewAgent(DefaultConfig(), &lifecycleRoot{dir: dir})
 	require.NoError(t, err)
 	a.options.startup = 5 * time.Second
 	a.options.shutdown = 5 * time.Second
