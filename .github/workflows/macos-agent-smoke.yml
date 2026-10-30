@@ -1,9 +1,13 @@
 name: macOS agent smoke
 
-# manually dispatched only; nothing else depends on this workflow. see docs/current/macos-agent-smoke.md for the
+# isolated smoke workflow; see docs/current/macos-agent-smoke.md for the
 # environment, account and recovery procedure.
 on:  # yamllint disable-line rule:truthy
   workflow_dispatch:
+  # temporary bootstrap: validate the development branch before this workflow reaches main
+  push:
+    branches:
+      - fixes-209
 
 permissions:
   contents: read

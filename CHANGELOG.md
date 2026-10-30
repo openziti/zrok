@@ -16,7 +16,7 @@ FIX: Web shares no longer panic while starting Caddy when built with Go 1.27 or 
 
 CHANGE: Official builds now use Go 1.27.3, with CI and source-build Docker images using the same compiler version. Building from source still requires Go 1.26 or newer.
 
-CHANGE: A manually dispatched `macOS agent smoke` workflow builds `zrok2` from the selected branch on a GitHub-hosted macOS runner. It takes an agent-managed named public share through Ctrl-C and a restart against a dedicated zrok test account, checking that the agent exits cleanly, the old share is gone, the reserved name survives and the replayed share has a new token. It runs only when dispatched, needs only the `ZROK2_CI_ACCOUNT_TOKEN` secret in the `zrok-agent-smoke` environment, and leaves existing builds and tests unchanged; see `docs/current/macos-agent-smoke.md`.
+CHANGE: A `macOS agent smoke` workflow builds `zrok2` from the selected branch on a GitHub-hosted macOS runner. It takes an agent-managed named public share through Ctrl-C and a restart against a dedicated zrok test account, checking that the agent exits cleanly, the old share is gone, the reserved name survives and the replayed share has a new token. It runs on manual dispatch and temporarily on pushes to `fixes-209` for validation before merging, needs only the `ZROK2_CI_ACCOUNT_TOKEN` secret in the `zrok-agent-smoke` environment, and leaves existing builds and tests unchanged; see `docs/current/macos-agent-smoke.md`.
 
 ## v2.0.8
 

@@ -1,6 +1,6 @@
 # macOS agent smoke
 
-The `macOS agent smoke` workflow (`.github/workflows/macos-agent-smoke.yml`) runs the agent's named public share through an interrupt and a restart on a native GitHub-hosted macOS runner, against a live zrok v2 service with a dedicated test account. It builds `zrok2` from the dispatched commit and drives it as a user would. It supplies the native evidence that [Agent share lifecycle](agent-share-lifecycle.md) records as outstanding for macOS. It is the only CI job that uses a live service account. It runs only when an operator dispatches it, and no other workflow, required check, release or `Makefile` target depends on it.
+The `macOS agent smoke` workflow (`.github/workflows/macos-agent-smoke.yml`) runs the agent's named public share through an interrupt and a restart on a native GitHub-hosted macOS runner, against a live zrok v2 service with a dedicated test account. It builds `zrok2` from the triggering commit and drives it as a user would. It supplies the native evidence that [Agent share lifecycle](agent-share-lifecycle.md) records as outstanding for macOS. It is the only CI job that uses a live service account. It runs on manual dispatch and, temporarily, pushes to `fixes-209` for validation before merging. No other workflow, required check, release or `Makefile` target depends on it.
 
 ## What a run proves
 
@@ -30,7 +30,9 @@ A missing secret fails the live step with an error naming it; the job is never g
 
 ## Dispatch
 
-GitHub offers manual dispatch only for workflows present on the default branch, so the workflow file must reach `main` before any run. After that, an authorized operator selects the branch to test: Actions, `macOS agent smoke`, Run workflow, or `gh workflow run macos-agent-smoke.yml --ref <branch>`. The branch must be one the `zrok-agent-smoke` environment admits. The workflow takes no inputs: the checkout is the dispatched ref, and the endpoint and namespace come only from the environment's variables.
+To validate before merging, the workflow temporarily also triggers on every push to `fixes-209`. Commit and push the workflow change on that branch, and ensure the `zrok-agent-smoke` environment admits `fixes-209`. GitHub reads the workflow from the pushed commit, so this first run needs no change on `main`. Find it in Actions under the pushed commit, or use `gh run list --branch fixes-209 --workflow macos-agent-smoke.yml`. Remove the temporary `push` trigger after branch validation and before merging to restore manual-only operation.
+
+GitHub's manual Run workflow button requires the workflow on the default branch. Once it reaches `main`, an authorized operator selects the branch to test: Actions, `macOS agent smoke`, Run workflow, or `gh workflow run macos-agent-smoke.yml --ref <branch>`. The branch must be one the `zrok-agent-smoke` environment admits. The workflow takes no inputs: the checkout is the triggering ref, and the endpoint and namespace come only from the environment's variables.
 
 Runs share one concurrency group and never cancel each other; a second dispatch waits for the first. The job is bounded at 45 minutes, the live step at 20 and fallback cleanup at 5.
 
@@ -92,4 +94,4 @@ Without a logged environment identity, cleanup matches the exact description. An
 
 ## Validation status
 
-No hosted run has been recorded. The workflow and harness were validated locally on Linux/amd64: the tagged offline tests, under the race detector as well, and a check that ordinary package discovery excludes the harness. The workflow file was parsed but not checked with `actionlint`, which was unavailable. When an operator-dispatched run completes, record its URL, commit, runner OS and architecture, scenario result and cleanup outcome here. Only a passing run updates the macOS line in [Agent share lifecycle](agent-share-lifecycle.md).
+No hosted run has been recorded. The workflow and harness were validated locally on Linux/amd64: the tagged offline tests, under the race detector as well, and a check that ordinary package discovery excludes the harness. The workflow file was parsed but not checked with `actionlint`, which was unavailable. When a hosted run completes, record its URL, commit, runner OS and architecture, scenario result and cleanup outcome here. Only a passing run updates the macOS line in [Agent share lifecycle](agent-share-lifecycle.md).
