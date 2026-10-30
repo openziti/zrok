@@ -175,7 +175,11 @@ func (lb *loopback) close() {
 }
 
 // awaitBody fetches the random path through a public endpoint until it returns the exact random body.
+// named endpoints can be bare hostnames; assume https when no scheme is supplied.
 func awaitBody(ctx context.Context, cfg config, endpoint string, lb *loopback) (string, error) {
+	if !strings.Contains(endpoint, "://") {
+		endpoint = "https://" + endpoint
+	}
 	url := strings.TrimSuffix(endpoint, "/") + lb.path
 	client := &http.Client{Timeout: cfg.requestBound}
 	var last error

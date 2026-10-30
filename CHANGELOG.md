@@ -20,6 +20,8 @@ CHANGE: A `macOS agent smoke` workflow builds `zrok2` from the selected branch o
 
 FIX: Agent lifecycle tests use short temporary directory names so their Unix sockets fit within macOS path limits. The macOS smoke workflow no longer times out in these fixtures before reaching the live scenario.
 
+FIX: The macOS agent smoke harness assumes HTTPS for public endpoints returned as bare hostnames, allowing named shares to reach the public response check. Explicit HTTP and HTTPS endpoints keep their supplied scheme.
+
 ## v2.0.8
 
 CHANGE: **Share and access commands exit with status 2, not 1, when the controller refuses the request.** `zrok2 share public`, `zrok2 share private` and `zrok2 access private` exit 2 for a refusal a retry cannot change (such as a name held by another share, now named in the message) and 1 for a failure a retry may fix (the controller unreachable, busy or failing; a busy controller says how many seconds to wait). Scripts that test for status 1 must also accept 2; a supervisor can stop restarting on 2, for example with systemd's `RestartPreventExitStatus=2`.
