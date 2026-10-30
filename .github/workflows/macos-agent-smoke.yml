@@ -1,0 +1,158 @@
+name: macOS agent smoke
+
+# manually dispatched only; nothing else depends on this workflow. see docs/current/macos-agent-smoke.md for the
+# environment, account and recovery procedure.
+on:  # yamllint disable-line rule:truthy
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# one run at a time against the dedicated account; a queued run waits instead of cancelling a live one
+concurrency:
+  group: macos-agent-smoke-zrok2-ci-account
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    name: Named public share restart (macOS arm64)
+    runs-on: macos-15
+    timeout-minutes: 45
+    environment: zrok-agent-smoke
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: fresh runner preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -e "$HOME/.zrok2" ]; then
+            echo "::error::'$HOME/.zrok2' already exists; the smoke runs only on a fresh runner"
+            exit 1
+          fi
+          smoke_dir="$RUNNER_TEMP/agent-smoke"
+          mkdir -p "$smoke_dir/bin"
+          echo "SMOKE_DIR=$smoke_dir" >> "$GITHUB_ENV"
+          version="$(git describe --tags --match 'v2.*' --abbrev=0)"
+          hash="$(git rev-parse HEAD)"
+          echo "SMOKE_VERSION=$version" >> "$GITHUB_ENV"
+          echo "SMOKE_HASH=$hash" >> "$GITHUB_ENV"
+
+      - name: report dispatch
+        shell: bash
+        run: |
+          {
+            echo "### macOS agent smoke"
+            echo ""
+            echo "- ref: \`$GITHUB_REF\`"
+            echo "- commit: \`$SMOKE_HASH\`"
+            echo "- build version: \`$SMOKE_VERSION\`"
+            echo "- runner: \`$RUNNER_OS/$RUNNER_ARCH\` ($(sw_vers -productVersion), $(uname -m))"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .go-version
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: install ui node modules
+        shell: bash
+        run: npm ci
+        working-directory: ui
+
+      - name: build ui
+        shell: bash
+        run: npm run build
+        working-directory: ui
+        env:
+          CI: "true"
+
+      - name: install agent ui node modules
+        shell: bash
+        run: npm ci
+        working-directory: agent/agentUi
+
+      - name: build agent ui
+        shell: bash
+        run: npm run build
+        working-directory: agent/agentUi
+        env:
+          CI: "true"
+
+      - name: build zrok2 and harness
+        shell: bash
+        run: |
+          set -euo pipefail
+          ldflags="-X github.com/openziti/zrok/v2/build.Version=$SMOKE_VERSION -X github.com/openziti/zrok/v2/build.Hash=$SMOKE_HASH"
+          go build -ldflags "$ldflags" -o "$SMOKE_DIR/bin/zrok2" ./cmd/zrok2
+          go build -tags agent_smoke -ldflags "$ldflags" -o "$SMOKE_DIR/bin/agent-smoke" ./tests/agent-smoke
+          "$SMOKE_DIR/bin/zrok2" version
+
+      - name: native process and worker fixtures
+        shell: bash
+        run: go test ./agent/proctree ./cmd/zrok2/subordinate -count=1 -timeout=2m
+
+      - name: agent lifecycle tests
+        shell: bash
+        run: go test -race ./agent -count=1 -timeout=10m
+
+      - name: offline harness tests
+        shell: bash
+        run: go test -tags agent_smoke ./tests/agent-smoke -count=1 -timeout=5m
+
+      - name: live scenario
+        shell: bash
+        timeout-minutes: 20
+        env:
+          ZROK2_CI_ACCOUNT_TOKEN: ${{ secrets.ZROK2_CI_ACCOUNT_TOKEN }}
+          SMOKE_API_ENDPOINT: ${{ vars.ZROK2_SMOKE_API_ENDPOINT || 'https://api-v2.zrok.io' }}
+          SMOKE_NAMESPACE: ${{ vars.ZROK2_SMOKE_NAMESPACE || 'public' }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ZROK2_CI_ACCOUNT_TOKEN:-}" ]; then
+            echo "::error::secret 'ZROK2_CI_ACCOUNT_TOKEN' is not set in the 'zrok-agent-smoke' environment; the live scenario cannot run"
+            exit 1
+          fi
+          "$SMOKE_DIR/bin/agent-smoke" run \
+            --binary "$SMOKE_DIR/bin/zrok2" \
+            --state-dir "$SMOKE_DIR/state" \
+            --api-endpoint "$SMOKE_API_ENDPOINT" \
+            --namespace "$SMOKE_NAMESPACE"
+
+      - name: fallback cleanup
+        if: always()
+        shell: bash
+        timeout-minutes: 5
+        env:
+          ZROK2_CI_ACCOUNT_TOKEN: ${{ secrets.ZROK2_CI_ACCOUNT_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SMOKE_DIR:-}" ] || [ ! -x "$SMOKE_DIR/bin/agent-smoke" ]; then
+            echo "the harness was not built; no live resources were created"
+            exit 0
+          fi
+          "$SMOKE_DIR/bin/agent-smoke" cleanup --state-dir "$SMOKE_DIR/state"
+
+      - name: publish summary
+        if: always()
+        shell: bash
+        run: |
+          shopt -s nullglob
+          for summary in "${SMOKE_DIR:-/nonexistent}"/state/report/*-summary.md; do
+            { echo ""; cat "$summary"; } >> "$GITHUB_STEP_SUMMARY"
+          done
+
+      - name: upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-agent-smoke-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.SMOKE_DIR }}/state/report/
+          retention-days: 7
+          if-no-files-found: warn
