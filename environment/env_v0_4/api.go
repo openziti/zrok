@@ -1,6 +1,7 @@
 package env_v0_4
 
 import (
+	"context"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -40,6 +41,15 @@ func (r *Root) SetConfig(cfg *env_core.Config) error {
 }
 
 func (r *Root) Client() (*rest_client_zrok.Zrok, error) {
+	return r.client(nil)
+}
+
+// ClientContext includes the version check in the caller's operation deadline.
+func (r *Root) ClientContext(ctx context.Context) (*rest_client_zrok.Zrok, error) {
+	return r.client(ctx)
+}
+
+func (r *Root) client(ctx context.Context) (*rest_client_zrok.Zrok, error) {
 	apiEndpoint, _ := r.ApiEndpoint()
 	apiUrl, err := url.Parse(apiEndpoint)
 	if err != nil {
@@ -51,6 +61,7 @@ func (r *Root) Client() (*rest_client_zrok.Zrok, error) {
 
 	zrok := rest_client_zrok.New(transport, strfmt.Default)
 	_, err = zrok.Metadata.ClientVersionCheck(&metadata2.ClientVersionCheckParams{
+		Context: ctx,
 		Body: metadata2.ClientVersionCheckBody{
 			ClientVersion: build.String(),
 		},

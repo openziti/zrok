@@ -2,10 +2,7 @@ package main
 
 import (
 	"fmt"
-	"math"
-	"net/url"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/go-openapi/runtime"
@@ -13,6 +10,7 @@ import (
 	"github.com/openziti/zrok/v2/agent/agentClient"
 	"github.com/openziti/zrok/v2/environment"
 	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/internal/sharepublic"
 	"github.com/openziti/zrok/v2/tui"
 	"github.com/pkg/errors"
 )
@@ -60,29 +58,7 @@ func getEnvironmentAuthOptional(accountToken string) (env_core.Root, runtime.Cli
 }
 
 func parseUrl(in string) (string, error) {
-	// parse port-only urls
-	if iv, err := strconv.ParseInt(in, 10, 0); err == nil {
-		if iv > 0 && iv <= math.MaxUint16 {
-			if iv == 443 {
-				return fmt.Sprintf("https://127.0.0.1:%d", iv), nil
-			}
-			return fmt.Sprintf("http://127.0.0.1:%d", iv), nil
-		}
-		return "", errors.Errorf("ports must be between 1 and %d; %d is not", math.MaxUint16, iv)
-	}
-
-	// make sure either https:// or http:// was specified
-	if !strings.HasPrefix(in, "https://") && !strings.HasPrefix(in, "http://") {
-		in = "http://" + in
-	}
-
-	// parse the url
-	targetEndpoint, err := url.Parse(in)
-	if err != nil {
-		return "", err
-	}
-
-	return targetEndpoint.String(), nil
+	return sharepublic.ParseURL(in)
 }
 
 // detectAndRouteToAgent handles the common pattern of checking if the agent is running

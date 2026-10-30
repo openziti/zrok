@@ -5,6 +5,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/agent"
 	"github.com/openziti/zrok/v2/environment"
 	"github.com/openziti/zrok/v2/tui"
@@ -57,17 +58,18 @@ func (cmd *agentStartCommand) run(_ *cobra.Command, _ []string) {
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	done := make(chan struct{})
+	defer close(done)
+	defer signal.Stop(c)
 	go func() {
-		<-c
-		cmd.shutdown(a)
-		os.Exit(0)
+		select {
+		case <-c:
+			_ = a.Shutdown()
+		case <-done:
+		}
 	}()
-
 	if err := a.Run(); err != nil {
-		tui.Error("agent aborted", err)
+		dl.Errorf("agent failed: %v", err)
+		os.Exit(1)
 	}
-}
-
-func (cmd *agentStartCommand) shutdown(a *agent.Agent) {
-	a.Shutdown()
 }

@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## v2.0.9
+
+FIX: **Agent-managed public shares are now deleted on shutdown, including named shares.** Reserved names and saved restart requests survive, but restarting creates a new share with a new token. Failed cleanup keeps tokens visible, retries before recreation, and reports unresolved tokens at shutdown.
+
+FIX: **The agent API changes: `Agent.Shutdown()` now returns an error, and `Agent.ReloadRegistry()` is replaced by `Agent.RestoreRegistryOnce()`.** Agent shutdown waits for in-flight startup, share and access cleanup, and saved restart requests before exiting. The agent command now exits 1 instead of 0 if shutdown fails or times out. Releasing a queued or in-flight retry prevents it from returning, and stopping during registry replay preserves requests not yet attempted.
+
+FIX: The agent can restore saved shares and accesses from v2.0.8 registries containing null optional fields. Upgrading no longer fails with "expected array for slice"; existing registry files need no manual conversion.
+
+FIX: Public shares routed through the agent now exit 2 when the controller refuses creation, preserving its error message. Temporary controller failures continue to exit 1, including retry advice when the service is busy.
+
+FIX: Releasing agent-managed shares and accesses no longer waits indefinitely for blocked child output. Startup messages split across reads or delivered together are no longer lost.
+
+FIX: Public shares requested through the agent use the current configured default namespace when none is supplied, including after the configuration changes while the agent is running. Defaults such as 'team:app' select namespace 'team' and name 'app', matching the CLI. Empty namespaces, invalid authentication combinations and OAuth refresh intervals fail before starting a worker. Standalone public shares also stop and clean up when a serving backend fails.
+
+FIX: Web shares no longer panic while starting Caddy when built with Go 1.27 or the JSON v2 experiment. The embedded Caddy dependency is updated from 2.9.1 to 2.11.7 to recognize the JSON type used by these builds, allowing both terminal and headless web shares to start. This update also requires newer shared dependencies, including Go OpenAPI, gRPC and OpenTelemetry.
+
+CHANGE: Official builds now use Go 1.27.3, with CI and source-build Docker images using the same compiler version. Building from source still requires Go 1.26 or newer.
+
+CHANGE: A manually dispatched `agent smoke` workflow checks, against a live zrok service on GitHub-hosted macOS, Linux and Windows runners, that the agent removes an agent-managed named public share when it shuts down gracefully and replays it with a new share after a restart. It is separate from existing builds, tests and releases; see `docs/current/agent-smoke.md` for setup and dispatch.
+
 ## v2.0.8
 
 CHANGE: **Share and access commands exit with status 2, not 1, when the controller refuses the request.** `zrok2 share public`, `zrok2 share private` and `zrok2 access private` exit 2 for a refusal a retry cannot change (such as a name held by another share, now named in the message) and 1 for a failure a retry may fix (the controller unreachable, busy or failing; a busy controller says how many seconds to wait). Scripts that test for status 1 must also accept 2; a supervisor can stop restarting on 2, for example with systemd's `RestartPreventExitStatus=2`.

@@ -296,7 +296,9 @@ func (cmd *sharePrivateCommand) shareLocal(cobraCmd *cobra.Command, args []strin
 	default:
 		fail("unable to create share", errors.New("invalid backend mode"))
 	}
-	backend.set(be)
+	if !backend.set(be) {
+		return
+	}
 
 	if startsInline(backendMode) {
 		if err := be.Run(); err != nil {

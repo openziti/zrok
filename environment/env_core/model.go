@@ -1,6 +1,25 @@
 package env_core
 
-import "github.com/openziti/zrok/v2/rest_client_zrok"
+import (
+	"context"
+	"fmt"
+
+	"github.com/openziti/zrok/v2/rest_client_zrok"
+)
+
+// ContextClient is the optional bounded client-construction capability.
+type ContextClient interface {
+	ClientContext(context.Context) (*rest_client_zrok.Zrok, error)
+}
+
+// ClientContext requires bounded initialization rather than silently using a legacy client.
+func ClientContext(ctx context.Context, root Root) (*rest_client_zrok.Zrok, error) {
+	client, ok := root.(ContextClient)
+	if !ok {
+		return nil, fmt.Errorf("environment root does not support context-aware client initialization")
+	}
+	return client.ClientContext(ctx)
+}
 
 // Root is the primary interface encapsulating the on-disk environment data.
 type Root interface {

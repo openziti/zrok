@@ -2,6 +2,10 @@ package agent
 
 import (
 	"errors"
+	"fmt"
+	"strings"
+
+	"github.com/michaelquigley/df/dd"
 
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/cmd/zrok2/subordinate"
@@ -10,6 +14,8 @@ import (
 
 // BootHandlerConfig defines the field mappings for extracting values from boot messages
 type BootHandlerConfig struct {
+	// validate checks the operation-specific boot contract before applying any field setters.
+	validate func(subordinate.Message) error
 	// StringFields maps message keys to functions that set string values
 	StringFields map[string]func(string)
 	// ArrayFields maps message keys to functions that set string array values
@@ -50,6 +56,12 @@ func (ubh *UnifiedBootHandler) HandleMalformed(msg subordinate.Message) {
 
 // processBootMessage extracts field values from boot messages using configured mappings
 func (ubh *UnifiedBootHandler) processBootMessage(msg subordinate.Message) {
+	if ubh.config.validate != nil {
+		if err := ubh.config.validate(msg); err != nil {
+			*ubh.bootErr = err
+			return
+		}
+	}
 	// process string fields
 	for key, setter := range ubh.config.StringFields {
 		if v, found := msg[key]; found {
@@ -79,6 +91,7 @@ func (ubh *UnifiedBootHandler) processBootMessage(msg subordinate.Message) {
 
 // processErrorMessage extracts error information and sets the boot error
 func (ubh *UnifiedBootHandler) processErrorMessage(msg subordinate.Message) {
+	*ubh.bootErr = errors.New("subordinate reported an error without a message")
 	if v, found := msg[subordinate.ErrorMessage]; found {
 		if str, ok := v.(string); ok {
 			*ubh.bootErr = errors.New(str)
@@ -119,4 +132,24 @@ func NewAccessBootHandler(acc *access, bootErr *error) *UnifiedBootHandler {
 		OperationType: "access",
 	}
 	return NewBootHandler(config, bootErr)
+}
+
+// publicWorkerBoot binds the public worker's readiness fields; endpoints remain owned by the parent.
+type publicWorkerBoot struct {
+	Token string `dd:"token,+required"`
+}
+
+// NewPublicWorkerBootHandler checks the parent's existing identity without importing child resource fields.
+func NewPublicWorkerBootHandler(shr *share, bootErr *error) *UnifiedBootHandler {
+	expectedToken := shr.token
+	return NewBootHandler(&BootHandlerConfig{OperationType: "public worker", validate: func(msg subordinate.Message) error {
+		boot, err := dd.New[publicWorkerBoot](msg)
+		if err != nil {
+			return fmt.Errorf("invalid public worker boot: %w", err)
+		}
+		if strings.TrimSpace(expectedToken) == "" || strings.TrimSpace(boot.Token) == "" || boot.Token != expectedToken {
+			return fmt.Errorf("public worker boot token '%v' does not match expected token '%v'", boot.Token, expectedToken)
+		}
+		return nil
+	}}, bootErr)
 }

@@ -4,81 +4,39 @@ package proctree
 
 import (
 	"os/exec"
-	"strings"
 	"sync"
 
 	"github.com/kolesnikovae/go-winjob"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/windows"
 )
 
 var job *winjob.JobObject
+var jobMu sync.Mutex
 
 func Init(name string) error {
-	var err error
+	jobMu.Lock()
+	defer jobMu.Unlock()
 	if job == nil {
+		var err error
 		job, err = winjob.Create(name, winjob.LimitKillOnJobClose, winjob.LimitBreakawayOK)
-		if err != nil {
-			return err
-		}
+		return err
 	}
 	return nil
 }
 
-func StartChild(tail TailFunction, args ...string) (*Child, error) {
-	logrus.Infof("executing '%v'", strings.Join(args, " "))
-
-	cmd := exec.Command(args[0], args[1:]...)
+func configureChild(cmd *exec.Cmd, _ bool) error {
+	if err := Init("zrok Agent"); err != nil {
+		return err
+	}
 	cmd.SysProcAttr = &windows.SysProcAttr{CreationFlags: windows.CREATE_SUSPENDED}
+	return nil
+}
 
-	cld := &Child{
-		TailFunction: tail,
-		cmd:          cmd,
-		outStream:    make(chan []byte),
-		errStream:    make(chan []byte),
-		wg:           new(sync.WaitGroup),
-	}
-
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		return nil, err
-	}
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		return nil, err
-	}
-
-	if err := cmd.Start(); err != nil {
-		return nil, err
-	}
-
+func finishStart(cmd *exec.Cmd) error {
 	if err := job.Assign(cmd.Process); err != nil {
-		return nil, err
-	}
-
-	if err := winjob.ResumeProcess(cmd.Process.Pid); err != nil {
-		return nil, err
-	}
-
-	cld.wg.Add(3)
-	go reader(stdout, cld.outStream, cld.wg)
-	go reader(stderr, cld.errStream, cld.wg)
-	go cld.combiner(cld.wg)
-
-	return cld, nil
-}
-
-func WaitChild(c *Child) error {
-	c.wg.Wait()
-	if err := c.cmd.Wait(); err != nil {
 		return err
 	}
-	return nil
+	return winjob.ResumeProcess(cmd.Process.Pid)
 }
 
-func StopChild(c *Child) error {
-	if err := c.cmd.Process.Kill(); err != nil {
-		return err
-	}
-	return nil
-}
+func killChild(c *Child) error { return c.cmd.Process.Kill() }

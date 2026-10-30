@@ -1,0 +1,24 @@
+{
+  "v": "2",
+  "public_shares": [
+    {
+      "request": {
+        "target": "http://localhost:8080",
+        "basic_auth": null,
+        "name_selections": [
+          {
+            "namespace_token": "public",
+            "name": "fixture-app"
+          }
+        ],
+        "backend_mode": "proxy",
+        "insecure": false,
+        "oauth_provider": "",
+        "oauth_email_domains": null,
+        "oauth_refresh_interval": "",
+        "closed": false,
+        "access_grants": null
+      }
+    }
+  ]
+}

@@ -11,15 +11,22 @@ import (
 )
 
 func (a *Agent) ShareHttpHealthcheck(shareToken, endpoint, httpVerb string, expectedHttpResponse, timeoutMs int) error {
-	if shr, found := a.shares[shareToken]; found {
-		if shr.backendMode == sdk.ProxyBackendMode {
-			return a.doHttpHealthcheck(shr, endpoint, httpVerb, expectedHttpResponse, timeoutMs)
-		} else {
-			return fmt.Errorf("cannot perform http healthcheck on '%v' share '%v'", shr.backendMode, shareToken)
+	a.mu.Lock()
+	var snapshot *share
+	for _, op := range a.operations {
+		if op.phase == phaseActive && op.shr != nil && op.shr.token == shareToken {
+			snapshot = &share{target: op.shr.target, backendMode: op.shr.backendMode}
+			break
 		}
-	} else {
+	}
+	a.mu.Unlock()
+	if snapshot == nil {
 		return fmt.Errorf("share '%v' not found in agent", shareToken)
 	}
+	if snapshot.backendMode != sdk.ProxyBackendMode {
+		return fmt.Errorf("cannot perform http healthcheck on '%v' share '%v'", snapshot.backendMode, shareToken)
+	}
+	return a.doHttpHealthcheck(snapshot, endpoint, httpVerb, expectedHttpResponse, timeoutMs)
 }
 
 func (a *Agent) doHttpHealthcheck(shr *share, endpoint, httpVerb string, expectedHttpResponse, timeoutMs int) error {

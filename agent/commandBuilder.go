@@ -53,7 +53,7 @@ func (cb *CommandBuilder) Target(target string) *CommandBuilder {
 	return cb
 }
 
-// ShareToken adds the --share-token option for private shares
+// ShareToken adds an existing public-share token or a requested private-share token.
 func (cb *CommandBuilder) ShareToken(token string) *CommandBuilder {
 	if token != "" {
 		cb.args = append(cb.args, "--share-token", token)

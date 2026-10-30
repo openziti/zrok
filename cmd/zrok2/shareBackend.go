@@ -27,10 +27,19 @@ type runningBackend struct {
 	stopping bool
 }
 
-func (r *runningBackend) set(be shareBackend) {
+// set rejects a backend constructed after stop was requested.
+func (r *runningBackend) set(be shareBackend) bool {
 	r.mu.Lock()
-	defer r.mu.Unlock()
+	if r.stopping {
+		r.mu.Unlock()
+		if err := be.Stop(); err != nil {
+			dl.Warnf("error stopping backend: %v", err)
+		}
+		return false
+	}
 	r.be = be
+	r.mu.Unlock()
+	return true
 }
 
 // stop closes the backend's listener, if a backend was created; a Run returning after stop is not a
