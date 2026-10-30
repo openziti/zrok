@@ -1,6 +1,15 @@
-# macOS agent smoke
+# Agent smoke
 
-The `macOS agent smoke` workflow (`.github/workflows/macos-agent-smoke.yml`) runs the agent's named public share through an interrupt and a restart on a native GitHub-hosted macOS runner, against a live zrok v2 service with a dedicated test account. It builds `zrok2` from the triggering commit and drives it as a user would. It supplies the native evidence that [Agent share lifecycle](agent-share-lifecycle.md) records as outstanding for macOS. It is the only CI job that uses a live service account. It runs on manual dispatch and, temporarily, pushes to `fixes-209` for validation before merging. No other workflow, required check, release or `Makefile` target depends on it.
+The `agent smoke` workflow (`.github/workflows/agent-smoke.yml`) runs the agent's named public share through an interrupt and a restart on native GitHub-hosted runners, against a live zrok v2 service with a dedicated test account. It builds `zrok2` from the triggering commit on each runner and drives it as a user would. It supplies the native platform evidence recorded in [Agent share lifecycle](agent-share-lifecycle.md). It is the only CI workflow that uses a live service account. It runs on manual dispatch and, temporarily, on pushes to `fixes-209` for validation before merging. No other workflow, required check, release or `Makefile` target depends on it.
+
+One platform matrix runs the same build, fixture, live-scenario and cleanup sequence on each row, each on a fresh runner:
+
+| Row | Runner | Architecture | Graceful stop |
+| --- | --- | --- | --- |
+| macOS arm64 | `macos-15` | arm64 | SIGINT to the agent's process group |
+| Linux amd64 | `ubuntu-24.04` | amd64 | SIGINT to the agent's process group |
+
+Windows is not yet a row; its native validation remains outstanding.
 
 ## What a run proves
 
@@ -9,14 +18,14 @@ The live scenario passes only when every observation holds and final cleanup suc
 1. A fresh environment is enabled with the built CLI's headless enable path, and a new unique name is reserved.
 2. `zrok2 agent start` runs in its own process group and reports the exact build identity the job stamped.
 3. `zrok2 share public --force-agent --open -n <namespace>:<name>` against a loopback server produces exactly one active share in structured agent status, the name is bound to its token, and the public endpoint returns the server's per-run random body. Bare endpoint hostnames are fetched over HTTPS; explicit HTTP or HTTPS schemes are preserved.
-4. SIGINT to the agent's process group, as a terminal Ctrl-C delivers it, ends the agent with exit 0 within 130 seconds. A forced kill is a failure.
+4. The row's graceful-stop event ends the agent with exit 0 within 130 seconds. On macOS and Linux that event is SIGINT to the agent's process group, as a terminal Ctrl-C delivers it. A forced kill is a failure.
 5. A successful authenticated account overview still lists the environment, no longer mentions the share token anywhere, and the name listing shows the name reserved and unbound.
 6. Restarting the agent with the same environment replays the saved request without another share command: exactly one active share, a new token, the old token still absent, the name bound to the replacement and the random body served through it.
 7. A second interrupt repeats the exit, absence and name checks. Cleanup then removes the name and the environment and proves their absence.
 
-Before the live scenario the job runs the native process and worker fixtures (`./agent/proctree`, `./cmd/zrok2/subordinate`), the agent package's lifecycle tests under the race detector, and the harness's offline tests.
+Before the live scenario each row runs the native process and worker fixtures (`./agent/proctree`, `./cmd/zrok2/subordinate`), and the agent package's lifecycle tests and the harness's offline tests under the race detector.
 
-A successful build, passing native fixtures or a run rescued by fallback cleanup does not close the macOS gap; only a run whose scenario steps and run-mode cleanup all pass does. Windows validation and the Linux live check are outside this workflow and remain outstanding.
+A successful build, passing native fixtures or a run rescued by fallback cleanup does not close a platform's gap; only a row whose scenario steps and run-mode cleanup all pass does. Each row's result stands alone: a passing macOS row is no evidence for Linux, and a row cancelled while queued is not a result. Windows validation is outside this workflow and remains outstanding.
 
 ## Setup
 
@@ -26,17 +35,17 @@ The operator does these once, in repository settings. No step needs an admin tok
 - A GitHub environment named `zrok-agent-smoke`, with deployment branches restricted to trusted branches, holding the secret `ZROK2_CI_ACCOUNT_TOKEN` (the dedicated account's token). An environment secret reaches only jobs that reference that environment, and within the job only the live scenario and fallback cleanup steps receive it.
 - Optionally, environment variables `ZROK2_SMOKE_API_ENDPOINT` and `ZROK2_SMOKE_NAMESPACE` to target a dedicated service. The defaults are `https://api-v2.zrok.io` and `public`.
 
-A missing secret fails the live step with an error naming it; the job is never green without the live scenario.
+A missing secret fails the live step with an error naming it; no row is green without the live scenario.
 
 ## Dispatch
 
-To validate before merging, the workflow temporarily also triggers on every push to `fixes-209`. Commit and push the workflow change on that branch, and ensure the `zrok-agent-smoke` environment admits `fixes-209`. GitHub reads the workflow from the pushed commit, so this first run needs no change on `main`. Find it in Actions under the pushed commit, or use `gh run list --branch fixes-209 --workflow macos-agent-smoke.yml`. Remove the temporary `push` trigger after branch validation and before merging to restore manual-only operation.
+To validate before merging, the workflow temporarily also triggers on every push to `fixes-209`; the `zrok-agent-smoke` environment already admits that branch. GitHub reads the workflow from the pushed commit, so these runs need no change on `main`. Find them in Actions under the pushed commit, or use `gh run list --branch fixes-209 --workflow agent-smoke.yml`. Remove the temporary `push` trigger after every platform row passes and before merging, to restore manual-only operation.
 
-GitHub's manual Run workflow button requires the workflow on the default branch. Once it reaches `main`, an authorized operator selects the branch to test: Actions, `macOS agent smoke`, Run workflow, or `gh workflow run macos-agent-smoke.yml --ref <branch>`. The branch must be one the `zrok-agent-smoke` environment admits. The workflow takes no inputs: the checkout is the triggering ref, and the endpoint and namespace come only from the environment's variables.
+GitHub's manual Run workflow button requires the workflow on the default branch. Once it reaches `main`, an authorized operator selects the branch to test: Actions, `agent smoke`, Run workflow, or `gh workflow run agent-smoke.yml --ref <branch>`. The branch must be one the `zrok-agent-smoke` environment admits. The workflow takes no inputs: the checkout is the triggering ref, and the endpoint and namespace come only from the environment's variables.
 
-Runs share one concurrency group and never cancel each other; a second dispatch waits for the first. The job is bounded at 45 minutes, the live step at 20 and fallback cleanup at 5.
+Matrix rows run one at a time, and a failed row does not cancel the rest. Runs share one concurrency group, and a run in progress is never cancelled by another; a second run waits for the first. GitHub keeps at most one waiting run per group, so a third run cancels the waiting one, and a cancelled run supplies no result for any row. The group keeps its original name, `macos-agent-smoke-zrok2-ci-account`, so a run of the earlier macOS-only workflow from an older branch also waits. Each row's job is bounded at 45 minutes, the live step at 20 and fallback cleanup at 5.
 
-The build version is the latest `v2.*` tag reachable from the checkout, and `build.Hash` is the full commit hash. Both are written to the job summary. The CLI and the harness are built with identical stamps, so the controller's version check applies to both. A version refusal fails the run as a failed prerequisite and keeps the controller's message.
+The build version is the latest `v2.*` tag reachable from the checkout, and `build.Hash` is the full commit hash. Both are written to each row's job summary, with the runner's OS release and architecture, the Go toolchain and the C compiler. The CLI and the harness are built with identical stamps, so the controller's version check applies to both. A version refusal fails the run as a failed prerequisite and keeps the controller's message.
 
 ## The harness
 
@@ -53,7 +62,7 @@ Before any side effect, `run` chooses the name `agentsmoke-<run id>-<attempt>-<r
 
 The scenario has an overall 15-minute bound. Agent readiness and share startup or replay each get at most 7 minutes, an agent stop 130 seconds and public HTTP convergence 120 seconds. Each controller or agent request gets 30 seconds, and each short CLI invocation 90 seconds. All of these are capped by the scenario's remaining time. Readiness is polled, never inferred from a sleep. The harness's own assertions read the generated REST client and the agent's structured gRPC status, independently of the agent's cleanup code.
 
-Child output is held in memory (the first 64 KiB and last 192 KiB per process) and written to `<state-dir>/report/logs/` only after the account token has been redacted. The report directory also holds `run-summary.json`/`.md` and `cleanup-summary.json`/`.md`. It is the only uploaded artifact, kept for seven days, and its markdown summary is appended to the job summary.
+Child output is held in memory (the first 64 KiB and last 192 KiB per process) and written to `<state-dir>/report/logs/` only after the account token has been redacted. The report directory also holds `run-summary.json`/`.md` and `cleanup-summary.json`/`.md`. It is each row's only uploaded artifact, named `agent-smoke-<row>-<run id>-<attempt>` (`macos-arm64`, `linux-amd64`) and kept for seven days, and its markdown summary, which names the harness's OS and architecture, is appended to the row's job summary.
 
 ## Cleanup
 
@@ -94,6 +103,6 @@ Without a logged environment identity, cleanup matches the exact description. An
 
 ## Validation status
 
-Hosted run [41110212451](https://github.com/openziti/zrok/actions/runs/41110212451), at commit `9b6bdf90eb01be04a894e33f196c9903d03da55d` on the macOS arm64 job, reached the live scenario and created a named share. The public response check failed because the harness treated the returned hostname as a URL without a scheme. Fallback cleanup confirmed removal of the share, name and environment. The harness now defaults bare endpoints to HTTPS and awaits another hosted run; neither graceful shutdown nor replay was reached in that attempt.
+Hosted run [41112465896](https://github.com/openziti/zrok/actions/runs/41112465896) passed on 2026-10-30 at commit `ee5cbd392a34ced018d608699ee6cc6e0b838ece`, using the `macos-15` arm64 runner against the production zrok service. Native process/worker fixtures, agent lifecycle race tests, offline harness tests, the live scenario and fallback cleanup all passed. This supplies the macOS evidence for successful SIGINT shutdown, old-token absence, reserved-name preservation, automatic replay with a different token, public HTTP traffic and final resource cleanup. That run came from the earlier macOS-only workflow, `macos-agent-smoke.yml`, which this workflow replaces.
 
-No passing hosted live scenario has been recorded. Local Linux/amd64 verification includes tagged offline tests under the race detector and ordinary package discovery excluding the harness. The workflow file was parsed but not checked with `actionlint`, which was unavailable. When a hosted run completes, record its URL, commit, runner OS and architecture, scenario result and cleanup outcome here. Only a passing run updates the macOS line in [Agent share lifecycle](agent-share-lifecycle.md).
+The generalized workflow has no hosted run yet. Native Linux live validation, and a macOS regression run of the generalized workflow, await its first run on `fixes-209`. When a row completes, record here its run URL, commit, runner OS and architecture, native fixture results, graceful-stop method, scenario result and cleanup outcome. Only a passing row updates its platform's line in [Agent share lifecycle](agent-share-lifecycle.md). Windows native validation remains outstanding.
