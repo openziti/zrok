@@ -1,4 +1,4 @@
-//go:build agent_smoke && unix
+//go:build agent_smoke
 
 // agent-smoke drives the named public share shutdown and restart scenario against a live zrok service, using a
 // separately built zrok2 binary. it is built only with '-tags agent_smoke'. see docs/current/agent-smoke.md.

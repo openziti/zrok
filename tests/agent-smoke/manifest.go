@@ -1,4 +1,4 @@
-//go:build agent_smoke && unix
+//go:build agent_smoke
 
 package main
 
@@ -40,11 +40,15 @@ type manifest struct {
 }
 
 // processRecord identifies an agent process by pid and start time, so a later invocation can refuse a reused pid.
+// Platform says which identity format Started and Command hold: 'posix' (ps start time and command line, also
+// assumed when empty) or 'windows' (creation time and executable path). cleanup acts only on its own platform's
+// records.
 type processRecord struct {
-	PID     int    `dd:"pid"`
-	Started string `dd:"started"`
-	Command string `dd:"command"`
-	Reaped  bool   `dd:"reaped"`
+	PID      int    `dd:"pid"`
+	Platform string `dd:"platform"`
+	Started  string `dd:"started"`
+	Command  string `dd:"command"`
+	Reaped   bool   `dd:"reaped"`
 }
 
 // runState serializes manifest updates and persists each one before the caller proceeds.

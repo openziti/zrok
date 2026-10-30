@@ -1,4 +1,4 @@
-//go:build agent_smoke && unix
+//go:build agent_smoke
 
 package main
 
@@ -38,6 +38,7 @@ type summary struct {
 	Build      string       `dd:"build"`
 	Commit     string       `dd:"commit"`
 	Runner     string       `dd:"runner"`
+	StopEvent  string       `dd:"stop_event"`
 	RunID      string       `dd:"run_id"`
 	RunAttempt string       `dd:"run_attempt"`
 	Resources  resources    `dd:"resources"`
@@ -123,6 +124,13 @@ func (r *report) step(name string, fn func() (string, error)) error {
 	return err
 }
 
+// stopEvent records the graceful-stop event the run delivered and who received it.
+func (r *report) stopEvent(description string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.summary.StopEvent = description
+}
+
 // fail records a failure that did not come from a step, such as cancellation, unless one is already recorded.
 func (r *report) fail(err error) {
 	r.mu.Lock()
@@ -204,6 +212,9 @@ func (r *report) markdown() string {
 	var out bytes.Buffer
 	_, _ = fmt.Fprintf(&out, "### agent smoke %v: %v\n\n", s.Mode, s.Result)
 	_, _ = fmt.Fprintf(&out, "- build: `%v`\n- commit: `%v`\n- runner: `%v`\n- run: `%v` attempt `%v`\n", s.Build, s.Commit, s.Runner, s.RunID, s.RunAttempt)
+	if s.StopEvent != "" {
+		_, _ = fmt.Fprintf(&out, "- graceful stop: %v\n", s.StopEvent)
+	}
 	_, _ = fmt.Fprintf(&out, "- endpoint: `%v`, name: `%v:%v`\n", s.Resources.APIEndpoint, s.Resources.Namespace, s.Resources.Name)
 	_, _ = fmt.Fprintf(&out, "- environment: `%v` (`%v`)\n- share tokens: `%v`\n", s.Resources.EnvZID, s.Resources.Description, strings.Join(s.Resources.ShareTokens, ", "))
 	if s.Failure != "" {

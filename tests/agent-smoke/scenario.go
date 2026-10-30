@@ -1,4 +1,4 @@
-//go:build agent_smoke && unix
+//go:build agent_smoke
 
 package main
 
@@ -89,7 +89,7 @@ func preflight(cfg config) error {
 	if err != nil {
 		return fmt.Errorf("binary under test: %w", err)
 	}
-	if !info.Mode().IsRegular() || info.Mode().Perm()&0o111 == 0 {
+	if !executableFile(cfg.binary, info) {
 		return fmt.Errorf("binary under test '%v' is not an executable file", cfg.binary)
 	}
 	home, err := os.UserHomeDir()
@@ -245,15 +245,13 @@ func (h *harness) startTarget(_ context.Context) (string, error) {
 func (h *harness) startAgent(ctx context.Context) (string, error) {
 	h.starts++
 	label := fmt.Sprintf("agent-%d", h.starts)
-	agent, err := startChild(h.cfg.binary, []string{"agent", "start"}, h.childEnv(), h.rep.log(label))
+	args := []string{"agent", "start"}
+	agent, err := startChild(h.cfg.binary, args, h.childEnv(), h.rep.log(label))
 	if err != nil {
 		return "", fmt.Errorf("unable to start agent: %w", err)
 	}
 	h.agent = agent
-	record := processRecord{PID: agent.pid(), Command: h.cfg.binary + " agent start"}
-	if started, _, alive, err := processIdentity(ctx, agent.pid()); err == nil && alive {
-		record.Started = started
-	}
+	record := identify(ctx, agent.pid(), h.cfg.binary, args)
 	if err := h.st.update(func(m *manifest) { m.Processes = append(m.Processes, record) }); err != nil {
 		return "", err
 	}
@@ -345,8 +343,9 @@ func (h *harness) checkPublic(ctx context.Context) (string, error) {
 	return fmt.Sprintf("exact body from '%v'", strings.Join(urls, ", ")), nil
 }
 
-// stopAgent interrupts the agent's process group as a terminal would. a timeout is a failure recorded before
-// cleanup force-terminates the processes.
+// stopAgent delivers the platform's graceful-stop event to the agent's process group: SIGINT as a terminal's
+// Ctrl-C would on POSIX, CTRL_BREAK_EVENT on Windows. a timeout is a failure recorded before cleanup
+// force-terminates the processes.
 func (h *harness) stopAgent(ctx context.Context) (string, error) {
 	agent := h.agent
 	if h.agentConn != nil {
@@ -354,23 +353,24 @@ func (h *harness) stopAgent(ctx context.Context) (string, error) {
 		h.agentConn, h.agentRPC = nil, nil
 	}
 	started := time.Now()
+	h.rep.stopEvent(stopDescription())
 	if err := agent.interrupt(); err != nil {
-		return "", fmt.Errorf("unable to interrupt agent pid %d: %w", agent.pid(), err)
+		return "", fmt.Errorf("unable to deliver %v to agent pid %d: %w", stopEvent, agent.pid(), err)
 	}
 	stopCtx, cancel := context.WithTimeout(ctx, h.cfg.stopBound)
 	defer cancel()
 	select {
 	case <-agent.done:
 	case <-stopCtx.Done():
-		return "", fmt.Errorf("agent pid %d did not exit within %v of SIGINT: %w", agent.pid(), h.cfg.stopBound, stopCtx.Err())
+		return "", fmt.Errorf("agent pid %d did not exit within %v of %v: %w", agent.pid(), h.cfg.stopBound, stopEvent, stopCtx.Err())
 	}
 	if err := h.markReaped(agent.pid()); err != nil {
 		return "", err
 	}
 	if code := agent.exitCode(); code != 0 {
-		return "", fmt.Errorf("agent pid %d exited with status %d after SIGINT; see '%v'", agent.pid(), code, h.rep.logPath(fmt.Sprintf("agent-%d", h.starts)))
+		return "", fmt.Errorf("agent pid %d exited with status %d after %v; see '%v'", agent.pid(), code, stopEvent, h.rep.logPath(fmt.Sprintf("agent-%d", h.starts)))
 	}
-	return fmt.Sprintf("exit 0 after %v", time.Since(started).Round(time.Millisecond)), nil
+	return fmt.Sprintf("exit 0 %v after %v", time.Since(started).Round(time.Millisecond), stopEvent), nil
 }
 
 func (h *harness) checkStopped(ctx context.Context) (string, error) {
@@ -474,7 +474,8 @@ func (h *harness) runCommand(ctx context.Context, label string, bound time.Durat
 	select {
 	case <-c.done:
 	case <-cmdCtx.Done():
-		return errors.Join(fmt.Errorf("'%v' did not complete: %w", label, cmdCtx.Err()), c.kill(h.cfg.killBound))
+		_, err := c.kill(h.cfg.killBound)
+		return errors.Join(fmt.Errorf("'%v' did not complete: %w", label, cmdCtx.Err()), err)
 	}
 	if code := c.exitCode(); code != 0 {
 		return fmt.Errorf("'%v' exited with status %d; see '%v'", label, code, h.rep.logPath(label))

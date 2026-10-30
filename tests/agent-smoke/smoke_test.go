@@ -1,20 +1,23 @@
-//go:build agent_smoke && unix
+//go:build agent_smoke
 
 package main
 
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
-	"syscall"
 	"testing"
 	"time"
 
 	"github.com/michaelquigley/df/dd"
+	"github.com/openziti/zrok/v2/agent/proctree"
 	"github.com/openziti/zrok/v2/build"
 	"github.com/openziti/zrok/v2/util"
 	"github.com/stretchr/testify/assert"
@@ -24,6 +27,10 @@ import (
 const testAccountToken = "acct-secret-0123456789"
 
 func TestMain(m *testing.M) {
+	// helper modes come first: a helper started from a test inherits the fake binary's environment
+	if mode := os.Getenv(helperEnv); mode != "" {
+		os.Exit(helperProcess(mode))
+	}
 	if os.Getenv(fakeCLIEnv) == "1" {
 		os.Exit(fakeCLI(os.Args[1:]))
 	}
@@ -38,11 +45,13 @@ type world struct {
 }
 
 func newWorld(t *testing.T, modes ...string) *world {
-	// a short home keeps the agent socket path inside the unix socket limit
+	// a short home keeps the agent socket path inside the unix socket limit. os.UserHomeDir reads HOME on unix and
+	// USERPROFILE on windows; setting both points the fake binary at it on either.
 	home, err := os.MkdirTemp("", "smk")
 	require.NoError(t, err)
 	t.Cleanup(func() { _ = os.RemoveAll(home) })
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
 	t.Setenv(fakeCLIEnv, "1")
 	t.Setenv(fakeModeEnv, strings.Join(modes, ","))
 	version, hash := build.Version, build.Hash
@@ -136,7 +145,7 @@ func TestScenarioPasses(t *testing.T) {
 		}
 		info, err := entry.Info()
 		require.NoError(t, err)
-		assert.Equal(t, os.FileMode(0o600), info.Mode().Perm(), path)
+		assertPrivateMode(t, info, path)
 		data, err := os.ReadFile(path)
 		require.NoError(t, err)
 		assert.NotContains(t, string(data), testAccountToken, path)
@@ -161,7 +170,7 @@ func TestScenarioFailures(t *testing.T) {
 		{name: "name left bound", modes: []string{"keep-binding"}, step: "controller state after stop", text: "listed name 'public:"},
 		{name: "replacement reuses token", modes: []string{"same-token"}, step: "replayed share", text: "reuses token"},
 		{name: "wrong public body", setup: func(w *world) { w.ctrl.wrongBody = true; w.cfg.publicBound = 500 * time.Millisecond }, step: "public response", text: "did not return the expected body"},
-		{name: "nonzero shutdown", modes: []string{"exit-nonzero"}, step: "interrupt agent", text: "exited with status 1 after SIGINT"},
+		{name: "nonzero shutdown", modes: []string{"exit-nonzero"}, step: "interrupt agent", text: "exited with status 1 after " + stopEvent},
 		{name: "hung shutdown", modes: []string{"hang"}, setup: func(w *world) { w.cfg.stopBound = 500 * time.Millisecond }, step: "interrupt agent", text: "did not exit within"},
 		{name: "failed controller read", setup: func(w *world) { w.ctrl.failOnStop = 3 }, step: "controller state after stop", text: "account overview failed"},
 		{name: "build mismatch", setup: func(w *world) { w.t.Setenv(fakeBuildEnv, "v2.0.0 [other]") }, step: "start agent", text: "expected 'v2.0.0-smoke [0123abcd]'"},
@@ -298,49 +307,32 @@ func TestPreflightRefusals(t *testing.T) {
 
 func TestRecordedProcessGuard(t *testing.T) {
 	w := newWorld(t)
-	start := func() *exec.Cmd {
-		cmd := exec.Command("sleep", "30")
-		cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-		require.NoError(t, cmd.Start())
-		t.Cleanup(func() { _ = cmd.Process.Kill(); _ = cmd.Wait() })
-		return cmd
-	}
-	matching, reused := start(), start()
-	started, command, ok, err := processIdentity(context.Background(), matching.Process.Pid)
-	require.NoError(t, err)
-	require.True(t, ok)
-	require.Equal(t, "sleep 30", command)
+	matching, reused := startRecordable(t), startRecordable(t)
+	matchingRecord := recordOf(t, matching)
+	reusedRecord := recordOf(t, reused)
+	reusedRecord.Started = "0"
 
-	_, err = newRunState(w.cfg.stateDir, manifest{Processes: []processRecord{
-		{PID: matching.Process.Pid, Started: started, Command: command},
-		{PID: reused.Process.Pid, Started: "Thu Jan  1 00:00:00 1970", Command: command},
-	}})
+	_, err := newRunState(w.cfg.stateDir, manifest{Processes: []processRecord{matchingRecord, reusedRecord}})
 	require.NoError(t, err)
 	require.Equal(t, 0, w.cleanup())
 
-	done := make(chan error, 1)
-	go func() { done <- matching.Wait() }()
-	select {
-	case err := <-done:
-		assert.Error(t, err, "the matching process should have been killed")
-	case <-time.After(5 * time.Second):
-		t.Fatal("the matching recorded process was not killed")
-	}
+	requireKilled(t, matching, "the matching recorded process")
 	assert.True(t, alive(reused.Process.Pid), "a pid with a different start time must not be signalled")
 	detail := w.summary("cleanup").Cleanup.Detail
 	assert.Contains(t, detail, "is now a different process; not signalled")
+	assert.Contains(t, detail, fmt.Sprintf("force-terminated recorded agent pid %d", matching.Process.Pid))
 	for _, record := range w.manifest().Processes {
 		assert.True(t, record.Reaped)
 	}
 }
 
 // a recorded process whose termination cleanup cannot confirm fails cleanup even when every controller resource is
-// removed, and its record stays for the next cleanup, which resolves it once ps answers truthfully.
+// removed, and its record stays for the next cleanup, which resolves it once inspection answers truthfully.
 func TestUnresolvedProcessFailsCleanup(t *testing.T) {
 	for _, tc := range []struct {
-		name     string
-		identity bool
-		expect   string
+		name        string
+		unconfirmed bool
+		expect      string
 	}{
 		{"inspection fails", false, "unable to inspect recorded agent pid"},
 		{"termination unconfirmed", true, "not confirmed terminated"},
@@ -348,28 +340,18 @@ func TestUnresolvedProcessFailsCleanup(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			w := newWorld(t)
 			w.cfg.killBound = time.Second
-			cmd := exec.Command("sleep", "30")
-			cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-			require.NoError(t, cmd.Start())
-			t.Cleanup(func() { _ = cmd.Process.Kill(); _ = cmd.Wait() })
+			cmd := startRecordable(t)
 			pid := cmd.Process.Pid
-			started, command, ok, err := processIdentity(context.Background(), pid)
-			require.NoError(t, err)
-			require.True(t, ok)
+			record := recordOf(t, cmd)
 
 			m := newManifest(w.cfg)
 			m.EnvAttempted, m.EnvZID = true, "envproc"
-			m.Processes = []processRecord{{PID: pid, Started: started, Command: command}}
+			m.Processes = []processRecord{record}
 			w.ctrl.addEnv(m.EnvZID, m.Description)
-			_, err = newRunState(w.cfg.stateDir, m)
+			_, err := newRunState(w.cfg.stateDir, m)
 			require.NoError(t, err)
 
-			path := os.Getenv("PATH")
-			if tc.identity {
-				fakePS(t, started, command)
-			} else {
-				fakePS(t, "", "")
-			}
+			restore := breakInspection(t, record, tc.unconfirmed)
 			require.Equal(t, 1, w.cleanup())
 			s := w.summary("cleanup")
 			assert.Equal(t, "fail", s.Result)
@@ -378,24 +360,75 @@ func TestUnresolvedProcessFailsCleanup(t *testing.T) {
 			assert.Contains(t, s.Cleanup.Detail, strconv.Itoa(pid))
 			assert.True(t, w.ctrl.empty(), "controller cleanup continues past a process failure")
 			assert.False(t, w.manifest().Processes[0].Reaped)
-			if !tc.identity {
+			if !tc.unconfirmed {
 				assert.True(t, alive(pid), "a process whose identity was not inspected must not be signalled")
 			}
 
-			t.Setenv("PATH", path)
+			restore()
 			require.Equal(t, 0, w.cleanup())
 			assert.Equal(t, "pass", w.summary("cleanup").Result)
 			assert.True(t, w.manifest().Processes[0].Reaped)
-			done := make(chan error, 1)
-			go func() { done <- cmd.Wait() }()
-			select {
-			case err := <-done:
-				assert.Error(t, err, "the recorded process should have been killed")
-			case <-time.After(5 * time.Second):
-				t.Fatal("the recorded process was not killed")
-			}
+			requireKilled(t, cmd, "the recorded process")
 		})
 	}
+}
+
+// a record written on another platform holds an identity this build cannot check, so its pid is never acted on
+// and the record is kept.
+func TestForeignPlatformRecordIsKept(t *testing.T) {
+	w := newWorld(t)
+	cmd := startRecordable(t)
+	record := recordOf(t, cmd)
+	record.Platform = posixPlatform
+	if localPlatform == posixPlatform {
+		record.Platform = windowsPlatform
+	}
+	_, err := newRunState(w.cfg.stateDir, manifest{Processes: []processRecord{record}})
+	require.NoError(t, err)
+
+	require.Equal(t, 1, w.cleanup())
+	s := w.summary("cleanup")
+	assert.Contains(t, s.Cleanup.Detail, fmt.Sprintf("has a '%v' identity and cannot be inspected on '%v'", record.Platform, localPlatform))
+	assert.True(t, alive(cmd.Process.Pid), "a foreign record's pid must not be signalled")
+	assert.False(t, w.manifest().Processes[0].Reaped)
+}
+
+func TestRecordsWithoutPlatformArePOSIX(t *testing.T) {
+	assert.Equal(t, posixPlatform, recordPlatform(processRecord{PID: 1, Started: "Thu Jan  1 00:00:00 1970"}))
+	assert.Equal(t, windowsPlatform, recordPlatform(processRecord{PID: 1, Platform: windowsPlatform}))
+}
+
+// the delivery the live scenario uses for a graceful stop reaches a child that installed go's interrupt handler,
+// which acknowledges it and exits normally.
+func TestGracefulEventDelivery(t *testing.T) {
+	out := &boundedLog{}
+	c := startHelperChild(t, "interrupt", out)
+	awaitOutput(t, out, "ready")
+	require.NoError(t, c.interrupt())
+	select {
+	case <-c.done:
+	case <-time.After(10 * time.Second):
+		t.Fatalf("helper did not exit within 10s of %v", stopEvent)
+	}
+	assert.Equal(t, 0, c.exitCode(), string(out.contents()))
+	assert.Contains(t, string(out.contents()), "interrupted")
+}
+
+// forced termination reaches a worker started the way the agent starts its workers, in their own process group
+// on POSIX and in a nested job object on Windows, not just the direct child.
+func TestKillTerminatesDescendants(t *testing.T) {
+	out := &boundedLog{}
+	c := startHelperChild(t, "worker", out)
+	grandchild := awaitGrandchild(t, out)
+	require.True(t, alive(grandchild))
+
+	killed, err := c.kill(5 * time.Second)
+	require.NoError(t, err)
+	assert.Contains(t, killed, fmt.Sprintf("pid %d", c.pid()))
+	require.Eventually(t, func() bool { return !alive(grandchild) }, 5*time.Second, 50*time.Millisecond, "grandchild pid %d survived", grandchild)
+	again, err := c.kill(5 * time.Second)
+	require.NoError(t, err)
+	assert.Empty(t, again, "a second kill has nothing left to terminate")
 }
 
 func TestGeneratedNamesAreValid(t *testing.T) {
@@ -429,4 +462,108 @@ func TestOrdinaryDiscoveryExcludesHarness(t *testing.T) {
 	require.NoError(t, err)
 	assert.Contains(t, string(out), "github.com/openziti/zrok/v2/agent\n")
 	assert.NotContains(t, string(out), "tests/agent-smoke")
+}
+
+const helperEnv = "AGENT_SMOKE_HELPER"
+
+// helperProcess runs the test binary as a plain process for the process tests: wait idles, interrupt
+// acknowledges a graceful-stop event and exits normally, worker starts a waiting grandchild through the agent's
+// own worker launcher, and spawn starts one directly, exiting at once when AGENT_SMOKE_HELPER_ORPHAN is set so
+// the grandchild outlives it.
+func helperProcess(mode string) int {
+	switch mode {
+	case "wait":
+		fmt.Printf("grandchild %d\n", os.Getpid())
+		time.Sleep(5 * time.Minute)
+		return 0
+	case "interrupt":
+		interrupts := make(chan os.Signal, 1)
+		signal.Notify(interrupts, os.Interrupt)
+		fmt.Println("ready")
+		select {
+		case <-interrupts:
+			fmt.Println("interrupted")
+			return 0
+		case <-time.After(2 * time.Minute):
+			return 3
+		}
+	case "worker":
+		_ = os.Setenv(helperEnv, "wait")
+		// started as the agent starts a public worker; it reports its own pid, so relay its output
+		relay := func(data []byte) { _, _ = os.Stdout.Write(data) }
+		if _, err := proctree.StartControlledChild(proctree.ControlledOptions{Stdout: relay, Stderr: relay}, os.Args[0]); err != nil {
+			fmt.Fprintf(os.Stderr, "unable to start worker: %v\n", err)
+			return 1
+		}
+		time.Sleep(5 * time.Minute)
+		return 0
+	case "spawn":
+		cmd := exec.Command(os.Args[0])
+		cmd.Env = append(os.Environ(), helperEnv+"=wait")
+		if err := cmd.Start(); err != nil {
+			fmt.Fprintf(os.Stderr, "unable to start grandchild: %v\n", err)
+			return 1
+		}
+		fmt.Printf("grandchild %d\n", cmd.Process.Pid)
+		if os.Getenv(helperEnv+"_ORPHAN") != "" {
+			return 0
+		}
+		time.Sleep(5 * time.Minute)
+		return 0
+	}
+	fmt.Fprintf(os.Stderr, "unknown helper mode '%v'\n", mode)
+	return 2
+}
+
+func testBinary(t *testing.T) string {
+	binary, err := filepath.Abs(os.Args[0])
+	require.NoError(t, err)
+	return binary
+}
+
+// startHelperChild starts a helper exactly as the harness starts the agent, and force-terminates it at test end.
+func startHelperChild(t *testing.T, mode string, out *boundedLog, extraEnv ...string) *child {
+	env := append(os.Environ(), helperEnv+"="+mode)
+	c, err := startChild(testBinary(t), nil, append(env, extraEnv...), out)
+	require.NoError(t, err)
+	t.Cleanup(func() { _, _ = c.kill(5 * time.Second) })
+	return c
+}
+
+func awaitOutput(t *testing.T, out *boundedLog, text string) {
+	require.Eventually(t, func() bool { return strings.Contains(string(out.contents()), text) }, 10*time.Second, 20*time.Millisecond, "helper never printed '%v'", text)
+}
+
+var grandchildLine = regexp.MustCompile(`grandchild (\d+)`)
+
+func awaitGrandchild(t *testing.T, out *boundedLog) int {
+	awaitOutput(t, out, "grandchild ")
+	match := grandchildLine.FindStringSubmatch(string(out.contents()))
+	require.NotNil(t, match)
+	pid, err := strconv.Atoi(match[1])
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		if p, err := os.FindProcess(pid); err == nil {
+			_ = p.Kill()
+		}
+	})
+	return pid
+}
+
+// recordOf records a helper's identity as the harness records an agent's.
+func recordOf(t *testing.T, cmd *exec.Cmd) processRecord {
+	record := identify(context.Background(), cmd.Process.Pid, testBinary(t), nil)
+	require.NotEmpty(t, record.Started, "identity of pid %d", cmd.Process.Pid)
+	return record
+}
+
+func requireKilled(t *testing.T, cmd *exec.Cmd, what string) {
+	done := make(chan error, 1)
+	go func() { done <- cmd.Wait() }()
+	select {
+	case err := <-done:
+		assert.Error(t, err, "%v should have been killed", what)
+	case <-time.After(5 * time.Second):
+		t.Fatalf("%v was not killed", what)
+	}
 }

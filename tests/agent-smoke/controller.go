@@ -1,4 +1,4 @@
-//go:build agent_smoke && unix
+//go:build agent_smoke
 
 package main
 

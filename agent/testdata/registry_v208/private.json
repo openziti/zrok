@@ -1,0 +1,28 @@
+{
+  "v": "2",
+  "private_accesses": [
+    {
+      "request": {
+        "share_token": "access-token",
+        "bind_address": "127.0.0.1:8082",
+        "auto_mode": false,
+        "auto_address": "",
+        "auto_start_port": 0,
+        "auto_end_port": 0,
+        "response_headers": null
+      }
+    }
+  ],
+  "private_shares": [
+    {
+      "request": {
+        "target": "8081",
+        "private_share_token": "reserved-token",
+        "backend_mode": "proxy",
+        "insecure": false,
+        "closed": false,
+        "access_grants": null
+      }
+    }
+  ]
+}

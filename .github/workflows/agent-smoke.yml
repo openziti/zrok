@@ -34,9 +34,15 @@ jobs:
           - runner: macos-15
             platform: macOS arm64
             slug: macos-arm64
+            exe: ""
           - runner: ubuntu-24.04
             platform: Linux amd64
             slug: linux-amd64
+            exe: ""
+          - runner: windows-2025
+            platform: Windows amd64
+            slug: windows-amd64
+            exe: .exe
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,17 +53,38 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ -e "$HOME/.zrok2" ]; then
-            echo "::error::'$HOME/.zrok2' already exists; the smoke runs only on a fresh runner"
+          home="$HOME"
+          temp="$RUNNER_TEMP"
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            # zrok2 finds its home through USERPROFILE on windows; mixed-style paths suit both bash and native tools
+            home="$(cygpath -u "$USERPROFILE")"
+            temp="$(cygpath -m "$RUNNER_TEMP")"
+          fi
+          if [ -e "$home/.zrok2" ]; then
+            echo "::error::'$home/.zrok2' already exists; the smoke runs only on a fresh runner"
             exit 1
           fi
-          smoke_dir="$RUNNER_TEMP/agent-smoke"
+          smoke_dir="$temp/agent-smoke"
           mkdir -p "$smoke_dir/bin"
           echo "SMOKE_DIR=$smoke_dir" >> "$GITHUB_ENV"
           version="$(git describe --tags --match 'v2.*' --abbrev=0)"
           hash="$(git rev-parse HEAD)"
           echo "SMOKE_VERSION=$version" >> "$GITHUB_ENV"
           echo "SMOKE_HASH=$hash" >> "$GITHUB_ENV"
+
+      # cgo and the race detector need a native c compiler; windows runners do not configure one, and the
+      # linux cross-build's mingw path does not apply here. its bin directory stays on PATH for runtime dlls.
+      - name: configure windows c compiler
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $msys = 'C:\msys64'
+          if (-not (Test-Path "$msys\usr\bin\bash.exe")) { throw "MSYS2 was not found at '$msys'" }
+          & "$msys\usr\bin\bash.exe" -lc 'pacman -Sy --noconfirm --needed mingw-w64-ucrt-x86_64-gcc'
+          if ($LASTEXITCODE -ne 0) { throw "unable to install the UCRT64 gcc toolchain" }
+          Add-Content -Path $env:GITHUB_PATH -Value "$msys\ucrt64\bin"
+          Add-Content -Path $env:GITHUB_ENV -Value "CC=gcc"
 
       - uses: actions/setup-go@v5
         with:
@@ -74,6 +101,7 @@ jobs:
           case "$RUNNER_OS" in
             macOS) os_release="macOS $(sw_vers -productVersion)" ;;
             Linux) os_release="$(. /etc/os-release && echo "$PRETTY_NAME")" ;;
+            Windows) os_release="$(pwsh -NoProfile -Command '[System.Environment]::OSVersion.VersionString')" ;;
             *) os_release="$RUNNER_OS" ;;
           esac
           {
@@ -84,7 +112,7 @@ jobs:
             echo "- build version: \`$SMOKE_VERSION\`"
             echo "- runner: \`$RUNNER_OS/$RUNNER_ARCH\` ($os_release, $(uname -m))"
             echo "- go: \`$(go version)\`"
-            echo "- c compiler: \`$(cc --version | head -n 1)\`"
+            echo "- c compiler: \`$(go env CC)\` (\`$("$(go env CC)" --version | head -n 1)\`)"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: install ui node modules
@@ -118,9 +146,9 @@ jobs:
         run: |
           set -euo pipefail
           ldflags="-X github.com/openziti/zrok/v2/build.Version=$SMOKE_VERSION -X github.com/openziti/zrok/v2/build.Hash=$SMOKE_HASH"
-          go build -ldflags "$ldflags" -o "$SMOKE_DIR/bin/zrok2" ./cmd/zrok2
-          go build -tags agent_smoke -ldflags "$ldflags" -o "$SMOKE_DIR/bin/agent-smoke" ./tests/agent-smoke
-          "$SMOKE_DIR/bin/zrok2" version
+          go build -ldflags "$ldflags" -o "$SMOKE_DIR/bin/zrok2${{ matrix.exe }}" ./cmd/zrok2
+          go build -tags agent_smoke -ldflags "$ldflags" -o "$SMOKE_DIR/bin/agent-smoke${{ matrix.exe }}" ./tests/agent-smoke
+          "$SMOKE_DIR/bin/zrok2${{ matrix.exe }}" version
 
       - name: native process and worker fixtures
         shell: bash
@@ -147,8 +175,8 @@ jobs:
             echo "::error::secret 'ZROK2_CI_ACCOUNT_TOKEN' is not set in the 'zrok-agent-smoke' environment; the live scenario cannot run"
             exit 1
           fi
-          "$SMOKE_DIR/bin/agent-smoke" run \
-            --binary "$SMOKE_DIR/bin/zrok2" \
+          "$SMOKE_DIR/bin/agent-smoke${{ matrix.exe }}" run \
+            --binary "$SMOKE_DIR/bin/zrok2${{ matrix.exe }}" \
             --state-dir "$SMOKE_DIR/state" \
             --api-endpoint "$SMOKE_API_ENDPOINT" \
             --namespace "$SMOKE_NAMESPACE"
@@ -161,11 +189,11 @@ jobs:
           ZROK2_CI_ACCOUNT_TOKEN: ${{ secrets.ZROK2_CI_ACCOUNT_TOKEN }}
         run: |
           set -euo pipefail
-          if [ -z "${SMOKE_DIR:-}" ] || [ ! -x "$SMOKE_DIR/bin/agent-smoke" ]; then
+          if [ -z "${SMOKE_DIR:-}" ] || [ ! -x "$SMOKE_DIR/bin/agent-smoke${{ matrix.exe }}" ]; then
             echo "the harness was not built; no live resources were created"
             exit 0
           fi
-          "$SMOKE_DIR/bin/agent-smoke" cleanup --state-dir "$SMOKE_DIR/state"
+          "$SMOKE_DIR/bin/agent-smoke${{ matrix.exe }}" cleanup --state-dir "$SMOKE_DIR/state"
 
       - name: publish summary
         if: always()

@@ -42,8 +42,19 @@ type FailureEntry struct {
 }
 
 func LoadRegistry(path string) (*Registry, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	var values map[string]any
+	if err := json.Unmarshal(data, &values); err != nil {
+		return nil, fmt.Errorf("unable to parse registry '%v': %w", path, err)
+	}
+	// the v2.0.8 writer emitted null for unused request slices. encoding/json accepted these as zero values;
+	// omit null object fields before binding a fresh registry so dd retains the same behavior.
+	omitRegistryNullFields(values)
 	r := &Registry{}
-	if err := dd.BindFromJSON(r, path, registryBindingOptions()); err != nil {
+	if err := dd.Bind(r, values, registryBindingOptions()); err != nil {
 		return nil, err
 	}
 
@@ -52,6 +63,23 @@ func LoadRegistry(path string) (*Registry, error) {
 	}
 
 	return r, nil
+}
+
+func omitRegistryNullFields(value any) {
+	switch value := value.(type) {
+	case map[string]any:
+		for key, child := range value {
+			if child == nil {
+				delete(value, key)
+			} else {
+				omitRegistryNullFields(child)
+			}
+		}
+	case []any:
+		for _, child := range value {
+			omitRegistryNullFields(child)
+		}
+	}
 }
 
 func (r *Registry) Save(path string) error {

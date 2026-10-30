@@ -1,4 +1,4 @@
-//go:build agent_smoke && unix
+//go:build agent_smoke
 
 package main
 
@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/michaelquigley/df/dl"
@@ -177,19 +176,17 @@ func (h *harness) cleanup(ctx context.Context) (_ string, err error) {
 	return detail(), errors.Join(problems...)
 }
 
-// stopProcesses force-terminates an agent this invocation owns. a process recorded by another invocation is
-// signalled only while its pid still shows the recorded start time and command line. a record is marked reaped
-// only once its process is confirmed gone; every other outcome is returned and the record is kept for a later
-// cleanup.
+// stopProcesses force-terminates what an agent this invocation owns still has running. a process recorded by
+// another invocation is acted on only while it still shows the recorded identity, and only by a build for the
+// platform that recorded it. a record is marked reaped only once its process is confirmed gone; every other
+// outcome is returned and the record is kept for a later cleanup.
 func (h *harness) stopProcesses(ctx context.Context, note func(string, ...any)) error {
 	var problems []error
 	if h.agent != nil {
-		if !h.agent.exited() {
-			if err := h.agent.kill(h.cfg.killBound); err != nil {
-				problems = append(problems, err)
-			} else {
-				note("force-terminated agent pid %d", h.agent.pid())
-			}
+		if killed, err := h.agent.kill(h.cfg.killBound); err != nil {
+			problems = append(problems, err)
+		} else if killed != "" {
+			note("force-terminated agent %v", killed)
 		}
 		if h.agent.exited() {
 			if err := h.markReaped(h.agent.pid()); err != nil {
@@ -201,25 +198,24 @@ func (h *harness) stopProcesses(ctx context.Context, note func(string, ...any)) 
 		if record.Reaped || (h.agent != nil && record.PID == h.agent.pid()) {
 			continue
 		}
-		started, command, alive, err := processIdentity(ctx, record.PID)
-		switch {
-		case err != nil:
-			problems = append(problems, fmt.Errorf("unable to inspect recorded agent pid %d: %w; record kept", record.PID, err))
+		if platform := recordPlatform(record); platform != localPlatform {
+			problems = append(problems, fmt.Errorf("recorded agent pid %d has a '%v' identity and cannot be inspected on '%v'; record kept", record.PID, platform, localPlatform))
 			continue
-		case !alive:
+		}
+		outcome, err := stopRecorded(ctx, record, h.cfg.killBound, h.cfg.pollInterval)
+		var inspect *inspectError
+		switch {
+		case errors.As(err, &inspect):
+			problems = append(problems, fmt.Errorf("unable to inspect recorded agent pid %d: %w; record kept", record.PID, inspect.err))
+			continue
+		case err != nil:
+			problems = append(problems, fmt.Errorf("recorded agent pid %d %w; record kept", record.PID, err))
+			continue
+		case outcome == recordNotRunning:
 			note("recorded agent pid %d is not running", record.PID)
-		case record.Started == "" || started != record.Started || command != record.Command:
+		case outcome == recordReplaced:
 			note("recorded pid %d is now a different process; not signalled", record.PID)
 		default:
-			descendants := childPIDs(record.PID)
-			_ = syscall.Kill(-record.PID, syscall.SIGKILL)
-			for _, pid := range descendants {
-				killGroupOrProcess(pid)
-			}
-			if err := awaitGone(ctx, record, h.cfg.killBound, h.cfg.pollInterval); err != nil {
-				problems = append(problems, fmt.Errorf("recorded agent pid %d %w; record kept", record.PID, err))
-				continue
-			}
 			note("force-terminated recorded agent pid %d", record.PID)
 		}
 		if err := h.markReaped(record.PID); err != nil {

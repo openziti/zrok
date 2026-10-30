@@ -1,19 +1,18 @@
-//go:build agent_smoke && unix
+//go:build agent_smoke
 
 package main
 
 import (
 	"bytes"
-	"context"
-	"errors"
 	"fmt"
-	"os"
 	"os/exec"
-	"strconv"
-	"strings"
 	"sync"
-	"syscall"
 	"time"
+)
+
+const (
+	posixPlatform   = "posix"
+	windowsPlatform = "windows"
 )
 
 const (
@@ -68,30 +67,23 @@ func (l *boundedLog) contents() []byte {
 	return out.Bytes()
 }
 
-// child is a subprocess in its own process group. its single reaper goroutine closes done; everything else waits
-// on done.
+// child is a subprocess started in its own interrupt scope: a process group on POSIX, a console process group
+// inside a job object on Windows. its single reaper goroutine closes done; everything else waits on done.
 type child struct {
 	cmd     *exec.Cmd
 	done    chan struct{}
 	waitErr error
+	tree    processTree
 }
 
-func startChild(binary string, args, env []string, out *boundedLog) (*child, error) {
-	cmd := exec.Command(binary, args...)
-	cmd.Env = env
-	cmd.Stdout = out
-	cmd.Stderr = out
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	cmd.WaitDelay = ioWaitDelay
-	if err := cmd.Start(); err != nil {
-		return nil, err
-	}
-	c := &child{cmd: cmd, done: make(chan struct{})}
+// reap starts the single goroutine that owns cmd.Wait.
+func reap(cmd *exec.Cmd, tree processTree) *child {
+	c := &child{cmd: cmd, done: make(chan struct{}), tree: tree}
 	go func() {
 		c.waitErr = cmd.Wait()
 		close(c.done)
 	}()
-	return c, nil
+	return c
 }
 
 func (c *child) pid() int {
@@ -115,107 +107,29 @@ func (c *child) exitCode() int {
 	return c.cmd.ProcessState.ExitCode()
 }
 
-func (c *child) interrupt() error {
-	return syscall.Kill(-c.pid(), syscall.SIGINT)
+// recordPlatform names the platform whose process identity a record holds. records written before the field
+// existed are POSIX.
+func recordPlatform(record processRecord) string {
+	if record.Platform == "" {
+		return posixPlatform
+	}
+	return record.Platform
 }
 
-// kill force-terminates the child's process group and the groups of its direct children, which the agent places
-// in their own groups, then waits for the reaper.
-func (c *child) kill(bound time.Duration) error {
-	if c.exited() {
-		return nil
-	}
-	descendants := childPIDs(c.pid())
-	_ = syscall.Kill(-c.pid(), syscall.SIGKILL)
-	for _, pid := range descendants {
-		killGroupOrProcess(pid)
-	}
-	select {
-	case <-c.done:
-		return nil
-	case <-time.After(bound):
-		return fmt.Errorf("process '%d' was not reaped within %v of being killed", c.pid(), bound)
-	}
+// inspectError marks a failure to read a recorded process's identity, as distinct from a failure to confirm its
+// termination.
+type inspectError struct {
+	err error
 }
 
-func killGroupOrProcess(pid int) {
-	if err := syscall.Kill(-pid, syscall.SIGKILL); err != nil {
-		_ = syscall.Kill(pid, syscall.SIGKILL)
-	}
-}
+func (e *inspectError) Error() string { return e.err.Error() }
+func (e *inspectError) Unwrap() error { return e.err }
 
-func childPIDs(parent int) []int {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	out, _ := exec.CommandContext(ctx, "pgrep", "-P", strconv.Itoa(parent)).Output()
-	var pids []int
-	for _, field := range strings.Fields(string(out)) {
-		if pid, err := strconv.Atoi(field); err == nil {
-			pids = append(pids, pid)
-		}
-	}
-	return pids
-}
+// recordOutcome is how a recorded process from an earlier invocation was resolved.
+type recordOutcome int
 
-// processIdentity reports a live pid's start time and command line as ps prints them, or alive false.
-func processIdentity(ctx context.Context, pid int) (started, command string, alive bool, err error) {
-	if started, alive, err = psField(ctx, pid, "lstart"); err != nil || !alive {
-		return "", "", alive, err
-	}
-	if command, alive, err = psField(ctx, pid, "args"); err != nil || !alive {
-		return "", "", alive, err
-	}
-	return started, command, true, nil
-}
-
-func psField(ctx context.Context, pid int, field string) (string, bool, error) {
-	cmd := exec.CommandContext(ctx, "ps", "-o", field+"=", "-p", strconv.Itoa(pid))
-	cmd.Env = append(os.Environ(), "LC_ALL=C")
-	out, err := cmd.Output()
-	var exit *exec.ExitError
-	if errors.As(err, &exit) && exit.ExitCode() == 1 {
-		return "", false, nil
-	}
-	if err != nil {
-		return "", false, err
-	}
-	return strings.TrimSpace(string(out)), true, nil
-}
-
-// processGone reports whether a recorded process has terminated: its pid is free, names another process, or is
-// a zombie awaiting its parent.
-func processGone(ctx context.Context, record processRecord) (bool, error) {
-	started, command, alive, err := processIdentity(ctx, record.PID)
-	if err != nil {
-		return false, err
-	}
-	if !alive || started != record.Started || command != record.Command {
-		return true, nil
-	}
-	stat, alive, err := psField(ctx, record.PID, "stat")
-	if err != nil {
-		return false, err
-	}
-	return !alive || strings.HasPrefix(stat, "Z"), nil
-}
-
-// awaitGone polls until a killed recorded process is confirmed gone, within bound. inspection failures are
-// retried until the bound expires.
-func awaitGone(ctx context.Context, record processRecord, bound, poll time.Duration) error {
-	ctx, cancel := context.WithTimeout(ctx, bound)
-	defer cancel()
-	for {
-		gone, err := processGone(ctx, record)
-		if err == nil && gone {
-			return nil
-		}
-		select {
-		case <-ctx.Done():
-			if err != nil {
-				return fmt.Errorf("termination not confirmed within %v of being killed: %w", bound, err)
-			}
-			return fmt.Errorf("not confirmed terminated within %v of being killed", bound)
-		case <-time.After(poll):
-		}
-	}
-}
+const (
+	recordNotRunning recordOutcome = iota
+	recordReplaced
+	recordTerminated
+)

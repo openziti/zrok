@@ -1,4 +1,4 @@
-//go:build agent_smoke && unix
+//go:build agent_smoke
 
 package main
 
@@ -17,7 +17,6 @@ import (
 	"slices"
 	"strings"
 	"sync"
-	"syscall"
 	"testing"
 
 	"github.com/michaelquigley/df/dd"
@@ -401,12 +400,10 @@ type fakeAgentServer struct {
 }
 
 func fakeAgent(api string, modes []string) int {
+	// hang swallows the interrupt rather than ignoring it: on windows an ignored console event falls through to
+	// the default handler, which exits the process
 	interrupts := make(chan os.Signal, 1)
-	if slices.Contains(modes, "hang") {
-		signal.Ignore(os.Interrupt)
-	} else {
-		signal.Notify(interrupts, os.Interrupt)
-	}
+	signal.Notify(interrupts, os.Interrupt)
 	root, err := environment.LoadRoot()
 	if err != nil {
 		return fakeFail(err)
@@ -439,6 +436,9 @@ func fakeAgent(api string, modes []string) int {
 	agentGrpc.RegisterAgentServer(server, a)
 	go func() { _ = server.Serve(listener) }()
 	<-interrupts
+	if slices.Contains(modes, "hang") {
+		select {}
+	}
 
 	a.mu.Lock()
 	for token := range a.shares {
@@ -502,23 +502,4 @@ func (a *fakeAgentServer) SharePublic(_ context.Context, req *agentGrpc.SharePub
 	a.entries = append(a.entries, entry)
 	a.save()
 	return &agentGrpc.SharePublicResponse{Token: entry.Token, FrontendEndpoints: a.shares[entry.Token].FrontendEndpoint}, nil
-}
-
-// fakePS puts a ps on PATH that fails every inspection, or with an identity reports it for any pid as a running
-// process, so a recorded process never appears to terminate.
-func fakePS(t *testing.T, started, command string) {
-	script := "#!/bin/sh\nexit 2\n"
-	if started != "" {
-		script = fmt.Sprintf("#!/bin/sh\ncase \"$2\" in\nlstart=) echo '%v' ;;\nargs=) echo '%v' ;;\n*) echo S ;;\nesac\n", started, command)
-	}
-	dir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(dir, "ps"), []byte(script), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	t.Setenv("PATH", dir)
-}
-
-// alive reports whether a pid still names a process.
-func alive(pid int) bool {
-	return syscall.Kill(pid, 0) == nil
 }

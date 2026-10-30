@@ -6,6 +6,8 @@ FIX: **Agent-managed public shares are now deleted on shutdown, including named 
 
 FIX: **The agent API changes: `Agent.Shutdown()` now returns an error, and `Agent.ReloadRegistry()` is replaced by `Agent.RestoreRegistryOnce()`.** Agent shutdown waits for in-flight startup, share and access cleanup, and saved restart requests before exiting. The agent command now exits 1 instead of 0 if shutdown fails or times out. Releasing a queued or in-flight retry prevents it from returning, and stopping during registry replay preserves requests not yet attempted.
 
+FIX: The agent can restore saved shares and accesses from v2.0.8 registries containing null optional fields. Upgrading no longer fails with "expected array for slice"; existing registry files need no manual conversion.
+
 FIX: Public shares routed through the agent now exit 2 when the controller refuses creation, preserving its error message. Temporary controller failures continue to exit 1, including retry advice when the service is busy.
 
 FIX: Releasing agent-managed shares and accesses no longer waits indefinitely for blocked child output. Startup messages split across reads or delivered together are no longer lost.
@@ -16,11 +18,7 @@ FIX: Web shares no longer panic while starting Caddy when built with Go 1.27 or 
 
 CHANGE: Official builds now use Go 1.27.3, with CI and source-build Docker images using the same compiler version. Building from source still requires Go 1.26 or newer.
 
-CHANGE: An `agent smoke` workflow builds `zrok2` from the selected branch on GitHub-hosted macOS (arm64) and Linux (amd64) runners, one platform at a time. On each, it takes an agent-managed named public share through Ctrl-C and a restart against a dedicated zrok test account, checking that the agent exits cleanly, the old share is gone, the reserved name survives and the replayed share has a new token. It runs on manual dispatch and temporarily on pushes to `fixes-209` for validation before merging, needs only the `ZROK2_CI_ACCOUNT_TOKEN` secret in the `zrok-agent-smoke` environment, and leaves existing builds and tests unchanged; see `docs/current/agent-smoke.md`.
-
-FIX: Agent lifecycle tests use short temporary directory names so their Unix sockets fit within macOS path limits. The macOS smoke workflow no longer times out in these fixtures before reaching the live scenario.
-
-FIX: The macOS agent smoke harness assumes HTTPS for public endpoints returned as bare hostnames, allowing named shares to reach the public response check. Explicit HTTP and HTTPS endpoints keep their supplied scheme.
+CHANGE: A manually dispatched `agent smoke` workflow checks, against a live zrok service on GitHub-hosted macOS, Linux and Windows runners, that the agent removes an agent-managed named public share when it shuts down gracefully and replays it with a new share after a restart. It is separate from existing builds, tests and releases; see `docs/current/agent-smoke.md` for setup and dispatch.
 
 ## v2.0.8
 

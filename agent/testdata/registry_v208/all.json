@@ -1,0 +1,65 @@
+{
+  "v": "2",
+  "private_accesses": [
+    {
+      "request": {
+        "share_token": "access-token",
+        "bind_address": "127.0.0.1:8082",
+        "auto_mode": true,
+        "auto_address": "127.0.0.1",
+        "auto_start_port": 1024,
+        "auto_end_port": 2048,
+        "response_headers": [
+          "X-Fixture: true"
+        ]
+      },
+      "failure": {
+        "next_retry": "0001-01-01T00:00:00Z"
+      }
+    }
+  ],
+  "public_shares": [
+    {
+      "request": {
+        "target": "8080",
+        "basic_auth": [
+          "fixture:password"
+        ],
+        "name_selections": [
+          {
+            "namespace_token": "team",
+            "name": "app"
+          }
+        ],
+        "backend_mode": "proxy",
+        "insecure": true,
+        "oauth_provider": "",
+        "oauth_email_domains": null,
+        "oauth_refresh_interval": "3h0m0s",
+        "closed": true,
+        "access_grants": [
+          "fixture-account"
+        ]
+      },
+      "failure": {
+        "count": 2,
+        "last_error": "fixture failure",
+        "next_retry": "2026-10-28T12:34:56.123456789-04:00"
+      }
+    }
+  ],
+  "private_shares": [
+    {
+      "request": {
+        "target": "8081",
+        "private_share_token": "reserved-token",
+        "backend_mode": "tcpTunnel",
+        "insecure": true,
+        "closed": true,
+        "access_grants": [
+          "fixture-account"
+        ]
+      }
+    }
+  ]
+}
