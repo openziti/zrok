@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"path/filepath"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -40,6 +41,18 @@ func TestPublicCLIRequestPreparation(t *testing.T) {
 		want, err := filepath.Abs("relative")
 		require.NoError(t, err)
 		require.Equal(t, want, out.Target)
+	}
+}
+
+func TestPublicCLIReadBasicAuth(t *testing.T) {
+	for input, want := range map[string]string{"u:p\n": "u:p", "u:p\r\n": "u:p", "u:p": "u:p", "u:p\nother:q\n": "u:p"} {
+		got, err := readBasicAuth(strings.NewReader(input))
+		require.NoError(t, err)
+		require.Equal(t, want, got)
+	}
+	for _, input := range []string{"", "\n", "\r\n"} {
+		_, err := readBasicAuth(strings.NewReader(input))
+		require.ErrorContains(t, err, "stdin is empty")
 	}
 }
 
