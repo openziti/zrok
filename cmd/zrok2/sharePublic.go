@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -35,6 +36,7 @@ func init() {
 
 type sharePublicCommand struct {
 	basicAuth            []string
+	basicAuthFromStdin   bool
 	nameSelections       []string
 	backendMode          string
 	headless             bool
@@ -85,7 +87,10 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.Flags().StringVar(&command.oauthProvider, "oauth-provider", "", "Select named OAuth provider (configured in selected frontend)")
 	cmd.Flags().StringArrayVar(&command.oauthEmailDomains, "oauth-email-domain", []string{}, "Allow only email addresses matching this glob to access")
 	cmd.Flags().DurationVar(&command.oauthRefreshInterval, "oauth-refresh-interval", 3*time.Hour, "Maximum lifetime for OAuth authentication; refresh after expiry")
+	cmd.Flags().BoolVar(&command.basicAuthFromStdin, "basic-auth-from-stdin", false, "Read one basic authentication user (<username:password>) from the first line of stdin")
 	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
+	cmd.MarkFlagsMutuallyExclusive("basic-auth-from-stdin", "basic-auth")
+	cmd.MarkFlagsMutuallyExclusive("basic-auth-from-stdin", "oauth-provider")
 
 	cmd.Run = command.run
 	return command
@@ -95,6 +100,14 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	if err := cmd.validateWorkerOptions(); err != nil {
 		cmd.error("invalid public worker options", err)
 		return
+	}
+	if cmd.basicAuthFromStdin {
+		credential, err := readBasicAuth(os.Stdin)
+		if err != nil {
+			cmd.error("invalid basic authentication", err)
+			return
+		}
+		cmd.basicAuth = []string{credential}
 	}
 	if cmd.subordinate {
 		logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
@@ -118,6 +131,18 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		func() { cmd.shareLocal(args, root) },
 		func() { cmd.shareAgent(args, root) },
 	)
+}
+
+func readBasicAuth(r io.Reader) (string, error) {
+	line, err := bufio.NewReader(r).ReadString('\n')
+	if err != nil && err != io.EOF {
+		return "", errors.Wrap(err, "error reading basic authentication from stdin")
+	}
+	credential := strings.TrimRight(line, "\r\n")
+	if credential == "" {
+		return "", newPermanentError("--basic-auth-from-stdin is set but stdin is empty")
+	}
+	return credential, nil
 }
 
 func (cmd *sharePublicCommand) validateWorkerOptions() error {

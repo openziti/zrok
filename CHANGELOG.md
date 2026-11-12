@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+FEATURE: `zrok2 share public --basic-auth-from-stdin` reads one `<username:password>` from the first line of stdin instead of `--basic-auth`, so a supervising process can pass the credential without it appearing in the process command line or environment, where other local users and endpoint monitoring can read it. It cannot be combined with `--basic-auth` or `--oauth-provider`, and an empty stdin fails before the share is created.
+
 ## v2.0.9
 
 FIX: **Agent-managed public shares are now deleted on shutdown, including named shares.** Reserved names and saved restart requests survive, but restarting creates a new share with a new token. Failed cleanup keeps tokens visible, retries before recreation, and reports unresolved tokens at shutdown.
