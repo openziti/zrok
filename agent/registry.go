@@ -6,12 +6,21 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"slices"
+	"strings"
 	"time"
 
 	"github.com/michaelquigley/df/dd"
 )
 
-const RegistryV = "2"
+// RegistryV is the version every save writes, whatever the registry holds. agents from earlier releases refuse
+// any version but "2" and never replay a refused registry, so a version 3 file cannot be replayed by an agent
+// that would mishandle its contents. rolling back is the manual edit in docs/current/agent-share-lifecycle.md.
+const RegistryV = "3"
+
+// registryReadableV lists the versions LoadRegistry accepts. a version 2 file is read as it is; no conversion
+// exists, and the next save writes RegistryV.
+var registryReadableV = []string{"2", RegistryV}
 
 type Registry struct {
 	V               string                       `dd:"v"`
@@ -58,8 +67,8 @@ func LoadRegistry(path string) (*Registry, error) {
 		return nil, err
 	}
 
-	if r.V != RegistryV {
-		return nil, fmt.Errorf("invalid registry version '%v'; expected '%v'", r.V, RegistryV)
+	if !slices.Contains(registryReadableV, r.V) {
+		return nil, fmt.Errorf("invalid registry version '%v'; expected one of '%v'", r.V, strings.Join(registryReadableV, "', '"))
 	}
 
 	return r, nil

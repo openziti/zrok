@@ -166,4 +166,5 @@ message VersionRequest {
 message VersionResponse {
 	string v = 1;
 	string consoleEndpoint = 2;
+	repeated string capabilities = 3;
 }

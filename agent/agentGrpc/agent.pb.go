@@ -1175,6 +1175,7 @@ type VersionResponse struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	V               string                 `protobuf:"bytes,1,opt,name=v,proto3" json:"v,omitempty"`
 	ConsoleEndpoint string                 `protobuf:"bytes,2,opt,name=consoleEndpoint,proto3" json:"consoleEndpoint,omitempty"`
+	Capabilities    []string               `protobuf:"bytes,3,rep,name=capabilities,proto3" json:"capabilities,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1221,6 +1222,13 @@ func (x *VersionResponse) GetConsoleEndpoint() string {
 		return x.ConsoleEndpoint
 	}
 	return ""
+}
+
+func (x *VersionResponse) GetCapabilities() []string {
+	if x != nil {
+		return x.Capabilities
+	}
+	return nil
 }
 
 var File_agent_agentGrpc_agent_proto protoreflect.FileDescriptor
@@ -1305,10 +1313,11 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x0eStatusResponse\x12)\n" +
 	"\baccesses\x18\x01 \x03(\v2\r.AccessDetailR\baccesses\x12$\n" +
 	"\x06shares\x18\x02 \x03(\v2\f.ShareDetailR\x06shares\"\x10\n" +
-	"\x0eVersionRequest\"I\n" +
+	"\x0eVersionRequest\"m\n" +
 	"\x0fVersionResponse\x12\f\n" +
 	"\x01v\x18\x01 \x01(\tR\x01v\x12(\n" +
-	"\x0fconsoleEndpoint\x18\x02 \x01(\tR\x0fconsoleEndpoint2\xe7\x05\n" +
+	"\x0fconsoleEndpoint\x18\x02 \x01(\tR\x0fconsoleEndpoint\x12\"\n" +
+	"\fcapabilities\x18\x03 \x03(\tR\fcapabilities2\xe7\x05\n" +
 	"\x05Agent\x12_\n" +
 	"\rAccessPrivate\x12\x15.AccessPrivateRequest\x1a\x16.AccessPrivateResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\"\x17/v1/agent/accessPrivate\x12_\n" +
 	"\rReleaseAccess\x12\x15.ReleaseAccessRequest\x1a\x16.ReleaseAccessResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\"\x17/v1/agent/releaseAccess\x12[\n" +

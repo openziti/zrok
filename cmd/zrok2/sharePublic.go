@@ -23,6 +23,7 @@ import (
 	"github.com/openziti/zrok/v2/endpoints/proxy"
 	"github.com/openziti/zrok/v2/environment"
 	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/internal/basicauth"
 	"github.com/openziti/zrok/v2/internal/sharepublic"
 	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 	"github.com/pkg/errors"
@@ -109,6 +110,10 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 		}
 		cmd.basicAuth = []string{credential}
 	}
+	if err := cmd.validateBasicAuth(); err != nil {
+		cmd.error("invalid basic authentication", err)
+		return
+	}
 	if cmd.subordinate {
 		logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
 		dlOpts := dl.DefaultOptions().SetTrimPrefix(trimPrefix).SetLevel(slog.LevelInfo)
@@ -136,7 +141,7 @@ func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 func readBasicAuth(r io.Reader) (string, error) {
 	line, err := bufio.NewReader(r).ReadString('\n')
 	if err != nil && err != io.EOF {
-		return "", errors.Wrap(err, "error reading basic authentication from stdin")
+		return "", newPermanentError("error reading basic authentication from stdin: %v", err)
 	}
 	credential := strings.TrimRight(line, "\r\n")
 	if credential == "" {
@@ -152,6 +157,46 @@ func (cmd *sharePublicCommand) validateWorkerOptions() error {
 	}
 	if cmd.subordinate && strings.TrimSpace(cmd.shareToken) == "" {
 		return newPermanentError("public --subordinate requires a nonempty --share-token")
+	}
+	// a worker's stdin is the agent's control channel, and authentication stays with the agent.
+	if cmd.subordinate && cmd.basicAuthFromStdin {
+		return newPermanentError("public --subordinate does not accept --basic-auth-from-stdin")
+	}
+	return nil
+}
+
+// validateBasicAuth checks the value sources' entries and names the source of a malformed one, never the entry.
+func (cmd *sharePublicCommand) validateBasicAuth() error {
+	for i, entry := range cmd.basicAuth {
+		if _, _, err := basicauth.ParseEntry(entry); err != nil {
+			if cmd.basicAuthFromStdin {
+				return newPermanentError("invalid basic authentication from stdin: %v", err)
+			}
+			return newPermanentError("invalid --basic-auth value at position '%d': %v", i+1, err)
+		}
+	}
+	return nil
+}
+
+// needsFirstColonGrammar reports whether an entry has a password containing a colon. an agent from an earlier
+// release splits on every colon, rejects such an entry and quotes it in its error.
+func (cmd *sharePublicCommand) needsFirstColonGrammar() bool {
+	for _, entry := range cmd.basicAuth {
+		if strings.Count(entry, ":") > 1 {
+			return true
+		}
+	}
+	return false
+}
+
+// requireAgentCapability refuses, without sending anything, when the agent does not declare capability.
+func requireAgentCapability(client agentGrpc.AgentClient, capability, what string) error {
+	version, err := client.Version(context.Background(), &agentGrpc.VersionRequest{})
+	if err != nil {
+		return errors.Wrap(err, "error checking agent capabilities")
+	}
+	if !version.HasCapability(capability) {
+		return newPermanentError("the running agent (version '%v') does not support %v; restart 'zrok2 agent' on the current version", version.GetV(), what)
 	}
 	return nil
 }
@@ -369,6 +414,14 @@ func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
 		exitWithFailure("error connecting to agent", err)
 	}
 	defer func() { _ = conn.Close() }()
+
+	// checked here and not at detection, because --force-agent skips detection.
+	if cmd.needsFirstColonGrammar() {
+		if err := requireAgentCapability(client, agentGrpc.CapabilityBasicAuthFirstColon, "a basic authentication password containing ':'"); err != nil {
+			exitWithFailure("unable to create share", err)
+			return
+		}
+	}
 
 	grpcReq := &agentGrpc.SharePublicRequest{
 		Target:               prepared.Target,

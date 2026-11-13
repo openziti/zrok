@@ -112,3 +112,19 @@ func TestPrepareValidationAndOwnership(t *testing.T) {
 	_, err = Prepare(in, "public")
 	require.ErrorContains(t, err, "username:password")
 }
+
+// basicAuthSentinel is a distinctive password; the no-quote tests assert it never appears in an error.
+const basicAuthSentinel = "zrokSentinelPw7Q"
+
+func TestPrepareBasicAuthGrammar(t *testing.T) {
+	in := sdk.ShareRequest{BackendMode: sdk.ProxyBackendMode, Target: "8080", BasicAuth: []string{"admin:s3:cret", "user:" + basicAuthSentinel + ":x"}}
+	out, err := Prepare(in, "public")
+	require.NoError(t, err)
+	require.Equal(t, in.BasicAuth, out.BasicAuth)
+
+	in.BasicAuth = []string{"admin:secret", basicAuthSentinel}
+	_, err = Prepare(in, "public")
+	require.Error(t, err)
+	require.NotContains(t, err.Error(), basicAuthSentinel)
+	require.Contains(t, err.Error(), "position '2'")
+}

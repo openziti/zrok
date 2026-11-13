@@ -2,7 +2,17 @@
 
 ## Unreleased
 
-FEATURE: `zrok2 share public --basic-auth-from-stdin` reads one `<username:password>` from the first line of stdin instead of `--basic-auth`, so a supervising process can pass the credential without it appearing in the process command line or environment, where other local users and endpoint monitoring can read it. It cannot be combined with `--basic-auth` or `--oauth-provider`, and an empty stdin fails before the share is created.
+CHANGE: **The agent registry (`agent-registry.json`) is now version 3, which agents from v2.0.9 and earlier cannot read.** The agent reads an existing version 2 registry as it is and saves it as version 3 at the end of its first startup, so upgrading needs no manual step. An agent from an earlier release refuses a version 3 registry and restores nothing from it, so rolling back to v2.0.9 or earlier needs a manual edit of the registry; the procedure is in `docs/current/agent-share-lifecycle.md`. For v2.0.8, make the edit before starting the older agent, which otherwise replaces the registry with an empty one at its next save.
+
+FEATURE: `zrok2 share public --basic-auth-from-stdin` reads one `<username:password>` from the first line of stdin instead of `--basic-auth`, so a supervising process can pass the credential without it appearing in the process command line or environment, where other local users and endpoint monitoring can read it. It cannot be combined with `--basic-auth` or `--oauth-provider`, and an empty or unreadable stdin fails with exit 2 before the share is created.
+
+FIX: Basic authentication passwords may now contain a colon. An entry is split at its first colon, as the frontends do when they check a login, so `admin:s3:cret` is user `admin` with password `s3:cret`. This applies to `--basic-auth`, `--basic-auth-from-stdin` and the Go, Node and Python SDKs. An agent left running from an earlier release cannot take such a password; `zrok2 share public` refuses with exit 2 without sending the credential, and asks for the agent to be restarted on the current version.
+
+FIX: A malformed basic authentication entry no longer prints the credential. Errors name where the entry came from (its position among `--basic-auth` values, or stdin) and never its contents, so a supervising service that logs stderr no longer records the password.
+
+FIX: The Node SDK now throws an error for a basic authentication entry without a colon. It previously dropped that user without a word and created the share without it.
+
+FIX: Basic authentication in the Python SDK works. Creating a share with `BasicAuth` previously failed with `AttributeError: 'ShareRequest' object has no attribute 'auth_users'` before anything was sent to the controller; the users now reach the controller.
 
 ## v2.0.9
 

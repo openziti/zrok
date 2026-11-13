@@ -17,5 +17,6 @@ func (i *agentGrpcImpl) Version(_ context.Context, _ *agentGrpc.VersionRequest) 
 	return &agentGrpc.VersionResponse{
 		V:               v,
 		ConsoleEndpoint: endpoint,
+		Capabilities:    []string{agentGrpc.CapabilityBasicAuthFirstColon},
 	}, nil
 }

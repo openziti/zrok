@@ -5,14 +5,38 @@ from unittest.mock import patch, MagicMock
 
 from zrok2.share import CreateShare, DeleteShare, ModifyShare, GetShareDetail, ReleaseReservedShare
 import zrok2.model as model
+from zrok_api.models.share_request import ShareRequest
 
 
 def _make_mock_api_share_request():
     """Return a MagicMock that stands in for the pydantic ShareRequest from zrok_api."""
     m = MagicMock()
     m.auth_scheme = model.AUTH_SCHEME_NONE
-    m.auth_users = []
     return m
+
+
+# a distinctive password; the no-quote tests assert it never appears in an error
+SENTINEL = "zrokSentinelPw7Q"
+
+
+def _make_share_api(token):
+    mock_share_api = MagicMock()
+    mock_response = MagicMock()
+    mock_response.data = MagicMock()
+    mock_response.data.share_token = token
+    mock_response.data.frontend_proxy_endpoints = []
+    mock_share_api.share_with_http_info.return_value = mock_response
+    return mock_share_api
+
+
+def _basic_auth_request(entries):
+    return model.ShareRequest(
+        BackendMode=model.PROXY_BACKEND_MODE,
+        ShareMode=model.PUBLIC_SHARE_MODE,
+        Target="http://localhost:8080",
+        Frontends=["public"],
+        BasicAuth=entries,
+    )
 
 
 class TestCreateShare:
@@ -77,25 +101,42 @@ class TestCreateShare:
             CreateShare(mock_root, req)
 
     def test_create_share_with_basic_auth(self, mock_root):
-        mock_share_api = MagicMock()
-        mock_response = MagicMock()
-        mock_response.data = MagicMock()
-        mock_response.data.share_token = "shr_auth"
-        mock_response.data.frontend_proxy_endpoints = []
-        mock_share_api.share_with_http_info.return_value = mock_response
+        # the request model is the real generated one, so a write to a field it does not have fails here
+        mock_share_api = _make_share_api("shr_auth")
 
-        req = model.ShareRequest(
-            BackendMode=model.PROXY_BACKEND_MODE,
-            ShareMode=model.PUBLIC_SHARE_MODE,
-            Target="http://localhost:8080",
-            Frontends=["public"],
-            BasicAuth=["user1:pass1"],
-        )
-
-        with patch("zrok2.share.ShareApi", return_value=mock_share_api), \
-             patch("zrok2.share.ShareRequest", return_value=_make_mock_api_share_request()):
-            share = CreateShare(mock_root, req)
+        with patch("zrok2.share.ShareApi", return_value=mock_share_api):
+            share = CreateShare(mock_root, _basic_auth_request(["user1:pass1", " user2 : pass2 "]))
             assert share.Token == "shr_auth"
+
+        body = mock_share_api.share_with_http_info.call_args.kwargs["body"]
+        assert isinstance(body, ShareRequest)
+        assert body.auth_scheme == model.AUTH_SCHEME_BASIC
+        assert [(u.username, u.password) for u in body.basic_auth_users] == [("user1", "pass1"), ("user2", "pass2")]
+        assert body.to_dict()["basicAuthUsers"] == [
+            {"username": "user1", "password": "pass1"},
+            {"username": "user2", "password": "pass2"},
+        ]
+
+    def test_create_share_with_basic_auth_colon_in_password(self, mock_root):
+        mock_share_api = _make_share_api("shr_colon")
+
+        with patch("zrok2.share.ShareApi", return_value=mock_share_api):
+            CreateShare(mock_root, _basic_auth_request(["admin:s3:cret"]))
+
+        body = mock_share_api.share_with_http_info.call_args.kwargs["body"]
+        assert [(u.username, u.password) for u in body.basic_auth_users] == [("admin", "s3:cret")]
+
+    @pytest.mark.parametrize("entries", [[SENTINEL], ["user1:pass1", SENTINEL]])
+    def test_create_share_with_malformed_basic_auth_does_not_quote(self, mock_root, entries):
+        mock_share_api = _make_share_api("shr_bad")
+
+        with patch("zrok2.share.ShareApi", return_value=mock_share_api):
+            with pytest.raises(Exception) as raised:
+                CreateShare(mock_root, _basic_auth_request(entries))
+
+        assert SENTINEL not in str(raised.value)
+        assert SENTINEL not in repr(raised.value)
+        mock_share_api.share_with_http_info.assert_not_called()
 
 
 class TestDeleteShare:

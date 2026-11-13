@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync/atomic"
 	"testing"
+	"testing/iotest"
 	"time"
 
 	"github.com/openziti/zrok/v2/endpoints"
@@ -54,6 +55,35 @@ func TestPublicCLIReadBasicAuth(t *testing.T) {
 		_, err := readBasicAuth(strings.NewReader(input))
 		require.ErrorContains(t, err, "stdin is empty")
 	}
+	// a failed read is permanent, as the flag's documented exit status says.
+	_, err := readBasicAuth(iotest.ErrReader(errors.New("read failed")))
+	var permanent *permanentError
+	require.ErrorAs(t, err, &permanent)
+	require.Equal(t, exitPermanent, classifyFailure(err).exitCode)
+}
+
+// basicAuthSentinel is a distinctive password; the no-quote tests assert it never appears in an error.
+const basicAuthSentinel = "zrokSentinelPw7Q"
+
+func TestPublicCLIValidateBasicAuthNamesSourceNotEntry(t *testing.T) {
+	cmd := newSharePublicCommand()
+	cmd.basicAuth = []string{"admin:s3:cret", "user:secret"}
+	require.NoError(t, cmd.validateBasicAuth())
+
+	cmd.basicAuth = []string{"admin:secret", basicAuthSentinel}
+	err := cmd.validateBasicAuth()
+	require.Error(t, err)
+	require.Equal(t, exitPermanent, classifyFailure(err).exitCode)
+	require.Contains(t, err.Error(), "--basic-auth value at position '2'")
+	require.NotContains(t, err.Error(), basicAuthSentinel)
+
+	cmd.basicAuthFromStdin = true
+	cmd.basicAuth = []string{basicAuthSentinel}
+	err = cmd.validateBasicAuth()
+	require.Error(t, err)
+	require.Equal(t, exitPermanent, classifyFailure(err).exitCode)
+	require.Contains(t, err.Error(), "from stdin")
+	require.NotContains(t, err.Error(), basicAuthSentinel)
 }
 
 func TestPublicCLIRejectsEmptyNamespaces(t *testing.T) {
@@ -221,6 +251,7 @@ func TestPublicWorkerOptionMatrix(t *testing.T) {
 	for _, args := range [][]string{
 		{"--share-token", "owned"}, {"--share-token="}, {"--share-token", " "},
 		{"--subordinate"}, {"--subordinate", "--share-token="}, {"--subordinate", "--share-token", "  "},
+		{"--subordinate", "--share-token", "owned", "--basic-auth-from-stdin"},
 	} {
 		cmd := newSharePublicCommand()
 		require.NoError(t, cmd.cmd.ParseFlags(args))
