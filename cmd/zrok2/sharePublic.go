@@ -38,6 +38,7 @@ func init() {
 type sharePublicCommand struct {
 	basicAuth            []string
 	basicAuthFromStdin   bool
+	basicAuthFile        string
 	nameSelections       []string
 	backendMode          string
 	headless             bool
@@ -92,6 +93,10 @@ func newSharePublicCommand() *sharePublicCommand {
 	cmd.MarkFlagsMutuallyExclusive("basic-auth", "oauth-provider")
 	cmd.MarkFlagsMutuallyExclusive("basic-auth-from-stdin", "basic-auth")
 	cmd.MarkFlagsMutuallyExclusive("basic-auth-from-stdin", "oauth-provider")
+	cmd.Flags().StringVar(&command.basicAuthFile, "basic-auth-file", "", "Read basic authentication users from a file, one <username:password> per line")
+	cmd.MarkFlagsMutuallyExclusive("basic-auth-file", "basic-auth")
+	cmd.MarkFlagsMutuallyExclusive("basic-auth-file", "basic-auth-from-stdin")
+	cmd.MarkFlagsMutuallyExclusive("basic-auth-file", "oauth-provider")
 
 	cmd.Run = command.run
 	return command
@@ -100,6 +105,10 @@ func newSharePublicCommand() *sharePublicCommand {
 func (cmd *sharePublicCommand) run(_ *cobra.Command, args []string) {
 	if err := cmd.validateWorkerOptions(); err != nil {
 		cmd.error("invalid public worker options", err)
+		return
+	}
+	if cmd.basicAuthFileGiven() && strings.TrimSpace(cmd.basicAuthFile) == "" {
+		cmd.error("invalid basic authentication", newPermanentError("--basic-auth-file requires a nonempty path"))
 		return
 	}
 	if cmd.basicAuthFromStdin {
@@ -162,7 +171,16 @@ func (cmd *sharePublicCommand) validateWorkerOptions() error {
 	if cmd.subordinate && cmd.basicAuthFromStdin {
 		return newPermanentError("public --subordinate does not accept --basic-auth-from-stdin")
 	}
+	if cmd.subordinate && cmd.basicAuthFileGiven() {
+		return newPermanentError("public --subordinate does not accept --basic-auth-file")
+	}
 	return nil
+}
+
+// basicAuthFileGiven reports whether --basic-auth-file was supplied. presence is the flag's set state, never a
+// nonempty value, so an empty path can never be read as the flag being absent.
+func (cmd *sharePublicCommand) basicAuthFileGiven() bool {
+	return cmd.cmd != nil && cmd.cmd.Flags().Changed("basic-auth-file")
 }
 
 // validateBasicAuth checks the value sources' entries and names the source of a malformed one, never the entry.
@@ -201,8 +219,9 @@ func requireAgentCapability(client agentGrpc.AgentClient, capability, what strin
 	return nil
 }
 
-// prepareRequest resolves paths in the invoking shell before either local execution or agent routing.
-func (cmd *sharePublicCommand) prepareRequest(args []string) (*sdk.ShareRequest, error) {
+// prepareRequest resolves paths in the invoking shell before either local execution or agent routing. in local
+// execution it reads a --basic-auth-file once, here, before the share is created.
+func (cmd *sharePublicCommand) prepareRequest(args []string, local bool) (*sdk.ShareRequest, error) {
 	target, err := sharepublic.Target(cmd.backendMode, args)
 	if err != nil {
 		return nil, err
@@ -213,9 +232,20 @@ func (cmd *sharePublicCommand) prepareRequest(args []string) (*sdk.ShareRequest,
 			return nil, err
 		}
 	}
+	basicAuth := cmd.basicAuth
+	if cmd.basicAuthFileGiven() {
+		if cmd.basicAuthFile, err = filepath.Abs(cmd.basicAuthFile); err != nil {
+			return nil, newPermanentError("invalid basic authentication file: %v", err)
+		}
+		if local {
+			if basicAuth, err = basicauth.ReadFile(cmd.basicAuthFile); err != nil {
+				return nil, newPermanentError("%v", err)
+			}
+		}
+	}
 	in := sdk.ShareRequest{
 		BackendMode: sdk.BackendMode(cmd.backendMode), Target: target,
-		BasicAuth: cmd.basicAuth, AccessGrants: cmd.accessGrants,
+		BasicAuth: basicAuth, AccessGrants: cmd.accessGrants,
 		OauthProvider: cmd.oauthProvider, OauthEmailAddressPatterns: cmd.oauthEmailDomains,
 		OauthRefreshInterval: cmd.oauthRefreshInterval, PermissionMode: sdk.ClosedPermissionMode,
 	}
@@ -244,7 +274,7 @@ func (cmd *sharePublicCommand) shareLocal(args []string, root env_core.Root) {
 		}
 		req = &sdk.ShareRequest{ShareMode: sdk.PublicShareMode, BackendMode: sdk.BackendMode(cmd.backendMode), Target: target}
 	} else {
-		req, err = cmd.prepareRequest(args)
+		req, err = cmd.prepareRequest(args, true)
 	}
 	if err != nil {
 		cmd.error("unable to create share", err)
@@ -403,7 +433,13 @@ func (cmd *sharePublicCommand) error(msg string, err error) {
 }
 
 func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
-	prepared, err := cmd.prepareRequest(args)
+	// the agent does not yet carry a file reference; refusing is the only alternative to a share without the
+	// requested authentication.
+	if cmd.basicAuthFileGiven() {
+		exitWithFailure("unable to create share", newPermanentError("--basic-auth-file is not supported through the agent; use --force-local"))
+		return
+	}
+	prepared, err := cmd.prepareRequest(args, false)
 	if err != nil {
 		exitWithFailure("unable to create share", err)
 		return

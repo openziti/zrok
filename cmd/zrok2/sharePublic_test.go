@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync/atomic"
@@ -19,11 +20,11 @@ import (
 
 func TestPublicCLIRequestPreparation(t *testing.T) {
 	cmd := &sharePublicCommand{backendMode: "proxy", nameSelections: []string{"team:app", "other"}, basicAuth: []string{"u:p"}, accessGrants: []string{"account"}}
-	out, err := cmd.prepareRequest([]string{"443"})
+	out, err := cmd.prepareRequest([]string{"443"}, true)
 	require.NoError(t, err)
 	require.Equal(t, &sdk.ShareRequest{BackendMode: sdk.ProxyBackendMode, ShareMode: sdk.PublicShareMode, Target: "https://127.0.0.1:443", NameSelections: []sdk.NameSelection{{NamespaceToken: "team", Name: "app"}, {NamespaceToken: "other"}}, BasicAuth: []string{"u:p"}, AccessGrants: []string{"account"}, PermissionMode: sdk.ClosedPermissionMode}, out)
 	for _, args := range [][]string{nil, {"a", "b"}} {
-		_, err := cmd.prepareRequest(args)
+		_, err := cmd.prepareRequest(args, true)
 		require.Error(t, err)
 	}
 	cmd.basicAuth = nil
@@ -31,13 +32,13 @@ func TestPublicCLIRequestPreparation(t *testing.T) {
 	cmd.oauthEmailDomains = []string{"*@example.com"}
 	cmd.oauthRefreshInterval = 3 * time.Hour
 	cmd.open = true
-	out, err = cmd.prepareRequest([]string{"8080"})
+	out, err = cmd.prepareRequest([]string{"8080"}, true)
 	require.NoError(t, err)
 	require.Equal(t, 3*time.Hour, out.OauthRefreshInterval)
 	require.Equal(t, sdk.OpenPermissionMode, out.PermissionMode)
 	for _, mode := range []string{"web", "drive", "caddy"} {
 		cmd.backendMode = mode
-		out, err = cmd.prepareRequest([]string{"relative"})
+		out, err = cmd.prepareRequest([]string{"relative"}, true)
 		require.NoError(t, err)
 		want, err := filepath.Abs("relative")
 		require.NoError(t, err)
@@ -89,7 +90,7 @@ func TestPublicCLIValidateBasicAuthNamesSourceNotEntry(t *testing.T) {
 func TestPublicCLIRejectsEmptyNamespaces(t *testing.T) {
 	for _, selections := range [][]string{{""}, {":app"}, {"team", ""}} {
 		cmd := &sharePublicCommand{backendMode: "proxy", nameSelections: selections}
-		out, err := cmd.prepareRequest([]string{"8080"})
+		out, err := cmd.prepareRequest([]string{"8080"}, true)
 		require.ErrorContains(t, err, "namespace")
 		require.Nil(t, out)
 		require.Equal(t, selections, cmd.nameSelections)
@@ -252,6 +253,8 @@ func TestPublicWorkerOptionMatrix(t *testing.T) {
 		{"--share-token", "owned"}, {"--share-token="}, {"--share-token", " "},
 		{"--subordinate"}, {"--subordinate", "--share-token="}, {"--subordinate", "--share-token", "  "},
 		{"--subordinate", "--share-token", "owned", "--basic-auth-from-stdin"},
+		{"--subordinate", "--share-token", "owned", "--basic-auth-file", "users"},
+		{"--subordinate", "--share-token", "owned", "--basic-auth-file="},
 	} {
 		cmd := newSharePublicCommand()
 		require.NoError(t, cmd.cmd.ParseFlags(args))
@@ -285,4 +288,47 @@ func TestPublicSubordinateNeverCreatesOrDeletes(t *testing.T) {
 			func(shr *sdk.Share) error { require.Equal(t, &sdk.Share{Token: "owned"}, shr); return runErr })
 		require.ErrorIs(t, err, runErr)
 	}
+}
+
+func TestPublicCLIBasicAuthFilePreparation(t *testing.T) {
+	dir := t.TempDir()
+	t.Chdir(dir)
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "users"), []byte("admin:s3:cret\r\n\r\nuser:two\n"), 0600))
+
+	cmd := newSharePublicCommand()
+	require.NoError(t, cmd.cmd.ParseFlags([]string{"--basic-auth-file", "users", "-n", "public"}))
+	require.True(t, cmd.basicAuthFileGiven())
+	out, err := cmd.prepareRequest([]string{"8080"}, true)
+	require.NoError(t, err)
+	require.Equal(t, filepath.Join(dir, "users"), cmd.basicAuthFile, "the path is made absolute in the invoking shell")
+	require.Equal(t, []string{"admin:s3:cret", "user:two"}, out.BasicAuth)
+
+	// the agent path resolves the path but never reads the file.
+	cmd = newSharePublicCommand()
+	require.NoError(t, cmd.cmd.ParseFlags([]string{"--basic-auth-file", "missing", "-n", "public"}))
+	out, err = cmd.prepareRequest([]string{"8080"}, false)
+	require.NoError(t, err)
+	require.Equal(t, filepath.Join(dir, "missing"), cmd.basicAuthFile)
+	require.Empty(t, out.BasicAuth)
+
+	// a reader failure is permanent, names the path and line, and never quotes the line.
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "bad"), []byte("admin:one\n"+basicAuthSentinel+"\n"), 0600))
+	cmd = newSharePublicCommand()
+	require.NoError(t, cmd.cmd.ParseFlags([]string{"--basic-auth-file", "bad", "-n", "public"}))
+	_, err = cmd.prepareRequest([]string{"8080"}, true)
+	require.Error(t, err)
+	require.Equal(t, exitPermanent, classifyFailure(err).exitCode)
+	require.Contains(t, err.Error(), filepath.Join(dir, "bad"))
+	require.Contains(t, err.Error(), "line '2'")
+	require.NotContains(t, err.Error(), basicAuthSentinel)
+}
+
+func TestPublicCLIBasicAuthFilePresenceIsTheFlagNotTheValue(t *testing.T) {
+	cmd := newSharePublicCommand()
+	require.NoError(t, cmd.cmd.ParseFlags([]string{"--basic-auth-file="}))
+	require.True(t, cmd.basicAuthFileGiven(), "an explicitly empty path is the flag given")
+	cmd = newSharePublicCommand()
+	require.NoError(t, cmd.cmd.ParseFlags(nil))
+	require.False(t, cmd.basicAuthFileGiven())
+	require.NoError(t, cmd.validateWorkerOptions())
 }

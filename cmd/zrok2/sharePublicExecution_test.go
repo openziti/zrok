@@ -17,6 +17,7 @@ import (
 
 	"github.com/openziti/zrok/v2/agent/agentGrpc"
 	"github.com/openziti/zrok/v2/environment"
+	"github.com/openziti/zrok/v2/tui"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 )
@@ -29,8 +30,11 @@ func TestPublicOptionExecutionHelper(t *testing.T) {
 	command := newSharePublicCommand()
 	for index, arg := range os.Args {
 		if arg == "--" {
-			require.NoError(t, command.cmd.ParseFlags(os.Args[index+1:]))
-			command.run(command.cmd, []string{"8080"})
+			// execute through cobra, as the binary does, so flag-group validation runs; report its error as main does.
+			command.cmd.SetArgs(append(append([]string{}, os.Args[index+1:]...), "8080"))
+			if err := command.cmd.Execute(); err != nil {
+				tui.Error("an error occurred", err)
+			}
 			t.Fatal("invalid worker invocation returned successfully")
 		}
 	}
@@ -91,10 +95,12 @@ func TestPublicCLIRejectsInvalidWorkerInvocationBeforeRouting(t *testing.T) {
 // rejects a request by quoting the credential it received, as v2.0.9 does.
 type legacyAgent struct {
 	agentGrpc.UnimplementedAgentServer
-	shares atomic.Int32
+	versions atomic.Int32
+	shares   atomic.Int32
 }
 
 func (a *legacyAgent) Version(context.Context, *agentGrpc.VersionRequest) (*agentGrpc.VersionResponse, error) {
+	a.versions.Add(1)
 	return &agentGrpc.VersionResponse{V: "v2.0.9"}, nil
 }
 
@@ -203,4 +209,69 @@ func TestPublicCLIRefusesColonPasswordForLegacyAgent(t *testing.T) {
 	// an entry the earlier grammar accepts goes to any agent, as it always has.
 	_, output := f.run(t, nil, "--basic-auth", "admin:secret")
 	require.EqualValues(t, 1, f.agent.shares.Load(), output)
+}
+
+func TestPublicCLIBasicAuthFileRefusals(t *testing.T) {
+	f := newPublicExecutionFixture(t)
+	dir := t.TempDir()
+	write := func(name, content string) string {
+		path := filepath.Join(dir, name)
+		require.NoError(t, os.WriteFile(path, []byte(content), 0600))
+		return path
+	}
+	good := write("good", "admin:s3:cret\n")
+	malformed := write("malformed", "admin:one\n"+basicAuthSentinel+"\n")
+	empty := write("empty", "\n \n")
+
+	t.Run("an explicitly empty path exits 2 before routing", func(t *testing.T) {
+		for _, flags := range [][]string{
+			{"--force-local", "--basic-auth-file="}, {"--basic-auth-file", ""}, {"--force-agent", "--basic-auth-file", "  "},
+		} {
+			code, output := f.run(t, nil, flags...)
+			require.Equal(t, exitPermanent, code, "%v: %s", flags, output)
+			require.Contains(t, output, "--basic-auth-file requires a nonempty path", "%v", flags)
+		}
+		require.Zero(t, f.controllerCalls.Load())
+		require.Zero(t, f.agent.versions.Load(), "an empty path reached agent detection")
+		require.Zero(t, f.agent.shares.Load())
+	})
+
+	t.Run("a bad file exits 2 with no create", func(t *testing.T) {
+		for _, path := range []string{malformed, empty, filepath.Join(dir, "missing"), dir} {
+			code, output := f.run(t, nil, "--force-local", "--basic-auth-file", path)
+			require.Equal(t, exitPermanent, code, "%v: %s", path, output)
+			require.Contains(t, output, path)
+			require.NotContains(t, output, basicAuthSentinel)
+		}
+		require.Zero(t, f.controllerCalls.Load())
+		require.Zero(t, f.agent.shares.Load())
+	})
+
+	t.Run("the agent path refuses instead of dropping the flag", func(t *testing.T) {
+		for _, flags := range [][]string{
+			{"--basic-auth-file", good}, {"--force-agent", "--basic-auth-file", good}, {"--force-agent", "--basic-auth-file", malformed},
+		} {
+			code, output := f.run(t, nil, flags...)
+			require.Equal(t, exitPermanent, code, "%v: %s", flags, output)
+			require.Contains(t, output, "not supported through the agent", "%v", flags)
+			require.NotContains(t, output, basicAuthSentinel)
+		}
+		require.Zero(t, f.controllerCalls.Load())
+		require.Zero(t, f.agent.shares.Load(), "a request was sent to the agent without its file")
+	})
+
+	t.Run("exclusive sources are rejected", func(t *testing.T) {
+		for _, flags := range [][]string{
+			{"--basic-auth-file", good, "--basic-auth", "admin:secret"},
+			{"--basic-auth-file", good, "--basic-auth-from-stdin"},
+			{"--basic-auth-file", good, "--oauth-provider", "github"},
+			{"--force-local", "--basic-auth-file=", "--basic-auth", "admin:secret"},
+		} {
+			code, output := f.run(t, strings.NewReader("admin:secret\n"), flags...)
+			require.NotZero(t, code, "%v: %s", flags, output)
+			require.Contains(t, output, "if any flags in the group", "%v", flags)
+		}
+		require.Zero(t, f.controllerCalls.Load())
+		require.Zero(t, f.agent.shares.Load())
+	})
 }
