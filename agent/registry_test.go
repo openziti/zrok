@@ -86,3 +86,23 @@ func TestRegistryVersions(t *testing.T) {
 		}
 	})
 }
+
+func TestRegistryBasicAuthFileRoundTrip(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "registry.json")
+	request := &SharePublicRequest{BackendMode: "proxy", Target: "8080", BasicAuthFile: "/etc/zrok2/app-users",
+		NameSelections: []NameSelection{{NamespaceToken: "public", Name: "app"}}}
+	require.NoError(t, (&Registry{PublicShares: []*PublicShareRegistryEntry{{Request: request}}}).Save(path))
+	var saved map[string]any
+	data, err := os.ReadFile(path)
+	require.NoError(t, err)
+	require.NoError(t, json.Unmarshal(data, &saved))
+	require.Equal(t, "3", saved["v"])
+	entry := saved["public_shares"].([]any)[0].(map[string]any)["request"].(map[string]any)
+	require.Equal(t, "/etc/zrok2/app-users", entry["basic_auth_file"])
+	require.Empty(t, entry["basic_auth"])
+	loaded, err := LoadRegistry(path)
+	require.NoError(t, err)
+	require.Equal(t, "/etc/zrok2/app-users", loaded.PublicShares[0].Request.BasicAuthFile)
+	require.Empty(t, loaded.PublicShares[0].Request.BasicAuth)
+	require.True(t, sameRequest(request, loaded.PublicShares[0].Request))
+}

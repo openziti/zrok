@@ -433,16 +433,20 @@ func (cmd *sharePublicCommand) error(msg string, err error) {
 }
 
 func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
-	// the agent does not yet carry a file reference; refusing is the only alternative to a share without the
-	// requested authentication.
-	if cmd.basicAuthFileGiven() {
-		exitWithFailure("unable to create share", newPermanentError("--basic-auth-file is not supported through the agent; use --force-local"))
-		return
-	}
+	// the agent is the only reader of a --basic-auth-file; prepareRequest makes its path absolute and does not read it.
 	prepared, err := cmd.prepareRequest(args, false)
 	if err != nil {
 		exitWithFailure("unable to create share", err)
 		return
+	}
+	basicAuth, basicAuthFile := cmd.basicAuth, ""
+	if cmd.basicAuthFileGiven() {
+		if cmd.basicAuthFile == "" {
+			// on the wire an empty path reads as no reference at all; never send one.
+			exitWithFailure("unable to create share", newPermanentError("--basic-auth-file requires a nonempty path"))
+			return
+		}
+		basicAuth, basicAuthFile = nil, cmd.basicAuthFile
 	}
 
 	client, conn, err := agentClient.NewClient(root)
@@ -458,10 +462,17 @@ func (cmd *sharePublicCommand) shareAgent(args []string, root env_core.Root) {
 			return
 		}
 	}
+	if basicAuthFile != "" {
+		if err := requireAgentCapability(client, agentGrpc.CapabilityBasicAuthFile, "--basic-auth-file"); err != nil {
+			exitWithFailure("unable to create share", err)
+			return
+		}
+	}
 
 	grpcReq := &agentGrpc.SharePublicRequest{
 		Target:               prepared.Target,
-		BasicAuth:            cmd.basicAuth,
+		BasicAuth:            basicAuth,
+		BasicAuthFile:        basicAuthFile,
 		BackendMode:          cmd.backendMode,
 		Insecure:             cmd.insecure,
 		OauthProvider:        cmd.oauthProvider,

@@ -891,6 +891,7 @@ type SharePublicRequest struct {
 	OauthRefreshInterval string                 `protobuf:"bytes,8,opt,name=oauthRefreshInterval,proto3" json:"oauthRefreshInterval,omitempty"`
 	Closed               bool                   `protobuf:"varint,9,opt,name=closed,proto3" json:"closed,omitempty"`
 	AccessGrants         []string               `protobuf:"bytes,10,rep,name=accessGrants,proto3" json:"accessGrants,omitempty"`
+	BasicAuthFile        string                 `protobuf:"bytes,11,opt,name=basicAuthFile,proto3" json:"basicAuthFile,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -993,6 +994,13 @@ func (x *SharePublicRequest) GetAccessGrants() []string {
 		return x.AccessGrants
 	}
 	return nil
+}
+
+func (x *SharePublicRequest) GetBasicAuthFile() string {
+	if x != nil {
+		return x.BasicAuthFile
+	}
+	return ""
 }
 
 type SharePublicResponse struct {
@@ -1293,7 +1301,7 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x06closed\x18\x05 \x01(\bR\x06closed\x12\"\n" +
 	"\faccessGrants\x18\x06 \x03(\tR\faccessGrants\",\n" +
 	"\x14SharePrivateResponse\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"\x84\x03\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"\xaa\x03\n" +
 	"\x12SharePublicRequest\x12\x16\n" +
 	"\x06target\x18\x01 \x01(\tR\x06target\x12\x1c\n" +
 	"\tbasicAuth\x18\x02 \x03(\tR\tbasicAuth\x126\n" +
@@ -1305,7 +1313,8 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x14oauthRefreshInterval\x18\b \x01(\tR\x14oauthRefreshInterval\x12\x16\n" +
 	"\x06closed\x18\t \x01(\bR\x06closed\x12\"\n" +
 	"\faccessGrants\x18\n" +
-	" \x03(\tR\faccessGrants\"Y\n" +
+	" \x03(\tR\faccessGrants\x12$\n" +
+	"\rbasicAuthFile\x18\v \x01(\tR\rbasicAuthFile\"Y\n" +
 	"\x13SharePublicResponse\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12,\n" +
 	"\x11frontendEndpoints\x18\x02 \x03(\tR\x11frontendEndpoints\"\x0f\n" +

@@ -351,6 +351,12 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "basicAuthFile",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [

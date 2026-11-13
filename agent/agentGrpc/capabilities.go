@@ -8,6 +8,10 @@ const (
 	// CapabilityBasicAuthFirstColon: basic authentication entries are split at the first colon, so a password
 	// may contain one, and a rejected entry is never quoted in an error.
 	CapabilityBasicAuthFirstColon = "basic-auth-first-colon"
+
+	// CapabilityBasicAuthFile: a SharePublicRequest's basicAuthFile is a reference the agent reads at each
+	// create. an agent without it ignores the field and would create the share with no authentication.
+	CapabilityBasicAuthFile = "basic-auth-file"
 )
 
 // HasCapability reports whether the agent's VersionResponse declares capability.

@@ -10,7 +10,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -20,6 +22,9 @@ import (
 	"github.com/openziti/zrok/v2/tui"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	grpcStatus "google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestPublicOptionExecutionHelper(t *testing.T) {
@@ -91,22 +96,47 @@ func TestPublicCLIRejectsInvalidWorkerInvocationBeforeRouting(t *testing.T) {
 	require.NotContains(t, string(output), "unable to load environment")
 }
 
-// legacyAgent answers as an agent from an earlier release of the series: it declares no capabilities, and it
-// rejects a request by quoting the credential it received, as v2.0.9 does.
+// legacyAgent answers as an agent from an earlier release of the series: by default it declares no capabilities,
+// and it rejects a request by quoting the credential it received, as v2.0.9 does. it records every request.
 type legacyAgent struct {
 	agentGrpc.UnimplementedAgentServer
-	versions atomic.Int32
-	shares   atomic.Int32
+	capabilities []string
+	refusal      error // when set, SharePublic answers with it instead of quoting
+	versions     atomic.Int32
+	shares       atomic.Int32
+	mu           sync.Mutex
+	requests     []*agentGrpc.SharePublicRequest
 }
 
 func (a *legacyAgent) Version(context.Context, *agentGrpc.VersionRequest) (*agentGrpc.VersionResponse, error) {
 	a.versions.Add(1)
-	return &agentGrpc.VersionResponse{V: "v2.0.9"}, nil
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return &agentGrpc.VersionResponse{V: "v2.0.9", Capabilities: slices.Clone(a.capabilities)}, nil
+}
+
+func (a *legacyAgent) declare(capabilities ...string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.capabilities = capabilities
 }
 
 func (a *legacyAgent) SharePublic(_ context.Context, req *agentGrpc.SharePublicRequest) (*agentGrpc.SharePublicResponse, error) {
 	a.shares.Add(1)
+	a.mu.Lock()
+	a.requests = append(a.requests, proto.Clone(req).(*agentGrpc.SharePublicRequest))
+	refusal := a.refusal
+	a.mu.Unlock()
+	if refusal != nil {
+		return nil, refusal
+	}
 	return nil, fmt.Errorf("invalid username:password '%v'", strings.Join(req.BasicAuth, ","))
+}
+
+func (a *legacyAgent) received() []*agentGrpc.SharePublicRequest {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return append([]*agentGrpc.SharePublicRequest(nil), a.requests...)
 }
 
 // publicExecutionFixture is an enabled environment whose controller and agent count every call they receive.
@@ -247,17 +277,23 @@ func TestPublicCLIBasicAuthFileRefusals(t *testing.T) {
 		require.Zero(t, f.agent.shares.Load())
 	})
 
-	t.Run("the agent path refuses instead of dropping the flag", func(t *testing.T) {
-		for _, flags := range [][]string{
-			{"--basic-auth-file", good}, {"--force-agent", "--basic-auth-file", good}, {"--force-agent", "--basic-auth-file", malformed},
-		} {
-			code, output := f.run(t, nil, flags...)
-			require.Equal(t, exitPermanent, code, "%v: %s", flags, output)
-			require.Contains(t, output, "not supported through the agent", "%v", flags)
-			require.NotContains(t, output, basicAuthSentinel)
+	t.Run("an agent without the file capability is sent nothing", func(t *testing.T) {
+		// with no capabilities (v2.0.9), and with only the entry grammar (a stage 1 build).
+		for _, capabilities := range [][]string{nil, {agentGrpc.CapabilityBasicAuthFirstColon}} {
+			f.agent.declare(capabilities...)
+			for _, flags := range [][]string{
+				{"--basic-auth-file", good}, {"--force-agent", "--basic-auth-file", good}, {"--force-agent", "--basic-auth-file", malformed},
+			} {
+				code, output := f.run(t, nil, flags...)
+				require.Equal(t, exitPermanent, code, "%v: %s", flags, output)
+				require.Contains(t, output, "restart 'zrok2 agent'", "%v", flags)
+				require.Contains(t, output, "v2.0.9", "%v", flags)
+				require.NotContains(t, output, basicAuthSentinel)
+			}
 		}
+		f.agent.declare()
 		require.Zero(t, f.controllerCalls.Load())
-		require.Zero(t, f.agent.shares.Load(), "a request was sent to the agent without its file")
+		require.Zero(t, f.agent.shares.Load(), "a file reference was sent to an agent that would ignore it")
 	})
 
 	t.Run("exclusive sources are rejected", func(t *testing.T) {
@@ -274,4 +310,47 @@ func TestPublicCLIBasicAuthFileRefusals(t *testing.T) {
 		require.Zero(t, f.controllerCalls.Load())
 		require.Zero(t, f.agent.shares.Load())
 	})
+}
+
+func TestPublicCLISendsBasicAuthFileByReference(t *testing.T) {
+	f := newPublicExecutionFixture(t)
+	f.agent.declare(agentGrpc.CapabilityBasicAuthFirstColon, agentGrpc.CapabilityBasicAuthFile)
+	cwd, err := os.Getwd()
+	require.NoError(t, err)
+	// the paths do not exist: the agent is the only reader, so the command must not try.
+	absent := filepath.Join(t.TempDir(), "absent-users")
+	for _, tc := range []struct {
+		path string
+		want string
+	}{
+		{absent, absent},
+		{"relative-absent-users", filepath.Join(cwd, "relative-absent-users")},
+	} {
+		for _, force := range []bool{false, true} {
+			flags := []string{"--basic-auth-file", tc.path}
+			if force {
+				flags = append([]string{"--force-agent"}, flags...)
+			}
+			before := len(f.agent.received())
+			_, output := f.run(t, nil, flags...)
+			received := f.agent.received()
+			require.Len(t, received, before+1, "%v: %s", flags, output)
+			sent := received[len(received)-1]
+			require.Equal(t, tc.want, sent.BasicAuthFile, "%v", flags)
+			require.Empty(t, sent.BasicAuth, "%v", flags)
+		}
+	}
+	require.Zero(t, f.controllerCalls.Load())
+}
+
+func TestPublicCLIAgentFileRefusalExitsPermanent(t *testing.T) {
+	f := newPublicExecutionFixture(t)
+	f.agent.declare(agentGrpc.CapabilityBasicAuthFirstColon, agentGrpc.CapabilityBasicAuthFile)
+	f.agent.mu.Lock()
+	f.agent.refusal = grpcStatus.Error(codes.InvalidArgument, "invalid basic authentication file '/agent/users': line '2': expected <username:password>")
+	f.agent.mu.Unlock()
+	code, output := f.run(t, nil, "--basic-auth-file", "/agent/users")
+	require.Equal(t, exitPermanent, code, output)
+	require.Contains(t, output, "line '2'")
+	require.EqualValues(t, 1, f.agent.shares.Load())
 }

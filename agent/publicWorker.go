@@ -44,7 +44,7 @@ func (a *Agent) launchPublic(op *operation, attempt *startAttempt, req *SharePub
 	}
 	shr := &share{token: created.Token, frontendEndpoints: slices.Clone(created.FrontendEndpoints),
 		shareMode: sdk.PublicShareMode, backendMode: prepared.BackendMode, target: prepared.Target,
-		basicAuth: prepared.BasicAuth, nameSelections: names, insecure: req.Insecure,
+		nameSelections: names, insecure: req.Insecure,
 		oauthProvider: prepared.OauthProvider, oauthEmailAddressPatterns: prepared.OauthEmailAddressPatterns,
 		closed: req.Closed, accessGrants: prepared.AccessGrants}
 	a.mu.Lock()

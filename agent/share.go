@@ -35,6 +35,9 @@ type SharePublicRequest struct {
 	OauthRefreshInterval string          `dd:"oauth_refresh_interval"`
 	Closed               bool            `dd:"closed"`
 	AccessGrants         []string        `dd:"access_grants"`
+	// BasicAuthFile is a reference: the agent reads the users from it at each create, and the saved request
+	// never holds them. empty means absent; the CLI refuses an empty path before it reaches the agent.
+	BasicAuthFile string `dd:"basic_auth_file"`
 }
 
 func (spr *SharePublicRequest) hasReservedName() bool {
@@ -50,7 +53,6 @@ type share struct {
 	token                     string
 	frontendEndpoints         []string
 	target                    string
-	basicAuth                 []string
 	nameSelections            []NameSelection
 	shareMode                 sdk.ShareMode
 	backendMode               sdk.BackendMode

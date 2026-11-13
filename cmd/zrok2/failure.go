@@ -18,15 +18,18 @@ import (
 	"github.com/openziti/zrok/v2/rest_model_zrok"
 	"github.com/openziti/zrok/v2/tui"
 	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
+	grpcStatus "google.golang.org/grpc/status"
 )
 
 const (
 	// exitTransient is the exit status for a failure a later retry may fix: the controller was unreachable,
-	// busy or failing (a connection failure, any 5xx, a 429), or the failure was not a controller answer.
+	// busy or failing (a connection failure, any 5xx, a 429), or any other failure not classified as permanent.
 	exitTransient = 1
 
 	// exitPermanent is the exit status for a failure a retry cannot fix: the controller refused the request
-	// with a 4xx other than 429.
+	// with a 4xx other than 429, or the command (or the agent it sent the request to) refused an input or a
+	// condition before the request reached the controller.
 	exitPermanent = 2
 )
 
@@ -36,8 +39,8 @@ const permanentAdvice = "retrying will not change the answer; 'zrok2 agent' retr
 // exitCodesHelp documents the exit statuses in the help of the commands that classify their failures.
 const exitCodesHelp = `Exit status:
   0  success
-  1  a failure a later retry may fix: the zrok controller was unreachable, busy (503 or 429) or failing (5xx); also any failure that is not an answer from the controller
-  2  a failure a retry cannot fix: the zrok controller refused the request (401, 400, 404, 409 and other 4xx)`
+  1  a failure a later retry may fix: the zrok controller was unreachable, busy (503 or 429) or failing (5xx); also any failure not listed under 2, including unknown or conflicting flags
+  2  a failure a retry cannot fix: the zrok controller refused the request (401, 400, 404, 409 and other 4xx), or the command refused an input or a condition before sending the request (for example a malformed credential, an unusable credentials file, or an agent that must be restarted)`
 
 // statusError is satisfied by every response type the generated zrok client returns as an error.
 type statusError interface {
@@ -81,6 +84,11 @@ func classifyFailureAgainst(err error, apiEndpoint func() string) failure {
 	var permanent *permanentError
 	if errors.As(err, &permanent) {
 		return failure{exitCode: exitPermanent, detail: permanent.msg}
+	}
+
+	// the agent refuses input the command sent it, such as an unusable basic authentication file, as InvalidArgument.
+	if refusal, ok := grpcStatus.FromError(err); ok && refusal.Code() == codes.InvalidArgument {
+		return failure{exitCode: exitPermanent, detail: refusal.Message()}
 	}
 
 	if status, payload, found := controllerAnswer(err); found {
