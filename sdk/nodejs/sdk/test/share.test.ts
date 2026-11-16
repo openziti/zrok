@@ -17,7 +17,7 @@ import {
     AUTH_SCHEME_OAUTH,
     NameSelection,
 } from "../src/zrok/model";
-import {ShareRequestBackendModeEnum} from "../src/api";
+import {ShareApi, ShareRequestBackendModeEnum} from "../src/api";
 
 // mock the API modules
 vi.mock("../src/api", async (importOriginal) => {
@@ -77,6 +77,51 @@ describe("createShare", () => {
         let root = mockRoot();
         let req = new ShareRequest("invalid", PROXY_BACKEND_MODE, "http://localhost:8080");
         await expect(createShare(root, req)).rejects.toThrow("unknown share mode");
+    });
+});
+
+// a distinctive password; the no-quote tests assert it never appears in an error
+const SENTINEL = "zrokSentinelPw7Q";
+
+const basicAuthRequest = (basicAuth: string[]): ShareRequest => {
+    let req = new ShareRequest(PUBLIC_SHARE_MODE, PROXY_BACKEND_MODE, "http://localhost:8080");
+    req.basicAuth = basicAuth;
+    return req;
+};
+
+const sentShareBodies = (): any[] =>
+    vi.mocked(ShareApi).mock.results.flatMap(result => (result.value as any).share.mock.calls.map((call: any[]) => call[0].body));
+
+describe("createShare basic authentication", () => {
+    beforeEach(() => {
+        vi.mocked(ShareApi).mockClear();
+    });
+
+    it("should split an entry at the first colon", async () => {
+        await createShare(mockRoot(), basicAuthRequest(["admin:s3:cret", " user2 : pass2 "]));
+        const bodies = sentShareBodies();
+        expect(bodies).toHaveLength(1);
+        expect(bodies[0].authScheme).toBe(AUTH_SCHEME_BASIC);
+        expect(bodies[0].basicAuthUsers).toEqual([
+            {username: "admin", password: "s3:cret"},
+            {username: "user2", password: "pass2"},
+        ]);
+    });
+
+    it("should reject a malformed entry without quoting it", async () => {
+        const err = await createShare(mockRoot(), basicAuthRequest([SENTINEL])).catch(e => e);
+        expect(err).toBeInstanceOf(Error);
+        expect(String(err)).not.toContain(SENTINEL);
+        expect(err.message).toContain("position '1'");
+        expect(sentShareBodies()).toHaveLength(0);
+    });
+
+    it("should reject a malformed entry among valid ones without quoting it", async () => {
+        const err = await createShare(mockRoot(), basicAuthRequest(["user1:pass1", SENTINEL, "user3:pass3"])).catch(e => e);
+        expect(err).toBeInstanceOf(Error);
+        expect(String(err)).not.toContain(SENTINEL);
+        expect(err.message).toContain("position '2'");
+        expect(sentShareBodies()).toHaveLength(0);
     });
 });
 

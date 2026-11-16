@@ -46,6 +46,13 @@ func newLifecycleAgent(t *testing.T) *Agent {
 	dir, err := os.MkdirTemp("", "agent-")
 	require.NoError(t, err)
 	t.Cleanup(func() { require.NoError(t, os.RemoveAll(dir)) })
+	return newLifecycleAgentIn(t, dir)
+}
+
+// newLifecycleAgentIn starts a lifecycle agent on an existing root directory, so a second agent can replay what a
+// first one saved.
+func newLifecycleAgentIn(t *testing.T, dir string) *Agent {
+	t.Helper()
 	a, err := NewAgent(DefaultConfig(), &lifecycleRoot{dir: dir})
 	require.NoError(t, err)
 	a.options.startup = 5 * time.Second

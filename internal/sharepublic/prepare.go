@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/gobwas/glob"
+	"github.com/openziti/zrok/v2/internal/basicauth"
 	"github.com/openziti/zrok/v2/sdk/golang/sdk"
 )
 
@@ -22,9 +23,10 @@ func Prepare(in sdk.ShareRequest, defaultNamespace string) (*sdk.ShareRequest, e
 	if len(in.BasicAuth) > 0 && in.OauthProvider != "" {
 		return nil, fmt.Errorf("basic authentication and oauth provider are mutually exclusive")
 	}
-	for _, user := range in.BasicAuth {
-		if len(strings.Split(user, ":")) != 2 {
-			return nil, fmt.Errorf("invalid username:password '%v'", user)
+	// the backstop for callers that bypass the command's validation; it names the position, never the entry.
+	for i, entry := range in.BasicAuth {
+		if _, _, err := basicauth.ParseEntry(entry); err != nil {
+			return nil, fmt.Errorf("invalid basic authentication entry at position '%d': %w", i+1, err)
 		}
 	}
 	if in.OauthProvider != "" {

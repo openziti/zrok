@@ -891,6 +891,7 @@ type SharePublicRequest struct {
 	OauthRefreshInterval string                 `protobuf:"bytes,8,opt,name=oauthRefreshInterval,proto3" json:"oauthRefreshInterval,omitempty"`
 	Closed               bool                   `protobuf:"varint,9,opt,name=closed,proto3" json:"closed,omitempty"`
 	AccessGrants         []string               `protobuf:"bytes,10,rep,name=accessGrants,proto3" json:"accessGrants,omitempty"`
+	BasicAuthFile        string                 `protobuf:"bytes,11,opt,name=basicAuthFile,proto3" json:"basicAuthFile,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -993,6 +994,13 @@ func (x *SharePublicRequest) GetAccessGrants() []string {
 		return x.AccessGrants
 	}
 	return nil
+}
+
+func (x *SharePublicRequest) GetBasicAuthFile() string {
+	if x != nil {
+		return x.BasicAuthFile
+	}
+	return ""
 }
 
 type SharePublicResponse struct {
@@ -1175,6 +1183,7 @@ type VersionResponse struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	V               string                 `protobuf:"bytes,1,opt,name=v,proto3" json:"v,omitempty"`
 	ConsoleEndpoint string                 `protobuf:"bytes,2,opt,name=consoleEndpoint,proto3" json:"consoleEndpoint,omitempty"`
+	Capabilities    []string               `protobuf:"bytes,3,rep,name=capabilities,proto3" json:"capabilities,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1221,6 +1230,13 @@ func (x *VersionResponse) GetConsoleEndpoint() string {
 		return x.ConsoleEndpoint
 	}
 	return ""
+}
+
+func (x *VersionResponse) GetCapabilities() []string {
+	if x != nil {
+		return x.Capabilities
+	}
+	return nil
 }
 
 var File_agent_agentGrpc_agent_proto protoreflect.FileDescriptor
@@ -1285,7 +1301,7 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x06closed\x18\x05 \x01(\bR\x06closed\x12\"\n" +
 	"\faccessGrants\x18\x06 \x03(\tR\faccessGrants\",\n" +
 	"\x14SharePrivateResponse\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"\x84\x03\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"\xaa\x03\n" +
 	"\x12SharePublicRequest\x12\x16\n" +
 	"\x06target\x18\x01 \x01(\tR\x06target\x12\x1c\n" +
 	"\tbasicAuth\x18\x02 \x03(\tR\tbasicAuth\x126\n" +
@@ -1297,7 +1313,8 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x14oauthRefreshInterval\x18\b \x01(\tR\x14oauthRefreshInterval\x12\x16\n" +
 	"\x06closed\x18\t \x01(\bR\x06closed\x12\"\n" +
 	"\faccessGrants\x18\n" +
-	" \x03(\tR\faccessGrants\"Y\n" +
+	" \x03(\tR\faccessGrants\x12$\n" +
+	"\rbasicAuthFile\x18\v \x01(\tR\rbasicAuthFile\"Y\n" +
 	"\x13SharePublicResponse\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12,\n" +
 	"\x11frontendEndpoints\x18\x02 \x03(\tR\x11frontendEndpoints\"\x0f\n" +
@@ -1305,10 +1322,11 @@ const file_agent_agentGrpc_agent_proto_rawDesc = "" +
 	"\x0eStatusResponse\x12)\n" +
 	"\baccesses\x18\x01 \x03(\v2\r.AccessDetailR\baccesses\x12$\n" +
 	"\x06shares\x18\x02 \x03(\v2\f.ShareDetailR\x06shares\"\x10\n" +
-	"\x0eVersionRequest\"I\n" +
+	"\x0eVersionRequest\"m\n" +
 	"\x0fVersionResponse\x12\f\n" +
 	"\x01v\x18\x01 \x01(\tR\x01v\x12(\n" +
-	"\x0fconsoleEndpoint\x18\x02 \x01(\tR\x0fconsoleEndpoint2\xe7\x05\n" +
+	"\x0fconsoleEndpoint\x18\x02 \x01(\tR\x0fconsoleEndpoint\x12\"\n" +
+	"\fcapabilities\x18\x03 \x03(\tR\fcapabilities2\xe7\x05\n" +
 	"\x05Agent\x12_\n" +
 	"\rAccessPrivate\x12\x15.AccessPrivateRequest\x1a\x16.AccessPrivateResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\"\x17/v1/agent/accessPrivate\x12_\n" +
 	"\rReleaseAccess\x12\x15.ReleaseAccessRequest\x1a\x16.ReleaseAccessResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\"\x17/v1/agent/releaseAccess\x12[\n" +

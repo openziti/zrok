@@ -458,7 +458,6 @@ func (b *legacyBoot) snapshot() (*share, *access, error) {
 	if b.shr != nil {
 		out := *b.shr
 		out.frontendEndpoints = slices.Clone(out.frontendEndpoints)
-		out.basicAuth = slices.Clone(out.basicAuth)
 		out.nameSelections = slices.Clone(out.nameSelections)
 		out.accessGrants = slices.Clone(out.accessGrants)
 		out.oauthEmailAddressPatterns = slices.Clone(out.oauthEmailAddressPatterns)

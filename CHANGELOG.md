@@ -2,7 +2,19 @@
 
 ## Unreleased
 
-FEATURE: `zrok2 share public --basic-auth-from-stdin` reads one `<username:password>` from the first line of stdin instead of `--basic-auth`, so a supervising process can pass the credential without it appearing in the process command line or environment, where other local users and endpoint monitoring can read it. It cannot be combined with `--basic-auth` or `--oauth-provider`, and an empty stdin fails before the share is created.
+CHANGE: **The agent registry (`agent-registry.json`) is now version 3, which agents from v2.0.9 and earlier cannot read.** The agent reads an existing version 2 registry as it is and saves it as version 3 at the end of its first startup, so upgrading needs no manual step. A v2.0.9 agent will not start on a version 3 registry: it reports the unsupported version, exits 1 and leaves the file as it was. Rolling back to v2.0.9 or earlier therefore needs a manual edit of the registry before the older agent will run; the procedure is in `docs/current/agent-share-lifecycle.md`. A v2.0.8 agent does start, with nothing restored, and replaces the registry with an empty one at its next save, so for v2.0.8 make the edit before starting it.
+
+FEATURE: `zrok2 share public --basic-auth-from-stdin` reads one `<username:password>` from the first line of stdin instead of `--basic-auth`, so a supervising process can pass the credential without it appearing in the process command line or environment, where other local users and endpoint monitoring can read it. It cannot be combined with `--basic-auth` or `--oauth-provider`, and an empty or unreadable stdin fails with exit 2 before the share is created.
+
+FEATURE: `zrok2 share public --basic-auth-file <path>` reads basic authentication users from a file, one `<username:password>` per line, so the credentials appear in neither the process command line nor the environment. Blank lines are skipped, either line ending is accepted, and a password may contain a colon. A missing, empty or malformed file, a file over 1 MiB, or `--basic-auth-file ""` fails with exit 2 before the share is created, naming the path and, for a malformed entry, the line number, never the line's contents. It cannot be combined with `--basic-auth`, `--basic-auth-from-stdin` or `--oauth-provider`. With `zrok2 agent` running, the command sends the agent the file's absolute path, not its contents, and the agent reads the file each time it creates the share, including when it restores a named share at startup. The saved registry holds the path and never the users, and a changed file takes effect the next time the agent creates the share. A file that is missing or bad when the agent restarts leaves the share down and retried, never running without authentication. An agent left running from an earlier release does not understand the path; the command refuses with exit 2 and asks for the agent to be restarted on the current version.
+
+FIX: Basic authentication passwords may now contain a colon. An entry is split at its first colon, as the frontends do when they check a login, so `admin:s3:cret` is user `admin` with password `s3:cret`. This applies to `--basic-auth`, `--basic-auth-from-stdin` and the Go, Node and Python SDKs. An agent left running from an earlier release cannot take such a password; `zrok2 share public` refuses with exit 2 without sending the credential, and asks for the agent to be restarted on the current version.
+
+FIX: A malformed basic authentication entry no longer prints the credential. Errors name where the entry came from (its position among `--basic-auth` values, or stdin) and never its contents, so a supervising service that logs stderr no longer records the password.
+
+FIX: The Node SDK now throws an error for a basic authentication entry without a colon. It previously dropped that user without a word and created the share without it.
+
+FIX: Basic authentication in the Python SDK works. Creating a share with `BasicAuth` previously failed with `AttributeError: 'ShareRequest' object has no attribute 'auth_users'` before anything was sent to the controller; the users now reach the controller.
 
 ## v2.0.9
 

@@ -85,6 +85,7 @@ export interface AgentSharePublicRequest {
     oauthRefreshInterval?: string;
     closed?: boolean;
     accessGrants?: Array<string>;
+    basicAuthFile?: string;
 }
 
 /**
@@ -346,6 +347,10 @@ export class AgentApi extends runtime.BaseAPI {
 
         if (requestParameters['accessGrants'] != null) {
             queryParameters['accessGrants'] = requestParameters['accessGrants'];
+        }
+
+        if (requestParameters['basicAuthFile'] != null) {
+            queryParameters['basicAuthFile'] = requestParameters['basicAuthFile'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

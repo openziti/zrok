@@ -44,8 +44,8 @@ that says whether trying again can help. This matters when the command runs unde
 | Exit status | Meaning |
 |-------------|---------|
 | `0` | The command finished normally. |
-| `1` | A later retry may succeed: the zrok service could not be reached, was busy (it answers when to retry, for example `the zrok service is busy, retry in 5 seconds`), or failed. Also used for any failure that is not an answer from the zrok service. |
-| `2` | The zrok service refused the request (for example, the name is already held by another share, or the account token is not valid). Retrying will not change the answer. |
+| `1` | A later retry may succeed: the zrok service could not be reached, was busy (it answers when to retry, for example `the zrok service is busy, retry in 5 seconds`), or failed. Also used for any failure not listed under `2`, including unknown or conflicting flags. |
+| `2` | The zrok service refused the request (for example, the name is already held by another share, or the account token is not valid), or the command refused an input or a condition before sending the request (for example, a malformed credential, an unusable credentials file, or an agent that must be restarted). Retrying will not change the answer. |
 
 A supervisor should not restart the command on status 2; for example, a systemd unit can set
 `RestartPreventExitStatus=2`. To have shares retried for you with backoff, run them through the

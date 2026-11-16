@@ -11,10 +11,13 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/openziti/zrok/v2/agent/agentGrpc"
 	"github.com/openziti/zrok/v2/environment/env_v0_4"
+	"github.com/openziti/zrok/v2/internal/basicauth"
 	"github.com/openziti/zrok/v2/internal/sharepublic"
 	restshare "github.com/openziti/zrok/v2/rest_client_zrok/share"
 	"github.com/openziti/zrok/v2/rest_model_zrok"
 	"github.com/openziti/zrok/v2/sdk/golang/sdk"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func (a *Agent) SharePublic(req *SharePublicRequest) (shareToken string, frontendEndpoint []string, err error) {
@@ -45,6 +48,7 @@ func (i *agentGrpcImpl) SharePublic(ctx context.Context, req *agentGrpc.SharePub
 		OauthRefreshInterval: req.OauthRefreshInterval,
 		Closed:               req.Closed,
 		AccessGrants:         req.AccessGrants,
+		BasicAuthFile:        req.BasicAuthFile,
 	}
 	for _, nssIn := range req.NameSelections {
 		if nssIn == nil {
@@ -59,7 +63,17 @@ func (i *agentGrpcImpl) SharePublic(ctx context.Context, req *agentGrpc.SharePub
 	}
 }
 
+// errBasicAuthFileConflict refuses a file reference combined with another authentication source. a direct
+// gateway request bypasses the CLI's flag exclusivity.
+var errBasicAuthFileConflict = errors.New("a basic authentication file cannot be combined with basic authentication users or an oauth provider")
+
 func publicShareRPCError(err error) error {
+	// a file-reference refusal is the caller's input, not a controller answer; it crosses as InvalidArgument so
+	// the command classifies it as permanent. other preparation errors keep their classification.
+	var fileErr *basicauth.FileError
+	if errors.As(err, &fileErr) || errors.Is(err, errBasicAuthFileConflict) {
+		return status.Error(codes.InvalidArgument, err.Error())
+	}
 	var create *publicCreateError
 	if !errors.As(err, &create) {
 		return err
@@ -122,9 +136,24 @@ func (a *Agent) preparePublicRequest(req *SharePublicRequest) (*sdk.ShareRequest
 			return nil, err
 		}
 	}
+	// a file reference is resolved here, on every attempt, into the prepared request only; the saved request keeps
+	// the path. this is the one reader in agent mode, for the original request, replay and retry alike.
+	basicAuth := req.BasicAuth
+	if req.BasicAuthFile != "" {
+		if len(req.BasicAuth) > 0 || req.OauthProvider != "" {
+			return nil, errBasicAuthFileConflict
+		}
+		path, err := filepath.Abs(req.BasicAuthFile)
+		if err != nil {
+			return nil, &basicauth.FileError{Path: req.BasicAuthFile, Err: err}
+		}
+		if basicAuth, err = basicauth.ReadFile(path); err != nil {
+			return nil, err
+		}
+	}
 	in := sdk.ShareRequest{
 		BackendMode: sdk.BackendMode(req.BackendMode), Target: target,
-		BasicAuth: req.BasicAuth, AccessGrants: req.AccessGrants,
+		BasicAuth: basicAuth, AccessGrants: req.AccessGrants,
 		OauthProvider: req.OauthProvider, OauthEmailAddressPatterns: req.OauthEmailDomains,
 		OauthRefreshInterval: interval, PermissionMode: sdk.OpenPermissionMode,
 	}

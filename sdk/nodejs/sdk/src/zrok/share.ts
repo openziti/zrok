@@ -181,12 +181,14 @@ const toPublicApiShareRequest = (root: Root, request: ShareRequest): ApiShareReq
     } else if (request.basicAuth && request.basicAuth.length > 0) {
         out.authScheme = AUTH_SCHEME_BASIC;
         out.basicAuthUsers = new Array<AuthUser>();
-        for (const pair of request.basicAuth) {
-            const tokens = pair.split(":");
-            if (tokens.length === 2) {
-                out.basicAuthUsers.push({username: tokens[0].trim(), password: tokens[1].trim()});
+        request.basicAuth.forEach((entry, index) => {
+            // split at the first colon; a password may contain one. the error never quotes the entry.
+            const colon = entry.indexOf(":");
+            if (colon < 0) {
+                throw new Error(`invalid basic authentication entry at position '${index + 1}': expected <username:password>`);
             }
-        }
+            out.basicAuthUsers!.push({username: entry.slice(0, colon).trim(), password: entry.slice(colon + 1).trim()});
+        });
     }
 
     return out;

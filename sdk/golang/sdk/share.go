@@ -2,10 +2,10 @@ package sdk
 
 import (
 	"context"
-	"strings"
 
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/openziti/zrok/v2/environment/env_core"
+	"github.com/openziti/zrok/v2/internal/basicauth"
 	"github.com/openziti/zrok/v2/rest_client_zrok"
 	"github.com/openziti/zrok/v2/rest_client_zrok/metadata"
 	"github.com/openziti/zrok/v2/rest_client_zrok/share"
@@ -51,13 +51,12 @@ func createShare(ctx context.Context, root env_core.Root, request *ShareRequest)
 
 	if len(request.BasicAuth) > 0 {
 		out.Body.AuthScheme = string(Basic)
-		for _, basicAuthUser := range request.BasicAuth {
-			tokens := strings.Split(basicAuthUser, ":")
-			if len(tokens) == 2 {
-				out.Body.BasicAuthUsers = append(out.Body.BasicAuthUsers, &rest_model_zrok.AuthUser{Username: strings.TrimSpace(tokens[0]), Password: strings.TrimSpace(tokens[1])})
-			} else {
-				return nil, errors.Errorf("invalid username:password '%v'", basicAuthUser)
+		for i, entry := range request.BasicAuth {
+			username, password, err := basicauth.ParseEntry(entry)
+			if err != nil {
+				return nil, errors.Wrapf(err, "invalid basic authentication entry at position '%d'", i+1)
 			}
+			out.Body.BasicAuthUsers = append(out.Body.BasicAuthUsers, &rest_model_zrok.AuthUser{Username: username, Password: password})
 		}
 	}
 

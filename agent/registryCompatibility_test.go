@@ -16,12 +16,12 @@ func TestRegistryReadsV208WriterFixtures(t *testing.T) {
 	// these files were generated with Registry.Save and the request structs from the v2.0.8 tag.
 	// retain its null slices and omitted optional fields; hand-written populated fixtures missed this regression.
 	cases := map[string]*Registry{
-		"empty": {V: RegistryV},
-		"public": {V: RegistryV, PublicShares: []*PublicShareRegistryEntry{{Request: &SharePublicRequest{
+		"empty": {V: "2"},
+		"public": {V: "2", PublicShares: []*PublicShareRegistryEntry{{Request: &SharePublicRequest{
 			Target: "http://localhost:8080", BackendMode: "proxy",
 			NameSelections: []NameSelection{{NamespaceToken: "public", Name: "fixture-app"}},
 		}}}},
-		"private": {V: RegistryV,
+		"private": {V: "2",
 			PrivateShares: []*PrivateShareRegistryEntry{{Request: &SharePrivateRequest{
 				Target: "8081", BackendMode: "proxy", PrivateShareToken: "reserved-token",
 			}}},
@@ -29,7 +29,7 @@ func TestRegistryReadsV208WriterFixtures(t *testing.T) {
 				ShareToken: "access-token", BindAddress: "127.0.0.1:8082",
 			}}},
 		},
-		"all": {V: RegistryV,
+		"all": {V: "2",
 			PublicShares: []*PublicShareRegistryEntry{{Request: &SharePublicRequest{
 				Target: "8080", BackendMode: "proxy", NameSelections: []NameSelection{{NamespaceToken: "team", Name: "app"}},
 				BasicAuth: []string{"fixture:password"}, Insecure: true, Closed: true,
@@ -62,6 +62,8 @@ func TestRegistryReadsV208WriterFixtures(t *testing.T) {
 			require.NoError(t, loaded.Save(path))
 			roundTrip, err := LoadRegistry(path)
 			require.NoError(t, err)
+			require.Equal(t, RegistryV, roundTrip.V, "a version 2 file is saved as version 3")
+			roundTrip.V = expected.V
 			before, err := dd.Unbind(expected, registryBindingOptions())
 			require.NoError(t, err)
 			after, err := dd.Unbind(roundTrip, registryBindingOptions())
@@ -74,7 +76,9 @@ func TestRegistryReadsV208WriterFixtures(t *testing.T) {
 func TestRegistryCompatibilityKeepsInvalidInput(t *testing.T) {
 	for name, raw := range map[string]string{
 		"invalid json":     `{"v":"2",`,
-		"unknown version":  `{"v":"3","public_shares":null}`,
+		"unknown version":  `{"v":"4","public_shares":null}`,
+		"earlier version":  `{"v":"1","public_shares":null}`,
+		"missing version":  `{"public_shares":null}`,
 		"wrong slice type": `{"v":"2","public_shares":[{"request":{"basic_auth":false}}]}`,
 		"null entry":       `{"v":"2","public_shares":[null]}`,
 		"null request":     `{"v":"2","public_shares":[{"request":null}]}`,

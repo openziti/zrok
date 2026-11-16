@@ -41,12 +41,14 @@ def CreateShare(root: Root, request: model.ShareRequest) -> model.Share:
             raise Exception("unknown share mode " + request.ShareMode)
     if len(request.BasicAuth) > 0:
         out.auth_scheme = model.AUTH_SCHEME_BASIC
-        for pair in request.BasicAuth:
-            tokens = pair.split(":")
-            if len(tokens) == 2:
-                out.auth_users.append(AuthUser(username=tokens[0].strip(), password=tokens[1].strip()))
-            else:
-                raise Exception("invalid username:password pair: " + pair)
+        out.basic_auth_users = []
+        for position, entry in enumerate(request.BasicAuth, start=1):
+            # split at the first colon; a password may contain one. the error never quotes the entry.
+            username, colon, password = entry.partition(":")
+            if not colon:
+                raise Exception(
+                    f"invalid basic authentication entry at position '{position}': expected <username:password>")
+            out.basic_auth_users.append(AuthUser(username=username.strip(), password=password.strip()))
 
     if request.OauthProvider != "":
         out.auth_scheme = model.AUTH_SCHEME_OAUTH

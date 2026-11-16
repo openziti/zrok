@@ -31,6 +31,12 @@ export interface VersionResponse {
      * @memberof VersionResponse
      */
     consoleEndpoint?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof VersionResponse
+     */
+    capabilities?: Array<string>;
 }
 
 /**
@@ -52,6 +58,7 @@ export function VersionResponseFromJSONTyped(json: any, ignoreDiscriminator: boo
         
         'v': json['v'] == null ? undefined : json['v'],
         'consoleEndpoint': json['consoleEndpoint'] == null ? undefined : json['consoleEndpoint'],
+        'capabilities': json['capabilities'] == null ? undefined : json['capabilities'],
     };
 }
 
@@ -68,6 +75,7 @@ export function VersionResponseToJSONTyped(value?: VersionResponse | null, ignor
         
         'v': value['v'],
         'consoleEndpoint': value['consoleEndpoint'],
+        'capabilities': value['capabilities'],
     };
 }
 

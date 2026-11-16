@@ -52,3 +52,5 @@ __pycache__/
 /sdk/python/src/dist/
 /sdk/python/.coverage
 .python-version
+
+/.mega/environment.yaml

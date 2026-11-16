@@ -179,3 +179,14 @@ func TestVersionCheckRejectionPreservesCLIMessage(t *testing.T) {
 	require.Equal(t, exitPermanent, f.exitCode)
 	require.Equal(t, "client upgrade required", f.detail)
 }
+
+func TestClassifyFailureAgentInvalidArgumentIsPermanent(t *testing.T) {
+	refusal := status.Error(codes.InvalidArgument, "invalid basic authentication file '/etc/users': no <username:password> entries")
+	f := classifyFailure(refusal)
+	assert.Equal(t, exitPermanent, f.exitCode)
+	assert.Equal(t, "invalid basic authentication file '/etc/users': no <username:password> entries", f.detail)
+	assert.Equal(t, exitPermanent, classifyFailure(errors.Wrap(refusal, "error creating share")).exitCode)
+	// other agent errors keep their classification.
+	assert.Equal(t, exitTransient, classifyFailure(status.Error(codes.Unknown, "worker failed")).exitCode)
+	assert.Equal(t, exitTransient, classifyFailure(status.Error(codes.Unavailable, "agent gone")).exitCode)
+}
