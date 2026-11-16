@@ -169,19 +169,25 @@ func processGone(ctx context.Context, record processRecord) (bool, error) {
 }
 
 // awaitGone polls until a killed recorded process is confirmed gone, within bound. inspection failures are
-// retried until the bound expires.
+// retried until the bound expires. the bound also cancels an inspection it catches running, and that ps then
+// fails because it was killed, which says nothing about the recorded process; only the result of an inspection
+// that finished inside the bound is reported as an inspection failure.
 func awaitGone(ctx context.Context, record processRecord, bound, poll time.Duration) error {
 	ctx, cancel := context.WithTimeout(ctx, bound)
 	defer cancel()
+	var inspectErr error
 	for {
 		gone, err := processGone(ctx, record)
 		if err == nil && gone {
 			return nil
 		}
+		if ctx.Err() == nil {
+			inspectErr = err
+		}
 		select {
 		case <-ctx.Done():
-			if err != nil {
-				return fmt.Errorf("termination not confirmed within %v of being killed: %w", bound, err)
+			if inspectErr != nil {
+				return fmt.Errorf("termination not confirmed within %v of being killed: %w", bound, inspectErr)
 			}
 			return fmt.Errorf("not confirmed terminated within %v of being killed", bound)
 		case <-time.After(poll):
