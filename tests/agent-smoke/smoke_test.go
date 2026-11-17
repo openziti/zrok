@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
@@ -125,11 +126,12 @@ func TestScenarioPasses(t *testing.T) {
 
 	s := w.summary("run")
 	assert.Equal(t, "pass", s.Result, s.Failure)
-	assert.Len(t, s.Steps, 14)
+	assert.Len(t, s.Steps, 18)
 	w.requireCleaned(s)
 	m := w.manifest()
-	require.Len(t, m.ShareTokens, 2)
-	assert.NotEqual(t, m.ShareTokens[0], m.ShareTokens[1])
+	// the private share, then the public share and its replacement
+	require.Len(t, m.ShareTokens, 3)
+	assert.Len(t, slices.Compact(slices.Sorted(slices.Values(m.ShareTokens))), 3)
 	assert.Equal(t, s.Resources.ShareTokens, m.ShareTokens)
 	assert.NotEmpty(t, m.EnvZID)
 	assert.True(t, m.NameReserved)
@@ -157,6 +159,23 @@ func TestScenarioPasses(t *testing.T) {
 	assert.Equal(t, 1, logs)
 }
 
+// an agent that holds nothing for an access whose bind failed has also finished its cleanup; there is then
+// nothing to release, and the scenario passes the same way.
+func TestScenarioPassesWhenTheAgentKeepsNoAccess(t *testing.T) {
+	w := newWorld(t, "access-forgotten")
+	require.Equal(t, 0, w.run())
+	s := w.summary("run")
+	assert.Equal(t, "pass", s.Result, s.Failure)
+	w.requireCleaned(s)
+	var release string
+	for _, step := range s.Steps {
+		if step.Name == "release the access" {
+			release = step.Detail
+		}
+	}
+	assert.Contains(t, release, "nothing left to release")
+}
+
 func TestScenarioFailures(t *testing.T) {
 	cases := []struct {
 		name  string
@@ -165,6 +184,9 @@ func TestScenarioFailures(t *testing.T) {
 		step  string
 		text  string
 	}{
+		{name: "access stuck after its worker deleted it", modes: []string{"access-stuck"}, step: "access on an occupied port", text: "stuck in 'failed' holding frontend"},
+		{name: "access left at the controller", modes: []string{"leak-frontend"}, step: "release the access", text: "is still present: frontend '"},
+		{name: "private share left at the controller", modes: []string{"private-leak"}, step: "release the private share", text: "is still present"},
 		{name: "old token persists", modes: []string{"leak-token"}, step: "controller state after stop", text: "is still present"},
 		{name: "name lost", modes: []string{"drop-name"}, step: "controller state after stop", text: "listed 0 times"},
 		{name: "name left bound", modes: []string{"keep-binding"}, step: "controller state after stop", text: "listed name 'public:"},
@@ -190,7 +212,12 @@ func TestScenarioFailures(t *testing.T) {
 func TestLostEnableIsReconciledByDescription(t *testing.T) {
 	w := newWorld(t, "enable-lost")
 	require.Equal(t, 1, w.run())
-	w.requireCleaned(w.requireFailure("enable environment", "exited"))
+	s := w.requireFailure("enable environment", "exited")
+	w.requireCleaned(s)
+	// the failed command's last output is in the failure, with the account token it printed redacted
+	assert.Contains(t, s.Failure, "lost the enable response")
+	assert.Contains(t, s.Failure, "account token '[redacted]'")
+	assert.NotContains(t, s.Failure, testAccountToken)
 	m := w.manifest()
 	assert.NotEmpty(t, m.EnvZID)
 	assert.Contains(t, w.summary("run").Cleanup.Detail, "reconciled environment '"+m.EnvZID+"' by description")

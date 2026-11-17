@@ -127,11 +127,124 @@ func activeShare(resp *agentGrpc.StatusResponse) (*agentGrpc.ShareDetail, bool, 
 	return shr, true, nil
 }
 
+// awaitStatus polls structured agent status until settled reports true. settled returns an error to end the wait
+// at once, and describes what it saw through describeStatus when the wait runs out.
+func awaitStatus(ctx context.Context, cfg config, client agentGrpc.AgentClient, agent *child, what string, settled func(*agentGrpc.StatusResponse) (bool, error)) (*agentGrpc.StatusResponse, error) {
+	var last error
+	for {
+		callCtx, cancel := context.WithTimeout(ctx, cfg.requestBound)
+		resp, err := client.Status(callCtx, &agentGrpc.StatusRequest{})
+		cancel()
+		if err == nil {
+			done, err := settled(resp)
+			if err != nil {
+				return nil, err
+			}
+			if done {
+				return resp, nil
+			}
+			last = errors.New(describeStatus(resp))
+		} else {
+			last = err
+		}
+		if err := pause(ctx, agent, cfg.pollInterval, last); err != nil {
+			return nil, fmt.Errorf("%v: %w", what, err)
+		}
+	}
+}
+
+// awaitPrivateShare polls until exactly one private share is active and nothing else is held. every token seen
+// is recorded first.
+func awaitPrivateShare(ctx context.Context, cfg config, client agentGrpc.AgentClient, agent *child, record func(string) error) (*agentGrpc.ShareDetail, error) {
+	resp, err := awaitStatus(ctx, cfg, client, agent, "no active private share", func(resp *agentGrpc.StatusResponse) (bool, error) {
+		for _, shr := range resp.GetShares() {
+			if shr.GetToken() != "" {
+				if err := record(shr.GetToken()); err != nil {
+					return false, err
+				}
+			}
+		}
+		if len(resp.GetAccesses()) != 0 {
+			return false, fmt.Errorf("agent status lists %d accesses; expected none", len(resp.GetAccesses()))
+		}
+		shares := resp.GetShares()
+		switch {
+		case len(shares) == 0:
+			return false, nil
+		case len(shares) > 1:
+			return false, fmt.Errorf("agent status lists %d shares; expected exactly one (%v)", len(shares), describeStatus(resp))
+		}
+		shr := shares[0]
+		if shr.GetShareMode() != "private" {
+			return false, fmt.Errorf("agent share has mode '%v'; expected 'private'", shr.GetShareMode())
+		}
+		if shr.GetStatus() == "failed" {
+			return false, fmt.Errorf("agent share failed: %v", shr.GetFailure().GetLastError())
+		}
+		return shr.GetStatus() == "active" && shr.GetToken() != "", nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return resp.GetShares()[0], nil
+}
+
+// awaitCollision polls until the access that was pointed at an occupied port has settled. the agent either holds
+// no access, or holds it awaiting a retry with a failure id; both are an agent that finished its cleanup. an
+// access in 'failed' is one whose cleanup could not finish, and ends the wait at once. an access still 'active'
+// when the wait runs out bound a port this process occupies.
+func awaitCollision(ctx context.Context, cfg config, client agentGrpc.AgentClient, agent *child) (*agentGrpc.AccessDetail, error) {
+	resp, err := awaitStatus(ctx, cfg, client, agent, "the access did not settle", func(resp *agentGrpc.StatusResponse) (bool, error) {
+		accesses := resp.GetAccesses()
+		switch {
+		case len(accesses) == 0:
+			return true, nil
+		case len(accesses) > 1:
+			return false, fmt.Errorf("agent status lists %d accesses; expected at most one (%v)", len(accesses), describeStatus(resp))
+		}
+		access := accesses[0]
+		if access.GetStatus() == "failed" {
+			return false, fmt.Errorf("the access is stuck in 'failed' holding frontend '%v': %v", access.GetFrontendToken(), access.GetFailure().GetLastError())
+		}
+		return access.GetStatus() == "retrying" && access.GetFailure().GetId() != "", nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(resp.GetAccesses()) == 0 {
+		return nil, nil
+	}
+	return resp.GetAccesses()[0], nil
+}
+
+// awaitNoAccess polls until the agent lists no access.
+func awaitNoAccess(ctx context.Context, cfg config, client agentGrpc.AgentClient, agent *child) error {
+	_, err := awaitStatus(ctx, cfg, client, agent, "the agent still lists an access", func(resp *agentGrpc.StatusResponse) (bool, error) {
+		return len(resp.GetAccesses()) == 0, nil
+	})
+	return err
+}
+
+// awaitIdle polls until the agent lists no share and no access.
+func awaitIdle(ctx context.Context, cfg config, client agentGrpc.AgentClient, agent *child) error {
+	_, err := awaitStatus(ctx, cfg, client, agent, "the agent still lists shares or accesses", func(resp *agentGrpc.StatusResponse) (bool, error) {
+		return len(resp.GetShares()) == 0 && len(resp.GetAccesses()) == 0, nil
+	})
+	return err
+}
+
 func describeStatus(resp *agentGrpc.StatusResponse) string {
 	var parts []string
 	for _, shr := range resp.GetShares() {
 		part := fmt.Sprintf("share '%v' status '%v'", shr.GetToken(), shr.GetStatus())
 		if lastError := shr.GetFailure().GetLastError(); lastError != "" {
+			part += fmt.Sprintf(" error '%v'", lastError)
+		}
+		parts = append(parts, part)
+	}
+	for _, access := range resp.GetAccesses() {
+		part := fmt.Sprintf("access to '%v' status '%v'", access.GetToken(), access.GetStatus())
+		if lastError := access.GetFailure().GetLastError(); lastError != "" {
 			part += fmt.Sprintf(" error '%v'", lastError)
 		}
 		parts = append(parts, part)

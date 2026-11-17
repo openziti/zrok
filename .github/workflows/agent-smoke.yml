@@ -155,7 +155,7 @@ jobs:
 
       - name: offline harness tests
         shell: bash
-        run: go test -race -tags agent_smoke ./tests/agent-smoke -count=1 -timeout=5m
+        run: go test -race -tags agent_smoke ./tests/agent-smoke -count=1 -timeout=10m
 
       - name: live scenario
         shell: bash

@@ -188,6 +188,26 @@ func (v *accountView) tokenLocations(token string) []string {
 	return found
 }
 
+// accessLocations lists every access the account overview holds to a share token, in any environment.
+func (v *accountView) accessLocations(token string) []string {
+	var found []string
+	for _, resources := range v.overview.Environments {
+		if resources == nil {
+			continue
+		}
+		zID := ""
+		if resources.Environment != nil {
+			zID = resources.Environment.ZID
+		}
+		for _, fe := range resources.Frontends {
+			if fe != nil && fe.ShareToken == token {
+				found = append(found, fmt.Sprintf("frontend '%v' in environment '%v'", fe.FrontendToken, zID))
+			}
+		}
+	}
+	return found
+}
+
 func (v *accountView) matchingNames(namespace, name string) []*rest_model_zrok.Name {
 	var found []*rest_model_zrok.Name
 	for _, entry := range v.names {

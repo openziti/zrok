@@ -1,6 +1,8 @@
 package sdk
 
 import (
+	"context"
+
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/michaelquigley/df/dl"
 	"github.com/openziti/zrok/v2/environment/env_core"
@@ -36,12 +38,25 @@ func CreateAccess(root env_core.Root, request *AccessRequest) (*Access, error) {
 }
 
 func DeleteAccess(root env_core.Root, acc *Access) error {
+	return deleteAccess(nil, root, acc)
+}
+
+// DeleteAccessContext bounds initialization and deletion with the same context.
+func DeleteAccessContext(ctx context.Context, root env_core.Root, acc *Access) error {
+	if ctx == nil {
+		return errors.New("missing access deletion context")
+	}
+	return deleteAccess(ctx, root, acc)
+}
+
+func deleteAccess(ctx context.Context, root env_core.Root, acc *Access) error {
 	out := share.NewUnaccessParams()
+	out.Context = ctx
 	out.Body.FrontendToken = acc.Token
 	out.Body.ShareToken = acc.ShareToken
 	out.Body.EnvZID = root.Environment().ZitiIdentity
 
-	zrok, err := root.Client()
+	zrok, err := shareClient(ctx, root)
 	if err != nil {
 		return errors.Wrap(err, "error getting zrok client")
 	}
