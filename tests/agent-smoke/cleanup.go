@@ -53,6 +53,7 @@ func (h *harness) cleanup(ctx context.Context) (_ string, err error) {
 	if h.target != nil {
 		h.target.close()
 	}
+	h.releaseHeld()
 	if h.agentConn != nil {
 		_ = h.agentConn.Close()
 	}

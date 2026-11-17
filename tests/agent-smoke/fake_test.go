@@ -46,6 +46,7 @@ type fakeController struct {
 	envs          map[string]*fakeEnv
 	names         map[string]*fakeName
 	shares        map[string]*fakeShare
+	accesses      map[string]*fakeAccess
 	calls         []string
 	next          int
 	api           *httptest.Server
@@ -61,7 +62,11 @@ type fakeName struct {
 }
 
 type fakeShare struct {
-	token, envZID, target, name string
+	token, envZID, target, name, mode string
+}
+
+type fakeAccess struct {
+	token, envZID, share string
 }
 
 func newFakeController(t *testing.T, accountToken string) *fakeController {
@@ -70,6 +75,7 @@ func newFakeController(t *testing.T, accountToken string) *fakeController {
 		envs:         make(map[string]*fakeEnv),
 		names:        make(map[string]*fakeName),
 		shares:       make(map[string]*fakeShare),
+		accesses:     make(map[string]*fakeAccess),
 	}
 	f.api = httptest.NewServer(http.HandlerFunc(f.serveAPI))
 	f.frontend = httptest.NewServer(http.HandlerFunc(f.serveFrontend))
@@ -93,7 +99,7 @@ func (f *fakeController) callCount(name string) int {
 func (f *fakeController) empty() bool {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	return len(f.envs) == 0 && len(f.names) == 0 && len(f.shares) == 0
+	return len(f.envs) == 0 && len(f.names) == 0 && len(f.shares) == 0 && len(f.accesses) == 0
 }
 
 func (f *fakeController) addEnv(zID, description string) {
@@ -174,6 +180,11 @@ func (f *fakeController) serveAPI(w http.ResponseWriter, r *http.Request) {
 				f.deleteShare(token, false)
 			}
 		}
+		for token, access := range f.accesses {
+			if access.envZID == zID {
+				delete(f.accesses, token)
+			}
+		}
 		delete(f.envs, zID)
 		w.WriteHeader(http.StatusOK)
 	case "POST /fake/enable":
@@ -200,9 +211,31 @@ func (f *fakeController) serveAPI(w http.ResponseWriter, r *http.Request) {
 			f.next++
 			token = fmt.Sprintf("shr%d", f.next)
 		}
-		f.shares[token] = &fakeShare{token: token, envZID: field("envZId"), target: field("target"), name: field("name")}
+		f.shares[token] = &fakeShare{token: token, envZID: field("envZId"), target: field("target"), name: field("name"), mode: "public"}
 		name.share = token
 		writeJSON(w, http.StatusOK, map[string]string{"token": token, "endpoint": f.frontend.URL + "/f/" + token})
+	case "POST /fake/private-share":
+		f.next++
+		token := fmt.Sprintf("shr%d", f.next)
+		f.shares[token] = &fakeShare{token: token, envZID: field("envZId"), target: field("target"), mode: "private"}
+		writeJSON(w, http.StatusOK, map[string]string{"token": token})
+	case "POST /fake/access":
+		if _, found := f.shares[field("share")]; !found {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		f.next++
+		token := fmt.Sprintf("fe%d", f.next)
+		f.accesses[token] = &fakeAccess{token: token, envZID: field("envZId"), share: field("share")}
+		writeJSON(w, http.StatusOK, map[string]string{"token": token})
+	case "POST /fake/unaccess":
+		delete(f.accesses, field("token"))
+		w.WriteHeader(http.StatusOK)
+	case "POST /fake/delete-private":
+		if _, found := f.shares[field("token")]; found {
+			f.deleteShare(field("token"), false)
+		}
+		w.WriteHeader(http.StatusOK)
 	case "POST /fake/delete":
 		if _, found := f.shares[field("token")]; found {
 			f.deleteShare(field("token"), field("keepBinding") == "true")
@@ -220,6 +253,11 @@ func (f *fakeController) serveAPI(w http.ResponseWriter, r *http.Request) {
 func (f *fakeController) deleteShare(token string, keepBinding bool) {
 	shr := f.shares[token]
 	delete(f.shares, token)
+	for frontend, access := range f.accesses {
+		if access.share == token {
+			delete(f.accesses, frontend)
+		}
+	}
 	if name, found := f.names[shr.name]; found && name.share == token && !keepBinding {
 		name.share = ""
 	}
@@ -231,7 +269,12 @@ func (f *fakeController) overview() *rest_model_zrok.Overview {
 		resources := &rest_model_zrok.EnvironmentAndResources{Environment: &rest_model_zrok.Environment{ZID: env.zID, Description: env.description}}
 		for _, shr := range f.shares {
 			if shr.envZID == env.zID {
-				resources.Shares = append(resources.Shares, &rest_model_zrok.Share{ShareToken: shr.token, EnvZID: shr.envZID, ShareMode: "public"})
+				resources.Shares = append(resources.Shares, &rest_model_zrok.Share{ShareToken: shr.token, EnvZID: shr.envZID, ShareMode: shr.mode})
+			}
+		}
+		for _, access := range f.accesses {
+			if access.envZID == env.zID {
+				resources.Frontends = append(resources.Frontends, &rest_model_zrok.Frontend{FrontendToken: access.token, ShareToken: access.share})
 			}
 		}
 		ov.Environments = append(ov.Environments, resources)
@@ -334,7 +377,46 @@ func fakeCLI(args []string) int {
 		fmt.Println(resp)
 		return 0
 	}
+	if len(args) == 4 && args[0] == "share" && args[1] == "private" {
+		return fakeRPC(func(client agentGrpc.AgentClient) (any, error) {
+			return client.SharePrivate(context.Background(), &agentGrpc.SharePrivateRequest{Target: args[3]})
+		})
+	}
+	if len(args) == 6 && args[0] == "access" && args[1] == "private" {
+		return fakeRPC(func(client agentGrpc.AgentClient) (any, error) {
+			return client.AccessPrivate(context.Background(), &agentGrpc.AccessPrivateRequest{Token: args[5], BindAddress: args[4]})
+		})
+	}
+	if len(args) == 4 && args[0] == "agent" && args[1] == "release" && args[2] == "access" {
+		return fakeRPC(func(client agentGrpc.AgentClient) (any, error) {
+			return client.ReleaseAccess(context.Background(), &agentGrpc.ReleaseAccessRequest{FrontendToken: args[3]})
+		})
+	}
+	if len(args) == 4 && args[0] == "agent" && args[1] == "release" && args[2] == "share" {
+		return fakeRPC(func(client agentGrpc.AgentClient) (any, error) {
+			return client.ReleaseShare(context.Background(), &agentGrpc.ReleaseShareRequest{Token: args[3]})
+		})
+	}
 	return fakeFail(fmt.Errorf("unexpected fake invocation with %d arguments", len(args)))
+}
+
+// fakeRPC makes one call to the running fake agent, as the real binary does when it routes to an agent.
+func fakeRPC(call func(agentGrpc.AgentClient) (any, error)) int {
+	root, err := environment.LoadRoot()
+	if err != nil {
+		return fakeFail(err)
+	}
+	client, conn, err := agentClient.NewClient(root)
+	if err != nil {
+		return fakeFail(err)
+	}
+	defer func() { _ = conn.Close() }()
+	resp, err := call(client)
+	if err != nil {
+		return fakeFail(err)
+	}
+	fmt.Println(resp)
+	return 0
 }
 
 func fakeFail(err error) int {
@@ -397,6 +479,8 @@ type fakeAgentServer struct {
 	registry string
 	entries  []fakeRegistryEntry
 	shares   map[string]*agentGrpc.ShareDetail
+	accesses []*agentGrpc.AccessDetail
+	bound    []net.Listener
 }
 
 func fakeAgent(api string, modes []string) int {
@@ -488,6 +572,7 @@ func (a *fakeAgentServer) Status(context.Context, *agentGrpc.StatusRequest) (*ag
 	for _, shr := range a.shares {
 		resp.Shares = append(resp.Shares, shr)
 	}
+	resp.Accesses = append(resp.Accesses, a.accesses...)
 	return resp, nil
 }
 
@@ -502,4 +587,94 @@ func (a *fakeAgentServer) SharePublic(_ context.Context, req *agentGrpc.SharePub
 	a.entries = append(a.entries, entry)
 	a.save()
 	return &agentGrpc.SharePublicResponse{Token: entry.Token, FrontendEndpoints: a.shares[entry.Token].FrontendEndpoint}, nil
+}
+
+type fakeTokenResponse struct {
+	Token string `dd:"token"`
+}
+
+func (a *fakeAgentServer) SharePrivate(_ context.Context, req *agentGrpc.SharePrivateRequest) (*agentGrpc.SharePrivateResponse, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	var resp fakeTokenResponse
+	body := map[string]string{"envZId": a.root.Environment().ZitiIdentity, "target": req.GetTarget()}
+	if err := fakePost(a.api, a.root.Environment().AccountToken, "/fake/private-share", body, &resp); err != nil {
+		return nil, err
+	}
+	a.shares[resp.Token] = &agentGrpc.ShareDetail{Token: resp.Token, ShareMode: "private", BackendMode: "proxy", BackendEndpoint: req.GetTarget(), Status: "active"}
+	return &agentGrpc.SharePrivateResponse{Token: resp.Token}, nil
+}
+
+// AccessPrivate follows the real access worker: it creates the access, reports success, and only then binds. a
+// bind that fails makes the worker delete its own access and exit; what the agent does next is the mode. the
+// default finishes its cleanup and holds the access awaiting a retry. 'access-stuck' is an agent that treats the
+// controller's not-found as a failed delete: the access stays failed and cannot be released. 'access-forgotten'
+// holds nothing afterwards. 'leak-frontend' is a worker that does not delete its access.
+func (a *fakeAgentServer) AccessPrivate(_ context.Context, req *agentGrpc.AccessPrivateRequest) (*agentGrpc.AccessPrivateResponse, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	account := a.root.Environment().AccountToken
+	var resp fakeTokenResponse
+	body := map[string]string{"envZId": a.root.Environment().ZitiIdentity, "share": req.GetToken()}
+	if err := fakePost(a.api, account, "/fake/access", body, &resp); err != nil {
+		return nil, err
+	}
+	detail := &agentGrpc.AccessDetail{Token: req.GetToken(), BindAddress: req.GetBindAddress()}
+	listener, err := net.Listen("tcp", req.GetBindAddress())
+	if err == nil {
+		a.bound = append(a.bound, listener)
+		detail.FrontendToken, detail.Status = resp.Token, "active"
+		a.accesses = append(a.accesses, detail)
+		return &agentGrpc.AccessPrivateResponse{FrontendToken: resp.Token}, nil
+	}
+	if !slices.Contains(a.modes, "leak-frontend") {
+		_ = fakePost(a.api, account, "/fake/unaccess", map[string]string{"token": resp.Token}, nil)
+	}
+	switch {
+	case slices.Contains(a.modes, "access-forgotten"):
+	case slices.Contains(a.modes, "access-stuck"):
+		detail.FrontendToken, detail.Status = resp.Token, "failed"
+		detail.Failure = &agentGrpc.Failure{Id: "err_fake", Count: 1, LastError: fmt.Sprintf("pending cleanup for '%v': error deleting access: [DELETE /unaccess][404] unaccessNotFound", resp.Token)}
+		a.accesses = append(a.accesses, detail)
+	default:
+		detail.Status = "retrying"
+		detail.Failure = &agentGrpc.Failure{Id: "err_fake", Count: 1, LastError: "worker exited unexpectedly"}
+		a.accesses = append(a.accesses, detail)
+	}
+	return &agentGrpc.AccessPrivateResponse{FrontendToken: resp.Token}, nil
+}
+
+func (a *fakeAgentServer) ReleaseAccess(_ context.Context, req *agentGrpc.ReleaseAccessRequest) (*agentGrpc.ReleaseAccessResponse, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	id := req.GetFrontendToken()
+	for i, access := range a.accesses {
+		if access.GetFrontendToken() != id && access.GetFailure().GetId() != id {
+			continue
+		}
+		if access.GetStatus() == "failed" {
+			return nil, fmt.Errorf("%v", access.GetFailure().GetLastError())
+		}
+		a.accesses = slices.Delete(a.accesses, i, i+1)
+		return &agentGrpc.ReleaseAccessResponse{}, nil
+	}
+	return nil, fmt.Errorf("agent has no operation with token or failure id '%v'", id)
+}
+
+// ReleaseShare deletes the share at the controller, except in 'private-leak', where the agent forgets a private
+// share it never deleted.
+func (a *fakeAgentServer) ReleaseShare(_ context.Context, req *agentGrpc.ReleaseShareRequest) (*agentGrpc.ReleaseShareResponse, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	token := req.GetToken()
+	if _, found := a.shares[token]; !found {
+		return nil, fmt.Errorf("agent has no operation with token or failure id '%v'", token)
+	}
+	if !slices.Contains(a.modes, "private-leak") {
+		if err := fakePost(a.api, a.root.Environment().AccountToken, "/fake/delete-private", map[string]string{"token": token}, nil); err != nil {
+			return nil, err
+		}
+	}
+	delete(a.shares, token)
+	return &agentGrpc.ReleaseShareResponse{}, nil
 }

@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -36,6 +37,12 @@ type harness struct {
 	agentConn *grpc.ClientConn
 	starts    int
 	tokens    []string
+
+	// private is the token of the private share the access steps use. held is a local port this process occupies
+	// so an access cannot bind it. collided is the failure id of the access that tried, while the agent holds it.
+	private  string
+	held     net.Listener
+	collided string
 }
 
 func runMode(first, second context.Context, cfg config) int {
@@ -138,6 +145,10 @@ func (h *harness) scenario(ctx context.Context) error {
 		{"reserve name", h.reserveName},
 		{"start loopback target", h.startTarget},
 		{"start agent", h.startAgent},
+		{"private share through agent", h.sharePrivate},
+		{"access on an occupied port", h.collideAccess},
+		{"release the access", h.releaseAccess},
+		{"release the private share", h.releasePrivate},
 		{"share through agent", h.share},
 		{"public response", h.checkPublic},
 		{"interrupt agent", h.stopAgent},
@@ -288,6 +299,113 @@ func (h *harness) share(ctx context.Context) (string, error) {
 		return "", err
 	}
 	return fmt.Sprintf("share '%v' at '%v'", detail.GetToken(), strings.Join(detail.GetFrontendEndpoint(), ", ")), nil
+}
+
+// sharePrivate creates the private share the access steps need, through the agent.
+func (h *harness) sharePrivate(ctx context.Context) (string, error) {
+	shareCtx, cancel := context.WithTimeout(ctx, h.cfg.startupBound)
+	defer cancel()
+	if err := h.runCommand(shareCtx, "share-private", h.cfg.startupBound, "share", "private", "--force-agent", h.target.target()); err != nil {
+		return "", err
+	}
+	detail, err := awaitPrivateShare(shareCtx, h.cfg, h.agentRPC, h.agent, h.recordToken)
+	if err != nil {
+		return "", err
+	}
+	h.private = detail.GetToken()
+	view, err := h.readView(ctx)
+	if err != nil {
+		return "", err
+	}
+	if len(view.tokenLocations(h.private)) == 0 {
+		return "", fmt.Errorf("private share '%v' is missing from the account overview", h.private)
+	}
+	return fmt.Sprintf("private share '%v'", h.private), nil
+}
+
+// collideAccess asks the agent for an access bound to a port this process already occupies. the access worker
+// reports ready before it binds; the bind then fails, the worker deletes its own access and exits, and the
+// agent's cleanup asks the controller to delete an access that is already gone. an agent that cannot finish that
+// cleanup leaves the access 'failed' and unreleasable until it restarts, which is the defect this step catches.
+// the command's own exit status depends on whether the worker reported ready first, so the agent's state decides.
+func (h *harness) collideAccess(ctx context.Context) (string, error) {
+	held, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		return "", fmt.Errorf("unable to occupy a local port: %w", err)
+	}
+	h.held = held
+	addr := held.Addr().String()
+	accessCtx, cancel := context.WithTimeout(ctx, h.cfg.startupBound)
+	defer cancel()
+	code, err := h.runCommandCode(accessCtx, "access-private", h.cfg.startupBound, "access", "private", "--force-agent", "-b", addr, h.private)
+	if err != nil {
+		return "", err
+	}
+	access, err := awaitCollision(accessCtx, h.cfg, h.agentRPC, h.agent)
+	if err != nil {
+		return "", err
+	}
+	if access == nil {
+		return fmt.Sprintf("command exited %d; the agent holds no access for occupied '%v'", code, addr), nil
+	}
+	h.collided = access.GetFailure().GetId()
+	return fmt.Sprintf("command exited %d; access is '%v' as '%v' after failing to bind occupied '%v'", code, access.GetStatus(), h.collided, addr), nil
+}
+
+// releaseAccess releases whatever the agent still holds for the collided access, then requires that neither the
+// agent nor the account overview lists an access to the private share. the port stays occupied until the agent
+// holds no access, so a retry cannot bind it in between.
+func (h *harness) releaseAccess(ctx context.Context) (string, error) {
+	released := "nothing left to release"
+	if h.collided != "" {
+		if err := h.runCommand(ctx, "release-access", h.cfg.commandBound, "agent", "release", "access", h.collided); err != nil {
+			return "", err
+		}
+		released = fmt.Sprintf("released '%v'", h.collided)
+	}
+	waitCtx, cancel := context.WithTimeout(ctx, h.cfg.commandBound)
+	defer cancel()
+	if err := awaitNoAccess(waitCtx, h.cfg, h.agentRPC, h.agent); err != nil {
+		return "", err
+	}
+	h.releaseHeld()
+	view, err := h.readView(ctx)
+	if err != nil {
+		return "", err
+	}
+	if locations := view.accessLocations(h.private); len(locations) > 0 {
+		return "", fmt.Errorf("an access to '%v' is still present: %v", h.private, strings.Join(locations, "; "))
+	}
+	return released + "; no access listed by the agent or the account overview", nil
+}
+
+// releasePrivate releases the private share and requires the agent to hold nothing and the share to be gone, so
+// the public share steps start from the state they always did.
+func (h *harness) releasePrivate(ctx context.Context) (string, error) {
+	if err := h.runCommand(ctx, "release-share", h.cfg.commandBound, "agent", "release", "share", h.private); err != nil {
+		return "", err
+	}
+	waitCtx, cancel := context.WithTimeout(ctx, h.cfg.commandBound)
+	defer cancel()
+	if err := awaitIdle(waitCtx, h.cfg, h.agentRPC, h.agent); err != nil {
+		return "", err
+	}
+	view, err := h.readView(ctx)
+	if err != nil {
+		return "", err
+	}
+	if err := requireAbsent(view, []string{h.private}); err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("'%v' absent; the agent holds no shares or accesses", h.private), nil
+}
+
+// releaseHeld frees the occupied port. it is safe to repeat.
+func (h *harness) releaseHeld() {
+	if h.held != nil {
+		_ = h.held.Close()
+		h.held = nil
+	}
 }
 
 func (h *harness) awaitReplay(ctx context.Context) (string, error) {
@@ -465,9 +583,22 @@ func (h *harness) childEnv() []string {
 // runCommand runs one short-lived binary invocation within its bound. its arguments, which can include the
 // account token, never appear in errors or logs.
 func (h *harness) runCommand(ctx context.Context, label string, bound time.Duration, args ...string) error {
+	code, err := h.runCommandCode(ctx, label, bound, args...)
+	if err != nil {
+		return err
+	}
+	if code != 0 {
+		return fmt.Errorf("'%v' exited with status %d; see '%v'", label, code, h.rep.logPath(label))
+	}
+	return nil
+}
+
+// runCommandCode is runCommand for an invocation whose exit status is an observation, not a requirement. it
+// fails only when the binary cannot start or does not complete within its bound.
+func (h *harness) runCommandCode(ctx context.Context, label string, bound time.Duration, args ...string) (int, error) {
 	c, err := startChild(h.cfg.binary, args, h.childEnv(), h.rep.log(label))
 	if err != nil {
-		return fmt.Errorf("unable to start '%v': %w", label, err)
+		return 0, fmt.Errorf("unable to start '%v': %w", label, err)
 	}
 	cmdCtx, cancel := context.WithTimeout(ctx, bound)
 	defer cancel()
@@ -475,10 +606,7 @@ func (h *harness) runCommand(ctx context.Context, label string, bound time.Durat
 	case <-c.done:
 	case <-cmdCtx.Done():
 		_, err := c.kill(h.cfg.killBound)
-		return errors.Join(fmt.Errorf("'%v' did not complete: %w", label, cmdCtx.Err()), err)
+		return 0, errors.Join(fmt.Errorf("'%v' did not complete: %w", label, cmdCtx.Err()), err)
 	}
-	if code := c.exitCode(); code != 0 {
-		return fmt.Errorf("'%v' exited with status %d; see '%v'", label, code, h.rep.logPath(label))
-	}
-	return nil
+	return c.exitCode(), nil
 }
