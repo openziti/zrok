@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"slices"
 	"strings"
@@ -96,6 +97,32 @@ func (r *report) log(label string) *boundedLog {
 	r.order = append(r.order, label)
 	return l
 }
+
+// lastLines returns the end of a child's captured output on one line, for a failure message: the last few
+// non-empty lines, without terminal colour codes, shortened to a few hundred bytes. the caller's error passes
+// through redact with every other step detail before it is logged or written.
+func (r *report) lastLines(label string) string {
+	r.mu.Lock()
+	log := r.logs[label]
+	r.mu.Unlock()
+	if log == nil {
+		return ""
+	}
+	var kept []string
+	lines := strings.Split(ansiCodes.ReplaceAllString(string(log.contents()), ""), "\n")
+	for i := len(lines) - 1; i >= 0 && len(kept) < 3; i-- {
+		if line := strings.TrimSpace(lines[i]); line != "" {
+			kept = append([]string{line}, kept...)
+		}
+	}
+	text := strings.Join(kept, " | ")
+	if over := len(text) - 600; over > 0 {
+		text = "..." + text[over:]
+	}
+	return text
+}
+
+var ansiCodes = regexp.MustCompile(`\x1b\[[0-9;]*[A-Za-z]`)
 
 func (r *report) logPath(label string) string {
 	return filepath.Join(reportDir, "logs", r.mode+"-"+label+".log")

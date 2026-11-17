@@ -588,6 +588,10 @@ func (h *harness) runCommand(ctx context.Context, label string, bound time.Durat
 		return err
 	}
 	if code != 0 {
+		// the command's own last words go into the failure, so the job log says why without the artifact.
+		if said := h.rep.lastLines(label); said != "" {
+			return fmt.Errorf("'%v' exited with status %d: %v; see '%v'", label, code, said, h.rep.logPath(label))
+		}
 		return fmt.Errorf("'%v' exited with status %d; see '%v'", label, code, h.rep.logPath(label))
 	}
 	return nil

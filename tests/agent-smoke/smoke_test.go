@@ -212,7 +212,12 @@ func TestScenarioFailures(t *testing.T) {
 func TestLostEnableIsReconciledByDescription(t *testing.T) {
 	w := newWorld(t, "enable-lost")
 	require.Equal(t, 1, w.run())
-	w.requireCleaned(w.requireFailure("enable environment", "exited"))
+	s := w.requireFailure("enable environment", "exited")
+	w.requireCleaned(s)
+	// the failed command's last output is in the failure, with the account token it printed redacted
+	assert.Contains(t, s.Failure, "lost the enable response")
+	assert.Contains(t, s.Failure, "account token '[redacted]'")
+	assert.NotContains(t, s.Failure, testAccountToken)
 	m := w.manifest()
 	assert.NotEmpty(t, m.EnvZID)
 	assert.Contains(t, w.summary("run").Cleanup.Detail, "reconciled environment '"+m.EnvZID+"' by description")
