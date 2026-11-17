@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+FIX: The agent can release and clean up an access or a private share that the zrok service has already removed. When the share behind an access was deleted on its own side, the access showed as `failed` in `zrok2 agent status`, `zrok2 agent release access` answered `unaccessNotFound`, and only restarting the agent cleared it. The agent now confirms through the account overview that the access or share is really gone and finishes the cleanup. Deleting a private share or an access from the agent is also bounded at 30 seconds, as deleting a public share already was.
+
 ## v2.0.10
 
 CHANGE: **The agent registry (`agent-registry.json`) is now version 3, which agents from v2.0.9 and earlier cannot read.** The agent reads an existing version 2 registry as it is and saves it as version 3 at the end of its first startup, so upgrading needs no manual step. A v2.0.9 agent will not start on a version 3 registry: it reports the unsupported version, exits 1 and leaves the file as it was. Rolling back to v2.0.9 or earlier therefore needs a manual edit of the registry before the older agent will run; the procedure is in `docs/current/agent-share-lifecycle.md`. A v2.0.8 agent does start, with nothing restored, and replaces the registry with an empty one at its next save, so for v2.0.8 make the edit before starting it.

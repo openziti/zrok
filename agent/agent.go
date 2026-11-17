@@ -84,15 +84,13 @@ func NewAgent(cfg *AgentConfig, root env_core.Root) (*Agent, error) {
 		createPublic: func(ctx context.Context, req *sdk.ShareRequest) (*sdk.Share, error) {
 			return sdk.CreateShareContext(ctx, root, req)
 		},
-		deleteShare: func(_ context.Context, token string) error { return sdk.DeleteShare(root, &sdk.Share{Token: token}) },
-		deleteAccess: func(_ context.Context, token, frontend string) error {
-			return sdk.DeleteAccess(root, &sdk.Access{Token: frontend, ShareToken: token})
-		},
 		loadRegistry:   LoadRegistry,
 		saveRegistry:   func(registry *Registry, path string) error { return registry.Save(path) },
 		remoteListener: func(token string) (net.Listener, error) { return sdk.NewListener(token, root) },
 	}
 	a.deps.deletePublic = a.deletePublicShare
+	a.deps.deleteShare = a.deletePrivateShare
+	a.deps.deleteAccess = a.deleteAccess
 	return a, nil
 }
 
