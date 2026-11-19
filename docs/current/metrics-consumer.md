@@ -43,6 +43,10 @@ The cache belongs to the agent's run goroutine and takes no lock. After each eve
 
 The usage event carries the share's backend mode from attribution on. The Influx writer does not record it.
 
+## Bridge file source
+
+The metrics bridge follows the usage file from its saved byte position. It delivers a line only after its newline has been written, and advances the saved pointer past complete lines only. After a restart it resumes at the start of an unfinished line, so the line is delivered whole once the remaining text and newline arrive. The pointer's format and location are unchanged: by default it is the usage file's path with `.ptr` appended.
+
 ## Usage point identity
 
 The writer timestamps a usage point at its whole-second interval start plus an offset from the event's circuit id, reporting router (`source_id`) and report time (`timestamp`). The router and report time are carried as opaque strings; missing or wrongly typed values leave those parts empty and do not reject the event or log above debug. The offset is the 64-bit FNV-1a hash of those three strings in that order, each followed by a zero byte, modulo 999,999,999 plus one nanosecond. It is always greater than zero and less than one second. The `circuits` point and both backend and frontend `xfer` points for an event use the same time, written with nanosecond precision. Measurements, tags and usage queries are unchanged.

@@ -36,7 +36,7 @@ require (
 	github.com/michaelquigley/df v0.3.2
 	github.com/michaelquigley/pfxlog v0.6.10
 	github.com/muesli/reflow v0.3.0
-	github.com/nxadm/tail v1.4.8
+	github.com/nxadm/tail v1.4.11
 	github.com/openziti/channel/v4 v4.2.37
 	github.com/openziti/cobra-to-md v1.0.1
 	github.com/openziti/edge-api v0.26.48
