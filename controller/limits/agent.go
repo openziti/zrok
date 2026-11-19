@@ -33,6 +33,8 @@ type Agent struct {
 	ctx            context.Context
 	cancel         context.CancelFunc
 	droppedEvents  atomic.Uint64
+	// caches belongs to the run goroutine.
+	caches usageCaches
 }
 
 type bandwidthReader interface {
@@ -293,12 +295,13 @@ func (a *Agent) run() {
 	defer dl.Info("stopped")
 
 	lastCycle := time.Now()
+	a.caches.lastReport = a.caches.clock()
 mainLoop:
 	for {
 		select {
 		case usage := <-a.queue:
 			if usage.ShareToken != "" {
-				if err := a.enforceSafely(usage); err != nil {
+				if err := a.handleUsage(usage); err != nil {
 					dl.Errorf("error running enforcement: %v", err)
 				}
 				if time.Since(lastCycle) > a.cfg.Cycle {
@@ -307,6 +310,7 @@ mainLoop:
 					}
 					lastCycle = time.Now()
 				}
+				a.reportCaches()
 			} else {
 				dl.Debugf("not enforcing for usage with no share token: %v", usage.String())
 			}
@@ -324,49 +328,53 @@ mainLoop:
 	}
 }
 
-func (a *Agent) enforceSafely(usage *metrics.Usage) (err error) {
+func (a *Agent) enforceSafely(usage *metrics.Usage) (read *enforcement, err error) {
 	defer func() {
 		if recovered := recover(); recovered != nil {
+			read = nil
 			err = errors.Errorf("panic enforcing usage for account '#%d': %v", usage.AccountId, recovered)
 		}
 	}()
 	return a.enforce(usage)
 }
 
-func (a *Agent) enforce(u *metrics.Usage) error {
+// enforce decides from the store and InfluxDB, read here, whether to journal and act. it reads no cache; what
+// it read is handed back so the caller can refresh the caches.
+func (a *Agent) enforce(u *metrics.Usage) (*enforcement, error) {
 	trx, err := a.str.Begin()
 	if err != nil {
-		return errors.Wrap(err, "error starting transaction")
+		return nil, errors.Wrap(err, "error starting transaction")
 	}
 	defer func() { _ = trx.Rollback() }()
 
 	acct, err := a.str.GetAccount(int(u.AccountId), trx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if acct.Limitless {
-		return nil
+		return &enforcement{limitless: true}, nil
 	}
 
 	shr, err := a.str.FindShareWithTokenEvenIfDeleted(u.ShareToken, trx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	ul, err := a.getUserLimits(int(u.AccountId), trx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	exceededBwc, rxBytes, txBytes, err := a.anyBandwidthLimitExceeded(acct, u, ul.toBandwidthArray(sdk.BackendMode(shr.BackendMode)))
+	exceededBwc, rxBytes, txBytes, totals, err := a.anyBandwidthLimitExceeded(acct, u, ul.toBandwidthArray(sdk.BackendMode(shr.BackendMode)))
 	if err != nil {
-		return errors.Wrap(err, "error checking limit classes")
+		return nil, errors.Wrap(err, "error checking limit classes")
 	}
+	read := &enforcement{ul: ul, totals: totals}
 
 	if exceededBwc != nil {
 		latestJe, err := a.isBandwidthClassLimitedForAccount(int(u.AccountId), exceededBwc, trx)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if latestJe == nil {
 			je := &store.BandwidthLimitJournalEntry{
@@ -380,36 +388,37 @@ func (a *Agent) enforce(u *metrics.Usage) error {
 				je.LimitClassId = &lcId
 			}
 			if _, err := a.str.CreateBandwidthLimitJournalEntry(je, trx); err != nil {
-				return err
+				return nil, err
 			}
 			acct, err := a.str.GetAccount(int(u.AccountId), trx)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			switch exceededBwc.GetLimitAction() {
 			case store.LimitLimitAction:
 				for _, limitAction := range a.limitActions {
 					if err := limitAction.HandleAccount(acct, rxBytes, txBytes, exceededBwc, ul, trx); err != nil {
-						return errors.Wrapf(err, "%v", reflect.TypeOf(limitAction).String())
+						return nil, errors.Wrapf(err, "%v", reflect.TypeOf(limitAction).String())
 					}
 				}
 
 			case store.WarningLimitAction:
 				for _, warningAction := range a.warningActions {
 					if err := warningAction.HandleAccount(acct, rxBytes, txBytes, exceededBwc, ul, trx); err != nil {
-						return errors.Wrapf(err, "%v", reflect.TypeOf(warningAction).String())
+						return nil, errors.Wrapf(err, "%v", reflect.TypeOf(warningAction).String())
 					}
 				}
 			}
 			if err := trx.Commit(); err != nil {
-				return err
+				return nil, err
 			}
 		} else {
 			dl.Debugf("limit '%v' already applied for '%v' (at: %v)", exceededBwc, acct.Email, latestJe.CreatedAt)
 		}
+		read.confirmed = exceededBwc
 	}
 
-	return nil
+	return read, nil
 }
 
 func (a *Agent) relax() error {
@@ -578,7 +587,8 @@ func (a *Agent) isBandwidthClassLimitedForAccount(acctId int, bwc store.Bandwidt
 	return nil, nil
 }
 
-func (a *Agent) anyBandwidthLimitExceeded(acct *store.Account, u *metrics.Usage, bwcs []store.BandwidthClass) (store.BandwidthClass, int64, int64, error) {
+// anyBandwidthLimitExceeded selects the last exceeded class in bwcs, and returns the totals it read by period.
+func (a *Agent) anyBandwidthLimitExceeded(acct *store.Account, u *metrics.Usage, bwcs []store.BandwidthClass) (store.BandwidthClass, int64, int64, map[int]periodBwValues, error) {
 	periodBw := make(map[int]periodBwValues)
 
 	var selectedLc store.BandwidthClass
@@ -589,7 +599,7 @@ func (a *Agent) anyBandwidthLimitExceeded(acct *store.Account, u *metrics.Usage,
 		if _, found := periodBw[bwc.GetPeriodMinutes()]; !found {
 			rx, tx, err := a.ifx.totalRxTxForAccount(a.ctx, u.AccountId, time.Minute*time.Duration(bwc.GetPeriodMinutes()))
 			if err != nil {
-				return nil, 0, 0, errors.Wrapf(err, "error getting rx/tx for account '%v'", acct.Email)
+				return nil, 0, 0, nil, errors.Wrapf(err, "error getting rx/tx for account '%v'", acct.Email)
 			}
 			periodBw[bwc.GetPeriodMinutes()] = periodBwValues{rx: rx, tx: tx}
 		}
@@ -608,7 +618,7 @@ func (a *Agent) anyBandwidthLimitExceeded(acct *store.Account, u *metrics.Usage,
 		dl.Infof("'%v' exceeded limit '%v' with rx: %v, tx: %v, total: %v", acct.Email, selectedLc, util.BytesToSize(rxBytes), util.BytesToSize(txBytes), util.BytesToSize(rxBytes+txBytes))
 	}
 
-	return selectedLc, rxBytes, txBytes, nil
+	return selectedLc, rxBytes, txBytes, periodBw, nil
 }
 
 func (a *Agent) transferBytesExceeded(rx, tx int64, bwc store.BandwidthClass) bool {

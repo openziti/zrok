@@ -124,6 +124,17 @@ limits:
       total:        10485760
   enforcing:        false
   cycle:            5m
+  #
+  # The limits agent finishes a usage event without a database transaction or an InfluxDB query when its caches show
+  # there is nothing to do. Anything that journals a crossing or applies a warning or a limit is still decided from
+  # the database and InfluxDB. An administrator's change to an account's limits can take up to
+  # `account_cache_lifetime` to be noticed, and a crossing up to `usage_cache_lifetime`. Unset or zero uses the
+  # defaults shown; a negative lifetime turns that cache off, and a negative report interval turns off the periodic
+  # log line counting events finished by the fast path and events that took the full path.
+  #
+  #account_cache_lifetime: 60s
+  #usage_cache_lifetime:   60s
+  #cache_report_interval:  5m
 
 # Background maintenance job configuration. The `registration` job purges registration requests created through the
 # `zrok invite` tool. The `reset_password` job purges password reset requests.

@@ -35,6 +35,7 @@ func (str *Store) FindAppliedLimitClassesForAccount(acctId int, trx *sqlx.Tx) ([
 	if err != nil {
 		return nil, errors.Wrap(err, "error finding limit classes for account")
 	}
+	defer func() { _ = rows.Close() }()
 	var lcs []*LimitClass
 	for rows.Next() {
 		lc := &LimitClass{}
@@ -42,6 +43,10 @@ func (str *Store) FindAppliedLimitClassesForAccount(acctId int, trx *sqlx.Tx) ([
 			return nil, errors.Wrap(err, "error scanning limit_classes")
 		}
 		lcs = append(lcs, lc)
+	}
+	// a read that fails partway is an error, never a partial list.
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "error reading limit classes for account")
 	}
 	return lcs, nil
 }
