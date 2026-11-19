@@ -98,6 +98,8 @@ func Ingest(event ZitiEventJson) (*Usage, error) {
 			} else {
 				dl.Warnf("missing 'circuit_id': %v", event)
 			}
+			u.ZitiRouterId, _ = eventMap["source_id"].(string)
+			u.ZitiReportTime, _ = eventMap["timestamp"].(string)
 		} else {
 			dl.Errorf("not 'fabric.usage': %v", event)
 			invalid = true

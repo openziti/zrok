@@ -1,4 +1,4 @@
-# Metrics consumer bounds
+# Metrics consumer
 
 The controller consumes metrics with manual acknowledgement and a finite prefetch window. It nacks malformed JSON and unusable events without requeue immediately. A usable event has namespace `fabric.usage`, a numeric `interval_start_utc`, a string `tags.serviceId`, and a `usage` object. A missing `circuit_id` produces a warning and remains acceptable.
 
@@ -42,6 +42,22 @@ When the cache holds `share_cache_size` entries and a new service is stored, exp
 The cache belongs to the agent's run goroutine and takes no lock. After each event, once `cache_report_interval` has passed and lookups happened since the last report, the agent logs one info line with the lookups answered from memory, shares and "not a share" counted separately, the lookups that went to the store, and the entries held, then resets the counts. A negative interval turns the line off.
 
 The usage event carries the share's backend mode from attribution on. The Influx writer does not record it.
+
+## Usage point identity
+
+The writer timestamps a usage point at its whole-second interval start plus an offset from the event's circuit id, reporting router (`source_id`) and report time (`timestamp`). The router and report time are carried as opaque strings; missing or wrongly typed values leave those parts empty and do not reject the event or log above debug. The offset is the 64-bit FNV-1a hash of those three strings in that order, each followed by a zero byte, modulo 999,999,999 plus one nanosecond. It is always greater than zero and less than one second. The `circuits` point and both backend and frontend `xfer` points for an event use the same time, written with nanosecond precision. Measurements, tags and usage queries are unchanged.
+
+Several connections through a share in one reporting interval now keep separate points instead of replacing one another. The same event always lands on the same point in every consumer, including after a restart, so redelivery replaces itself and is counted once. The function must stay the same across releases to preserve that behaviour. Different report times distinguish repeated reports for the same circuit and interval; different router ids distinguish routers reporting that circuit at the same instant.
+
+An event with no circuit, router or report time still gets a nonzero offset, but all such events share that offset and can replace one another for the same measurement, tags and interval. Different identities can also hash to the same offset: with 100 events for a share and interval the chance is about one in 200,000 intervals, and with 1,000 about one in 2,000. These collisions still lose one report.
+
+Points stay within their original second, so whole-second aggregation windows keep their usage. A range beginning at a fractional instant can include a point differently within a second of its start; a caller requesting a fractional window through the metrics API can see a point move to the neighbouring window. Neither edge loses or repeats usage.
+
+Only usage written after the upgrade is corrected; overwritten history cannot be recovered. Old consumers write at the interval start and new consumers write at nonzero offsets, so their points do not overwrite each other during an upgrade. An event written before the upgrade and redelivered after it is counted twice. Totals for concurrent connections rise as corrected usage accumulates, and limits can reach a warning or enforcement threshold they did not reach before. There is no new setting; rollback means running the previous release, which can still read the points written with offsets.
+
+Duplicate limits journal entries from concurrent consumers remain a separate defect: two consumers can each find no entry and each record and run the same warning action. Corrected usage does not resolve that race.
+
+## Shutdown and failed processing
 
 The consumer cancels database lookups, active writes, and retry waits at shutdown. It drains events so a source blocked on send can exit, leaving drained deliveries unsettled. A delivery held by the source when its send is cancelled is also left unsettled, as is an active delivery interrupted before durable success. Closing the AMQP connection lets the broker requeue these deliveries for recovery. This differs from failed processing: shutdown is not a processing failure, and nacking these valid messages would discard them on restart.
 

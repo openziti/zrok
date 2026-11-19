@@ -1,12 +1,41 @@
 package metrics
 
 import (
+	"fmt"
 	"strings"
 	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
+
+func TestUsageOptionalReportIdentity(t *testing.T) {
+	for _, field := range []string{"source_id", "timestamp"} {
+		for _, value := range []string{`"opaque, not a parsed time"`, `""`, `null`, `17`, `true`, `{}`, `[]`, "missing"} {
+			t.Run(field+"/"+value, func(t *testing.T) {
+				identity := ""
+				if value != "missing" {
+					identity = fmt.Sprintf(",%q:%s", field, value)
+				}
+				data := ZitiEventJson(`{"namespace":"fabric.usage","interval_start_utc":1,"tags":{"serviceId":"service"},"circuit_id":"circuit","usage":{}` + identity + `}`)
+				u, err := Ingest(data)
+				require.NoError(t, err)
+				require.Equal(t, "circuit", u.ZitiCircuitId)
+				want := ""
+				if value == `"opaque, not a parsed time"` {
+					want = "opaque, not a parsed time"
+				}
+				if field == "source_id" {
+					require.Equal(t, want, u.ZitiRouterId)
+					require.Empty(t, u.ZitiReportTime)
+				} else {
+					require.Equal(t, want, u.ZitiReportTime)
+					require.Empty(t, u.ZitiRouterId)
+				}
+			})
+		}
+	}
+}
 
 func TestUnusableUsageNacksWithoutRunningSinks(t *testing.T) {
 	for _, tc := range []struct {
