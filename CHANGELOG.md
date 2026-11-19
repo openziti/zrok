@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v2.0.11
+
 FIX: The metrics bridge with a file source could skip usage events, or pass on a partial event that was then discarded, when it read the file while OpenZiti was writing to it. Some usage consequently went unrecorded. The file source now delivers each event once, when its line is complete.
 
 FIX: Usage for a share with more than one connection in a reporting interval was under-reported because each connection's report replaced the one before it. These reports now keep separate points, so totals shown in the console and API will be higher for such shares from the upgrade on. Limits are now enforced against the true totals: an account may reach a warning or limit it did not reach before, and operators may want to review their limit values. Usage recorded before the upgrade is not corrected.
