@@ -19,6 +19,10 @@ The following optional configuration values use these defaults when unset:
 | `metrics.agent.retry_initial_backoff` | `1s` |
 | `metrics.agent.retry_max_backoff` | `30s` |
 | `metrics.agent.retry_budget` | `2m` shared per message |
+| `metrics.agent.share_cache_lifetime` | `10m`; how long a confirmed share attribution is trusted |
+| `metrics.agent.not_share_cache_lifetime` | `1m`; how long a confirmed "not a share" is trusted |
+| `metrics.agent.share_cache_size` | 100000 entries of both kinds together |
+| `metrics.agent.cache_report_interval` | `5m` between attribution lookup reports |
 | `metrics.influx.write_timeout` | `10s` per attempt |
 | `limits.handoff_timeout` | `3s` |
 | `limits.query_timeout` | `30s` per limits-agent Influx query |
@@ -28,6 +32,16 @@ Share-detail enrichment and the durable write share one per-message deadline, in
 - A confirmed missing share is recognized as `errNotAShare`, debug-logged, and processing continues without retries or attribution. This is legitimate traffic for another service; the Influx writer skips events without a share token and the delivery is acknowledged.
 - A share is attributed and processing continues to the durable sink. Ephemeral environments deliberately have no account: enrichment reports that condition at debug level, retains the share token and environment ID, and continues with account ID zero without retries.
 - A store failure is retried with the configured attempts and backoff within the shared deadline. Exhaustion is logged and nacked without requeue, and no sinks run. Treating an unavailable store as proof that the service is unrelated would silently lose real share usage.
+
+Enrichment remembers its confirmed answers by Ziti service ID, so a service seen recently costs no database query. A remembered share fills the share token, environment ID, account ID and backend mode exactly as the store lookup did, and a share whose environment has no account is remembered with that outcome. A remembered "not a share" is answered as `errNotAShare`. These facts do not change for the life of a share row: the lookup includes deleted shares, nothing rewrites a share's token, `z_id`, environment or backend mode, and a share's row is committed before any usage can flow over its service. So share creation and deletion take effect without delay, and entries expire only to bound memory and to let anything unexpected heal itself; "not a share" expires sooner as a margin.
+
+Only a confirmed answer is stored: an attributed share, an attributed share with no account, or no row for the service. A failure to begin the transaction, a failed select, or a cancelled context stores nothing, and the event follows the retry path above. An unavailable store is never remembered as proof that a service is unrelated.
+
+When the cache holds `share_cache_size` entries and a new service is stored, expired entries are dropped; if none have expired, the cache is cleared. A negative lifetime turns that kind of entry off, and every lookup of that kind goes to the store as before the cache existed.
+
+The cache belongs to the agent's run goroutine and takes no lock. After each event, once `cache_report_interval` has passed and lookups happened since the last report, the agent logs one info line with the lookups answered from memory, shares and "not a share" counted separately, the lookups that went to the store, and the entries held, then resets the counts. A negative interval turns the line off.
+
+The usage event carries the share's backend mode from attribution on. The Influx writer does not record it.
 
 The consumer cancels database lookups, active writes, and retry waits at shutdown. It drains events so a source blocked on send can exit, leaving drained deliveries unsettled. A delivery held by the source when its send is cancelled is also left unsettled, as is an active delivery interrupted before durable success. Closing the AMQP connection lets the broker requeue these deliveries for recovery. This differs from failed processing: shutdown is not a processing failure, and nacking these valid messages would discard them on restart.
 

@@ -150,6 +150,16 @@ metrics:
       type:         amqpSource
       url:          amqp://guest:guest@localhost:5672
       queue_name:   events
+    #
+    # The agent remembers which share each OpenZiti service belongs to, and which services are not shares, so a usage
+    # event for a service seen recently costs no database query. A failed lookup is never remembered. Unset or zero
+    # uses the defaults shown; a negative lifetime turns that kind of entry off, and a negative report interval turns
+    # off the periodic log line counting lookups answered from memory and from the database.
+    #
+    #share_cache_lifetime:      10m
+    #not_share_cache_lifetime:  1m
+    #share_cache_size:          100000
+    #cache_report_interval:     5m
   #
   # The `influx` section configures access to the InfluxDB instance used to store `zrok` metrics.
   #

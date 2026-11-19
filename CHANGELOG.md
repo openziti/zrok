@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+CHANGE: The controller's metrics agent now remembers which share each OpenZiti service belongs to, and which services are not shares at all, instead of asking the database again for every usage event. A busy controller makes far fewer database queries as a result; usage keeps being attributed to the same share, environment and account. A share is remembered for 10 minutes and a service that is not a share for 1 minute, set with `metrics.agent.share_cache_lifetime` and `metrics.agent.not_share_cache_lifetime`; `metrics.agent.share_cache_size` bounds how many are held (100000 by default). A failed database lookup is never remembered. Every 5 minutes, when usage has flowed, the agent logs how many lookups it answered from memory and how many went to the database; `metrics.agent.cache_report_interval` changes that, and a negative value turns the line off. A negative lifetime turns that kind of remembering off and restores the previous behaviour.
+
 FIX: The agent can release and clean up an access or a private share that the zrok service has already removed. When the share behind an access was deleted on its own side, the access showed as `failed` in `zrok2 agent status`, `zrok2 agent release access` answered `unaccessNotFound`, and only restarting the agent cleared it. The agent now confirms through the account overview that the access or share is really gone and finishes the cleanup. Deleting a private share or an access from the agent is also bounded at 30 seconds, as deleting a public share already was.
 
 ## v2.0.10

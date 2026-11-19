@@ -12,11 +12,30 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// flakyShareStore counts the enrichment store calls and fails the first few of each kind.
 type flakyShareStore struct {
 	*store.Store
 	failures      int32
 	calls         atomic.Int32
 	firstDeadline time.Time
+	beginFailures int32
+	beginCalls    atomic.Int32
+	envFailures   int32
+	envCalls      atomic.Int32
+}
+
+func (s *flakyShareStore) BeginContext(ctx context.Context) (*sqlx.Tx, error) {
+	if s.beginCalls.Add(1) <= s.beginFailures {
+		return nil, errors.New("store temporarily unavailable")
+	}
+	return s.Store.BeginContext(ctx)
+}
+
+func (s *flakyShareStore) GetEnvironmentContext(ctx context.Context, id int, trx *sqlx.Tx) (*store.Environment, error) {
+	if s.envCalls.Add(1) <= s.envFailures {
+		return nil, errors.New("store temporarily unavailable")
+	}
+	return s.Store.GetEnvironmentContext(ctx, id, trx)
 }
 
 func (s *flakyShareStore) FindShareWithZIdAndDeletedContext(ctx context.Context, id string, trx *sqlx.Tx) (*store.Share, error) {
@@ -114,5 +133,76 @@ func TestTransientEnrichment(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+// a store failure is retried under the existing policy and never remembered: an event whose enrichment failed
+// leaves the next event for the same service to go to the store again and be attributed.
+func TestEnrichmentFailureIsNotAnAnswer(t *testing.T) {
+	for _, stage := range []string{"begin", "share select", "environment select"} {
+		for _, attempts := range []int{2, 1} {
+			name := stage + "/retried"
+			if attempts == 1 {
+				name = stage + "/not remembered"
+			}
+			t.Run(name, func(t *testing.T) {
+				str, err := store.Open(&store.Config{Type: "sqlite3", Path: ":memory:"})
+				require.NoError(t, err)
+				t.Cleanup(func() { _ = str.Close() })
+				trx, err := str.Begin()
+				require.NoError(t, err)
+				defer func() { _ = trx.Rollback() }()
+				accountID, err := str.CreateAccount(&store.Account{Email: "test@example.com", Token: "test", Password: "password"}, trx)
+				require.NoError(t, err)
+				envID, err := str.CreateEnvironment(accountID, &store.Environment{ZId: "environment"}, trx)
+				require.NoError(t, err)
+				_, err = str.CreateShare(envID, &store.Share{ZId: "unrelated", Token: "share", ShareMode: "private", BackendMode: "tcpTunnel", PermissionMode: store.OpenPermissionMode}, trx)
+				require.NoError(t, err)
+				require.NoError(t, trx.Commit())
+
+				first := &testEvent{data: validUsage, done: make(chan bool, 2)}
+				second := &testEvent{data: validUsage, done: make(chan bool, 2)}
+				a, err := NewAgent(&AgentConfig{
+					Source: &testSource{messages: []ZitiEventMsg{first, second}}, RetryAttempts: attempts,
+					RetryInitialBackoff: time.Millisecond, RetryMaxBackoff: 5 * time.Millisecond,
+				}, str, &InfluxConfig{})
+				require.NoError(t, err)
+				flaky := &flakyShareStore{Store: str}
+				switch stage {
+				case "begin":
+					flaky.beginFailures = 1
+				case "share select":
+					flaky.failures = 1
+				case "environment select":
+					flaky.envFailures = 1
+				}
+				a.cache.str = flaky
+				a.durable.(*influxWriter).idb.Close()
+				var got []Usage
+				a.durable = sinkFunc(func(u *Usage) error { got = append(got, *u); return nil })
+				require.NoError(t, a.Start())
+				t.Cleanup(a.Stop)
+				firstAcked := awaitEvent(t, first)
+				require.True(t, awaitEvent(t, second))
+				a.Stop()
+
+				if attempts == 2 {
+					require.True(t, firstAcked)
+					require.EqualValues(t, 2, flaky.transactions(), "the failure is retried; the second event is answered from memory")
+					require.Len(t, got, 2)
+				} else {
+					require.False(t, firstAcked)
+					require.EqualValues(t, 1, first.nacks.Load())
+					require.EqualValues(t, 2, flaky.transactions(), "the second event must go to the store again")
+					require.Len(t, got, 1)
+				}
+				for _, u := range got {
+					require.Equal(t, "share", u.ShareToken)
+					require.EqualValues(t, envID, u.EnvironmentId)
+					require.EqualValues(t, accountID, u.AccountId)
+					require.Equal(t, "tcpTunnel", u.BackendMode)
+				}
+			})
+		}
 	}
 }
