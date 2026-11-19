@@ -73,9 +73,10 @@ func (s *fileSource) tail(ptr int64, events chan ZitiEventMsg) {
 
 	var err error
 	s.t, err = tail.TailFile(s.cfg.Path, tail.Config{
-		ReOpen:   true,
-		Follow:   true,
-		Location: &tail.SeekInfo{Offset: ptr},
+		ReOpen:        true,
+		Follow:        true,
+		CompleteLines: true,
+		Location:      &tail.SeekInfo{Offset: ptr},
 	})
 	if err != nil {
 		dl.Errorf("error starting tail: %v", err)
