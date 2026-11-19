@@ -13,6 +13,8 @@ type Usage struct {
 	IntervalStart  time.Time
 	ZitiServiceId  string
 	ZitiCircuitId  string
+	ZitiRouterId   string
+	ZitiReportTime string
 	ShareToken     string
 	EnvironmentId  int64
 	AccountId      int64
@@ -29,6 +31,8 @@ func (u Usage) String() string {
 	out += ", " + fmt.Sprintf("interval '%v'", u.IntervalStart)
 	out += ", " + fmt.Sprintf("service '%v'", u.ZitiServiceId)
 	out += ", " + fmt.Sprintf("circuit '%v'", u.ZitiCircuitId)
+	out += ", " + fmt.Sprintf("router '%v'", u.ZitiRouterId)
+	out += ", " + fmt.Sprintf("report time '%v'", u.ZitiReportTime)
 	out += ", " + fmt.Sprintf("share '%v'", u.ShareToken)
 	out += ", " + fmt.Sprintf("environment '%d'", u.EnvironmentId)
 	out += ", " + fmt.Sprintf("account '%v'", u.AccountId)

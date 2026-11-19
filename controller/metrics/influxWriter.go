@@ -3,6 +3,7 @@ package metrics
 import (
 	"context"
 	"fmt"
+	"hash/fnv"
 	"time"
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
@@ -40,19 +41,20 @@ func (w *influxWriter) HandleContext(parent context.Context, u *Usage) error {
 
 		envId := fmt.Sprintf("%d", u.EnvironmentId)
 		acctId := fmt.Sprintf("%d", u.AccountId)
+		pointTime := usagePointTime(u)
 
 		var pts []*write.Point
 		circuitPt := influxdb2.NewPoint("circuits",
 			map[string]string{"share": u.ShareToken, "envId": envId, "acctId": acctId},
 			map[string]interface{}{"circuit": u.ZitiCircuitId},
-			u.IntervalStart)
+			pointTime)
 		pts = append(pts, circuitPt)
 
 		if u.BackendTx > 0 || u.BackendRx > 0 {
 			pt := influxdb2.NewPoint("xfer",
 				map[string]string{"namespace": "backend", "share": u.ShareToken, "envId": envId, "acctId": acctId},
 				map[string]interface{}{"rx": u.BackendRx, "tx": u.BackendTx},
-				u.IntervalStart)
+				pointTime)
 			pts = append(pts, pt)
 			out += fmt.Sprintf(" backend {rx: %v, tx: %v}", util.BytesToSize(u.BackendRx), util.BytesToSize(u.BackendTx))
 		}
@@ -60,7 +62,7 @@ func (w *influxWriter) HandleContext(parent context.Context, u *Usage) error {
 			pt := influxdb2.NewPoint("xfer",
 				map[string]string{"namespace": "frontend", "share": u.ShareToken, "envId": envId, "acctId": acctId},
 				map[string]interface{}{"rx": u.FrontendRx, "tx": u.FrontendTx},
-				u.IntervalStart)
+				pointTime)
 			pts = append(pts, pt)
 			out += fmt.Sprintf(" frontend {rx: %v, tx: %v}", util.BytesToSize(u.FrontendRx), util.BytesToSize(u.FrontendTx))
 		}
@@ -73,4 +75,15 @@ func (w *influxWriter) HandleContext(parent context.Context, u *Usage) error {
 	}
 
 	return nil
+}
+
+// usagePointTime must stay identical in every consumer and across releases:
+// redelivering an event must replace its point rather than count it twice.
+func usagePointTime(u *Usage) time.Time {
+	h := fnv.New64a()
+	for _, part := range []string{u.ZitiCircuitId, u.ZitiRouterId, u.ZitiReportTime} {
+		_, _ = h.Write([]byte(part))
+		_, _ = h.Write([]byte{0})
+	}
+	return u.IntervalStart.Add(time.Duration(h.Sum64()%999999999 + 1))
 }
