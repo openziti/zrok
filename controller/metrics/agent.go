@@ -33,7 +33,7 @@ func NewAgent(cfg *AgentConfig, str *store.Store, ifxCfg *InfluxConfig) (*Agent,
 	} else {
 		return nil, errors.New("invalid event json source")
 	}
-	a.cache = newShareCache(str)
+	a.cache = newShareCache(str, a.cfg)
 	a.durable = newInfluxWriter(ifxCfg)
 	return a, nil
 }
@@ -74,6 +74,7 @@ func (a *Agent) run() {
 				continue
 			}
 			a.process(event)
+			a.cache.report()
 		case <-a.srcJoin:
 			return
 		}

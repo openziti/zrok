@@ -16,6 +16,7 @@ type Usage struct {
 	ShareToken     string
 	EnvironmentId  int64
 	AccountId      int64
+	BackendMode    string
 	FrontendTx     int64
 	FrontendRx     int64
 	BackendTx      int64
@@ -31,6 +32,7 @@ func (u Usage) String() string {
 	out += ", " + fmt.Sprintf("share '%v'", u.ShareToken)
 	out += ", " + fmt.Sprintf("environment '%d'", u.EnvironmentId)
 	out += ", " + fmt.Sprintf("account '%v'", u.AccountId)
+	out += ", " + fmt.Sprintf("backend mode '%v'", u.BackendMode)
 	out += ", " + fmt.Sprintf("fe {rx %v, tx %v}", util.BytesToSize(u.FrontendRx), util.BytesToSize(u.FrontendTx))
 	out += ", " + fmt.Sprintf("be {rx %v, tx %v}", util.BytesToSize(u.BackendRx), util.BytesToSize(u.BackendTx))
 	out += "}"
